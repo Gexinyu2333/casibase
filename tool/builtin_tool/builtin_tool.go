@@ -54,7 +54,6 @@ func (r *ToolRegistry) GetAllTools() map[string]BuiltinTool {
 func (r *ToolRegistry) GetToolsAsProtocolTools() []*protocol.Tool {
 	var tools []*protocol.Tool
 	for _, tool := range r.tools {
-		// InputSchema to protocol.InputSchema
 		schemaInterface := tool.GetInputSchema()
 		schemaBytes, err := json.Marshal(schemaInterface)
 		if err != nil {

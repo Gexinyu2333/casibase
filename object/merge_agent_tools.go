@@ -16,13 +16,12 @@ package object
 
 import (
 	"github.com/the-open-agent/openagent/agent"
-	"github.com/the-open-agent/openagent/agent/builtin_tool"
 	"github.com/the-open-agent/openagent/tool"
 	"github.com/the-open-agent/openagent/util"
 )
 
-func buildMergedBuiltinRegistry(store *Store, lang string) *builtin_tool.ToolRegistry {
-	reg := builtin_tool.NewToolRegistry()
+func buildMergedBuiltinRegistry(store *Store, lang string) *tool.ToolRegistry {
+	reg := tool.NewToolRegistry()
 
 	if store == nil {
 		return reg

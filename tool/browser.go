@@ -23,7 +23,6 @@ import (
 
 	"github.com/ThinkInAIXYZ/go-mcp/protocol"
 	"github.com/chromedp/chromedp"
-	"github.com/the-open-agent/openagent/agent/builtin_tool"
 	"github.com/the-open-agent/openagent/proxy"
 	"golang.org/x/net/html"
 )
@@ -43,8 +42,8 @@ func NewBrowserTool(config Config) (*BrowserTool, error) {
 	return &BrowserTool{enableProxy: config.EnableProxy}, nil
 }
 
-func (p *BrowserTool) BuiltinTools() []builtin_tool.BuiltinTool {
-	return []builtin_tool.BuiltinTool{
+func (p *BrowserTool) BuiltinTools() []BuiltinTool {
+	return []BuiltinTool{
 		&browserNavigateBuiltin{enableProxy: p.enableProxy},
 		&browserScreenshotBuiltin{enableProxy: p.enableProxy},
 		&browserEvaluateBuiltin{enableProxy: p.enableProxy},

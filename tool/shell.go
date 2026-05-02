@@ -24,14 +24,13 @@ import (
 	"time"
 
 	"github.com/ThinkInAIXYZ/go-mcp/protocol"
-	"github.com/the-open-agent/openagent/agent/builtin_tool"
 )
 
 // ShellTool is the Tool Type "shell".
 type ShellTool struct{}
 
-func (p *ShellTool) BuiltinTools() []builtin_tool.BuiltinTool {
-	return []builtin_tool.BuiltinTool{&shellBuiltin{}}
+func (p *ShellTool) BuiltinTools() []BuiltinTool {
+	return []BuiltinTool{&shellBuiltin{}}
 }
 
 type shellBuiltin struct{}

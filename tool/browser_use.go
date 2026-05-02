@@ -35,7 +35,6 @@ import (
 	"github.com/chromedp/cdproto/target"
 	"github.com/chromedp/chromedp"
 	"github.com/chromedp/chromedp/kb"
-	"github.com/the-open-agent/openagent/agent/builtin_tool"
 	"github.com/the-open-agent/openagent/proxy"
 )
 
@@ -71,8 +70,8 @@ func NewBrowserUseTool(config Config) (*BrowserUseTool, error) {
 	}, nil
 }
 
-func (p *BrowserUseTool) BuiltinTools() []builtin_tool.BuiltinTool {
-	return []builtin_tool.BuiltinTool{
+func (p *BrowserUseTool) BuiltinTools() []BuiltinTool {
+	return []BuiltinTool{
 		&browserUseOpenBuiltin{provider: p},
 		&browserUseSnapshotBuiltin{provider: p},
 		&browserUseClickBuiltin{provider: p},

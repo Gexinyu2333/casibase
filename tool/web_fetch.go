@@ -23,7 +23,6 @@ import (
 	"time"
 
 	"github.com/ThinkInAIXYZ/go-mcp/protocol"
-	"github.com/the-open-agent/openagent/agent/builtin_tool"
 	"github.com/the-open-agent/openagent/proxy"
 	"golang.org/x/net/html"
 )
@@ -54,8 +53,8 @@ func NewWebFetchTool(config Config) (*WebFetchTool, error) {
 	return &WebFetchTool{httpClient: httpClient}, nil
 }
 
-func (p *WebFetchTool) BuiltinTools() []builtin_tool.BuiltinTool {
-	return []builtin_tool.BuiltinTool{&webFetchBuiltin{httpClient: p.httpClient}}
+func (p *WebFetchTool) BuiltinTools() []BuiltinTool {
+	return []BuiltinTool{&webFetchBuiltin{httpClient: p.httpClient}}
 }
 
 type webFetchBuiltin struct {

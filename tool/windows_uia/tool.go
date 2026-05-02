@@ -22,7 +22,7 @@ import (
 	"path/filepath"
 
 	"github.com/ThinkInAIXYZ/go-mcp/protocol"
-	"github.com/the-open-agent/openagent/agent/builtin_tool"
+	"github.com/the-open-agent/openagent/tool/builtin_tool"
 )
 
 // BuiltinTools returns all Windows UIA builtin tools.

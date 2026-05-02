@@ -17,13 +17,12 @@ package tool
 import (
 	"fmt"
 
-	"github.com/the-open-agent/openagent/agent/builtin_tool"
 	"github.com/the-open-agent/openagent/i18n"
 )
 
 // Tool supplies LLM-callable tools.
 type Tool interface {
-	BuiltinTools() []builtin_tool.BuiltinTool
+	BuiltinTools() []BuiltinTool
 }
 
 // Config contains the fields needed to construct builtin tools.

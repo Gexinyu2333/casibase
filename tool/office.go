@@ -19,7 +19,6 @@ import (
 	"path/filepath"
 
 	"github.com/ThinkInAIXYZ/go-mcp/protocol"
-	"github.com/the-open-agent/openagent/agent/builtin_tool"
 )
 
 // resolveOutputPath returns path unchanged if it is absolute.
@@ -58,7 +57,7 @@ const (
 )
 
 // allOfficeTools is the full ordered list returned when SubType is "All".
-var allOfficeTools = []builtin_tool.BuiltinTool{
+var allOfficeTools = []BuiltinTool{
 	&wordReadBuiltin{},
 	&wordWriteBuiltin{},
 	&excelReadBuiltin{},
@@ -68,7 +67,7 @@ var allOfficeTools = []builtin_tool.BuiltinTool{
 }
 
 // officeToolBySubType maps each specific SubType to its single tool.
-var officeToolBySubType = map[officeSubType]builtin_tool.BuiltinTool{
+var officeToolBySubType = map[officeSubType]BuiltinTool{
 	officeSubTypeWordRead:        &wordReadBuiltin{},
 	officeSubTypeWordWrite:       &wordWriteBuiltin{},
 	officeSubTypeExcelRead:       &excelReadBuiltin{},
@@ -85,12 +84,12 @@ type OfficeTool struct {
 	subType officeSubType
 }
 
-func (p *OfficeTool) BuiltinTools() []builtin_tool.BuiltinTool {
+func (p *OfficeTool) BuiltinTools() []BuiltinTool {
 	if p.subType == officeSubTypeAll || p.subType == "" {
 		return allOfficeTools
 	}
 	if t, ok := officeToolBySubType[p.subType]; ok {
-		return []builtin_tool.BuiltinTool{t}
+		return []BuiltinTool{t}
 	}
 	return allOfficeTools
 }

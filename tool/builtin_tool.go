@@ -1,4 +1,4 @@
-// Copyright 2026 The OpenAgent Authors. All Rights Reserved.
+// Copyright 2025 The OpenAgent Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,17 +14,13 @@
 
 package tool
 
-import (
-	windowsuia "github.com/the-open-agent/openagent/tool/windows_uia"
-)
+import "github.com/the-open-agent/openagent/tool/builtin_tool"
 
-// WindowsUiaTool implements the Windows UI Automation tool (Type "gui", SubType "Windows UIA").
-type WindowsUiaTool struct{}
+// Type aliases so callers can use tool.BuiltinTool and tool.ToolRegistry
+// without importing the sub-package directly.
+type BuiltinTool = builtin_tool.BuiltinTool
+type ToolRegistry = builtin_tool.ToolRegistry
 
-func NewWindowsUiaTool(_ Config) (*WindowsUiaTool, error) {
-	return &WindowsUiaTool{}, nil
-}
-
-func (t *WindowsUiaTool) BuiltinTools() []BuiltinTool {
-	return windowsuia.BuiltinTools()
+func NewToolRegistry() *ToolRegistry {
+	return builtin_tool.NewToolRegistry()
 }

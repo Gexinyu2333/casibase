@@ -17,12 +17,12 @@ package agent
 import (
 	"github.com/ThinkInAIXYZ/go-mcp/client"
 	"github.com/ThinkInAIXYZ/go-mcp/protocol"
-	"github.com/the-open-agent/openagent/agent/builtin_tool"
+	"github.com/the-open-agent/openagent/tool"
 )
 
 type AgentClients struct {
 	Clients          map[string]*client.Client
 	Tools            []*protocol.Tool
-	BuiltinToolReg   *builtin_tool.ToolRegistry
+	BuiltinToolReg   *tool.ToolRegistry
 	WebSearchEnabled bool
 }

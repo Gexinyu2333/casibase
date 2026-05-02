@@ -20,14 +20,13 @@ import (
 	stdtime "time"
 
 	"github.com/ThinkInAIXYZ/go-mcp/protocol"
-	"github.com/the-open-agent/openagent/agent/builtin_tool"
 )
 
 // TimeTool is the Tool Type "time".
 type TimeTool struct{}
 
-func (p *TimeTool) BuiltinTools() []builtin_tool.BuiltinTool {
-	return []builtin_tool.BuiltinTool{&timeBuiltin{}}
+func (p *TimeTool) BuiltinTools() []BuiltinTool {
+	return []BuiltinTool{&timeBuiltin{}}
 }
 
 type timeBuiltin struct{}

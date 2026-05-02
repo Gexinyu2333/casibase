@@ -30,7 +30,6 @@ import (
 	"time"
 
 	"github.com/ThinkInAIXYZ/go-mcp/protocol"
-	"github.com/the-open-agent/openagent/agent/builtin_tool"
 	"github.com/the-open-agent/openagent/proxy"
 )
 
@@ -47,8 +46,8 @@ func NewVideoDownloadTool(_ Config) (*VideoDownloadTool, error) {
 	return &VideoDownloadTool{ytDlpPath: ytDlpPath}, nil
 }
 
-func (p *VideoDownloadTool) BuiltinTools() []builtin_tool.BuiltinTool {
-	return []builtin_tool.BuiltinTool{
+func (p *VideoDownloadTool) BuiltinTools() []BuiltinTool {
+	return []BuiltinTool{
 		&videoDownloadBuiltin{ytDlpPath: p.ytDlpPath},
 		&videoInfoBuiltin{ytDlpPath: p.ytDlpPath},
 		&videoAudioExtractBuiltin{ytDlpPath: p.ytDlpPath},

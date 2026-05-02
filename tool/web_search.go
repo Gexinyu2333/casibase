@@ -27,7 +27,6 @@ import (
 	"time"
 
 	"github.com/ThinkInAIXYZ/go-mcp/protocol"
-	"github.com/the-open-agent/openagent/agent/builtin_tool"
 	"github.com/the-open-agent/openagent/proxy"
 	"golang.org/x/net/html"
 )
@@ -66,8 +65,8 @@ func NewWebSearchTool(config Config) (*WebSearchTool, error) {
 	}, nil
 }
 
-func (p *WebSearchTool) BuiltinTools() []builtin_tool.BuiltinTool {
-	return []builtin_tool.BuiltinTool{&webSearchBuiltin{
+func (p *WebSearchTool) BuiltinTools() []BuiltinTool {
+	return []BuiltinTool{&webSearchBuiltin{
 		engine:         p.engine,
 		apiKey:         p.apiKey,
 		searchEngineID: p.searchEngineID,

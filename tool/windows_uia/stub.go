@@ -16,7 +16,7 @@
 
 package windowsuia
 
-import "github.com/the-open-agent/openagent/agent/builtin_tool"
+import "github.com/the-open-agent/openagent/tool/builtin_tool"
 
 // BuiltinTools returns nil on non-Windows platforms; Windows UIA is not supported.
 func BuiltinTools() []builtin_tool.BuiltinTool {
