@@ -1,4 +1,4 @@
-// Copyright 2023 The OpenAgent Authors. All Rights Reserved.
+// Copyright 2025 The OpenAgent Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
 
 import * as Setting from "../Setting";
 
-export function getGlobalProviders() {
-  return fetch(`${Setting.ServerUrl}/api/get-global-providers`, {
+export function getServers(owner, page = "", pageSize = "", field = "", value = "", sortField = "", sortOrder = "") {
+  return fetch(`${Setting.ServerUrl}/api/get-servers?owner=${owner}&p=${page}&pageSize=${pageSize}&field=${field}&value=${value}&sortField=${sortField}&sortOrder=${sortOrder}`, {
     method: "GET",
     credentials: "include",
     headers: {
@@ -24,8 +24,8 @@ export function getGlobalProviders() {
   }).then(res => Setting.handleFetchResponse(res));
 }
 
-export function getProviders(owner, storeName = "", page = "", pageSize = "", field = "", value = "", sortField = "", sortOrder = "") {
-  return fetch(`${Setting.ServerUrl}/api/get-providers?owner=${owner}&store=${storeName}&p=${page}&pageSize=${pageSize}&field=${field}&value=${value}&sortField=${sortField}&sortOrder=${sortOrder}`, {
+export function getServer(owner, name) {
+  return fetch(`${Setting.ServerUrl}/api/get-server?id=${owner}/${encodeURIComponent(name)}`, {
     method: "GET",
     credentials: "include",
     headers: {
@@ -34,70 +34,62 @@ export function getProviders(owner, storeName = "", page = "", pageSize = "", fi
   }).then(res => Setting.handleFetchResponse(res));
 }
 
-export function getProvider(owner, name) {
-  return fetch(`${Setting.ServerUrl}/api/get-provider?id=${owner}/${encodeURIComponent(name)}`, {
-    method: "GET",
-    credentials: "include",
-    headers: {
-      "Accept-Language": Setting.getAcceptLanguage(),
-    },
-  }).then(res => Setting.handleFetchResponse(res));
-}
-
-export function updateProvider(owner, name, provider) {
-  const newProvider = Setting.deepCopy(provider);
-  return fetch(`${Setting.ServerUrl}/api/update-provider?id=${owner}/${encodeURIComponent(name)}`, {
+export function updateServer(owner, name, server) {
+  const newServer = Setting.deepCopy(server);
+  return fetch(`${Setting.ServerUrl}/api/update-server?id=${owner}/${encodeURIComponent(name)}`, {
     method: "POST",
     credentials: "include",
     headers: {
       "Accept-Language": Setting.getAcceptLanguage(),
     },
-    body: JSON.stringify(newProvider),
+    body: JSON.stringify(newServer),
   }).then(res => Setting.handleFetchResponse(res));
 }
 
-export function addProvider(provider) {
-  const newProvider = Setting.deepCopy(provider);
-  return fetch(`${Setting.ServerUrl}/api/add-provider`, {
+export function addServer(server) {
+  const newServer = Setting.deepCopy(server);
+  return fetch(`${Setting.ServerUrl}/api/add-server`, {
     method: "POST",
     credentials: "include",
     headers: {
       "Accept-Language": Setting.getAcceptLanguage(),
     },
-    body: JSON.stringify(newProvider),
+    body: JSON.stringify(newServer),
   }).then(res => Setting.handleFetchResponse(res));
 }
 
-export function deleteProvider(provider) {
-  const newProvider = Setting.deepCopy(provider);
-  return fetch(`${Setting.ServerUrl}/api/delete-provider`, {
+export function deleteServer(server) {
+  const newServer = Setting.deepCopy(server);
+  return fetch(`${Setting.ServerUrl}/api/delete-server`, {
     method: "POST",
     credentials: "include",
     headers: {
       "Accept-Language": Setting.getAcceptLanguage(),
     },
-    body: JSON.stringify(newProvider),
+    body: JSON.stringify(newServer),
   }).then(res => Setting.handleFetchResponse(res));
 }
 
-export function testTool(provider) {
-  const newProvider = Setting.deepCopy(provider);
-  return fetch(`${Setting.ServerUrl}/api/test-tool`, {
+export function refreshServerMcpTools(server) {
+  const newServer = Setting.deepCopy(server);
+  return fetch(`${Setting.ServerUrl}/api/refresh-server-mcp-tools`, {
     method: "POST",
     credentials: "include",
     headers: {
       "Accept-Language": Setting.getAcceptLanguage(),
     },
-    body: JSON.stringify(newProvider),
+    body: JSON.stringify(newServer),
   }).then(res => Setting.handleFetchResponse(res));
 }
 
-export function setTelegramWebhook(id) {
-  return fetch(`${Setting.ServerUrl}/api/set-telegram-webhook?id=${encodeURIComponent(id)}`, {
+export function testMcpServer(server) {
+  const newServer = Setting.deepCopy(server);
+  return fetch(`${Setting.ServerUrl}/api/test-mcp-server`, {
     method: "POST",
     credentials: "include",
     headers: {
       "Accept-Language": Setting.getAcceptLanguage(),
     },
+    body: JSON.stringify(newServer),
   }).then(res => Setting.handleFetchResponse(res));
 }

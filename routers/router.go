@@ -81,10 +81,16 @@ func initAPI() {
 	beego.Router("/api/update-provider", &controllers.ApiController{}, "POST:UpdateProvider")
 	beego.Router("/api/add-provider", &controllers.ApiController{}, "POST:AddProvider")
 	beego.Router("/api/delete-provider", &controllers.ApiController{}, "POST:DeleteProvider")
-	beego.Router("/api/refresh-mcp-tools", &controllers.ApiController{}, "POST:RefreshMcpTools")
-	beego.Router("/api/test-mcp-provider", &controllers.ApiController{}, "POST:TestMcpProvider")
 	beego.Router("/api/set-telegram-webhook", &controllers.ApiController{}, "POST:SetTelegramWebhook")
 	beego.Router("/webhook/telegram/:providerName", &controllers.ApiController{}, "POST:TelegramWebhook")
+
+	beego.Router("/api/get-servers", &controllers.ApiController{}, "GET:GetServers")
+	beego.Router("/api/get-server", &controllers.ApiController{}, "GET:GetServer")
+	beego.Router("/api/update-server", &controllers.ApiController{}, "POST:UpdateServer")
+	beego.Router("/api/add-server", &controllers.ApiController{}, "POST:AddServer")
+	beego.Router("/api/delete-server", &controllers.ApiController{}, "POST:DeleteServer")
+	beego.Router("/api/refresh-server-mcp-tools", &controllers.ApiController{}, "POST:RefreshServerMcpTools")
+	beego.Router("/api/test-mcp-server", &controllers.ApiController{}, "POST:TestMcpServer")
 
 	beego.Router("/api/get-global-tools", &controllers.ApiController{}, "GET:GetGlobalTools")
 	beego.Router("/api/get-tools", &controllers.ApiController{}, "GET:GetTools")

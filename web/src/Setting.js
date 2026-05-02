@@ -1093,16 +1093,6 @@ export function getOtherProviderInfo() {
         url: "https://www.alibabacloud.com/",
       },
     },
-    Agent: {
-      "MCP": {
-        logo: `${StaticBaseUrl}/img/social_mcp.png`,
-        url: "https://modelcontextprotocol.io/",
-      },
-      "A2A": {
-        logo: `${StaticBaseUrl}/img/social_a2a.png`,
-        url: "https://agent2agent.info/",
-      },
-    },
     Tool: {
       time: {
         logo: `${StaticBaseUrl}/img/social_mcp.png`,
@@ -1450,11 +1440,6 @@ export function getProviderTypeOptions(category) {
         {id: "Dummy", name: "Dummy"},
       ]
     );
-  } else if (category === "Agent") {
-    return ([
-      {id: "MCP", name: "MCP"},
-      {id: "A2A", name: "A2A"},
-    ]);
   } else if (category === "Tool") {
     return [
       {id: "time", name: "time"},
@@ -2197,17 +2182,6 @@ export function getProviderSubTypeOptions(category, type) {
     return getModelSubTypeOptions(type);
   } else if (category === "Embedding") {
     return getEmbeddingSubTypeOptions(type);
-  } else if (category === "Agent") {
-    if (type === "MCP") {
-      return [
-        {id: "Default", name: "Default"},
-      ];
-    } else if (type === "A2A") {
-      return [
-        {id: "Default", name: "Default"},
-      ];
-    }
-    return [];
   } else if (category === "Tool") {
     if (type === "time") {
       return [
@@ -2840,7 +2814,7 @@ export function getFormTypeItems(formType) {
       {name: "embeddingProvider", label: "store:Embedding provider", visible: true, width: "300"},
       {name: "textToSpeechProvider", label: "store:Text-to-Speech provider", visible: true, width: "300"},
       {name: "speechToTextProvider", label: "store:Speech-to-Text provider", visible: true, width: "200"},
-      {name: "agentProvider", label: "store:Agent provider", visible: true, width: "250"},
+      {name: "mcpServer", label: "store:MCP server", visible: true, width: "250"},
       {name: "tools", label: "general:Tools", visible: true, width: "280"},
       {name: "memoryLimit", label: "store:Memory limit", visible: true, width: "120"},
       {name: "state", label: "general:State", visible: true, width: "90"},

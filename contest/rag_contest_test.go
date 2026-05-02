@@ -140,7 +140,7 @@ func createStore(paperId string) (*object.Store, error) {
 		SearchProvider:       "Hierarchy",
 		TextToSpeechProvider: "Browser Built-In",
 		SpeechToTextProvider: "Browser Built-In",
-		AgentProvider:        "",
+		McpServer:            "",
 		Frequency:            10000,
 		MemoryLimit:          10,
 		LimitMinutes:         15,

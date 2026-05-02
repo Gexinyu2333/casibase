@@ -21,7 +21,6 @@ import * as Setting from "./Setting";
 import i18next from "i18next";
 import copy from "copy-to-clipboard";
 import FileSaver from "file-saver";
-import McpToolsTable from "./table/McpToolsTable";
 import ModelTestWidget from "./common/TestModelWidget";
 import TtsTestWidget from "./common/TestTtsWidget";
 import EmbedTestWidget from "./common/TestEmbedWidget";
@@ -41,7 +40,6 @@ class ProviderEditPage extends React.Component {
       provider: null,
       originalProvider: null,
       modelProviders: [],
-      refreshButtonLoading: false,
       isNewProvider: props.location?.state?.isNewProvider || false,
     };
   }
@@ -188,14 +186,13 @@ class ProviderEditPage extends React.Component {
         (provider.category === "Storage" && provider.type !== "OpenAI File System")) ||
       (provider.category === "Blockchain" && !["ChainMaker", "Ethereum"].includes(provider.type)) ||
       ((provider.category === "Model" || provider.category === "Embedding") && provider.type === "Azure") ||
-      (!(["Storage", "Model", "Embedding", "Text-to-Speech", "Speech-to-Text", "Agent", "Blockchain", "Chat"].includes(provider.category)))
+      (!(["Storage", "Model", "Embedding", "Text-to-Speech", "Speech-to-Text", "Blockchain", "Chat"].includes(provider.category)))
     );
   }
 
   shouldShowClientSecretInput(provider) {
     return !(
       (provider.category === "Storage" && provider.type !== "OpenAI File System") ||
-      (provider.category === "Agent" && provider.type === "MCP") ||
       (provider.category === "Blockchain" && provider.type === "ChainMaker") ||
       provider.category === "Scan" ||
       provider.type === "Dummy" ||
@@ -219,22 +216,6 @@ class ProviderEditPage extends React.Component {
       value = Setting.myParseFloat(value);
     }
     return value;
-  }
-
-  parseMcpToolsField(key, value) {
-    if ([""].includes(key)) {
-      value = Setting.myParseInt(value);
-    }
-    return value;
-  }
-
-  updateMcpToolsField(key, value) {
-    value = this.parseMcpToolsField(key, value);
-    const provider = this.state.provider;
-    provider[key] = value;
-    this.setState({
-      provider: provider,
-    });
   }
 
   updateProviderField(key, value) {
@@ -385,9 +366,6 @@ class ProviderEditPage extends React.Component {
               } else if (value === "Embedding") {
                 this.updateProviderField("type", "OpenAI");
                 this.updateProviderField("subType", "AdaSimilarity");
-              } else if (value === "Agent") {
-                this.updateProviderField("type", "MCP");
-                this.updateProviderField("subType", "Default");
               } else if (value === "Video") {
                 this.updateProviderField("type", "AWS");
               } else if (value === "Text-to-Speech") {
@@ -413,7 +391,6 @@ class ProviderEditPage extends React.Component {
                   {id: "Storage", name: "Storage"},
                   {id: "Model", name: "Model"},
                   {id: "Embedding", name: "Embedding"},
-                  {id: "Agent", name: "Agent"},
                   {id: "Public Cloud", name: "Public Cloud"},
                   {id: "Private Cloud", name: "Private Cloud"},
                   {id: "Blockchain", name: "Blockchain"},
@@ -509,12 +486,6 @@ class ProviderEditPage extends React.Component {
                 } else if (value === "Dummy") {
                   this.updateProviderField("subType", "Dummy");
                 }
-              } else if (this.state.provider.category === "Agent") {
-                if (value === "MCP") {
-                  this.updateProviderField("subType", "Default");
-                } else if (value === "A2A") {
-                  this.updateProviderField("subType", "Default");
-                }
               } else if (this.state.provider.category === "Text-to-Speech") {
                 if (value === "Alibaba Cloud") {
                   this.updateProviderField("subType", "cosyvoice-v1");
@@ -546,7 +517,7 @@ class ProviderEditPage extends React.Component {
           </Col>
         </Row>
         {
-          !["Model", "Embedding", "Agent", "Text-to-Speech", "Speech-to-Text", "Bot"].includes(this.state.provider.category) ? null : (
+          !["Model", "Embedding", "Text-to-Speech", "Speech-to-Text", "Bot"].includes(this.state.provider.category) ? null : (
             <Row style={{marginTop: "20px"}} >
               <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
                 {Setting.getLabel(i18next.t("provider:Sub type"), i18next.t("provider:Sub type - Tooltip"))} :
@@ -816,53 +787,7 @@ class ProviderEditPage extends React.Component {
           ) : null
         }
         {
-          !["Agent"].includes(this.state.provider.category) ? null : (
-            <>
-              <Row style={{marginTop: "20px"}} >
-                <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-                  {Setting.getLabel(i18next.t("provider:MCP servers"), i18next.t("provider:MCP servers - Tooltip"))} :
-                </Col>
-                <Col span={10} >
-                  <div style={{height: "500px"}}>
-                    <Editor
-                      editable={!isRemote}
-                      value={this.state.provider.text}
-                      lang="json"
-                      fillHeight
-                      dark
-                      onChange={value => {
-                        this.updateProviderField("text", value);
-                      }}
-                    />
-                  </div>
-                  <br />
-                  <Button disabled={isRemote} loading={this.state.refreshButtonLoading} style={{marginBottom: "10px"}} type="primary" onClick={() => {
-                    this.refreshMcpTools();
-                  }}
-                  >
-                    {i18next.t("provider:Refresh MCP tools")}
-                  </Button>
-                </Col>
-              </Row>
-              <Row style={{marginTop: "20px"}} >
-                <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-                  {Setting.getLabel(i18next.t("provider:MCP tools"), i18next.t("provider:MCP tools - Tooltip"))} :
-                </Col>
-                <Col span={22}>
-                  <McpToolsTable
-                    title={i18next.t("provider:MCP tools")}
-                    table={this.state.provider.mcpTools}
-                    onUpdateTable={(value) => {
-                      this.updateMcpToolsField("mcpTools", value);
-                    }}
-                  />
-                </Col>
-              </Row>
-            </>
-          )
-        }
-        {
-          ["Storage", "Model", "Embedding", "Agent", "Text-to-Speech", "Speech-to-Text", "Scan"].includes(this.state.provider.category) || (this.state.provider.category === "Blockchain" && this.state.provider.type === "Ethereum") || (this.state.provider.category === "Private Cloud" && this.state.provider.type === "Kubernetes") ? null : (
+          ["Storage", "Model", "Embedding", "Text-to-Speech", "Speech-to-Text", "Scan"].includes(this.state.provider.category) || (this.state.provider.category === "Blockchain" && this.state.provider.type === "Ethereum") || (this.state.provider.category === "Private Cloud" && this.state.provider.type === "Kubernetes") ? null : (
             <Row style={{marginTop: "20px"}} >
               <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
                 {this.getRegionLabel(this.state.provider)} :
@@ -1374,39 +1299,6 @@ class ProviderEditPage extends React.Component {
       })
       .catch((error) => {
         Setting.showMessage("error", `${i18next.t("general:Failed to save")}: ${error}`);
-      });
-  }
-
-  refreshMcpTools() {
-    this.setState({
-      refreshButtonLoading: true,
-    });
-    const provider = Setting.deepCopy(this.state.provider);
-    provider.mcpTools = [];
-    ProviderBackend.refreshMcpTools(provider)
-      .then((res) => {
-        if (res.status === "ok") {
-          Setting.showMessage("success", i18next.t("general:Successfully saved"));
-          this.setState({
-            provider: res.data,
-          }, () => {
-            this.submitProviderEdit(false);
-          });
-        } else {
-          Setting.showMessage("error", `${i18next.t("general:Failed to save")}: ${res.msg}`);
-          this.setState({
-            provider: provider,
-          });
-        }
-      })
-      .catch((error) => {
-        Setting.showMessage("error", `${i18next.t("general:Failed to save")}: ${error}`);
-        this.setState({
-          provider: provider,
-        });
-      })
-      .finally(() => {
-        this.setState({refreshButtonLoading: false});
       });
   }
 

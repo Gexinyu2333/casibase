@@ -176,8 +176,8 @@ func SyncDefaultProvidersToStore(store *Store) error {
 	if store.SpeechToTextProvider == "Browser Built-In" && defaultStore.SpeechToTextProvider != "" {
 		store.SpeechToTextProvider = defaultStore.SpeechToTextProvider
 	}
-	if store.AgentProvider == "" && defaultStore.AgentProvider != "" {
-		store.AgentProvider = defaultStore.AgentProvider
+	if store.McpServer == "" && defaultStore.McpServer != "" {
+		store.McpServer = defaultStore.McpServer
 	}
 
 	return nil

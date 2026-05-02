@@ -18,6 +18,7 @@ import {Avatar, Button, Card, Cascader, Col, Input, InputNumber, Modal, Row, Sel
 import * as StoreBackend from "./backend/StoreBackend";
 import * as StorageProviderBackend from "./backend/StorageProviderBackend";
 import * as ProviderBackend from "./backend/ProviderBackend";
+import * as ServerBackend from "./backend/ServerBackend";
 import * as ToolBackend from "./backend/ToolBackend";
 import * as OrganizationUserBackend from "./backend/OrganizationUserBackend";
 import * as Setting from "./Setting";
@@ -45,7 +46,7 @@ class StoreEditPage extends React.Component {
       embeddingProviders: [],
       textToSpeechProviders: [],
       speechToTextProviders: [],
-      agentProviders: [],
+      mcpServers: [],
       tools: [],
       builtinTools: [],
       enableTtsStreaming: false,
@@ -61,6 +62,7 @@ class StoreEditPage extends React.Component {
     this.getStores();
     this.getStorageProviders();
     this.getProviders();
+    this.getMcpServers();
     this.getTools();
   }
 
@@ -163,8 +165,18 @@ class StoreEditPage extends React.Component {
             embeddingProviders: res.data.filter(provider => provider.category === "Embedding"),
             textToSpeechProviders: res.data.filter(provider => provider.category === "Text-to-Speech"),
             speechToTextProviders: res.data.filter(provider => provider.category === "Speech-to-Text"),
-            agentProviders: res.data.filter(provider => provider.category === "Agent"),
           });
+        } else {
+          Setting.showMessage("error", `${i18next.t("general:Failed to get")}: ${res.msg}`);
+        }
+      });
+  }
+
+  getMcpServers() {
+    ServerBackend.getServers(this.props.account.name)
+      .then((res) => {
+        if (res.status === "ok") {
+          this.setState({mcpServers: res.data});
         } else {
           Setting.showMessage("error", `${i18next.t("general:Failed to get")}: ${res.msg}`);
         }
@@ -530,13 +542,15 @@ class StoreEditPage extends React.Component {
             </Row>
             <Row style={{marginTop: "20px"}} >
               <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-                {Setting.getLabel(i18next.t("store:Agent provider"), i18next.t("store:Agent provider - Tooltip"))} :
+                {Setting.getLabel(i18next.t("store:MCP server"), i18next.t("store:MCP server - Tooltip"))} :
               </Col>
               <Col span={22} >
-                <Select virtual={false} style={{width: "100%"}} value={this.state.store.agentProvider} onChange={(value => {this.updateStoreField("agentProvider", value);})}>
+                <Select virtual={false} style={{width: "100%"}} value={this.state.store.mcpServer} onChange={(value => {this.updateStoreField("mcpServer", value);})}>
                   <Option key="Empty" value="">{i18next.t("general:empty")}</Option>
                   {
-                    this.state.agentProviders.map((provider, index) => this.renderProviderOption(provider, index))
+                    this.state.mcpServers.map((server, index) => (
+                      <Option key={index} value={server.name}>{server.displayName || server.name}</Option>
+                    ))
                   }
                 </Select>
               </Col>

@@ -176,13 +176,7 @@ func (c *ApiController) GetMessageAnswer() {
 		return
 	}
 
-	_, agentProviderObj, err := object.GetAgentProviderFromContext(store.Owner, store.AgentProvider, c.GetAcceptLanguage())
-	if err != nil {
-		c.ResponseErrorStream(message, err.Error())
-		return
-	}
-
-	agentClients, err := object.GetAgentClients(agentProviderObj)
+	agentClients, err := object.GetMcpAgentClientsFromContext(store.Owner, store.McpServer, c.GetAcceptLanguage())
 	if err != nil {
 		c.ResponseErrorStream(message, err.Error())
 		return

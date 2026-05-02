@@ -16,13 +16,12 @@ import React from "react";
 import {Button, Col, Row} from "antd";
 import * as Setting from "../Setting";
 import i18next from "i18next";
-import * as ProviderBackend from "../backend/ProviderBackend";
-import {checkProvider} from "./ProviderWidget";
+import * as ServerBackend from "../backend/ServerBackend";
 import Editor from "./Editor";
 
-function buildDefaultMcpTestJson(provider) {
-  if (provider.mcpTools && provider.mcpTools.length > 0) {
-    const mt = provider.mcpTools.find(t => t.isEnabled !== false) || provider.mcpTools[0];
+function buildDefaultMcpTestJson(server) {
+  if (server.mcpTools && server.mcpTools.length > 0) {
+    const mt = server.mcpTools.find(t => t.isEnabled !== false) || server.mcpTools[0];
     try {
       const tools = JSON.parse(mt.tools || "[]");
       if (tools.length > 0 && tools[0].name) {
@@ -30,7 +29,7 @@ function buildDefaultMcpTestJson(provider) {
         return JSON.stringify({tool: toolId, arguments: {}}, null, 2);
       }
     } catch (e) {
-      // ignore parse errors, fall through
+      // ignore
     }
   }
   return "{\n  \"tool\": \"serverName__toolName\",\n  \"arguments\": {}\n}";
@@ -46,37 +45,33 @@ class TestMcpWidget extends React.Component {
   }
 
   componentDidMount() {
-    this.syncFromProvider(this.props.provider, null);
+    this.syncFromServer(this.props.server, null);
   }
 
   componentDidUpdate(prevProps) {
-    const {provider} = this.props;
-    if (provider !== prevProps.provider) {
-      this.syncFromProvider(provider, prevProps.provider);
+    const {server} = this.props;
+    if (server !== prevProps.server) {
+      this.syncFromServer(server, prevProps.server);
     }
   }
 
-  syncFromProvider(provider, prevProvider) {
-    const {onUpdateProvider} = this.props;
-    if (!provider || provider.category !== "Agent" || provider.type !== "MCP") {
+  syncFromServer(server, prevServer) {
+    const {onUpdateServer} = this.props;
+    if (!server) {
       return;
     }
-    if (!provider.testContent || provider.testContent.trim() === "") {
-      const def = buildDefaultMcpTestJson(provider);
-      if (onUpdateProvider) {
-        onUpdateProvider("testContent", def);
+    if (!server.testContent || server.testContent.trim() === "") {
+      const def = buildDefaultMcpTestJson(server);
+      if (onUpdateServer) {
+        onUpdateServer("testContent", def);
       }
-    }
-    const prevSummary = prevProvider ? prevProvider.resultSummary : null;
-    if (provider.resultSummary && provider.resultSummary !== prevSummary) {
-      this.setState({testResult: provider.resultSummary});
     }
   }
 
-  async sendTestMcp(provider, originalProvider) {
+  async sendTestMcp(server) {
     let parsed;
     try {
-      parsed = JSON.parse(provider.testContent);
+      parsed = JSON.parse(server.testContent);
     } catch (e) {
       Setting.showMessage("error", `${i18next.t("provider:Invalid MCP test JSON")}: ${e.message}`);
       return;
@@ -86,16 +81,14 @@ class TestMcpWidget extends React.Component {
       return;
     }
 
-    await checkProvider(provider, originalProvider);
     this.setState({testButtonLoading: true, testResult: ""});
 
     try {
-      const res = await ProviderBackend.testMcpProvider(provider);
+      const res = await ServerBackend.testMcpServer(server);
       if (res.status === "ok") {
         const out = typeof res.data === "string" ? res.data : JSON.stringify(res.data, null, 2);
         this.setState({testResult: out});
         Setting.showMessage("success", i18next.t("general:Success"));
-        await ProviderBackend.updateProvider(provider.owner, provider.name, {...provider, resultSummary: out, errorText: ""});
       } else {
         Setting.showMessage("error", res.msg || i18next.t("general:Failed to save"));
       }
@@ -107,9 +100,9 @@ class TestMcpWidget extends React.Component {
   }
 
   render() {
-    const {provider, originalProvider, onUpdateProvider} = this.props;
+    const {server, onUpdateServer} = this.props;
 
-    if (!provider || provider.category !== "Agent" || provider.type !== "MCP") {
+    if (!server) {
       return null;
     }
 
@@ -121,11 +114,11 @@ class TestMcpWidget extends React.Component {
           </Col>
           <Col span={10} >
             <Editor
-              value={provider.testContent}
+              value={server.testContent}
               lang="json"
               height="150px"
               dark
-              onChange={value => {onUpdateProvider("testContent", value);}}
+              onChange={value => {onUpdateServer("testContent", value);}}
             />
           </Col>
           <Col span={6} >
@@ -133,8 +126,8 @@ class TestMcpWidget extends React.Component {
               style={{marginLeft: "10px", marginBottom: "5px"}}
               type="primary"
               loading={this.state.testButtonLoading}
-              disabled={!provider.testContent || provider.testContent.trim() === ""}
-              onClick={() => this.sendTestMcp(provider, originalProvider)}
+              disabled={!server.testContent || server.testContent.trim() === ""}
+              onClick={() => this.sendTestMcp(server)}
             >
               {i18next.t("provider:Invoke MCP tool")}
             </Button>

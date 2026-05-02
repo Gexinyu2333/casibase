@@ -54,7 +54,7 @@ func initBuiltInStore(modelProviderName string, embeddingProviderName string, tt
 		SplitProvider:        "Default",
 		ModelProvider:        modelProviderName,
 		EmbeddingProvider:    embeddingProviderName,
-		AgentProvider:        "",
+		McpServer:            "",
 		TextToSpeechProvider: ttsProviderName,
 		SpeechToTextProvider: sttProviderName,
 		Frequency:            10000,

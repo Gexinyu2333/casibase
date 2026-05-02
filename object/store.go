@@ -71,7 +71,7 @@ type Store struct {
 	TextToSpeechProvider string   `xorm:"varchar(100)" json:"textToSpeechProvider"`
 	EnableTtsStreaming   bool     `xorm:"bool" json:"enableTtsStreaming"`
 	SpeechToTextProvider string   `xorm:"varchar(100)" json:"speechToTextProvider"`
-	AgentProvider        string   `xorm:"varchar(100)" json:"agentProvider"`
+	McpServer            string   `xorm:"varchar(100)" json:"mcpServer"`
 	Tools                []string `xorm:"mediumtext" json:"tools"`
 	VectorStoreId        string   `xorm:"varchar(100)" json:"vectorStoreId"`
 	BuiltinTools         []string `xorm:"varchar(500)" json:"builtinTools"`

@@ -15,11 +15,9 @@
 package object
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 
-	"github.com/the-open-agent/openagent/agent"
 	"github.com/the-open-agent/openagent/auth"
 	"github.com/the-open-agent/openagent/chat"
 	"github.com/the-open-agent/openagent/embedding"
@@ -51,10 +49,9 @@ type Provider struct {
 	ProviderKey        string            `xorm:"varchar(100)" json:"providerKey"`
 	ProviderUrl        string            `xorm:"varchar(200)" json:"providerUrl"`
 	ApiVersion         string            `xorm:"varchar(100)" json:"apiVersion"`
-	CompatibleProvider string            `xorm:"varchar(100)" json:"compatibleProvider"`
-	Domain             string            `xorm:"varchar(200)" json:"domain"`
-	McpTools           []*agent.McpTools `xorm:"text" json:"mcpTools"`
-	Text               string            `xorm:"mediumtext" json:"text"`
+	CompatibleProvider string `xorm:"varchar(100)" json:"compatibleProvider"`
+	Domain             string `xorm:"varchar(200)" json:"domain"`
+	Text               string `xorm:"mediumtext" json:"text"`
 	ConfigText         string            `xorm:"mediumtext" json:"configText"`
 	RawText            string            `xorm:"mediumtext" json:"rawText"` // Raw result from scan (for Scan category providers)
 
@@ -375,19 +372,6 @@ func (p *Provider) GetEmbeddingProvider(lang string) (embedding.EmbeddingProvide
 	return pProvider, nil
 }
 
-func (p *Provider) GetAgentProvider(lang string) (agent.AgentProvider, error) {
-	pProvider, err := agent.GetAgentProvider(p.Type, p.SubType, p.Text, p.McpTools, lang)
-	if err != nil {
-		return nil, err
-	}
-
-	if pProvider == nil {
-		return nil, fmt.Errorf(i18n.Translate(lang, "agent:the agent provider type: %s is not supported"), p.Type)
-	}
-
-	return pProvider, nil
-}
-
 func (p *Provider) GetTextToSpeechProvider(lang string) (tts.TextToSpeechProvider, error) {
 	pProvider, err := tts.GetTextToSpeechProvider(p.Type, p.SubType, p.ClientId, p.ClientSecret, p.ProviderUrl, p.ApiVersion, p.InputPricePerThousandTokens, p.Currency, p.Flavor, lang)
 	if err != nil {
@@ -476,31 +460,6 @@ func GetEmbeddingProviderFromContext(owner string, name string, lang string) (*P
 	return getEmbeddingProviderFromName(owner, providerName, lang)
 }
 
-func GetAgentProviderFromContext(owner string, name string, lang string) (*Provider, agent.AgentProvider, error) {
-	var providerName string
-	if name != "" {
-		providerName = name
-	} else {
-		store, err := GetDefaultStore(owner)
-		if err != nil {
-			return nil, nil, err
-		}
-
-		if store != nil && store.AgentProvider != "" {
-			providerName = store.AgentProvider
-		}
-	}
-
-	return getAgentProviderFromName(owner, providerName, lang)
-}
-
-func GetAgentClients(agentProviderObj agent.AgentProvider) (*agent.AgentClients, error) {
-	if agentProviderObj == nil {
-		return nil, nil
-	}
-	return agentProviderObj.GetAgentClients()
-}
-
 func GetProviderCount(owner, storeName, field, value string) (int64, error) {
 	session := GetDbSession(owner, -1, -1, field, value, "", "")
 	if storeName != "" {
@@ -560,9 +519,6 @@ func collectProviderNames(store *Store) []string {
 	}
 	if store.SpeechToTextProvider != "" {
 		providerNames = append(providerNames, store.SpeechToTextProvider)
-	}
-	if store.AgentProvider != "" {
-		providerNames = append(providerNames, store.AgentProvider)
 	}
 	if store.ChildModelProviders != nil {
 		providerNames = append(providerNames, store.ChildModelProviders...)
@@ -663,40 +619,6 @@ func GetPaginationProviders(owner, storeName string, offset, limit int, field, v
 	}
 
 	return providers, nil
-}
-
-func RefreshMcpTools(provider *Provider) error {
-	tools, err := agent.GetToolsList(provider.Text)
-	if err != nil {
-		return err
-	}
-
-	provider.McpTools = tools
-	return nil
-}
-
-// TestMcpProvider parses provider.testContent as {"tool":"...","arguments":{}} and invokes one MCP tools/call.
-func TestMcpProvider(p *Provider, lang string) (string, error) {
-	if p.Category != "Agent" || p.Type != "MCP" {
-		return "", fmt.Errorf(i18n.Translate(lang, "object:provider is not an MCP agent provider"))
-	}
-	if strings.TrimSpace(p.Text) == "" {
-		return "", fmt.Errorf("MCP servers configuration (text) is empty")
-	}
-	var payload struct {
-		Tool      string                 `json:"tool"`
-		Arguments map[string]interface{} `json:"arguments"`
-	}
-	if err := json.Unmarshal([]byte(p.TestContent), &payload); err != nil {
-		return "", fmt.Errorf(i18n.Translate(lang, "object:invalid MCP test JSON in testContent: %v"), err)
-	}
-	if strings.TrimSpace(payload.Tool) == "" {
-		return "", fmt.Errorf(i18n.Translate(lang, "object:MCP test JSON must include non-empty \"tool\""))
-	}
-	if payload.Arguments == nil {
-		payload.Arguments = map[string]interface{}{}
-	}
-	return agent.TestMcpToolCall(p.Text, p.McpTools, payload.Tool, payload.Arguments)
 }
 
 func (p *Provider) processProviderParams(providerDb *Provider) {
