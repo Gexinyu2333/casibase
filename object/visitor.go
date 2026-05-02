@@ -22,7 +22,7 @@ import (
 	"github.com/the-open-agent/openagent/i18n"
 )
 
-type Activity struct {
+type Visitor struct {
 	Date       string `json:"date"`
 	FieldCount map[string]int
 }
@@ -59,7 +59,7 @@ func getTargetfieldValue(record *Record, fieldName string) (string, error) {
 	return "", errors.New("no matched field")
 }
 
-func GetActivities(days int, user string, fieldNames []string, lang string) (map[string][]*Activity, error) {
+func GetVisitors(days int, user string, fieldNames []string, lang string) (map[string][]*Visitor, error) {
 	records, err := getAllRecords()
 	if err != nil {
 		return nil, err
@@ -69,17 +69,17 @@ func GetActivities(days int, user string, fieldNames []string, lang string) (map
 	// Adjusted to include today in the count by subtracting days-1
 	startDateTime := now.AddDate(0, 0, -(days - 1)).Truncate(24 * time.Hour)
 
-	resp := make(map[string][]*Activity)
+	resp := make(map[string][]*Visitor)
 	for j := 0; j < len(fieldNames); j++ {
 		// Adjusted the size to days, as we're now including today
-		activities := make([]*Activity, days)
+		visitors := make([]*Visitor, days)
 		for i := 0; i < days; i++ {
-			activities[i] = &Activity{
+			visitors[i] = &Visitor{
 				Date:       startDateTime.AddDate(0, 0, i).Format("2006-01-02"),
 				FieldCount: make(map[string]int),
 			}
 		}
-		resp[fieldNames[j]] = activities
+		resp[fieldNames[j]] = visitors
 	}
 
 	for _, record := range records {
@@ -104,16 +104,16 @@ func GetActivities(days int, user string, fieldNames []string, lang string) (map
 			}
 
 			if value != "" {
-				activity := resp[fieldName]
-				activity[dayIndex].FieldCount[value] += 1
+				visitor := resp[fieldName]
+				visitor[dayIndex].FieldCount[value] += 1
 			}
 		}
 	}
 
 	for i := 1; i < days; i++ {
-		for _, activities := range resp {
-			for action, count := range activities[i-1].FieldCount {
-				activities[i].FieldCount[action] += count
+		for _, visitors := range resp {
+			for action, count := range visitors[i-1].FieldCount {
+				visitors[i].FieldCount[action] += count
 			}
 		}
 	}

@@ -417,11 +417,11 @@ func initBuiltInSite() {
 	builtInNavItems := []string{
 		"/chat",
 		"/stores", "/chats", "/messages",
-		"/files", "/vectors", "/resources",
+		"/files", "/vectors",
 		"/providers", "/tools",
 		"/records", "/sessions",
 		"/users", "/casdoor-resources", "/permissions",
-		"/sites", "/usages", "/activities", "/sysinfo", "/swagger",
+		"/sites", "/resources", "/usages", "/visitors", "/sysinfo", "/swagger",
 	}
 
 	site := &Site{

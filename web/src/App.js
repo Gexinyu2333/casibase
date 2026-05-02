@@ -134,8 +134,8 @@ class App extends Component {
       this.setState({selectedMenuKey: "/usages"});
     } else if (uri.includes("/sites")) {
       this.setState({selectedMenuKey: "/sites"});
-    } else if (uri.includes("/activities")) {
-      this.setState({selectedMenuKey: "/activities"});
+    } else if (uri.includes("/visitors")) {
+      this.setState({selectedMenuKey: "/visitors"});
     } else if (uri.includes("/nodes")) {
       this.setState({selectedMenuKey: "/nodes"});
     } else if (uri.includes("/machines")) {

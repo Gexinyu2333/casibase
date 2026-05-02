@@ -27,7 +27,7 @@ const RESOURCE_LABELS = {
   "graphs": "general:Graphs",
   "scans": "general:Scans",
   "usages": "general:Usages",
-  "activities": "general:Activities",
+  "visitors": "general:Visitors",
   "nodes": "general:Nodes",
   "machines": "general:Machines",
   "assets": "general:Assets",

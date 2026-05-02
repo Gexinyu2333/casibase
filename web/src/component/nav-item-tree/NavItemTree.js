@@ -37,7 +37,6 @@ export const NavItemTree = ({disabled, checkedKeys, defaultExpandedKeys, onCheck
           children: [
             {title: i18next.t("general:Files"), key: "/files"},
             {title: i18next.t("general:Vectors"), key: "/vectors"},
-            {title: i18next.t("general:Resources"), key: "/resources"},
           ],
         },
         {
@@ -104,8 +103,9 @@ export const NavItemTree = ({disabled, checkedKeys, defaultExpandedKeys, onCheck
           key: "/admin",
           children: [
             {title: i18next.t("general:Sites"), key: "/sites"},
+            {title: i18next.t("general:Resources"), key: "/resources"},
             {title: i18next.t("general:Usages"), key: "/usages"},
-            {title: i18next.t("general:Activities"), key: "/activities"},
+            {title: i18next.t("general:Visitors"), key: "/visitors"},
             {title: i18next.t("general:System Info"), key: "/sysinfo"},
             {title: i18next.t("general:Swagger"), key: "/swagger"},
           ],

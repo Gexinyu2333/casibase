@@ -21,24 +21,24 @@ import (
 	"github.com/the-open-agent/openagent/util"
 )
 
-// GetActivities
-// @Title GetActivities
-// @Tag Activity API
-// @Description get activities
+// GetVisitors
+// @Title GetVisitors
+// @Tag Visitor API
+// @Description get visitors
 // @Param days query string true "days count"
-// @Success 200 {array} object.Activity The Response object
-// @router /get-activities [get]
-func (c *ApiController) GetActivities() {
+// @Success 200 {array} object.Visitor The Response object
+// @router /get-visitors [get]
+func (c *ApiController) GetVisitors() {
 	days := util.ParseInt(c.Input().Get("days"))
 	user := c.Input().Get("selectedUser")
 	fieldParam := c.Input().Get("field")
 	fields := strings.Split(fieldParam, ",")
 
-	activities, err := object.GetActivities(days, user, fields, c.GetAcceptLanguage())
+	visitors, err := object.GetVisitors(days, user, fields, c.GetAcceptLanguage())
 	if err != nil {
 		c.ResponseError(err.Error())
 		return
 	}
 
-	c.ResponseOk(activities)
+	c.ResponseOk(visitors)
 }

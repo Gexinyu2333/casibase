@@ -16,20 +16,20 @@ import React from "react";
 import {Col, Row, Select, Statistic} from "antd";
 import BaseListPage from "./BaseListPage";
 import * as Setting from "./Setting";
-import * as ActivityBackend from "./backend/ActivityBackend";
+import * as VisitorBackend from "./backend/VisitorBackend";
 import ReactEcharts from "echarts-for-react";
 import i18next from "i18next";
 import * as UsageBackend from "./backend/UsageBackend";
 
 const {Option} = Select;
 
-class ActivityPage extends BaseListPage {
+class VisitorPage extends BaseListPage {
   constructor(props) {
     super(props);
     this.subPieCharts = ["region", "city", "unit", "section"],
     this.state = {
       classes: props,
-      activities: null,
+      visitors: null,
       allOps: [],
       selectedOps: [],
       usageMetadata: null,
@@ -61,15 +61,15 @@ class ActivityPage extends BaseListPage {
     return Array.from(opsSet);
   }
 
-  getActivities(serverUrl, fieldNames) {
-    ActivityBackend.getActivities(serverUrl, this.state.selectedUser, 30, fieldNames)
+  getVisitors(serverUrl, fieldNames) {
+    VisitorBackend.getVisitors(serverUrl, this.state.selectedUser, 30, fieldNames)
       .then((res) => {
         if (res.status === "ok") {
           const state = {};
           const fieldCount = res.data;
           Object.entries(fieldCount).forEach(([fieldName, data]) => {
-            const activityKey = `activities${fieldName}`;
-            state[activityKey] = data;
+            const visitorKey = `visitors${fieldName}`;
+            state[visitorKey] = data;
             if (fieldName === "action") {
               const allOps = this.extractAllOperations(res);
               state["allOps"] = allOps;
@@ -83,10 +83,10 @@ class ActivityPage extends BaseListPage {
       });
   }
 
-  getActivitiesAll(serverUrl) {
-    this.getActivities(serverUrl, this.subPieCharts);
-    this.getActivities(serverUrl, ["action"]);
-    this.getActivities(serverUrl, ["response"]);
+  getVisitorsAll(serverUrl) {
+    this.getVisitors(serverUrl, this.subPieCharts);
+    this.getVisitors(serverUrl, ["action"]);
+    this.getVisitors(serverUrl, ["response"]);
   }
 
   getCountFromRangeType(rangeType) {
@@ -111,7 +111,7 @@ class ActivityPage extends BaseListPage {
             users: res.data,
             usageMetadata: res.data2,
           }, () => {
-            this.getActivitiesAll("");
+            this.getVisitorsAll("");
           }
           );
           this.state.selectedUser = !Setting.canViewAllUsers(this.props.account) ? res.data[0] : "All";
@@ -121,8 +121,8 @@ class ActivityPage extends BaseListPage {
       });
   }
 
-  renderPieChart(activity) {
-    const FieldCount = activity[activity.length - 1]?.FieldCount || {};
+  renderPieChart(visitor) {
+    const FieldCount = visitor[visitor.length - 1]?.FieldCount || {};
     const pieData = Object.keys(FieldCount).map(key => ({
       name: key,
       value: FieldCount[key],
@@ -180,14 +180,13 @@ class ActivityPage extends BaseListPage {
     };
   }
 
-  renderStatistic(activityResponse) {
-    // get-activity(,"response")
-    const lastActivity = activityResponse && activityResponse.length > 0 ? activityResponse[activityResponse.length - 1].FieldCount : {
+  renderStatistic(visitorResponse) {
+    const lastVisitor = visitorResponse && visitorResponse.length > 0 ? visitorResponse[visitorResponse.length - 1].FieldCount : {
       ok: 0,
       error: 0,
     };
 
-    const isLoading = activityResponse === undefined;
+    const isLoading = visitorResponse === undefined;
 
     return (
       <Row gutter={16}>
@@ -195,14 +194,14 @@ class ActivityPage extends BaseListPage {
           <Statistic
             loading={isLoading}
             title={i18next.t("general:Success")}
-            value={lastActivity.ok}
+            value={lastVisitor.ok}
           />
         </Col>
         <Col span={3}>
           <Statistic
             loading={isLoading}
             title={i18next.t("general:Error")}
-            value={lastActivity.error}
+            value={lastVisitor.error}
           />
         </Col>
       </Row>
@@ -217,7 +216,7 @@ class ActivityPage extends BaseListPage {
     }
   }
 
-  getActivitiesForAllCases(endpoint, rangeType) {
+  getVisitorsForAllCases(endpoint, rangeType) {
     if (endpoint === "") {
       endpoint = this.state.endpoint;
     }
@@ -226,12 +225,12 @@ class ActivityPage extends BaseListPage {
     if (rangeType === "") {
       rangeType = this.state.rangeType;
     }
-    this.getActivitiesAll(serverUrl);
+    this.getVisitorsAll(serverUrl);
   }
 
-  buildActivitiesLoadingReset() {
+  buildVisitorsLoadingReset() {
     return ["action", "response", ...this.subPieCharts]
-      .reduce((acc, key) => ({...acc, [`activities${key}`]: undefined}), {});
+      .reduce((acc, key) => ({...acc, [`visitors${key}`]: undefined}), {});
   }
 
   renderRadio() {
@@ -274,12 +273,12 @@ class ActivityPage extends BaseListPage {
       } else {
         user = this.state.users[value];
       }
-      const reset = this.buildActivitiesLoadingReset();
+      const reset = this.buildVisitorsLoadingReset();
       this.setState({
         selectedUser: user,
         ...reset,
       }, () => {
-        this.getActivitiesForAllCases("", this.state.rangeType);
+        this.getVisitorsForAllCases("", this.state.rangeType);
       });
     };
 
@@ -329,7 +328,6 @@ class ActivityPage extends BaseListPage {
   }
 
   renderSubPieCharts() {
-    // const count = this.subPieCharts?.length || 0;
     const count = this.subPieCharts?.length || 0;
     const numChartsPerRow = 2;
     const grouped = [];
@@ -344,13 +342,13 @@ class ActivityPage extends BaseListPage {
               {r.map((dataName, colIndex) => (
                 <Col span={12} key={`col-${rowIndex}-${colIndex}`}>
                   <ReactEcharts
-                    option={this.renderPieChart(this.state["activities" + dataName] || [])}
+                    option={this.renderPieChart(this.state["visitors" + dataName] || [])}
                     style={{
                       height: "400px",
                       width: "100%",
                       display: "inline-block",
                     }}
-                    showLoading={this.state["activities" + dataName] === undefined}
+                    showLoading={this.state["visitors" + dataName] === undefined}
                     loadingOption={{
                       color: localStorage.getItem("themeColor"),
                       fontSize: "16px",
@@ -370,21 +368,21 @@ class ActivityPage extends BaseListPage {
   }
 
   renderChart() {
-    const fieldName = "activitiesaction";
-    const activitiesAction = this.state[fieldName];
+    const fieldName = "visitorsaction";
+    const visitorsAction = this.state[fieldName];
     return (
       <React.Fragment>
         <Row style={{marginTop: "20px"}} >
           <Col span={1} />
           <Col span={11} >
             <ReactEcharts
-              option={this.renderPieChart(activitiesAction || [])}
+              option={this.renderPieChart(visitorsAction || [])}
               style={{
                 height: "400px",
                 width: "100%",
                 display: "inline-block",
               }}
-              showLoading={activitiesAction === undefined}
+              showLoading={visitorsAction === undefined}
               loadingOption={{
                 color: localStorage.getItem("themeColor"),
                 fontSize: "16px",
@@ -397,14 +395,14 @@ class ActivityPage extends BaseListPage {
           </Col>
           <Col span={11} >
             <ReactEcharts
-              option={this.renderLineChart(activitiesAction || [], this.state.selectedOps || [])}
+              option={this.renderLineChart(visitorsAction || [], this.state.selectedOps || [])}
               style={{
                 height: "400px",
                 width: "100%",
                 display: "inline-block",
               }}
               notMerge={true}
-              showLoading={activitiesAction === undefined}
+              showLoading={visitorsAction === undefined}
               loadingOption={{
                 color: localStorage.getItem("themeColor"),
                 fontSize: "16px",
@@ -432,7 +430,7 @@ class ActivityPage extends BaseListPage {
         <Row style={{marginTop: "20px"}} >
           <Col span={1} />
           <Col span={17} >
-            {this.renderStatistic(this.state["activitiesresponse"])}
+            {this.renderStatistic(this.state["visitorsresponse"])}
           </Col>
           <Col span={5} >
             {this.renderRadio()}
@@ -453,4 +451,4 @@ class ActivityPage extends BaseListPage {
   };
 }
 
-export default ActivityPage;
+export default VisitorPage;

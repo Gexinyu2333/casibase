@@ -130,7 +130,7 @@ import ArticleListPage from "./ArticleListPage";
 import ArticleEditPage from "./ArticleEditPage";
 import ChatPage from "./ChatPage";
 import UsagePage from "./UsagePage";
-import ActivityPage from "./ActivityPage";
+import VisitorPage from "./VisitorPage";
 import NodeWorkbench from "./NodeWorkbench";
 import AccessPage from "./component/access/AccessPage";
 import AuditPage from "./frame/AuditPage";
@@ -156,7 +156,7 @@ function getMenuParentKey(uri) {
   if (uri.includes("/videos") || uri.includes("/public-videos") || uri.includes("/tasks") || uri.includes("/scales") || uri.includes("/forms") || uri.includes("/workflows") || uri.includes("/audit") || uri.includes("/articles") || uri.includes("/graphs") || uri.includes("/scans")) {return "/multimedia";}
   if (uri.includes("/sessions") || uri.includes("/records")) {return "/logs";}
   if (uri.includes("/users") || uri.includes("/casdoor-resources") || uri.includes("/permissions")) {return "/identity";}
-  if (uri.includes("/sysinfo") || uri.includes("/swagger") || uri.includes("/activities") || uri.includes("/sites") || uri.includes("/usages")) {return "/admin";}
+  if (uri.includes("/sysinfo") || uri.includes("/swagger") || uri.includes("/visitors") || uri.includes("/sites") || uri.includes("/usages")) {return "/admin";}
   return null;
 }
 
@@ -470,7 +470,7 @@ function ManagementPage(props) {
       res.push(Setting.getItem(<Link to="/messages">{i18next.t("general:Messages")}</Link>, "/messages", <MessageOutlined />));
       res.push(Setting.getItem(<Link to="/usages">{i18next.t("general:Usages")}</Link>, "/usages", <LineChartOutlined />));
       if (Setting.isAdminUser(account)) {
-        res.push(Setting.getItem(<Link to="/activities">{i18next.t("general:Activities")}</Link>, "/activities", <DashboardOutlined />));
+        res.push(Setting.getItem(<Link to="/visitors">{i18next.t("general:Visitors")}</Link>, "/visitors", <DashboardOutlined />));
       }
     } else if (Setting.isChatAdminUser(account)) {
       res.push(Setting.getItem(<Link to="/chat">{i18next.t("general:Chat")}</Link>, "/chat", <CommentOutlined />));
@@ -480,7 +480,7 @@ function ManagementPage(props) {
       res.push(Setting.getItem(<Link to="/messages">{i18next.t("general:Messages")}</Link>, "/messages", <MessageOutlined />));
       res.push(Setting.getItem(<Link to="/usages">{i18next.t("general:Usages")}</Link>, "/usages", <LineChartOutlined />));
       if (Setting.isAdminUser(account)) {
-        res.push(Setting.getItem(<Link to="/activities">{i18next.t("general:Activities")}</Link>, "/activities", <DashboardOutlined />));
+        res.push(Setting.getItem(<Link to="/visitors">{i18next.t("general:Visitors")}</Link>, "/visitors", <DashboardOutlined />));
       }
 
       if (window.location.pathname === "/") {
@@ -549,7 +549,6 @@ function ManagementPage(props) {
       res.push(Setting.getItem(<Link style={{color: textColor}} to="/files">{i18next.t("general:Knowledge Base")}</Link>, "/knowledge-base", <DatabaseOutlined />, [
         Setting.getItem(<Link to="/files">{i18next.t("general:Files")}</Link>, "/files", <FolderOpenOutlined />),
         Setting.getItem(<Link to="/vectors">{i18next.t("general:Vectors")}</Link>, "/vectors", <ApartmentOutlined />),
-        Setting.getItem(<Link to="/resources">{i18next.t("general:Resources")}</Link>, "/resources", <InboxOutlined />),
       ]));
 
       res.push(Setting.getItem(<Link style={{color: textColor}} to="/providers">{i18next.t("general:Connectors")}</Link>, "/connectors", <ApiOutlined />, [
@@ -610,8 +609,9 @@ function ManagementPage(props) {
 
       res.push(Setting.getItem(<Link style={{color: textColor}} to="/sites/site-built-in">{i18next.t("general:Admin")}</Link>, "/admin", <SettingOutlined />, [
         Setting.getItem(<Link to="/sites/site-built-in">{i18next.t("general:Sites")}</Link>, "/sites", <LayoutOutlined />),
+        Setting.getItem(<Link to="/resources">{i18next.t("general:Resources")}</Link>, "/resources", <InboxOutlined />),
         Setting.getItem(<Link to="/usages">{i18next.t("general:Usages")}</Link>, "/usages", <LineChartOutlined />),
-        Setting.getItem(<Link to="/activities">{i18next.t("general:Activities")}</Link>, "/activities", <FundOutlined />),
+        Setting.getItem(<Link to="/visitors">{i18next.t("general:Visitors")}</Link>, "/visitors", <FundOutlined />),
         Setting.getItem(<Link to="/sysinfo">{i18next.t("general:System Info")}</Link>, "/sysinfo", <DashboardOutlined />),
         Setting.getItem(
           <a target="_blank" rel="noreferrer" href={Setting.isLocalhost() ? `${Setting.ServerUrl}/swagger/index.html` : "/swagger/index.html"}>
@@ -696,7 +696,7 @@ function ManagementPage(props) {
         <Route exact path="/usages" render={(props) => renderSigninIfNotSignedIn(<UsagePage account={account} themeAlgorithm={themeAlgorithm} {...props} />)} />
         <Route exact path="/sites" render={(props) => renderSigninIfNotSignedIn(<SiteListPage account={account} {...props} />)} />
         <Route exact path="/sites/:siteName" render={(props) => renderSigninIfNotSignedIn(<SiteEditPage account={account} {...props} />)} />
-        <Route exact path="/activities" render={(props) => renderSigninIfNotSignedIn(<ActivityPage account={account} themeAlgorithm={themeAlgorithm} {...props} />)} />
+        <Route exact path="/visitors" render={(props) => renderSigninIfNotSignedIn(<VisitorPage account={account} themeAlgorithm={themeAlgorithm} {...props} />)} />
         <Route exact path="/desktop" render={(props) => <OsDesktop account={account} {...props} />} />
         <Route exact path="/templates" render={(props) => renderSigninIfNotSignedIn(<TemplateListPage account={account} {...props} />)} />
         <Route exact path="/templates/:templateName" render={(props) => renderSigninIfNotSignedIn(<TemplateEditPage account={account} {...props} />)} />

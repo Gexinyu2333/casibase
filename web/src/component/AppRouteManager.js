@@ -118,13 +118,13 @@ routeManager.registerApp("usages", {
   ],
 });
 
-routeManager.registerApp("activities", {
-  title: "Activities",
+routeManager.registerApp("visitors", {
+  title: "Visitors",
   gradient: "linear-gradient(135deg, #ade4a4 0%, #f1faff 100%)",
   routes: [
     {
-      path: "/activity",
-      component: () => import("../ActivityPage"),
+      path: "/visitors",
+      component: () => import("../VisitorPage"),
     },
   ],
 });
