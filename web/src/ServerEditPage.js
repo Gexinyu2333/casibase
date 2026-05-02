@@ -15,10 +15,12 @@
 import React from "react";
 import Loading from "./common/Loading";
 import {Button, Card, Col, Input, Row} from "antd";
+import {LinkOutlined} from "@ant-design/icons";
 import * as ServerBackend from "./backend/ServerBackend";
 import * as Setting from "./Setting";
 import i18next from "i18next";
 import McpToolsTable from "./table/McpToolsTable";
+import ToolTable from "./table/ToolTable";
 import Editor from "./common/Editor";
 
 class ServerEditPage extends React.Component {
@@ -31,6 +33,7 @@ class ServerEditPage extends React.Component {
       originalServer: null,
       isNewServer: props.location?.state?.isNewServer || false,
       refreshButtonLoading: false,
+      syncButtonLoading: false,
       testButtonLoading: false,
       testResult: "",
     };
@@ -107,6 +110,26 @@ class ServerEditPage extends React.Component {
       });
   }
 
+  syncMcpTool(isCleared) {
+    const server = Setting.deepCopy(this.state.server);
+    this.setState({syncButtonLoading: true});
+    ServerBackend.syncMcpTool(this.state.originalServer.owner, this.state.originalServer.name, server, isCleared)
+      .then((res) => {
+        if (res.status === "ok") {
+          Setting.showMessage("success", i18next.t("general:Successfully saved"));
+          this.getServer();
+        } else {
+          Setting.showMessage("error", `${i18next.t("general:Failed to save")}: ${res.msg}`);
+        }
+      })
+      .catch(error => {
+        Setting.showMessage("error", `${i18next.t("general:Failed to connect to server")}: ${error}`);
+      })
+      .finally(() => {
+        this.setState({syncButtonLoading: false});
+      });
+  }
+
   testMcpServer() {
     let parsed;
     try {
@@ -163,6 +186,39 @@ class ServerEditPage extends React.Component {
           </Col>
           <Col span={22}>
             <Input value={this.state.server.displayName} onChange={e => this.updateServerField("displayName", e.target.value)} />
+          </Col>
+        </Row>
+        <Row style={{marginTop: "20px"}}>
+          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
+            {Setting.getLabel(i18next.t("general:URL"), i18next.t("general:URL - Tooltip"))} :
+          </Col>
+          <Col span={22}>
+            <Input prefix={<LinkOutlined />} value={this.state.server.url} onChange={e => this.updateServerField("url", e.target.value)} />
+          </Col>
+        </Row>
+        <Row style={{marginTop: "20px"}}>
+          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
+            {Setting.getLabel(i18next.t("server:Access token"), i18next.t("server:Access token - Tooltip"))} :
+          </Col>
+          <Col span={22}>
+            <Input.Password placeholder={"***"} value={this.state.server.token} onChange={e => this.updateServerField("token", e.target.value)} />
+          </Col>
+        </Row>
+        <Row style={{marginTop: "20px"}}>
+          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
+            {Setting.getLabel(i18next.t("general:Tool"), i18next.t("general:Tool - Tooltip"))} :
+          </Col>
+          <Col span={22}>
+            {!this.state.isNewServer && (
+              <>
+                <Button type="primary" loading={this.state.syncButtonLoading} style={{marginBottom: "5px"}} onClick={() => this.syncMcpTool(false)}>{i18next.t("general:Sync")}</Button>
+                <Button style={{marginBottom: "5px", marginLeft: "10px"}} onClick={() => this.syncMcpTool(true)}>{i18next.t("general:Clear")}</Button>
+              </>
+            )}
+            <ToolTable
+              tools={this.state.server.tools || []}
+              onUpdateTable={(value) => this.updateServerField("tools", value)}
+            />
           </Col>
         </Row>
         <Row style={{marginTop: "20px"}}>
@@ -235,6 +291,14 @@ class ServerEditPage extends React.Component {
             </Col>
           </Row>
         ) : null}
+        <Row style={{marginTop: "20px"}}>
+          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
+            {Setting.getLabel(i18next.t("server:Base URL"), i18next.t("server:Base URL - Tooltip"))} :
+          </Col>
+          <Col span={22}>
+            <Input prefix={<LinkOutlined />} readOnly value={`${window.location.origin}/api/get-server?id=${this.state.server.owner}/${this.state.server.name}`} />
+          </Col>
+        </Row>
       </Card>
     );
   }

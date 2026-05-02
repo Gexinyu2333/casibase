@@ -22,15 +22,27 @@ import (
 	"github.com/ThinkInAIXYZ/go-mcp/protocol"
 	"github.com/the-open-agent/openagent/agent"
 	"github.com/the-open-agent/openagent/i18n"
+	mcppkg "github.com/the-open-agent/openagent/mcp"
 	"github.com/the-open-agent/openagent/util"
 	"xorm.io/core"
 )
+
+type McpTool struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	IsAllowed   bool   `json:"isAllowed"`
+}
 
 type Server struct {
 	Owner       string `xorm:"varchar(100) notnull pk" json:"owner"`
 	Name        string `xorm:"varchar(100) notnull pk" json:"name"`
 	CreatedTime string `xorm:"varchar(100)" json:"createdTime"`
+	UpdatedTime string `xorm:"varchar(100)" json:"updatedTime"`
 	DisplayName string `xorm:"varchar(100)" json:"displayName"`
+
+	Url   string      `xorm:"varchar(500)" json:"url"`
+	Token string      `xorm:"varchar(500)" json:"-"`
+	Tools []*McpTool  `xorm:"mediumtext" json:"tools"`
 
 	ConfigText  string            `xorm:"mediumtext" json:"configText"`
 	McpTools    []*agent.McpTools `xorm:"text" json:"mcpTools"`
@@ -107,11 +119,92 @@ func UpdateServer(id string, server *Server) (bool, error) {
 	if err != nil {
 		return false, err
 	}
+
+	oldServer, err := getServer(owner, name)
+	if err != nil {
+		return false, err
+	}
+	if oldServer != nil && server.Token == "" {
+		server.Token = oldServer.Token
+	}
+
 	_, err = adapter.engine.ID(core.PK{owner, name}).AllCols().Update(server)
 	if err != nil {
 		return false, err
 	}
 	return true, nil
+}
+
+func SyncMcpTool(id string, server *Server, isCleared bool) (bool, error) {
+	owner, name, err := util.GetOwnerAndNameFromIdWithError(id)
+	if err != nil {
+		return false, err
+	}
+
+	if isCleared {
+		server.Tools = nil
+		_, err = adapter.engine.ID(core.PK{owner, name}).Cols("tools").Update(server)
+		if err != nil {
+			return false, err
+		}
+		return true, nil
+	}
+
+	oldServer, err := getServer(owner, name)
+	if err != nil {
+		return false, err
+	}
+	if oldServer == nil {
+		return false, nil
+	}
+	if server.Token == "" {
+		server.Token = oldServer.Token
+	}
+
+	if err = syncServerTools(server); err != nil {
+		return false, err
+	}
+
+	_, err = adapter.engine.ID(core.PK{owner, name}).AllCols().Update(server)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+func syncServerTools(server *Server) error {
+	if server.Url == "" {
+		return fmt.Errorf("server URL is empty")
+	}
+
+	oldTools := server.Tools
+	if oldTools == nil {
+		oldTools = []*McpTool{}
+	}
+
+	tools, err := mcppkg.GetToolsFromURL(server.Url, server.Token)
+	if err != nil {
+		return err
+	}
+
+	newTools := make([]*McpTool, 0, len(tools))
+	for _, t := range tools {
+		isAllowed := true
+		for _, old := range oldTools {
+			if old.Name == t.Name {
+				isAllowed = old.IsAllowed
+				break
+			}
+		}
+		newTools = append(newTools, &McpTool{
+			Name:        t.Name,
+			Description: t.Description,
+			IsAllowed:   isAllowed,
+		})
+	}
+
+	server.Tools = newTools
+	return nil
 }
 
 func DeleteServer(server *Server) (bool, error) {

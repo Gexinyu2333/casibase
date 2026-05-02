@@ -16,8 +16,13 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
+	"net/http"
+	"strings"
+	"time"
 
 	"github.com/beego/beego/utils/pagination"
+	mcppkg "github.com/the-open-agent/openagent/mcp"
 	"github.com/the-open-agent/openagent/object"
 	"github.com/the-open-agent/openagent/util"
 )
@@ -206,5 +211,99 @@ func (c *ApiController) TestMcpServer() {
 		return
 	}
 
+	c.ResponseOk(result)
+}
+
+// SyncMcpTool
+// @Title SyncMcpTool
+// @Tag Server API
+// @Description sync MCP tools from the server URL (or clear them)
+// @Param id query string true "The id (owner/name) of the server"
+// @Param isCleared query string false "Pass 1 to clear all tools"
+// @Param body body object.Server true "The server details"
+// @Success 200 {object} controllers.Response The Response object
+// @router /sync-mcp-tool [post]
+func (c *ApiController) SyncMcpTool() {
+	id := c.Input().Get("id")
+	isCleared := c.Input().Get("isCleared") == "1"
+
+	var server object.Server
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &server); err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	ok, err := object.SyncMcpTool(id, &server, isCleared)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+	c.ResponseOk(ok)
+}
+
+const onlineServerListURL = "https://mcp.casdoor.org/registry.json"
+
+// GetOnlineServers
+// @Title GetOnlineServers
+// @Tag Server API
+// @Description get online MCP server list from the public registry
+// @Success 200 {object} controllers.Response The Response object
+// @router /get-online-servers [get]
+func (c *ApiController) GetOnlineServers() {
+	httpClient := &http.Client{Timeout: 10 * time.Second}
+	resp, err := httpClient.Get(onlineServerListURL)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+	defer func() { _ = resp.Body.Close() }()
+
+	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
+		c.ResponseError(fmt.Sprintf("failed to get online server list, status code: %d", resp.StatusCode))
+		return
+	}
+
+	var result interface{}
+	if err = json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+	c.ResponseOk(result)
+}
+
+// SyncIntranetServers
+// @Title SyncIntranetServers
+// @Tag Server API
+// @Description scan intranet CIDR targets and detect MCP servers
+// @Param body body object "" "JSON with cidr (array), ports (array, optional), paths (array, optional)"
+// @Success 200 {object} controllers.Response The Response object
+// @router /sync-intranet-servers [post]
+func (c *ApiController) SyncIntranetServers() {
+	if !c.RequireAdmin() {
+		return
+	}
+
+	var req struct {
+		CIDR  []string `json:"cidr"`
+		Ports []string `json:"ports"`
+		Paths []string `json:"paths"`
+	}
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &req); err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	// Also accept a single cidr string
+	if len(req.CIDR) == 0 {
+		if cidrStr := strings.TrimSpace(c.Input().Get("cidr")); cidrStr != "" {
+			req.CIDR = []string{cidrStr}
+		}
+	}
+
+	result, err := mcppkg.ScanIntranetServers(req.CIDR, req.Ports, req.Paths)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
 	c.ResponseOk(result)
 }

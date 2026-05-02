@@ -91,6 +91,7 @@ import ToolListPage from "./ToolListPage";
 import ToolEditPage from "./ToolEditPage";
 import ServerListPage from "./ServerListPage";
 import ServerEditPage from "./ServerEditPage";
+import ServerStorePage from "./ServerStorePage";
 import VectorListPage from "./VectorListPage";
 import VectorEditPage from "./VectorEditPage";
 import SigninPage from "./SigninPage";
@@ -690,6 +691,7 @@ function ManagementPage(props) {
         <Route exact path="/tools/:toolName" render={(props) => renderSigninIfNotSignedIn(<ToolEditPage account={account} {...props} />)} />
         <Route exact path="/servers" render={(props) => renderSigninIfNotSignedIn(<ServerListPage account={account} {...props} />)} />
         <Route exact path="/servers/:serverName" render={(props) => renderSigninIfNotSignedIn(<ServerEditPage account={account} {...props} />)} />
+        <Route exact path="/server-store" render={(props) => renderSigninIfNotSignedIn(<ServerStorePage account={account} {...props} />)} />
         <Route exact path="/files" render={(props) => renderSigninIfNotSignedIn(<FileListPage account={account} {...props} />)} />
         <Route exact path="/files/:fileName" render={(props) => renderSigninIfNotSignedIn(<FileViewPage account={account} {...props} />)} />
         <Route exact path="/vectors" render={(props) => renderSigninIfNotSignedIn(<VectorListPage account={account} {...props} />)} />

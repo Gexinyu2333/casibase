@@ -93,3 +93,36 @@ export function testMcpServer(server) {
     body: JSON.stringify(newServer),
   }).then(res => Setting.handleFetchResponse(res));
 }
+
+export function syncMcpTool(owner, name, server, isCleared = false) {
+  const newServer = Setting.deepCopy(server);
+  return fetch(`${Setting.ServerUrl}/api/sync-mcp-tool?id=${owner}/${encodeURIComponent(name)}&isCleared=${isCleared ? "1" : "0"}`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Accept-Language": Setting.getAcceptLanguage(),
+    },
+    body: JSON.stringify(newServer),
+  }).then(res => Setting.handleFetchResponse(res));
+}
+
+export function getOnlineServers() {
+  return fetch(`${Setting.ServerUrl}/api/get-online-servers`, {
+    method: "GET",
+    credentials: "include",
+    headers: {
+      "Accept-Language": Setting.getAcceptLanguage(),
+    },
+  }).then(res => Setting.handleFetchResponse(res));
+}
+
+export function syncIntranetServers(cidr, ports = [], paths = []) {
+  return fetch(`${Setting.ServerUrl}/api/sync-intranet-servers`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Accept-Language": Setting.getAcceptLanguage(),
+    },
+    body: JSON.stringify({cidr, ports, paths}),
+  }).then(res => Setting.handleFetchResponse(res));
+}

@@ -21,10 +21,19 @@ import * as Setting from "./Setting";
 import * as ServerBackend from "./backend/ServerBackend";
 import i18next from "i18next";
 import {DeleteOutlined} from "@ant-design/icons";
+import ScanServerModal from "./common/modal/ScanServerModal";
 
 class ServerListPage extends BaseListPage {
   constructor(props) {
     super(props);
+    this.state = {
+      ...this.state,
+      showScanModal: false,
+      scanLoading: false,
+      scanResult: null,
+      scanServers: [],
+      scanCidr: "",
+    };
   }
 
   newServer() {
@@ -59,6 +68,68 @@ class ServerListPage extends BaseListPage {
         Setting.showMessage("error", `${i18next.t("general:Failed to add")}: ${error}`);
       });
   }
+
+  openScanModal = () => {
+    this.setState({showScanModal: true, scanResult: null, scanServers: [], scanCidr: ""});
+  };
+
+  closeScanModal = () => {
+    if (this.state.scanLoading) {return;}
+    this.setState({showScanModal: false});
+  };
+
+  submitScan = () => {
+    const cidr = this.state.scanCidr.trim();
+    if (!cidr) {
+      Setting.showMessage("error", i18next.t("server:Please enter a CIDR"));
+      return;
+    }
+    this.setState({scanLoading: true});
+    ServerBackend.syncIntranetServers([cidr])
+      .then((res) => {
+        this.setState({scanLoading: false});
+        if (res.status === "ok") {
+          const scanResult = res.data ?? {};
+          const scanServers = scanResult.servers ?? [];
+          this.setState({scanResult, scanServers});
+          Setting.showMessage("success", `${i18next.t("general:Successfully got")}: ${scanServers.length} server(s)`);
+        } else {
+          Setting.showMessage("error", `${i18next.t("general:Failed to get")}: ${res.msg}`);
+        }
+      })
+      .catch(error => {
+        this.setState({scanLoading: false});
+        Setting.showMessage("error", `${i18next.t("general:Failed to connect to server")}: ${error}`);
+      });
+  };
+
+  addScannedServer = (scanServer) => {
+    const randomName = Setting.getRandomName();
+    const newServer = {
+      owner: "admin",
+      name: `server_${randomName}`,
+      createdTime: moment().format(),
+      displayName: `Scanned MCP ${scanServer.host}:${scanServer.port}`,
+      url: scanServer.url,
+      configText: JSON.stringify({mcpServers: {}}, null, 2),
+      mcpTools: [],
+      testContent: "",
+      isDefault: false,
+    };
+    ServerBackend.addServer(newServer)
+      .then((res) => {
+        if (res.status === "ok") {
+          Setting.showMessage("success", i18next.t("general:Successfully added"));
+          const {pagination} = this.state;
+          this.fetch({pagination});
+        } else {
+          Setting.showMessage("error", `${i18next.t("general:Failed to add")}: ${res.msg}`);
+        }
+      })
+      .catch(error => {
+        Setting.showMessage("error", `${i18next.t("general:Failed to connect to server")}: ${error}`);
+      });
+  };
 
   deleteItem = async(i) => {
     return ServerBackend.deleteServer(this.state.data[i]);
@@ -156,7 +227,7 @@ class ServerListPage extends BaseListPage {
     };
 
     return (
-      <div>
+      <>
         <Table
           scroll={{x: "max-content"}}
           columns={columns}
@@ -171,12 +242,31 @@ class ServerListPage extends BaseListPage {
               <Button type="primary" size="small" onClick={() => this.addServer()}>
                 {i18next.t("general:Add")}
               </Button>
+              &nbsp;
+              <Button size="small" onClick={this.openScanModal}>
+                {i18next.t("server:Scan server")}
+              </Button>
+              &nbsp;
+              <Button size="small" onClick={() => this.props.history.push("/server-store")}>
+                {i18next.t("general:MCP Store")}
+              </Button>
             </div>
           )}
           loading={this.state.loading}
           onChange={this.handleTableChange}
         />
-      </div>
+        <ScanServerModal
+          open={this.state.showScanModal}
+          loading={this.state.scanLoading}
+          cidr={this.state.scanCidr}
+          scanResult={this.state.scanResult}
+          scanServers={this.state.scanServers}
+          onSubmit={this.submitScan}
+          onCancel={this.closeScanModal}
+          onChangeCidr={(cidr) => this.setState({scanCidr: cidr, scanResult: null, scanServers: []})}
+          onAddScannedServer={this.addScannedServer}
+        />
+      </>
     );
   }
 
