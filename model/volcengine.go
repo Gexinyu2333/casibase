@@ -197,7 +197,7 @@ func (p *VolcengineModelProvider) calculatePrice(modelResult *ModelResult, lang 
 	return nil
 }
 
-func (p *VolcengineModelProvider) QueryText(question string, writer io.Writer, history []*RawMessage, prompt string, knowledgeMessages []*RawMessage, agentInfo *AgentInfo, lang string) (*ModelResult, error) {
+func (p *VolcengineModelProvider) QueryText(question string, writer io.Writer, history []*RawMessage, prompt string, knowledgeMessages []*RawMessage, toolSession *ToolSession, lang string) (*ModelResult, error) {
 	ctx := context.Background()
 	flusher, ok := writer.(http.Flusher)
 	if !ok {

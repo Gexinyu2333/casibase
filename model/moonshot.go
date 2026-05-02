@@ -102,7 +102,7 @@ func (p *MoonshotModelProvider) calculatePrice(modelResult *ModelResult, lang st
 	return nil
 }
 
-func (p *MoonshotModelProvider) QueryText(question string, writer io.Writer, history []*RawMessage, prompt string, knowledgeMessages []*RawMessage, agentInfo *AgentInfo, lang string) (*ModelResult, error) {
+func (p *MoonshotModelProvider) QueryText(question string, writer io.Writer, history []*RawMessage, prompt string, knowledgeMessages []*RawMessage, toolSession *ToolSession, lang string) (*ModelResult, error) {
 	const BaseUrl = "https://api.moonshot.cn/v1"
 
 	localProvider, err := NewLocalModelProvider("Custom-think", "custom-model", p.secretKey, p.temperature, p.topP, 0, 0, BaseUrl, p.subType, 0, 0, "CNY")
@@ -110,7 +110,7 @@ func (p *MoonshotModelProvider) QueryText(question string, writer io.Writer, his
 		return nil, err
 	}
 
-	modelResult, err := localProvider.QueryText(question, writer, history, prompt, knowledgeMessages, agentInfo, lang)
+	modelResult, err := localProvider.QueryText(question, writer, history, prompt, knowledgeMessages, toolSession, lang)
 	if err != nil {
 		return nil, err
 	}

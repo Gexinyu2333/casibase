@@ -75,7 +75,7 @@ func (p *StepFunModelProvider) calculatePrice(modelResult *ModelResult, lang str
 	return nil
 }
 
-func (p *StepFunModelProvider) QueryText(question string, writer io.Writer, history []*RawMessage, prompt string, knowledgeMessages []*RawMessage, agentInfo *AgentInfo, lang string) (*ModelResult, error) {
+func (p *StepFunModelProvider) QueryText(question string, writer io.Writer, history []*RawMessage, prompt string, knowledgeMessages []*RawMessage, toolSession *ToolSession, lang string) (*ModelResult, error) {
 	const BaseUrl = "https://api.stepfun.com/v1"
 	// Create a new LocalModelProvider to handle the request
 	localProvider, err := NewLocalModelProvider("Custom", "custom-model", p.apiKey, p.temperature, p.topP, 0, 0, BaseUrl, p.subType, 0, 0, "CNY")
@@ -83,7 +83,7 @@ func (p *StepFunModelProvider) QueryText(question string, writer io.Writer, hist
 		return nil, err
 	}
 
-	modelResult, err := localProvider.QueryText(question, writer, history, prompt, knowledgeMessages, agentInfo, lang)
+	modelResult, err := localProvider.QueryText(question, writer, history, prompt, knowledgeMessages, toolSession, lang)
 	if err != nil {
 		return nil, err
 	}

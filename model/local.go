@@ -157,7 +157,7 @@ func flushDataThink(data string, eventType string, writer io.Writer, lang string
 	return nil
 }
 
-func (p *LocalModelProvider) QueryText(question string, writer io.Writer, history []*RawMessage, prompt string, knowledgeMessages []*RawMessage, agentInfo *AgentInfo, lang string) (*ModelResult, error) {
+func (p *LocalModelProvider) QueryText(question string, writer io.Writer, history []*RawMessage, prompt string, knowledgeMessages []*RawMessage, toolSession *ToolSession, lang string) (*ModelResult, error) {
 	var client *openai.Client
 	var flushData interface{} // Can be either flushData or flushDataThink
 
@@ -204,8 +204,8 @@ func (p *LocalModelProvider) QueryText(question string, writer io.Writer, histor
 		if err != nil {
 			return nil, err
 		}
-		if agentInfo != nil && agentInfo.AgentMessages != nil && agentInfo.AgentMessages.Messages != nil {
-			rawMessages = append(rawMessages, agentInfo.AgentMessages.Messages...)
+		if toolSession != nil && toolSession.ToolMessages != nil && toolSession.ToolMessages.Messages != nil {
+			rawMessages = append(rawMessages, toolSession.ToolMessages.Messages...)
 		}
 
 		var messages []openai.ChatCompletionMessage
@@ -242,8 +242,8 @@ func (p *LocalModelProvider) QueryText(question string, writer io.Writer, histor
 		}
 
 		req := ChatCompletionRequest(model, messages, temperature, topP, frequencyPenalty, presencePenalty)
-		if agentInfo != nil && agentInfo.AgentClients != nil {
-			tools, err := reverseToolsToOpenAi(agentInfo.AgentClients.Tools)
+		if toolSession != nil && toolSession.McpToolSet != nil {
+			tools, err := reverseToolsToOpenAi(toolSession.McpToolSet.Tools)
 			if err != nil {
 				return nil, err
 			}
@@ -339,8 +339,8 @@ func (p *LocalModelProvider) QueryText(question string, writer io.Writer, histor
 			}
 		}
 
-		if agentInfo != nil && agentInfo.AgentMessages != nil {
-			agentInfo.AgentMessages.ToolCalls = toolCalls
+		if toolSession != nil && toolSession.ToolMessages != nil {
+			toolSession.ToolMessages.ToolCalls = toolCalls
 		}
 
 		// https://github.com/sashabaranov/go-openai/pull/223#issuecomment-1494372875

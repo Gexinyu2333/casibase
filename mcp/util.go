@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package agent
+package mcp
 
 import (
 	"errors"
@@ -27,12 +27,12 @@ func GetServerNameAndToolNameFromId(id string) (string, string) {
 	}
 
 	if len(tokens) > 2 {
-		panic(errors.New("GetServerNameAndToolNameFromName() error, wrong token count for ID: " + id))
+		panic(errors.New("GetServerNameAndToolNameFromId() error, wrong token count for ID: " + id))
 	}
 
 	return tokens[0], tokens[1]
 }
 
-func GetIdFromServerNameAndToolName(ServerName, toolName string) string {
-	return ServerName + "__" + toolName
+func GetIdFromServerNameAndToolName(serverName, toolName string) string {
+	return serverName + "__" + toolName
 }

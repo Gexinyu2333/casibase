@@ -176,7 +176,7 @@ func (c *ApiController) GetMessageAnswer() {
 		return
 	}
 
-	agentClients, err := object.GetMcpAgentClientsFromContext(store.Owner, store.McpServer, c.GetAcceptLanguage())
+	mcpToolSet, err := object.GetServerMcpToolSet(store.Owner, store.McpServer, c.GetAcceptLanguage())
 	if err != nil {
 		c.ResponseErrorStream(message, err.Error())
 		return
@@ -186,7 +186,7 @@ func (c *ApiController) GetMessageAnswer() {
 	if questionMessage != nil {
 		webSearchEnabled = questionMessage.WebSearchEnabled
 	}
-	agentClients = object.MergeAgentToolClients(agentClients, store, webSearchEnabled, c.GetAcceptLanguage())
+	mcpToolSet = object.MergeMcpTools(mcpToolSet, store, webSearchEnabled, c.GetAcceptLanguage())
 
 	var knowledge []*model.RawMessage
 	var vectorScores []object.VectorScore
@@ -247,16 +247,16 @@ func (c *ApiController) GetMessageAnswer() {
 	}
 
 	var modelResult *model.ModelResult
-	if agentClients != nil {
-		messages := &model.AgentMessages{
+	if mcpToolSet != nil {
+		messages := &model.ToolMessages{
 			Messages:  []*model.RawMessage{},
 			ToolCalls: nil,
 		}
-		agentInfo := &model.AgentInfo{
-			AgentClients:  agentClients,
-			AgentMessages: messages,
+		toolSession := &model.ToolSession{
+			McpToolSet:  mcpToolSet,
+			ToolMessages: messages,
 		}
-		modelResult, err = model.QueryTextWithTools(modelProviderObj, question, writer, history, prompt, knowledge, agentInfo, c.GetAcceptLanguage())
+		modelResult, err = model.QueryTextWithTools(modelProviderObj, question, writer, history, prompt, knowledge, toolSession, c.GetAcceptLanguage())
 	} else {
 		if isReasonModel(modelProvider.SubType) {
 			modelResult, err = QueryCarrierText(question, writer, history, prompt, knowledge, modelProviderObj, chat.NeedTitle, store.SuggestionCount, c.GetAcceptLanguage())

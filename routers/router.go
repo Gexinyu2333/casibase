@@ -89,7 +89,6 @@ func initAPI() {
 	beego.Router("/api/update-server", &controllers.ApiController{}, "POST:UpdateServer")
 	beego.Router("/api/add-server", &controllers.ApiController{}, "POST:AddServer")
 	beego.Router("/api/delete-server", &controllers.ApiController{}, "POST:DeleteServer")
-	beego.Router("/api/refresh-server-mcp-tools", &controllers.ApiController{}, "POST:RefreshServerMcpTools")
 	beego.Router("/api/test-mcp-server", &controllers.ApiController{}, "POST:TestMcpServer")
 	beego.Router("/api/sync-mcp-tool", &controllers.ApiController{}, "POST:SyncMcpTool")
 	beego.Router("/api/get-online-servers", &controllers.ApiController{}, "GET:GetOnlineServers")

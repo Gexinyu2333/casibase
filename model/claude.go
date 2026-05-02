@@ -90,7 +90,7 @@ func (p *ClaudeModelProvider) calculatePrice(modelResult *ModelResult, lang stri
 	return nil
 }
 
-func (p *ClaudeModelProvider) QueryText(question string, writer io.Writer, history []*RawMessage, prompt string, knowledgeMessages []*RawMessage, agentInfo *AgentInfo, lang string) (*ModelResult, error) {
+func (p *ClaudeModelProvider) QueryText(question string, writer io.Writer, history []*RawMessage, prompt string, knowledgeMessages []*RawMessage, toolSession *ToolSession, lang string) (*ModelResult, error) {
 	client := anthropic.NewClient(
 		option.WithAPIKey(p.secretKey),
 		option.WithHTTPClient(proxy.ProxyHttpClient),

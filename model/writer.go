@@ -76,7 +76,7 @@ func (p *WriterModelProvider) calculatePrice(modelResult *ModelResult, lang stri
 	return nil
 }
 
-func (p *WriterModelProvider) QueryText(question string, writer io.Writer, history []*RawMessage, prompt string, knowledgeMessages []*RawMessage, agentInfo *AgentInfo, lang string) (*ModelResult, error) {
+func (p *WriterModelProvider) QueryText(question string, writer io.Writer, history []*RawMessage, prompt string, knowledgeMessages []*RawMessage, toolSession *ToolSession, lang string) (*ModelResult, error) {
 	const BaseUrl = "https://api.writer.com/v1"
 
 	// Create a LocalModelProvider to handle the OpenAI-compatible API
@@ -85,7 +85,7 @@ func (p *WriterModelProvider) QueryText(question string, writer io.Writer, histo
 		return nil, err
 	}
 
-	modelResult, err := localProvider.QueryText(question, writer, history, prompt, knowledgeMessages, agentInfo, lang)
+	modelResult, err := localProvider.QueryText(question, writer, history, prompt, knowledgeMessages, toolSession, lang)
 	if err != nil {
 		return nil, err
 	}

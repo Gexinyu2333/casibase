@@ -48,7 +48,7 @@ var welcomeMessages = []string{
 	"Greetings! I'm here to assist you. How can I help you today?",
 }
 
-func (p *DummyModelProvider) QueryText(message string, writer io.Writer, chat_history []*RawMessage, prompt string, knowledgeMessages []*RawMessage, agentInfo *AgentInfo, lang string) (*ModelResult, error) {
+func (p *DummyModelProvider) QueryText(message string, writer io.Writer, chat_history []*RawMessage, prompt string, knowledgeMessages []*RawMessage, toolSession *ToolSession, lang string) (*ModelResult, error) {
 	if strings.HasPrefix(message, "$OpenAgentDryRun$") {
 		return &ModelResult{}, nil
 	}

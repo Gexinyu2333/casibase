@@ -48,7 +48,7 @@ func (p *HuggingFaceModelProvider) calculatePrice(modelResult *ModelResult) erro
 	return nil
 }
 
-func (p *HuggingFaceModelProvider) QueryText(question string, writer io.Writer, history []*RawMessage, prompt string, knowledgeMessages []*RawMessage, agentInfo *AgentInfo, lang string) (*ModelResult, error) {
+func (p *HuggingFaceModelProvider) QueryText(question string, writer io.Writer, history []*RawMessage, prompt string, knowledgeMessages []*RawMessage, toolSession *ToolSession, lang string) (*ModelResult, error) {
 	ctx := context.Background()
 	client := huggingface.NewInferenceClient(p.secretKey, func(o *huggingface.InferenceClientOptions) {
 		o.HTTPClient = proxy.ProxyHttpClient

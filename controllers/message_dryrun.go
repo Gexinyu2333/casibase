@@ -36,8 +36,8 @@ func (w *dryRunWriter) Flush() {}
 // - Dummy providers (no real AI calls)
 // - Reason models (they have different execution paths)
 // - Queries with agent clients (agent-based workflows)
-func shouldPerformDryRun(providerType string, modelSubType string, hasAgentClients bool) bool {
-	return providerType != "Dummy" && !isReasonModel(modelSubType) && !hasAgentClients
+func shouldPerformDryRun(providerType string, modelSubType string, hasMcpTools bool) bool {
+	return providerType != "Dummy" && !isReasonModel(modelSubType) && !hasMcpTools
 }
 
 // validateTransactionBeforeAIGeneration performs a dry run to estimate cost and validates

@@ -13,27 +13,11 @@
 // limitations under the License.
 
 import React from "react";
-import {Button, Col, Row} from "antd";
+import {Button, Col, Input, InputNumber, Row, Select, Switch} from "antd";
 import * as Setting from "../Setting";
 import i18next from "i18next";
 import * as ServerBackend from "../backend/ServerBackend";
 import Editor from "./Editor";
-
-function buildDefaultMcpTestJson(server) {
-  if (server.mcpTools && server.mcpTools.length > 0) {
-    const mt = server.mcpTools.find(t => t.isEnabled !== false) || server.mcpTools[0];
-    try {
-      const tools = JSON.parse(mt.tools || "[]");
-      if (tools.length > 0 && tools[0].name) {
-        const toolId = `${mt.serverName}__${tools[0].name}`;
-        return JSON.stringify({tool: toolId, arguments: {}}, null, 2);
-      }
-    } catch (e) {
-      // ignore
-    }
-  }
-  return "{\n  \"tool\": \"serverName__toolName\",\n  \"arguments\": {}\n}";
-}
 
 class TestMcpWidget extends React.Component {
   constructor(props) {
@@ -41,50 +25,60 @@ class TestMcpWidget extends React.Component {
     this.state = {
       testButtonLoading: false,
       testResult: "",
+      testToolName: "",
+      testArgValues: {},
     };
   }
 
-  componentDidMount() {
-    this.syncFromServer(this.props.server, null);
-  }
-
-  componentDidUpdate(prevProps) {
+  async sendTestMcp() {
     const {server} = this.props;
-    if (server !== prevProps.server) {
-      this.syncFromServer(server, prevProps.server);
-    }
-  }
+    const {testToolName, testArgValues} = this.state;
 
-  syncFromServer(server, prevServer) {
-    const {onUpdateServer} = this.props;
-    if (!server) {
+    if (!testToolName) {
+      Setting.showMessage("error", i18next.t("server:Please select a tool first"));
       return;
     }
-    if (!server.testContent || server.testContent.trim() === "") {
-      const def = buildDefaultMcpTestJson(server);
-      if (onUpdateServer) {
-        onUpdateServer("testContent", def);
+
+    const tools = server.tools || [];
+    const toolObj = tools.find(t => t.name === testToolName);
+    let schema = {};
+    if (toolObj && toolObj.inputSchema) {
+      try {
+        schema = JSON.parse(toolObj.inputSchema);
+      } catch (_e) {
+        // leave schema empty
       }
     }
-  }
 
-  async sendTestMcp(server) {
-    let parsed;
-    try {
-      parsed = JSON.parse(server.testContent);
-    } catch (e) {
-      Setting.showMessage("error", `${i18next.t("provider:Invalid MCP test JSON")}: ${e.message}`);
-      return;
+    const args = {};
+    for (const [k, v] of Object.entries(testArgValues)) {
+      if (v === "" || v === undefined || v === null) {
+        continue;
+      }
+      const prop = schema.properties?.[k];
+      if (!prop) {
+        args[k] = v;
+        continue;
+      }
+      if (prop.type === "object" || prop.type === "array") {
+        try {
+          args[k] = JSON.parse(v);
+        } catch (_e) {
+          args[k] = v;
+        }
+      } else if (prop.type === "number" || prop.type === "integer") {
+        args[k] = Number(v);
+      } else {
+        args[k] = v;
+      }
     }
-    if (!parsed || typeof parsed.tool !== "string" || parsed.tool.trim() === "") {
-      Setting.showMessage("error", i18next.t("provider:MCP test JSON must include tool"));
-      return;
-    }
+
+    const serverCopy = Setting.deepCopy(server);
+    serverCopy.testContent = JSON.stringify({tool: testToolName, arguments: args});
 
     this.setState({testButtonLoading: true, testResult: ""});
-
     try {
-      const res = await ServerBackend.testMcpServer(server);
+      const res = await ServerBackend.testMcpServer(serverCopy);
       if (res.status === "ok") {
         const out = typeof res.data === "string" ? res.data : JSON.stringify(res.data, null, 2);
         this.setState({testResult: out});
@@ -99,55 +93,150 @@ class TestMcpWidget extends React.Component {
     }
   }
 
-  render() {
-    const {server, onUpdateServer} = this.props;
+  renderArgFields(schema) {
+    const {testArgValues} = this.state;
+    const properties = schema.properties || {};
+    const requiredArgs = schema.required || [];
 
+    return Object.entries(properties).map(([argName, argSchema]) => {
+      const isRequired = requiredArgs.includes(argName);
+      const type = argSchema.type || "string";
+      let inputEl;
+      if (type === "boolean") {
+        inputEl = (
+          <Switch
+            checked={!!testArgValues[argName]}
+            onChange={v => this.setState(prev => ({testArgValues: {...prev.testArgValues, [argName]: v}}))}
+          />
+        );
+      } else if (type === "number" || type === "integer") {
+        inputEl = (
+          <InputNumber
+            style={{width: "100%"}}
+            value={testArgValues[argName] !== undefined ? testArgValues[argName] : undefined}
+            onChange={v => this.setState(prev => ({testArgValues: {...prev.testArgValues, [argName]: v}}))}
+          />
+        );
+      } else if (type === "array" || type === "object") {
+        inputEl = (
+          <Input.TextArea
+            rows={3}
+            placeholder="JSON..."
+            value={testArgValues[argName] || ""}
+            onChange={e => this.setState(prev => ({testArgValues: {...prev.testArgValues, [argName]: e.target.value}}))}
+          />
+        );
+      } else {
+        inputEl = (
+          <Input
+            value={testArgValues[argName] || ""}
+            onChange={e => this.setState(prev => ({testArgValues: {...prev.testArgValues, [argName]: e.target.value}}))}
+          />
+        );
+      }
+
+      return (
+        <Row key={argName} style={{marginTop: "8px"}} align="top">
+          <Col span={5} style={{paddingTop: "5px", paddingRight: "8px", textAlign: "right"}}>
+            <span style={{fontWeight: isRequired ? 600 : 400, color: isRequired ? "#c00" : "inherit"}}>
+              {isRequired && "* "}{argName}
+            </span>
+            {argSchema.description && (
+              <div style={{fontSize: "11px", color: "#888", marginTop: "2px"}}>{argSchema.description}</div>
+            )}
+          </Col>
+          <Col span={19}>{inputEl}</Col>
+        </Row>
+      );
+    });
+  }
+
+  render() {
+    const {server} = this.props;
     if (!server) {
       return null;
     }
 
+    const {testToolName, testButtonLoading, testResult} = this.state;
+    const tools = server.tools || [];
+
+    if (tools.length === 0) {
+      return (
+        <span style={{color: "#aaa", fontStyle: "italic"}}>
+          {i18next.t("server:Sync tools first using the Sync button above")}
+        </span>
+      );
+    }
+
+    const toolOptions = tools.map(t => {
+      let inputSchema = {};
+      if (t.inputSchema) {
+        try {
+          inputSchema = JSON.parse(t.inputSchema);
+        } catch (_e) {
+          // ignore
+        }
+      }
+      return {label: t.name, value: t.name, description: t.description, inputSchema};
+    });
+
+    const selectedToolOpt = toolOptions.find(t => t.value === testToolName);
+    const currentSchema = selectedToolOpt?.inputSchema || {};
+    const argFields = this.renderArgFields(currentSchema);
+
     return (
       <React.Fragment>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("provider:Provider test"), i18next.t("provider:MCP test JSON - Tooltip"))} :
+        <Row gutter={16} align="middle">
+          <Col span={3} style={{textAlign: "right", paddingRight: "8px"}}>
+            {i18next.t("server:Tool")}:
           </Col>
-          <Col span={10} >
-            <Editor
-              value={server.testContent}
-              lang="json"
-              height="150px"
-              dark
-              onChange={value => {onUpdateServer("testContent", value);}}
+          <Col span={16}>
+            <Select
+              style={{width: "100%"}}
+              placeholder={i18next.t("server:Select tool...")}
+              value={testToolName || undefined}
+              options={toolOptions}
+              onChange={v => this.setState({testToolName: v, testArgValues: {}})}
+              optionRender={opt => (
+                <div>
+                  <div style={{fontWeight: 500}}>{opt.value}</div>
+                  {opt.data.description && (
+                    <div style={{fontSize: "12px", color: "#888"}}>{opt.data.description}</div>
+                  )}
+                </div>
+              )}
             />
           </Col>
-          <Col span={6} >
+        </Row>
+        {argFields.length > 0 && (
+          <div style={{marginTop: "12px", padding: "12px 16px", background: "#f5f5f5", borderRadius: "6px", border: "1px solid #e8e8e8"}}>
+            <div style={{marginBottom: "8px", fontWeight: 500, color: "#555"}}>{i18next.t("server:Arguments")}:</div>
+            {argFields}
+          </div>
+        )}
+        {testToolName && argFields.length === 0 && (
+          <div style={{marginTop: "8px", color: "#888", fontStyle: "italic", fontSize: "12px"}}>
+            {i18next.t("server:This tool takes no arguments")}
+          </div>
+        )}
+        <Row style={{marginTop: "12px"}}>
+          <Col>
             <Button
-              style={{marginLeft: "10px", marginBottom: "5px"}}
               type="primary"
-              loading={this.state.testButtonLoading}
-              disabled={!server.testContent || server.testContent.trim() === ""}
-              onClick={() => this.sendTestMcp(server)}
+              loading={testButtonLoading}
+              disabled={!testToolName}
+              onClick={() => this.sendTestMcp()}
             >
               {i18next.t("provider:Invoke MCP tool")}
             </Button>
           </Col>
         </Row>
-        {this.state.testResult ? (
-          <Row style={{marginTop: "10px"}}>
-            <Col span={2}></Col>
-            <Col span={10}>
-              <div style={{marginBottom: "5px"}}><strong>{i18next.t("provider:MCP tool result")}:</strong></div>
-              <Editor
-                value={this.state.testResult}
-                lang="text"
-                height="150px"
-                dark
-                readOnly
-              />
-            </Col>
-          </Row>
-        ) : null}
+        {testResult && (
+          <div style={{marginTop: "12px"}}>
+            <div style={{marginBottom: "5px"}}><strong>{i18next.t("provider:MCP tool result")}:</strong></div>
+            <Editor value={testResult} lang="text" height="150px" dark readOnly />
+          </div>
+        )}
       </React.Fragment>
     );
   }

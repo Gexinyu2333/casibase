@@ -91,7 +91,7 @@ func (p *CohereModelProvider) calculatePrice(modelResult *ModelResult, lang stri
 	return nil
 }
 
-func (p *CohereModelProvider) QueryText(message string, writer io.Writer, chat_history []*RawMessage, prompt string, knowledgeMessages []*RawMessage, agentInfo *AgentInfo, lang string) (*ModelResult, error) {
+func (p *CohereModelProvider) QueryText(message string, writer io.Writer, chat_history []*RawMessage, prompt string, knowledgeMessages []*RawMessage, toolSession *ToolSession, lang string) (*ModelResult, error) {
 	client := cohereclient.NewClient(
 		cohereclient.WithToken(p.secretKey),
 	)

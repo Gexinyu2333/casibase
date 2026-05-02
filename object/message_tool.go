@@ -17,13 +17,13 @@ package object
 import (
 	"strings"
 
-	"github.com/the-open-agent/openagent/agent"
+	"github.com/the-open-agent/openagent/mcp"
 	"github.com/the-open-agent/openagent/model"
 	"github.com/the-open-agent/openagent/tool"
 	"github.com/the-open-agent/openagent/util"
 )
 
-func buildAgentClientsForTool(toolName string, lang string) (*agent.AgentClients, error) {
+func buildToolSetForBuiltinTool(toolName string, lang string) (*mcp.ToolSet, error) {
 	if toolName == "" {
 		return nil, nil
 	}
@@ -52,9 +52,9 @@ func buildAgentClientsForTool(toolName string, lang string) (*agent.AgentClients
 		return nil, nil
 	}
 
-	return &agent.AgentClients{
-		Tools:          allTools,
-		BuiltinToolReg: reg,
+	return &mcp.ToolSet{
+		Tools:        allTools,
+		BuiltinTools: reg,
 	}, nil
 }
 
@@ -64,7 +64,7 @@ func GetAnswerWithTool(modelProviderName, toolName, question, lang string) (stri
 		return "", nil, err
 	}
 
-	agentClients, err := buildAgentClientsForTool(toolName, lang)
+	mcpToolSet, err := buildToolSetForBuiltinTool(toolName, lang)
 	if err != nil {
 		return "", nil, err
 	}
@@ -76,16 +76,16 @@ func GetAnswerWithTool(modelProviderName, toolName, question, lang string) (stri
 	var writer MyWriter
 	var modelResult *model.ModelResult
 
-	if agentClients != nil {
-		messages := &model.AgentMessages{
+	if mcpToolSet != nil {
+		messages := &model.ToolMessages{
 			Messages:  []*model.RawMessage{},
 			ToolCalls: nil,
 		}
-		agentInfo := &model.AgentInfo{
-			AgentClients:  agentClients,
-			AgentMessages: messages,
+		toolSession := &model.ToolSession{
+			McpToolSet:    mcpToolSet,
+			ToolMessages: messages,
 		}
-		modelResult, err = model.QueryTextWithTools(modelProviderObj, question, &writer, history, prompt, knowledge, agentInfo, lang)
+		modelResult, err = model.QueryTextWithTools(modelProviderObj, question, &writer, history, prompt, knowledge, toolSession, lang)
 	} else {
 		modelResult, err = modelProviderObj.QueryText(question, &writer, history, prompt, knowledge, nil, lang)
 	}

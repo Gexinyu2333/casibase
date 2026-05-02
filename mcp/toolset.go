@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package agent
+package mcp
 
 import (
 	"github.com/ThinkInAIXYZ/go-mcp/client"
@@ -20,9 +20,15 @@ import (
 	"github.com/the-open-agent/openagent/tool"
 )
 
-type AgentClients struct {
-	Clients          map[string]*client.Client
-	Tools            []*protocol.Tool
-	BuiltinToolReg   *tool.ToolRegistry
+// ToolSet holds everything needed to execute MCP and builtin tool calls
+// during a model conversation: the open connections, the tool list for the AI,
+// and the builtin tool registry.
+type ToolSet struct {
+	// Connections maps server name → open MCP connection (closed after the conversation).
+	Connections map[string]*client.Client
+	// Tools is the protocol-level tool list passed to the AI model.
+	Tools []*protocol.Tool
+	// BuiltinTools is the registry of server-side builtin tools.
+	BuiltinTools     *tool.ToolRegistry
 	WebSearchEnabled bool
 }

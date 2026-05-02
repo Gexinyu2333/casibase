@@ -306,7 +306,7 @@ func newOpenAiClient(authToken, endpoint string) openai.Client {
 	return openai.NewClient(opts...)
 }
 
-func (p *OpenAiModelProvider) QueryText(question string, writer io.Writer, history []*RawMessage, prompt string, knowledgeMessages []*RawMessage, agentInfo *AgentInfo, lang string) (*ModelResult, error) {
+func (p *OpenAiModelProvider) QueryText(question string, writer io.Writer, history []*RawMessage, prompt string, knowledgeMessages []*RawMessage, toolSession *ToolSession, lang string) (*ModelResult, error) {
 	var client openai.Client
 	var flushData interface{}
 
@@ -334,8 +334,8 @@ func (p *OpenAiModelProvider) QueryText(question string, writer io.Writer, histo
 		if err != nil {
 			return nil, err
 		}
-		if agentInfo != nil && agentInfo.AgentMessages != nil && agentInfo.AgentMessages.Messages != nil {
-			rawMessages = append(rawMessages, agentInfo.AgentMessages.Messages...)
+		if toolSession != nil && toolSession.ToolMessages != nil && toolSession.ToolMessages.Messages != nil {
+			rawMessages = append(rawMessages, toolSession.ToolMessages.Messages...)
 		}
 
 		var messages responses.ResponseInputParam
@@ -381,12 +381,12 @@ func (p *OpenAiModelProvider) QueryText(question string, writer io.Writer, histo
 		if p.endpoint == "" {
 			req.Reasoning = shared.ReasoningParam{Summary: "auto"}
 		}
-		if agentInfo != nil && agentInfo.AgentClients != nil {
-			agentTools, err := reverseMcpToolsToOpenAi(agentInfo.AgentClients.Tools)
+		if toolSession != nil && toolSession.McpToolSet != nil {
+			agentTools, err := reverseMcpToolsToOpenAi(toolSession.McpToolSet.Tools)
 			if err != nil {
 				return nil, err
 			}
-			if agentInfo.AgentClients.WebSearchEnabled {
+			if toolSession.McpToolSet.WebSearchEnabled {
 				agentTools = append(agentTools, responses.ToolParamOfWebSearchPreview(responses.WebSearchToolTypeWebSearchPreview))
 			}
 
@@ -467,8 +467,8 @@ func (p *OpenAiModelProvider) QueryText(question string, writer io.Writer, histo
 			return nil, respStream.Err()
 		}
 
-		if agentInfo != nil && agentInfo.AgentMessages != nil {
-			agentInfo.AgentMessages.ToolCalls = toolCalls
+		if toolSession != nil && toolSession.ToolMessages != nil {
+			toolSession.ToolMessages.ToolCalls = toolCalls
 		}
 
 		if p.inputPricePerThousandTokens > 0 || p.outputPricePerThousandTokens > 0 {

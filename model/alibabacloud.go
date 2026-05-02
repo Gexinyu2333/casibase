@@ -190,7 +190,7 @@ func (p *AlibabacloudModelProvider) queryWanx(ctx context.Context, question stri
 	return modelResult, nil
 }
 
-func (p *AlibabacloudModelProvider) QueryText(question string, writer io.Writer, history []*RawMessage, prompt string, knowledgeMessages []*RawMessage, agentInfo *AgentInfo, lang string) (*ModelResult, error) {
+func (p *AlibabacloudModelProvider) QueryText(question string, writer io.Writer, history []*RawMessage, prompt string, knowledgeMessages []*RawMessage, toolSession *ToolSession, lang string) (*ModelResult, error) {
 	ctx := context.Background()
 	flusher, ok := writer.(http.Flusher)
 	if !ok {
@@ -220,7 +220,7 @@ func (p *AlibabacloudModelProvider) QueryText(question string, writer io.Writer,
 		SetTopP(float64(p.topP)).
 		SetIncrementalOutput(true)
 
-	if agentInfo != nil && agentInfo.AgentClients != nil && agentInfo.AgentClients.WebSearchEnabled {
+	if toolSession != nil && toolSession.McpToolSet != nil && toolSession.McpToolSet.WebSearchEnabled {
 		params.SetEnableSearch(true)
 		params.SetSearchOptions(&qwen.SearchOptions{
 			ForcedSearch:        true,

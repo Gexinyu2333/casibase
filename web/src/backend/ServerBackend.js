@@ -70,18 +70,6 @@ export function deleteServer(server) {
   }).then(res => Setting.handleFetchResponse(res));
 }
 
-export function refreshServerMcpTools(server) {
-  const newServer = Setting.deepCopy(server);
-  return fetch(`${Setting.ServerUrl}/api/refresh-server-mcp-tools`, {
-    method: "POST",
-    credentials: "include",
-    headers: {
-      "Accept-Language": Setting.getAcceptLanguage(),
-    },
-    body: JSON.stringify(newServer),
-  }).then(res => Setting.handleFetchResponse(res));
-}
-
 export function testMcpServer(server) {
   const newServer = Setting.deepCopy(server);
   return fetch(`${Setting.ServerUrl}/api/test-mcp-server`, {

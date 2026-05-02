@@ -98,7 +98,7 @@ func (p *GrokModelProvider) calculatePrice(modelResult *ModelResult, lang string
 	return nil
 }
 
-func (p *GrokModelProvider) QueryText(question string, writer io.Writer, history []*RawMessage, prompt string, knowledgeMessages []*RawMessage, agentInfo *AgentInfo, lang string) (*ModelResult, error) {
+func (p *GrokModelProvider) QueryText(question string, writer io.Writer, history []*RawMessage, prompt string, knowledgeMessages []*RawMessage, toolSession *ToolSession, lang string) (*ModelResult, error) {
 	// Create a LocalModelProvider to handle the request
 	const BaseUrl = "https://api.x.ai/v1"
 	localProvider, err := NewLocalModelProvider("Custom", "custom-model", p.secretKey, p.temperature, p.topP, 0, 0, BaseUrl, p.subType, 0, 0, "USD")
@@ -106,7 +106,7 @@ func (p *GrokModelProvider) QueryText(question string, writer io.Writer, history
 		return nil, err
 	}
 
-	modelResult, err := localProvider.QueryText(question, writer, history, prompt, knowledgeMessages, agentInfo, lang)
+	modelResult, err := localProvider.QueryText(question, writer, history, prompt, knowledgeMessages, toolSession, lang)
 	if err != nil {
 		return nil, err
 	}

@@ -15,12 +15,15 @@
 package object
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
+	"github.com/ThinkInAIXYZ/go-mcp/client"
 	"github.com/ThinkInAIXYZ/go-mcp/protocol"
-	"github.com/the-open-agent/openagent/agent"
+	"github.com/the-open-agent/openagent/mcp"
 	"github.com/the-open-agent/openagent/i18n"
 	mcppkg "github.com/the-open-agent/openagent/mcp"
 	"github.com/the-open-agent/openagent/util"
@@ -31,6 +34,7 @@ type McpTool struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	IsAllowed   bool   `json:"isAllowed"`
+	InputSchema string `json:"inputSchema,omitempty"`
 }
 
 type Server struct {
@@ -40,14 +44,11 @@ type Server struct {
 	UpdatedTime string `xorm:"varchar(100)" json:"updatedTime"`
 	DisplayName string `xorm:"varchar(100)" json:"displayName"`
 
-	Url   string      `xorm:"varchar(500)" json:"url"`
-	Token string      `xorm:"varchar(500)" json:"-"`
-	Tools []*McpTool  `xorm:"mediumtext" json:"tools"`
-
-	ConfigText  string            `xorm:"mediumtext" json:"configText"`
-	McpTools    []*agent.McpTools `xorm:"text" json:"mcpTools"`
-	TestContent string            `xorm:"varchar(500)" json:"testContent"`
-	IsDefault   bool              `json:"isDefault"`
+	Url         string     `xorm:"varchar(500)" json:"url"`
+	Token       string     `xorm:"varchar(500)" json:"-"`
+	Tools       []*McpTool `xorm:"mediumtext" json:"tools"`
+	TestContent string     `xorm:"varchar(500)" json:"testContent"`
+	IsDefault   bool       `json:"isDefault"`
 }
 
 func (s *Server) GetId() string {
@@ -196,10 +197,12 @@ func syncServerTools(server *Server) error {
 				break
 			}
 		}
+		schemaJSON, _ := json.Marshal(t.InputSchema)
 		newTools = append(newTools, &McpTool{
 			Name:        t.Name,
 			Description: t.Description,
 			IsAllowed:   isAllowed,
+			InputSchema: string(schemaJSON),
 		})
 	}
 
@@ -215,65 +218,55 @@ func DeleteServer(server *Server) (bool, error) {
 	return affected != 0, nil
 }
 
-func (s *Server) GetAgentClients() (*agent.AgentClients, error) {
-	toolsMap := make(map[string]bool)
-	for _, tool := range s.McpTools {
-		toolsMap[tool.ServerName] = tool.IsEnabled
+// BuildMcpToolSet opens a connection to the server's URL and returns an
+// McpToolSet with the allowed tools and the open connection.
+// The caller must close all connections in McpToolSet.Connections when done.
+func (s *Server) BuildMcpToolSet() (*mcp.ToolSet, error) {
+	if s.Url == "" {
+		return nil, nil
 	}
-	clients, err := agent.GetMCPClientMap(s.ConfigText, toolsMap)
+
+	cli, err := mcp.NewClient(s.Url, s.Token)
 	if err != nil {
 		return nil, err
 	}
-	var tools []*protocol.Tool
-	for _, mcpTool := range s.McpTools {
-		if !mcpTool.IsEnabled {
-			continue
-		}
-		var toolsList []*protocol.Tool
-		if err := json.Unmarshal([]byte(mcpTool.Tools), &toolsList); err != nil {
-			return nil, err
-		}
-		for _, tool := range toolsList {
-			tool.Name = agent.GetIdFromServerNameAndToolName(mcpTool.ServerName, tool.Name)
-		}
-		tools = append(tools, toolsList...)
+
+	// Determine which tools are allowed. If Tools is empty (not yet synced),
+	// allow everything; otherwise only include tools with IsAllowed = true.
+	allowedSet := make(map[string]bool)
+	hasFilter := len(s.Tools) > 0
+	for _, t := range s.Tools {
+		allowedSet[t.Name] = t.IsAllowed
 	}
-	return &agent.AgentClients{
-		Clients: clients,
-		Tools:   tools,
+
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	list, err := cli.ListTools(ctx)
+	if err != nil {
+		cli.Close()
+		return nil, err
+	}
+
+	var filteredTools []*protocol.Tool
+	for _, t := range list.Tools {
+		if hasFilter {
+			if allowed, ok := allowedSet[t.Name]; !ok || !allowed {
+				continue
+			}
+		}
+		tCopy := *t
+		tCopy.Name = mcp.GetIdFromServerNameAndToolName(s.Name, t.Name)
+		filteredTools = append(filteredTools, &tCopy)
+	}
+
+	return &mcp.ToolSet{
+		Connections: map[string]*client.Client{s.Name: cli},
+		Tools:       filteredTools,
 	}, nil
 }
 
-func RefreshServerMcpTools(server *Server) error {
-	tools, err := agent.GetToolsList(server.ConfigText)
-	if err != nil {
-		return err
-	}
-	server.McpTools = tools
-	return nil
-}
-
-func TestMcpServer(s *Server, lang string) (string, error) {
-	if strings.TrimSpace(s.ConfigText) == "" {
-		return "", fmt.Errorf("MCP server configuration (configText) is empty")
-	}
-	var payload struct {
-		Tool      string                 `json:"tool"`
-		Arguments map[string]interface{} `json:"arguments"`
-	}
-	if err := json.Unmarshal([]byte(s.TestContent), &payload); err != nil {
-		return "", fmt.Errorf(i18n.Translate(lang, "object:invalid MCP test JSON in testContent: %v"), err)
-	}
-	if strings.TrimSpace(payload.Tool) == "" {
-		return "", fmt.Errorf(i18n.Translate(lang, "object:MCP test JSON must include non-empty \"tool\""))
-	}
-	if payload.Arguments == nil {
-		payload.Arguments = map[string]interface{}{}
-	}
-	return agent.TestMcpToolCall(s.ConfigText, s.McpTools, payload.Tool, payload.Arguments)
-}
-
-func GetMcpAgentClientsFromContext(owner, serverName, lang string) (*agent.AgentClients, error) {
+// GetServerMcpToolSet loads the named MCP server and returns its tool set.
+func GetServerMcpToolSet(owner, serverName, lang string) (*mcp.ToolSet, error) {
 	if serverName == "" {
 		return nil, nil
 	}
@@ -284,7 +277,29 @@ func GetMcpAgentClientsFromContext(owner, serverName, lang string) (*agent.Agent
 	if server == nil {
 		return nil, fmt.Errorf(i18n.Translate(lang, "object:The MCP server: %s is not found"), serverName)
 	}
-	return server.GetAgentClients()
+	return server.BuildMcpToolSet()
+}
+
+// TestMcpServer connects to the server URL and calls the tool specified in
+// TestContent (JSON: {"tool": "toolName", "arguments": {...}}).
+func TestMcpServer(s *Server, lang string) (string, error) {
+	if s.Url == "" {
+		return "", fmt.Errorf(i18n.Translate(lang, "object:Server URL is empty"))
+	}
+	var payload struct {
+		Tool      string                 `json:"tool"`
+		Arguments map[string]interface{} `json:"arguments"`
+	}
+	if err := json.Unmarshal([]byte(s.TestContent), &payload); err != nil {
+		return "", fmt.Errorf(i18n.Translate(lang, "object:invalid MCP test JSON: %v"), err)
+	}
+	if strings.TrimSpace(payload.Tool) == "" {
+		return "", fmt.Errorf(i18n.Translate(lang, "object:MCP test JSON must include non-empty \"tool\""))
+	}
+	if payload.Arguments == nil {
+		payload.Arguments = map[string]interface{}{}
+	}
+	return mcp.CallTool(s.Url, s.Token, payload.Tool, payload.Arguments)
 }
 
 func GetServerCount(owner, field, value string) (int64, error) {

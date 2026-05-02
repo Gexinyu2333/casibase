@@ -65,7 +65,7 @@ func (p *YiProvider) calculatePrice(modelResult *ModelResult, lang string) error
 	}
 }
 
-func (p *YiProvider) QueryText(question string, writer io.Writer, history []*RawMessage, prompt string, knowledgeMessages []*RawMessage, agentInfo *AgentInfo, lang string) (*ModelResult, error) {
+func (p *YiProvider) QueryText(question string, writer io.Writer, history []*RawMessage, prompt string, knowledgeMessages []*RawMessage, toolSession *ToolSession, lang string) (*ModelResult, error) {
 	// Configure Yi API client
 	const BaseUrl = "https://api.lingyiwanwu.com/v1"
 
@@ -75,7 +75,7 @@ func (p *YiProvider) QueryText(question string, writer io.Writer, history []*Raw
 		return nil, err
 	}
 
-	modelResult, err := localProvider.QueryText(question, writer, history, prompt, knowledgeMessages, agentInfo, lang)
+	modelResult, err := localProvider.QueryText(question, writer, history, prompt, knowledgeMessages, toolSession, lang)
 	if err != nil {
 		return nil, err
 	}

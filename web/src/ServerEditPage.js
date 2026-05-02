@@ -19,9 +19,8 @@ import {LinkOutlined} from "@ant-design/icons";
 import * as ServerBackend from "./backend/ServerBackend";
 import * as Setting from "./Setting";
 import i18next from "i18next";
-import McpToolsTable from "./table/McpToolsTable";
 import ToolTable from "./table/ToolTable";
-import Editor from "./common/Editor";
+import TestMcpWidget from "./common/TestMcpWidget";
 
 class ServerEditPage extends React.Component {
   constructor(props) {
@@ -32,10 +31,7 @@ class ServerEditPage extends React.Component {
       server: null,
       originalServer: null,
       isNewServer: props.location?.state?.isNewServer || false,
-      refreshButtonLoading: false,
       syncButtonLoading: false,
-      testButtonLoading: false,
-      testResult: "",
     };
   }
 
@@ -89,27 +85,6 @@ class ServerEditPage extends React.Component {
       });
   }
 
-  refreshMcpTools() {
-    this.setState({refreshButtonLoading: true});
-    const server = Setting.deepCopy(this.state.server);
-    server.mcpTools = [];
-    ServerBackend.refreshServerMcpTools(server)
-      .then((res) => {
-        if (res.status === "ok") {
-          Setting.showMessage("success", i18next.t("general:Successfully refreshed"));
-          this.updateServerField("mcpTools", res.data.mcpTools);
-        } else {
-          Setting.showMessage("error", `${i18next.t("general:Failed to refresh")}: ${res.msg}`);
-        }
-      })
-      .catch(error => {
-        Setting.showMessage("error", `${i18next.t("general:Failed to connect to server")}: ${error}`);
-      })
-      .finally(() => {
-        this.setState({refreshButtonLoading: false});
-      });
-  }
-
   syncMcpTool(isCleared) {
     const server = Setting.deepCopy(this.state.server);
     this.setState({syncButtonLoading: true});
@@ -130,38 +105,6 @@ class ServerEditPage extends React.Component {
       });
   }
 
-  testMcpServer() {
-    let parsed;
-    try {
-      parsed = JSON.parse(this.state.server.testContent);
-    } catch (e) {
-      Setting.showMessage("error", `${i18next.t("provider:Invalid MCP test JSON")}: ${e.message}`);
-      return;
-    }
-    if (!parsed || typeof parsed.tool !== "string" || parsed.tool.trim() === "") {
-      Setting.showMessage("error", i18next.t("provider:MCP test JSON must include tool"));
-      return;
-    }
-
-    this.setState({testButtonLoading: true, testResult: ""});
-    ServerBackend.testMcpServer(this.state.server)
-      .then((res) => {
-        if (res.status === "ok") {
-          const out = typeof res.data === "string" ? res.data : JSON.stringify(res.data, null, 2);
-          this.setState({testResult: out});
-          Setting.showMessage("success", i18next.t("general:Success"));
-        } else {
-          Setting.showMessage("error", res.msg || i18next.t("general:Failed to save"));
-        }
-      })
-      .catch(error => {
-        Setting.showMessage("error", `${i18next.t("general:Failed to connect to server")}: ${error.message}`);
-      })
-      .finally(() => {
-        this.setState({testButtonLoading: false});
-      });
-  }
-
   renderServer() {
     return (
       <Card size="small" title={
@@ -177,7 +120,7 @@ class ServerEditPage extends React.Component {
             {Setting.getLabel(i18next.t("general:Name"), i18next.t("general:Name - Tooltip"))} :
           </Col>
           <Col span={22}>
-            <Input value={this.state.server.name} disabled />
+            <Input value={this.state.server.name} onChange={e => this.updateServerField("name", e.target.value)} />
           </Col>
         </Row>
         <Row style={{marginTop: "20px"}}>
@@ -223,74 +166,12 @@ class ServerEditPage extends React.Component {
         </Row>
         <Row style={{marginTop: "20px"}}>
           <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("server:MCP servers config"), i18next.t("server:MCP servers config - Tooltip"))} :
-          </Col>
-          <Col span={10}>
-            <Editor
-              value={this.state.server.configText}
-              lang="json"
-              height="200px"
-              dark
-              onChange={value => this.updateServerField("configText", value)}
-            />
-            <br />
-            <Button loading={this.state.refreshButtonLoading} type="primary" style={{marginBottom: "10px"}}
-              onClick={() => this.refreshMcpTools()}>
-              {i18next.t("server:Refresh MCP tools")}
-            </Button>
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}}>
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("server:MCP tools"), i18next.t("server:MCP tools - Tooltip"))} :
+            {Setting.getLabel(i18next.t("server:MCP test"), i18next.t("server:MCP test - Tooltip"))} :
           </Col>
           <Col span={22}>
-            <McpToolsTable
-              title={i18next.t("server:MCP tools")}
-              table={this.state.server.mcpTools}
-              onUpdateTable={(value) => this.updateServerField("mcpTools", value)}
-            />
+            <TestMcpWidget server={this.state.server} />
           </Col>
         </Row>
-        <Row style={{marginTop: "20px"}}>
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("provider:Provider test"), i18next.t("provider:MCP test JSON - Tooltip"))} :
-          </Col>
-          <Col span={10}>
-            <Editor
-              value={this.state.server.testContent}
-              lang="json"
-              height="150px"
-              dark
-              onChange={value => this.updateServerField("testContent", value)}
-            />
-          </Col>
-          <Col span={6}>
-            <Button
-              style={{marginLeft: "10px"}}
-              type="primary"
-              loading={this.state.testButtonLoading}
-              disabled={!this.state.server.testContent || this.state.server.testContent.trim() === ""}
-              onClick={() => this.testMcpServer()}>
-              {i18next.t("provider:Invoke MCP tool")}
-            </Button>
-          </Col>
-        </Row>
-        {this.state.testResult ? (
-          <Row style={{marginTop: "10px"}}>
-            <Col span={2}></Col>
-            <Col span={10}>
-              <div style={{marginBottom: "5px"}}><strong>{i18next.t("provider:MCP tool result")}:</strong></div>
-              <Editor
-                value={this.state.testResult}
-                lang="text"
-                height="150px"
-                dark
-                readOnly
-              />
-            </Col>
-          </Row>
-        ) : null}
         <Row style={{marginTop: "20px"}}>
           <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
             {Setting.getLabel(i18next.t("server:Base URL"), i18next.t("server:Base URL - Tooltip"))} :

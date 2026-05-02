@@ -77,8 +77,6 @@ class ServerStorePage extends React.Component {
       createdTime: moment().format(),
       displayName: onlineServer.name || serverName,
       url: serverUrl,
-      configText: JSON.stringify({mcpServers: {}}, null, 2),
-      mcpTools: [],
       testContent: "",
       isDefault: false,
     };

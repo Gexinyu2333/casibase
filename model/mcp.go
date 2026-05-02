@@ -24,18 +24,18 @@ import (
 	"github.com/ThinkInAIXYZ/go-mcp/protocol"
 	"github.com/openai/openai-go/v2/responses"
 	"github.com/sashabaranov/go-openai"
-	"github.com/the-open-agent/openagent/agent"
 	"github.com/the-open-agent/openagent/i18n"
+	"github.com/the-open-agent/openagent/mcp"
 )
 
-type AgentMessages struct {
+type ToolMessages struct {
 	Messages  []*RawMessage
 	ToolCalls any
 }
 
-type AgentInfo struct {
-	AgentClients  *agent.AgentClients
-	AgentMessages *AgentMessages
+type ToolSession struct {
+	McpToolSet   *mcp.ToolSet
+	ToolMessages *ToolMessages
 }
 
 type ToolCallResponse struct {
@@ -105,21 +105,21 @@ func handleToolCallsParameters(toolCall openai.ToolCall, toolCalls []openai.Tool
 	return toolCalls, toolCallsMap
 }
 
-func QueryTextWithTools(p ModelProvider, question string, writer io.Writer, history []*RawMessage, prompt string, knowledgeMessages []*RawMessage, agentInfo *AgentInfo, lang string) (*ModelResult, error) {
+func QueryTextWithTools(p ModelProvider, question string, writer io.Writer, history []*RawMessage, prompt string, knowledgeMessages []*RawMessage, toolSession *ToolSession, lang string) (*ModelResult, error) {
 	var messages []*RawMessage
-	modelResult, err := p.QueryText(question, writer, history, prompt, knowledgeMessages, agentInfo, lang)
+	modelResult, err := p.QueryText(question, writer, history, prompt, knowledgeMessages, toolSession, lang)
 	if err != nil {
 		return nil, err
 	}
 
-	if agentInfo.AgentMessages.ToolCalls == nil {
+	if toolSession.ToolMessages.ToolCalls == nil {
 		fmt.Printf("Tool Call: [None]\n")
 		return modelResult, nil
 	}
 
-	toolCalls, ok := agentInfo.AgentMessages.ToolCalls.([]openai.ToolCall)
+	toolCalls, ok := toolSession.ToolMessages.ToolCalls.([]openai.ToolCall)
 	if !ok {
-		responseFunctionToolCalls := agentInfo.AgentMessages.ToolCalls.([]responses.ResponseFunctionToolCall)
+		responseFunctionToolCalls := toolSession.ToolMessages.ToolCalls.([]responses.ResponseFunctionToolCall)
 		for _, responseFunctionToolCall := range responseFunctionToolCalls {
 			toolCalls = append(toolCalls, openai.ToolCall{
 				ID:       responseFunctionToolCall.ID,
@@ -131,7 +131,7 @@ func QueryTextWithTools(p ModelProvider, question string, writer io.Writer, hist
 
 	for len(toolCalls) > 0 {
 		for _, toolCall := range toolCalls {
-			serverName, toolName := agent.GetServerNameAndToolNameFromId(toolCall.Function.Name)
+			serverName, toolName := mcp.GetServerNameAndToolNameFromId(toolCall.Function.Name)
 
 			messages = append(messages, &RawMessage{
 				Text:     "Call result from " + toolCall.Function.Name,
@@ -139,20 +139,20 @@ func QueryTextWithTools(p ModelProvider, question string, writer io.Writer, hist
 				ToolCall: toolCall,
 			})
 
-			messages, err = callTools(toolCall, serverName, toolName, agentInfo.AgentClients, messages, writer, lang)
+			messages, err = callMcpTool(toolCall, serverName, toolName, toolSession.McpToolSet, messages, writer, lang)
 			if err != nil {
 				return nil, err
 			}
 		}
-		agentInfo.AgentMessages.Messages = messages
-		modelResult, err = p.QueryText(question, writer, history, prompt, knowledgeMessages, agentInfo, lang)
+		toolSession.ToolMessages.Messages = messages
+		modelResult, err = p.QueryText(question, writer, history, prompt, knowledgeMessages, toolSession, lang)
 		if err != nil {
 			return nil, err
 		}
-		toolCalls, ok = agentInfo.AgentMessages.ToolCalls.([]openai.ToolCall)
+		toolCalls, ok = toolSession.ToolMessages.ToolCalls.([]openai.ToolCall)
 		if !ok {
 			toolCalls = []openai.ToolCall{}
-			responseFunctionToolCalls := agentInfo.AgentMessages.ToolCalls.([]responses.ResponseFunctionToolCall)
+			responseFunctionToolCalls := toolSession.ToolMessages.ToolCalls.([]responses.ResponseFunctionToolCall)
 			for _, responseFunctionToolCall := range responseFunctionToolCalls {
 				toolCalls = append(toolCalls, openai.ToolCall{
 					ID:       responseFunctionToolCall.ID,
@@ -163,8 +163,8 @@ func QueryTextWithTools(p ModelProvider, question string, writer io.Writer, hist
 		}
 	}
 
-	for _, mcpClient := range agentInfo.AgentClients.Clients {
-		mcpClient.Close()
+	for _, conn := range toolSession.McpToolSet.Connections {
+		conn.Close()
 	}
 	return modelResult, nil
 }
@@ -177,7 +177,7 @@ func createToolMessage(toolCall openai.ToolCall, text string) *RawMessage {
 	}
 }
 
-func callTools(toolCall openai.ToolCall, serverName, toolName string, agentClients *agent.AgentClients, messages []*RawMessage, writer io.Writer, lang string) ([]*RawMessage, error) {
+func callMcpTool(toolCall openai.ToolCall, serverName, toolName string, mcpToolSet *mcp.ToolSet, messages []*RawMessage, writer io.Writer, lang string) ([]*RawMessage, error) {
 	var arguments map[string]interface{}
 	ctx := context.Background()
 
@@ -203,13 +203,13 @@ func callTools(toolCall openai.ToolCall, serverName, toolName string, agentClien
 
 	if serverName == "" {
 		// builtin tools
-		if agentClients.BuiltinToolReg == nil {
+		if mcpToolSet.BuiltinTools == nil {
 			return messages, nil
 		}
-		result, err = agentClients.BuiltinToolReg.ExecuteTool(ctx, toolName, arguments)
+		result, err = mcpToolSet.BuiltinTools.ExecuteTool(ctx, toolName, arguments)
 	} else {
-		// MCP tools
-		mcpClient, ok := agentClients.Clients[serverName]
+		// MCP server tools
+		conn, ok := mcpToolSet.Connections[serverName]
 		if !ok {
 			return messages, nil
 		}
@@ -217,7 +217,7 @@ func callTools(toolCall openai.ToolCall, serverName, toolName string, agentClien
 			Name:      toolName,
 			Arguments: arguments,
 		}
-		result, err = mcpClient.CallTool(ctx, req)
+		result, err = conn.CallTool(ctx, req)
 	}
 
 	response := &ToolCallResponse{

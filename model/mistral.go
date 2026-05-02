@@ -85,7 +85,7 @@ func (c *MistralModelProvider) calculatePrice(modelResult *ModelResult, lang str
 	return nil
 }
 
-func (c *MistralModelProvider) QueryText(question string, writer io.Writer, history []*RawMessage, prompt string, knowledgeMessages []*RawMessage, agentInfo *AgentInfo, lang string) (*ModelResult, error) {
+func (c *MistralModelProvider) QueryText(question string, writer io.Writer, history []*RawMessage, prompt string, knowledgeMessages []*RawMessage, toolSession *ToolSession, lang string) (*ModelResult, error) {
 	chatRes, err := c.client.Chat(c.modelName, []mistral.ChatMessage{{Content: question, Role: mistral.RoleUser}}, nil)
 	if err != nil {
 		return nil, fmt.Errorf(i18n.Translate(lang, "model:error getting chat completion: %v"), err)

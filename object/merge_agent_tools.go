@@ -15,7 +15,7 @@
 package object
 
 import (
-	"github.com/the-open-agent/openagent/agent"
+	"github.com/the-open-agent/openagent/mcp"
 	"github.com/the-open-agent/openagent/tool"
 	"github.com/the-open-agent/openagent/util"
 )
@@ -45,29 +45,31 @@ func buildMergedBuiltinRegistry(store *Store, lang string) *tool.ToolRegistry {
 	return reg
 }
 
-// MergeAgentToolClients merges MCP agent tools with tools from configured Tools, plus web-search flag.
-func MergeAgentToolClients(agentClients *agent.AgentClients, store *Store, webSearchEnabled bool, lang string) *agent.AgentClients {
+// MergeMcpTools merges builtin tools (from the store's tool list) and the
+// web-search flag into an existing McpToolSet, creating one if needed.
+func MergeMcpTools(mcpToolSet *mcp.ToolSet, store *Store, webSearchEnabled bool, lang string) *mcp.ToolSet {
 	if webSearchEnabled {
-		if agentClients == nil {
-			agentClients = &agent.AgentClients{}
+		if mcpToolSet == nil {
+			mcpToolSet = &mcp.ToolSet{}
 		}
-		agentClients.WebSearchEnabled = true
+		mcpToolSet.WebSearchEnabled = true
 	}
 
 	reg := buildMergedBuiltinRegistry(store, lang)
 	allTools := reg.GetToolsAsProtocolTools()
 	if len(allTools) == 0 {
-		return agentClients
+		return mcpToolSet
 	}
 
-	if agentClients == nil {
-		return &agent.AgentClients{
-			Tools:          allTools,
-			BuiltinToolReg: reg,
+	if mcpToolSet == nil {
+		return &mcp.ToolSet{
+			Tools:        allTools,
+			BuiltinTools: reg,
 		}
 	}
 
-	agentClients.Tools = append(agentClients.Tools, allTools...)
-	agentClients.BuiltinToolReg = reg
-	return agentClients
+	mcpToolSet.Tools = append(mcpToolSet.Tools, allTools...)
+	mcpToolSet.BuiltinTools = reg
+	return mcpToolSet
 }
+

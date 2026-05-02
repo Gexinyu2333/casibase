@@ -43,8 +43,6 @@ class ServerListPage extends BaseListPage {
       name: `server_${randomName}`,
       createdTime: moment().format(),
       displayName: `New MCP Server - ${randomName}`,
-      configText: JSON.stringify({mcpServers: {}}, null, 2),
-      mcpTools: [],
       testContent: "",
       isDefault: false,
     };
@@ -111,8 +109,6 @@ class ServerListPage extends BaseListPage {
       createdTime: moment().format(),
       displayName: `Scanned MCP ${scanServer.host}:${scanServer.port}`,
       url: scanServer.url,
-      configText: JSON.stringify({mcpServers: {}}, null, 2),
-      mcpTools: [],
       testContent: "",
       isDefault: false,
     };
@@ -177,19 +173,10 @@ class ServerListPage extends BaseListPage {
         ...this.getColumnSearchProps("displayName"),
       },
       {
-        title: i18next.t("server:MCP tools"),
-        key: "mcpTools",
+        title: i18next.t("general:Tool"),
+        key: "tools",
         width: "130px",
-        render: (_, record) => {
-          const count = record.mcpTools ? record.mcpTools.reduce((sum, t) => {
-            try {
-              return sum + JSON.parse(t.tools || "[]").length;
-            } catch {
-              return sum;
-            }
-          }, 0) : 0;
-          return count;
-        },
+        render: (_, record) => (record.tools ? record.tools.length : 0),
       },
       {
         title: i18next.t("general:Action"),

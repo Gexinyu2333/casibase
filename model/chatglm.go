@@ -64,7 +64,7 @@ func (p *ChatGLMModelProvider) calculatePrice(modelResult *ModelResult, lang str
 	return nil
 }
 
-func (p *ChatGLMModelProvider) QueryText(question string, writer io.Writer, history []*RawMessage, prompt string, knowledgeMessages []*RawMessage, agentInfo *AgentInfo, lang string) (*ModelResult, error) {
+func (p *ChatGLMModelProvider) QueryText(question string, writer io.Writer, history []*RawMessage, prompt string, knowledgeMessages []*RawMessage, toolSession *ToolSession, lang string) (*ModelResult, error) {
 	proxy := client.NewChatGLMClient(p.clientSecret, 30*time.Second)
 	messages := []client.Message{{Role: "user", Content: question}}
 	taskId, err := proxy.AsyncInvoke(p.subType, 0.2, messages)

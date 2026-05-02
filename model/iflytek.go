@@ -196,7 +196,7 @@ func (p *iFlytekModelProvider) calculatePrice(modelResult *ModelResult, lang str
 	return nil
 }
 
-func (p *iFlytekModelProvider) QueryText(question string, writer io.Writer, history []*RawMessage, prompt string, knowledgeMessages []*RawMessage, agentInfo *AgentInfo, lang string) (*ModelResult, error) {
+func (p *iFlytekModelProvider) QueryText(question string, writer io.Writer, history []*RawMessage, prompt string, knowledgeMessages []*RawMessage, toolSession *ToolSession, lang string) (*ModelResult, error) {
 	baseURL := p.getBaseURL()
 	apiModelName := p.getAPIModelName()
 	localProvider, err := NewLocalModelProvider("Custom-think", "custom-model", p.secretKey, p.temperature, 0, 0, 0, baseURL, apiModelName, 0, 0, "CNY")
@@ -204,7 +204,7 @@ func (p *iFlytekModelProvider) QueryText(question string, writer io.Writer, hist
 		return nil, err
 	}
 
-	modelResult, err := localProvider.QueryText(question, writer, history, prompt, knowledgeMessages, agentInfo, lang)
+	modelResult, err := localProvider.QueryText(question, writer, history, prompt, knowledgeMessages, toolSession, lang)
 	if err != nil {
 		return nil, err
 	}

@@ -72,7 +72,7 @@ func (p *DeepSeekProvider) calculatePrice(modelResult *ModelResult, lang string)
 	return nil
 }
 
-func (p *DeepSeekProvider) QueryText(question string, writer io.Writer, history []*RawMessage, prompt string, knowledgeMessages []*RawMessage, agentInfo *AgentInfo, lang string) (*ModelResult, error) {
+func (p *DeepSeekProvider) QueryText(question string, writer io.Writer, history []*RawMessage, prompt string, knowledgeMessages []*RawMessage, toolSession *ToolSession, lang string) (*ModelResult, error) {
 	const BaseUrl = "https://api.deepseek.com/v1"
 
 	var localType string
@@ -87,7 +87,7 @@ func (p *DeepSeekProvider) QueryText(question string, writer io.Writer, history 
 		return nil, err
 	}
 
-	modelResult, err := localProvider.QueryText(question, writer, history, prompt, knowledgeMessages, agentInfo, lang)
+	modelResult, err := localProvider.QueryText(question, writer, history, prompt, knowledgeMessages, toolSession, lang)
 	if err != nil {
 		return nil, err
 	}

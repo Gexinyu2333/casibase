@@ -70,7 +70,7 @@ func (p *MiniMaxModelProvider) calculatePrice(modelResult *ModelResult, lang str
 	return nil
 }
 
-func (p *MiniMaxModelProvider) QueryText(question string, writer io.Writer, history []*RawMessage, prompt string, knowledgeMessages []*RawMessage, agentInfo *AgentInfo, lang string) (*ModelResult, error) {
+func (p *MiniMaxModelProvider) QueryText(question string, writer io.Writer, history []*RawMessage, prompt string, knowledgeMessages []*RawMessage, toolSession *ToolSession, lang string) (*ModelResult, error) {
 	const BaseUrl = "https://api.minimax.chat/v1"
 
 	localProvider, err := NewLocalModelProvider("Custom", "", p.apiKey, p.temperature, 0, 0, 0, BaseUrl, p.subType, 0, 0, "CNY")
@@ -78,7 +78,7 @@ func (p *MiniMaxModelProvider) QueryText(question string, writer io.Writer, hist
 		return nil, err
 	}
 
-	modelResult, err := localProvider.QueryText(question, writer, history, prompt, knowledgeMessages, agentInfo, lang)
+	modelResult, err := localProvider.QueryText(question, writer, history, prompt, knowledgeMessages, toolSession, lang)
 	if err != nil {
 		return nil, err
 	}

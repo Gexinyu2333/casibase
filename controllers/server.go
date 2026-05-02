@@ -166,30 +166,6 @@ func (c *ApiController) DeleteServer() {
 	c.ResponseOk(success)
 }
 
-// RefreshServerMcpTools
-// @Title RefreshServerMcpTools
-// @Tag Server API
-// @Description refresh MCP tools for a server
-// @Param body body object.Server true "The details of the server"
-// @Success 200 {object} controllers.Response The Response object
-// @router /refresh-server-mcp-tools [post]
-func (c *ApiController) RefreshServerMcpTools() {
-	var server object.Server
-	err := json.Unmarshal(c.Ctx.Input.RequestBody, &server)
-	if err != nil {
-		c.ResponseError(err.Error())
-		return
-	}
-
-	err = object.RefreshServerMcpTools(&server)
-	if err != nil {
-		c.ResponseError(err.Error())
-		return
-	}
-
-	c.ResponseOk(&server)
-}
-
 // TestMcpServer
 // @Title TestMcpServer
 // @Tag Server API
