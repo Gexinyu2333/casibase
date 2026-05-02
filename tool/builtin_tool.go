@@ -18,8 +18,10 @@ import "github.com/the-open-agent/openagent/tool/builtin_tool"
 
 // Type aliases so callers can use tool.BuiltinTool and tool.ToolRegistry
 // without importing the sub-package directly.
-type BuiltinTool = builtin_tool.BuiltinTool
-type ToolRegistry = builtin_tool.ToolRegistry
+type (
+	BuiltinTool  = builtin_tool.BuiltinTool
+	ToolRegistry = builtin_tool.ToolRegistry
+)
 
 func NewToolRegistry() *ToolRegistry {
 	return builtin_tool.NewToolRegistry()

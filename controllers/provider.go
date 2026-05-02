@@ -190,4 +190,3 @@ func (c *ApiController) DeleteProvider() {
 
 	c.ResponseOk(success)
 }
-

@@ -37,23 +37,23 @@ type Provider struct {
 	Name        string `xorm:"varchar(100) notnull pk" json:"name"`
 	CreatedTime string `xorm:"varchar(100)" json:"createdTime"`
 
-	DisplayName        string            `xorm:"varchar(100)" json:"displayName"`
-	DisplayName2       string            `xorm:"varchar(100)" json:"displayName2"`
-	Category           string            `xorm:"varchar(100)" json:"category"`
-	Type               string            `xorm:"varchar(100)" json:"type"`
-	SubType            string            `xorm:"varchar(100)" json:"subType"`
-	Flavor             string            `xorm:"varchar(100)" json:"flavor"`
-	ClientId           string            `xorm:"varchar(100)" json:"clientId"`
-	ClientSecret       string            `xorm:"varchar(2000)" json:"clientSecret"`
-	Region             string            `xorm:"varchar(100)" json:"region"`
-	ProviderKey        string            `xorm:"varchar(100)" json:"providerKey"`
-	ProviderUrl        string            `xorm:"varchar(200)" json:"providerUrl"`
-	ApiVersion         string            `xorm:"varchar(100)" json:"apiVersion"`
+	DisplayName        string `xorm:"varchar(100)" json:"displayName"`
+	DisplayName2       string `xorm:"varchar(100)" json:"displayName2"`
+	Category           string `xorm:"varchar(100)" json:"category"`
+	Type               string `xorm:"varchar(100)" json:"type"`
+	SubType            string `xorm:"varchar(100)" json:"subType"`
+	Flavor             string `xorm:"varchar(100)" json:"flavor"`
+	ClientId           string `xorm:"varchar(100)" json:"clientId"`
+	ClientSecret       string `xorm:"varchar(2000)" json:"clientSecret"`
+	Region             string `xorm:"varchar(100)" json:"region"`
+	ProviderKey        string `xorm:"varchar(100)" json:"providerKey"`
+	ProviderUrl        string `xorm:"varchar(200)" json:"providerUrl"`
+	ApiVersion         string `xorm:"varchar(100)" json:"apiVersion"`
 	CompatibleProvider string `xorm:"varchar(100)" json:"compatibleProvider"`
 	Domain             string `xorm:"varchar(200)" json:"domain"`
 	Text               string `xorm:"mediumtext" json:"text"`
-	ConfigText         string            `xorm:"mediumtext" json:"configText"`
-	RawText            string            `xorm:"mediumtext" json:"rawText"` // Raw result from scan (for Scan category providers)
+	ConfigText         string `xorm:"mediumtext" json:"configText"`
+	RawText            string `xorm:"mediumtext" json:"rawText"` // Raw result from scan (for Scan category providers)
 
 	EnableThinking   bool    `json:"enableThinking"`
 	Temperature      float32 `xorm:"float" json:"temperature"`
