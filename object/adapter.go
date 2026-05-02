@@ -394,7 +394,7 @@ func (a *Adapter) createTable() {
 		panic(err)
 	}
 
-	err = a.engine.Sync2(new(Tool))
+	err = a.engine.Sync2(new(Server))
 	if err != nil {
 		panic(err)
 	}

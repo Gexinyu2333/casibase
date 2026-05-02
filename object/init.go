@@ -418,7 +418,7 @@ func initBuiltInSite() {
 		"/chat",
 		"/stores", "/chats", "/messages",
 		"/files", "/vectors",
-		"/providers", "/tools",
+		"/providers", "/tools", "/servers",
 		"/records", "/sessions",
 		"/users", "/casdoor-resources", "/permissions",
 		"/sites", "/resources", "/usages", "/visitors", "/sysinfo", "/swagger",
