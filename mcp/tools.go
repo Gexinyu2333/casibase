@@ -25,8 +25,8 @@ import (
 )
 
 // GetToolsFromURL connects to an HTTP-based MCP server and returns its tool list.
-// When token is non-empty it is sent as a Bearer Authorization header via StreamableHTTP transport;
-// otherwise SSE transport is used.
+// Always uses StreamableHTTP transport (the current MCP standard); when token is
+// non-empty it is sent as a Bearer Authorization header.
 func GetToolsFromURL(url, token string) ([]*protocol.Tool, error) {
 	var tr transport.ClientTransport
 	var err error
@@ -38,7 +38,7 @@ func GetToolsFromURL(url, token string) ([]*protocol.Tool, error) {
 			}),
 		)
 	} else {
-		tr, err = transport.NewSSEClientTransport(url)
+		tr, err = transport.NewStreamableHTTPClientTransport(url)
 	}
 	if err != nil {
 		return nil, fmt.Errorf("mcp: create transport for %s: %w", url, err)
