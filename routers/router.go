@@ -45,6 +45,7 @@ func initAPI() {
 	beego.Router("/api/get-account", &controllers.ApiController{}, "GET:GetAccount")
 	beego.Router("/api/update-account", &controllers.ApiController{}, "POST:UpdateAccount")
 	beego.Router("/api/get-signin-options", &controllers.ApiController{}, "GET:GetSigninOptions")
+	beego.Router("/api/chrome-connect", &controllers.ApiController{}, "GET:ChromeConnect")
 
 	beego.Router("/api/get-global-sites", &controllers.ApiController{}, "GET:GetGlobalSites")
 	beego.Router("/api/get-sites", &controllers.ApiController{}, "GET:GetSites")

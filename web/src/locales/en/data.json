@@ -972,6 +972,13 @@
     "Function name": "Function name",
     "Functions": "Functions",
     "Functions - Tooltip": "Functions - Tooltip",
+    "OpenAgent Chrome Extension": "OpenAgent Chrome Extension",
+    "OpenAgent Chrome Extension - Setup title": "Setup instructions",
+    "OpenAgent Chrome Extension - Step 1 prefix": "Install the extension from",
+    "OpenAgent Chrome Extension - Step 1 link": "openagent-chrome on GitHub",
+    "OpenAgent Chrome Extension - Step 2": "Open the extension popup in Chrome.",
+    "OpenAgent Chrome Extension - Step 3": "Enter http://127.0.0.1:14000 and click Connect.",
+    "OpenAgent Chrome Extension - Step 4": "Browser Use will now operate your current Chrome tabs.",
     "Prompt examples": "Prompt examples",
     "Prompt examples - Tooltip": "Prompt examples - Tooltip",
     "User Chrome": "User Chrome"

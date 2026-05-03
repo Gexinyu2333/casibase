@@ -71,6 +71,9 @@ func NewBrowserUseTool(config Config) (*BrowserUseTool, error) {
 }
 
 func (p *BrowserUseTool) BuiltinTools() []BuiltinTool {
+	if p.isChromeExtMode() {
+		return chromeConnectBuiltinTools()
+	}
 	return []BuiltinTool{
 		&browserUseOpenBuiltin{provider: p},
 		&browserUseSnapshotBuiltin{provider: p},
@@ -80,6 +83,7 @@ func (p *BrowserUseTool) BuiltinTools() []BuiltinTool {
 		&browserUsePlayMediaBuiltin{provider: p},
 		&browserUseTabsBuiltin{provider: p},
 		&browserUseSwitchTabBuiltin{provider: p},
+		&browserUseCloseTabBuiltin{provider: p},
 		&browserUseCloseBuiltin{provider: p},
 	}
 }
@@ -634,11 +638,13 @@ type browserUseElement struct {
 }
 
 type browserUseTab struct {
-	Index  int
-	ID     target.ID
-	Title  string
-	URL    string
-	Active bool
+	Index      int
+	ID         target.ID
+	Title      string
+	URL        string
+	Active     bool
+	Controlled bool
+	Protected  bool
 }
 
 func (s *browserUseSession) pageTargetsLocked() ([]*target.Info, error) {
@@ -781,11 +787,21 @@ func browserUseFormatTabs(tabs []browserUseTab) string {
 	var builder strings.Builder
 	builder.WriteString("Browser tabs:\n")
 	for _, tab := range tabs {
-		active := ""
+		markers := []string{}
 		if tab.Active {
-			active = " active"
+			markers = append(markers, "active")
 		}
-		builder.WriteString(fmt.Sprintf("[%d]%s %s\n", tab.Index, active, strings.TrimSpace(tab.Title)))
+		if tab.Controlled {
+			markers = append(markers, "controlled")
+		}
+		if tab.Protected {
+			markers = append(markers, "protected")
+		}
+		markerText := ""
+		if len(markers) > 0 {
+			markerText = " " + strings.Join(markers, " ")
+		}
+		builder.WriteString(fmt.Sprintf("[%d]%s %s\n", tab.Index, markerText, strings.TrimSpace(tab.Title)))
 		if strings.TrimSpace(tab.URL) != "" {
 			builder.WriteString(fmt.Sprintf("    %s\n", tab.URL))
 		}
@@ -1147,7 +1163,7 @@ type browserUseOpenBuiltin struct{ provider *BrowserUseTool }
 func (b *browserUseOpenBuiltin) GetName() string { return "browser_use_open" }
 
 func (b *browserUseOpenBuiltin) GetDescription() string {
-	return "Open or reuse the managed visible browser and navigate the active tab to a URL. Use this for real browser tasks only; do not claim a page was opened unless this tool succeeds. The browser keeps tabs, cookies, and media state across related user requests. This tool returns a fresh snapshot plus current browser state; use the returned element indexes only until the next page-changing action."
+	return "Open or reuse the managed visible browser and navigate the Browser Use controlled tab to a URL. In extension mode, OpenAgent UI tabs are protected and Browser Use uses a separate controlled tab. Use this for real browser tasks only; do not claim a page was opened unless this tool succeeds. The browser keeps tabs, cookies, and media state across related user requests. This tool returns a fresh snapshot plus current browser state; use the returned element indexes only until the next page-changing action."
 }
 
 func (b *browserUseOpenBuiltin) GetInputSchema() interface{} {
@@ -1190,7 +1206,7 @@ type browserUseSnapshotBuiltin struct{ provider *BrowserUseTool }
 func (b *browserUseSnapshotBuiltin) GetName() string { return "browser_use_snapshot" }
 
 func (b *browserUseSnapshotBuiltin) GetDescription() string {
-	return "Read the active tab in the existing managed browser and return visible text, indexed interactive elements, URL, title, active tab index, tab count, and media state. Treat this as the source of truth before acting. Use it at the start of a follow-up request and after every navigation, click, type, or key press before reusing element indexes. Do not invent page contents or completed browser actions that are not visible in this tool result."
+	return "Read the Browser Use controlled tab in the existing managed browser and return visible text, indexed interactive elements, URL, title, controlled tab index, tab count, and media state. Treat this as the source of truth before acting. Use it at the start of a follow-up request and after every navigation, click, type, or key press before reusing element indexes. Do not invent page contents or completed browser actions that are not visible in this tool result."
 }
 
 func (b *browserUseSnapshotBuiltin) GetInputSchema() interface{} {
@@ -1493,7 +1509,7 @@ type browserUsePlayMediaBuiltin struct{ provider *BrowserUseTool }
 func (b *browserUsePlayMediaBuiltin) GetName() string { return "browser_use_play_media" }
 
 func (b *browserUsePlayMediaBuiltin) GetDescription() string {
-	return "Play and unmute visible audio or video elements on the current browser tab. Use this after opening a page with music or video if playback is paused, muted, or silent. The result includes media playback state; do not tell the user audio is playing unless the returned state says a media element is playing."
+	return "Play and unmute visible audio or video elements on the Browser Use controlled tab. Use this after opening a page with music or video if playback is paused, muted, or silent. The result includes media playback state; do not tell the user audio is playing unless the returned state says a media element is playing."
 }
 
 func (b *browserUsePlayMediaBuiltin) GetInputSchema() interface{} {
@@ -1522,7 +1538,7 @@ type browserUseTabsBuiltin struct{ provider *BrowserUseTool }
 func (b *browserUseTabsBuiltin) GetName() string { return "browser_use_tabs" }
 
 func (b *browserUseTabsBuiltin) GetDescription() string {
-	return "List open browser tabs in the managed Browser Use window, including the active tab marker, titles, and URLs. Use this when a click opens a new tab, when the current page does not match what the user sees, or before switching tabs."
+	return "List open browser tabs available to Browser Use, including active, controlled, and protected tab markers, titles, and URLs. Use this when a click opens a new tab, when the current page does not match what the user sees, or before switching tabs."
 }
 
 func (b *browserUseTabsBuiltin) GetInputSchema() interface{} {
@@ -1550,7 +1566,7 @@ type browserUseSwitchTabBuiltin struct{ provider *BrowserUseTool }
 func (b *browserUseSwitchTabBuiltin) GetName() string { return "browser_use_switch_tab" }
 
 func (b *browserUseSwitchTabBuiltin) GetDescription() string {
-	return "Switch Browser Use to a tab returned by browser_use_tabs. The switch changes the active tab used by all Browser Use tools. This tool returns a fresh snapshot and browser state for the selected tab."
+	return "Switch Browser Use to a tab returned by browser_use_tabs. The switch sets the selected tab as the controlled tab used by Browser Use tools; protected OpenAgent UI tabs cannot be controlled. This tool returns a fresh snapshot and browser state for the selected tab."
 }
 
 func (b *browserUseSwitchTabBuiltin) GetInputSchema() interface{} {
@@ -1596,6 +1612,82 @@ func (b *browserUseSwitchTabBuiltin) Execute(ctx context.Context, arguments map[
 		return browserUseErrorWithState(b.provider, fmt.Sprintf("browser use snapshot failed after switching tabs: %s", err.Error())), nil
 	}
 	return browserUseTextWithState(b.provider, snapshot), nil
+}
+
+// ---------------------------------------------------------------------------
+// browser_use_close_tab
+// ---------------------------------------------------------------------------
+
+type browserUseCloseTabBuiltin struct{ provider *BrowserUseTool }
+
+func (b *browserUseCloseTabBuiltin) GetName() string { return "browser_use_close_tab" }
+
+func (b *browserUseCloseTabBuiltin) GetDescription() string {
+	return "Close a browser tab returned by browser_use_tabs without closing the whole Browser Use session. Use browser_use_tabs first, then pass the tab index to close."
+}
+
+func (b *browserUseCloseTabBuiltin) GetInputSchema() interface{} {
+	return map[string]interface{}{
+		"type":                 "object",
+		"additionalProperties": false,
+		"properties": map[string]interface{}{
+			"index": map[string]interface{}{
+				"type":        "integer",
+				"description": "Tab index returned by browser_use_tabs.",
+			},
+		},
+		"required": []string{"index"},
+	}
+}
+
+func (b *browserUseCloseTabBuiltin) Execute(ctx context.Context, arguments map[string]interface{}) (*protocol.CallToolResult, error) {
+	rawIndex, ok := arguments["index"]
+	if !ok {
+		return browserToolError("missing required parameter: index"), nil
+	}
+	index, err := browserUsePositiveInt(rawIndex, "index")
+	if err != nil {
+		return browserToolError(err.Error()), nil
+	}
+
+	err = b.provider.runSession(func(session *browserUseSession) error {
+		tabs, err := session.pageTargetsLocked()
+		if err != nil {
+			return err
+		}
+		if index > len(tabs) {
+			return fmt.Errorf("tab index %d is out of range; there are %d tabs", index, len(tabs))
+		}
+
+		targetID := tabs[index-1].TargetID
+		active := targetID == session.currentTargetIDLocked()
+		chromeContext := chromedp.FromContext(session.browserCtx)
+		if chromeContext == nil || chromeContext.Browser == nil {
+			return fmt.Errorf("browser context is not ready")
+		}
+		timeoutCtx, cancel := context.WithTimeout(session.browserCtx, browserUseDefaultTimeout)
+		defer cancel()
+		if err = target.CloseTarget(targetID).Do(cdp.WithExecutor(timeoutCtx, chromeContext.Browser)); err != nil {
+			return err
+		}
+		if active {
+			time.Sleep(300 * time.Millisecond)
+			tabs, err = session.pageTargetsLocked()
+			if err != nil {
+				return err
+			}
+			if len(tabs) > 0 {
+				return session.switchToTargetLocked(tabs[0].TargetID)
+			}
+			session.activeTargetID = ""
+			session.ctx = session.browserCtx
+		}
+		return nil
+	})
+	if err != nil {
+		return browserUseErrorWithState(b.provider, fmt.Sprintf("browser use close tab failed: %s", err.Error())), nil
+	}
+	return browserUseTextWithState(b.provider, fmt.Sprintf("Closed tab %d.", index)), nil
 }
 
 // ---------------------------------------------------------------------------

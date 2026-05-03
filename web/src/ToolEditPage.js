@@ -14,7 +14,7 @@
 
 import React from "react";
 import Loading from "./common/Loading";
-import {Button, Card, Col, Input, Row, Select, Switch, Table, Tag} from "antd";
+import {Alert, Button, Card, Col, Input, Row, Select, Switch, Table, Tag} from "antd";
 import * as ToolBackend from "./backend/ToolBackend";
 import * as Setting from "./Setting";
 import i18next from "i18next";
@@ -256,7 +256,34 @@ class ToolEditPage extends React.Component {
               >
                 <Option value="User Chrome">{i18next.t("tool:User Chrome")}</Option>
                 <Option value="Chrome for Testing">{i18next.t("tool:Chrome for Testing")}</Option>
+                <Option value="OpenAgent Chrome Extension">{i18next.t("tool:OpenAgent Chrome Extension")}</Option>
               </Select>
+            </Col>
+          </Row>
+        ) : null}
+        {this.state.tool.type === "browser_use" && this.state.tool.mode === "OpenAgent Chrome Extension" ? (
+          <Row style={{marginTop: "20px"}}>
+            <Col span={(Setting.isMobile()) ? 22 : 2} />
+            <Col span={22}>
+              <Alert
+                type="info"
+                showIcon
+                message={i18next.t("tool:OpenAgent Chrome Extension - Setup title")}
+                description={
+                  <ol style={{marginTop: "8px", marginBottom: "0", paddingLeft: "20px"}}>
+                    <li>
+                      {i18next.t("tool:OpenAgent Chrome Extension - Step 1 prefix")}
+                      {" "}
+                      <a href="https://github.com/the-open-agent/openagent-chrome" target="_blank" rel="noopener noreferrer">
+                        {i18next.t("tool:OpenAgent Chrome Extension - Step 1 link")}
+                      </a>
+                    </li>
+                    <li>{i18next.t("tool:OpenAgent Chrome Extension - Step 2")}</li>
+                    <li>{i18next.t("tool:OpenAgent Chrome Extension - Step 3")}</li>
+                    <li>{i18next.t("tool:OpenAgent Chrome Extension - Step 4")}</li>
+                  </ol>
+                }
+              />
             </Col>
           </Row>
         ) : null}

@@ -48,6 +48,16 @@ func setCorsHeaders(ctx *context.Context, origin string) {
 }
 
 func CorsFilter(ctx *context.Context) {
+	// The Chrome extension bridge is exempt from Casdoor-based CORS validation.
+	// WebSocket upgrade requests from Chrome extensions carry a chrome-extension://
+	// Origin that is not registered in Casdoor's redirect URIs and would be rejected
+	// by the standard CORS check. The bridge handler performs its own access control:
+	// loopback-only connections and chrome-extension:// origin validation via the
+	// WebSocket Upgrader's CheckOrigin callback.
+	if ctx.Request.URL.Path == "/api/chrome-connect" {
+		return
+	}
+
 	origin := ctx.Input.Header(headerOrigin)
 
 	if origin == "" || origin == "null" {

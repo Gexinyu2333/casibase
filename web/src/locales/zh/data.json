@@ -972,6 +972,13 @@
     "Function name": "Function name",
     "Functions": "Functions",
     "Functions - Tooltip": "Functions - Tooltip",
+    "OpenAgent Chrome Extension": "OpenAgent Chrome 扩展",
+    "OpenAgent Chrome Extension - Setup title": "使用步骤",
+    "OpenAgent Chrome Extension - Step 1 prefix": "从 GitHub 安装扩展：",
+    "OpenAgent Chrome Extension - Step 1 link": "openagent-chrome",
+    "OpenAgent Chrome Extension - Step 2": "在 Chrome 中打开扩展弹出窗口。",
+    "OpenAgent Chrome Extension - Step 3": "输入 http://127.0.0.1:14000 并点击「连接」。",
+    "OpenAgent Chrome Extension - Step 4": "Browser Use 将开始操控您当前的 Chrome 标签页。",
     "Prompt examples": "Prompt examples",
     "Prompt examples - Tooltip": "Prompt examples - Tooltip",
     "User Chrome": "User Chrome"

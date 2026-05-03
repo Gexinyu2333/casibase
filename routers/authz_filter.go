@@ -63,6 +63,8 @@ func permissionFilter(ctx *context.Context) {
 	exemptedPaths := []string{
 		// Auth endpoints — must remain public
 		"signin", "signout", "health",
+		// Local Chrome extension browser bridge
+		"chrome-connect",
 		// Get paths accessible to regular users
 		"get-account", "get-signin-options", "get-chats", "get-forms", "get-global-videos", "get-videos", "get-video", "get-messages",
 		"delete-welcome-message", "get-message-answer", "get-answer",
