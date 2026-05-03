@@ -82,7 +82,7 @@ func GetAnswerWithTool(modelProviderName, toolName, question, lang string) (stri
 			ToolCalls: nil,
 		}
 		toolSession := &model.ToolSession{
-			McpToolSet:    mcpToolSet,
+			McpToolSet:   mcpToolSet,
 			ToolMessages: messages,
 		}
 		modelResult, err = model.QueryTextWithTools(modelProviderObj, question, &writer, history, prompt, knowledge, toolSession, lang)

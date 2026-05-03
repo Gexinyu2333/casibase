@@ -72,4 +72,3 @@ func MergeMcpTools(mcpToolSet *mcp.ToolSet, store *Store, webSearchEnabled bool,
 	mcpToolSet.BuiltinTools = reg
 	return mcpToolSet
 }
-

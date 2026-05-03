@@ -23,8 +23,8 @@ import (
 
 	"github.com/ThinkInAIXYZ/go-mcp/client"
 	"github.com/ThinkInAIXYZ/go-mcp/protocol"
-	"github.com/the-open-agent/openagent/mcp"
 	"github.com/the-open-agent/openagent/i18n"
+	"github.com/the-open-agent/openagent/mcp"
 	mcppkg "github.com/the-open-agent/openagent/mcp"
 	"github.com/the-open-agent/openagent/util"
 	"xorm.io/core"

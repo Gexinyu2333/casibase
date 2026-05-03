@@ -253,7 +253,7 @@ func (c *ApiController) GetMessageAnswer() {
 			ToolCalls: nil,
 		}
 		toolSession := &model.ToolSession{
-			McpToolSet:  mcpToolSet,
+			McpToolSet:   mcpToolSet,
 			ToolMessages: messages,
 		}
 		modelResult, err = model.QueryTextWithTools(modelProviderObj, question, writer, history, prompt, knowledge, toolSession, c.GetAcceptLanguage())
