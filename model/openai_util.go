@@ -132,8 +132,9 @@ func OpenaiRawMessagesToMessages(messages []*RawMessage) []openai.ChatCompletion
 		}
 
 		item := openai.ChatCompletionMessage{
-			Role:    role,
-			Content: message.Text,
+			Role:             role,
+			Content:          message.Text,
+			ReasoningContent: message.ReasoningContent,
 		}
 		if role == openai.ChatMessageRoleTool {
 			item.ToolCallID = message.ToolCallID

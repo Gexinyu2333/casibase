@@ -262,9 +262,10 @@ func (p *LocalModelProvider) QueryText(question string, writer io.Writer, histor
 
 		isLeadingReturn := true
 		var (
-			answerData   strings.Builder
-			toolCalls    []openai.ToolCall
-			toolCallsMap map[int]int
+			answerData    strings.Builder
+			reasoningData strings.Builder
+			toolCalls     []openai.ToolCall
+			toolCallsMap  map[int]int
 		)
 
 		for {
@@ -292,8 +293,9 @@ func (p *LocalModelProvider) QueryText(question string, writer io.Writer, histor
 
 				// Check if we have reasoning content (think_content)
 				if completion.Choices[0].Delta.ReasoningContent != "" {
-					reasoningData := completion.Choices[0].Delta.ReasoningContent
-					err = flushThink(reasoningData, "reason", writer, lang)
+					data := completion.Choices[0].Delta.ReasoningContent
+					reasoningData.WriteString(data)
+					err = flushThink(data, "reason", writer, lang)
 					if err != nil {
 						return nil, err
 					}
@@ -340,6 +342,7 @@ func (p *LocalModelProvider) QueryText(question string, writer io.Writer, histor
 		}
 
 		if toolSession != nil && toolSession.ToolMessages != nil {
+			toolSession.ToolMessages.ReasoningContent = reasoningData.String()
 			toolSession.ToolMessages.ToolCalls = toolCalls
 		}
 

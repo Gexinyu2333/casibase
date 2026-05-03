@@ -116,7 +116,8 @@ func OpenaiRawMessagesToGptVisionMessages(messages []*RawMessage) ([]openai.Chat
 		urls, messageText := extractImagesURL(message.Text)
 
 		item := openai.ChatCompletionMessage{
-			Role: role,
+			Role:             role,
+			ReasoningContent: message.ReasoningContent,
 		}
 
 		if role == openai.ChatMessageRoleTool {
