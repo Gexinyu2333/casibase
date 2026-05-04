@@ -14,7 +14,7 @@
 
 import React from "react";
 import {Link} from "react-router-dom";
-import {Button, Popconfirm, Switch, Table, Tag} from "antd";
+import {Button, Popconfirm, Popover, Switch, Table, Tag} from "antd";
 import BaseListPage from "./BaseListPage";
 import {ThemeDefault} from "./Conf";
 import * as Setting from "./Setting";
@@ -207,6 +207,33 @@ class MessageListPage extends BaseListPage {
   renderDownloadXlsxButton() {
     return (
       <Button size="small" style={{marginRight: "10px"}} loading={this.state.downloadLoading} onClick={this.downloadMessages}>{i18next.t("general:Download")}</Button>
+    );
+  }
+
+  renderLongText(text, maxLength = 200) {
+    if (!text) {
+      return null;
+    }
+
+    const plainText = text.replace(/<[^>]*>/g, "");
+    if (plainText.length <= maxLength) {
+      return (
+        <div dangerouslySetInnerHTML={{__html: text}} />
+      );
+    }
+
+    const popoverContent = (
+      <div style={{width: "900px", maxWidth: "calc(100vw - 80px)", maxHeight: "500px", overflow: "auto", whiteSpace: "pre-wrap", wordBreak: "break-word"}}>
+        <div dangerouslySetInnerHTML={{__html: text}} />
+      </div>
+    );
+
+    return (
+      <Popover placement="left" content={popoverContent} overlayStyle={{maxWidth: "none"}}>
+        <div style={{maxWidth: "300px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", cursor: "pointer"}}>
+          {Setting.getShortText(plainText, maxLength)}
+        </div>
+      </Popover>
     );
   }
 
@@ -418,9 +445,7 @@ class MessageListPage extends BaseListPage {
         sorter: (a, b) => a.text.localeCompare(b.text),
         ...this.getColumnSearchProps("text"),
         render: (text, record, index) => {
-          return (
-            <div dangerouslySetInnerHTML={{__html: text}} />
-          );
+          return this.renderLongText(text);
         },
       },
       {

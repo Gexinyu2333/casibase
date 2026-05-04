@@ -38,7 +38,7 @@ const VectorTooltip = ({vectorScore, children}) => {
 
   const tooltipContent = () => {
     return (
-      <div style={{maxWidth: 800, fontSize: "14px", padding: "5px", boxSizing: "border-box"}}>
+      <div style={{width: "900px", maxWidth: "calc(100vw - 80px)", fontSize: "14px", padding: "5px", boxSizing: "border-box"}}>
         <div style={{display: "flex", gap: "5px", flexWrap: "wrap"}}>
           <span><strong>{i18next.t("general:Name")}:</strong> {vectorScore.vector}</span>
           <span><strong>{i18next.t("task:Score")}:</strong> {vectorScore.score}</span>
@@ -54,7 +54,7 @@ const VectorTooltip = ({vectorScore, children}) => {
   };
 
   return (
-    <Tooltip title={tooltipContent()} placement="left" overlayInnerStyle={{backgroundColor: "white", color: "black"}}>
+    <Tooltip title={tooltipContent()} placement="left" overlayStyle={{maxWidth: "none"}} overlayInnerStyle={{backgroundColor: "white", color: "black", maxWidth: "none"}}>
       {children}
     </Tooltip>
   );
