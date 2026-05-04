@@ -194,7 +194,7 @@ func (c *ApiController) addInitialChat(organization string, userName string, sto
 		CreatedTime:   currentTime,
 		UpdatedTime:   currentTime,
 		Organization:  organization,
-		DisplayName:   fmt.Sprintf("New Chat - %d", 1),
+		DisplayName:   "New Chat",
 		Store:         store.Name,
 		ModelProvider: store.ModelProvider,
 		Category:      "Default Category",
@@ -210,7 +210,7 @@ func (c *ApiController) addInitialChat(organization string, userName string, sto
 	}
 
 	if store.Welcome != "Hello" {
-		chat.DisplayName = fmt.Sprintf("新会话 - %d", 1)
+		chat.DisplayName = "新会话"
 		chat.Category = "默认分类"
 	}
 

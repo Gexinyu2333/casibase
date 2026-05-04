@@ -28,7 +28,7 @@ class ChatMenu extends React.Component {
 
     this.state = {
       openKeys: openKeys,
-      selectedKeys: [selectedKey],
+      selectedKeys: selectedKey ? [selectedKey] : [],
       editChat: false,
       editChatName: "",
       hoveredKey: null,
@@ -173,7 +173,7 @@ class ChatMenu extends React.Component {
     this.setState({
       selectedKeys: [`${categoryIndex}-${chatIndex}`],
       editChat: false,
-      editChatName: this.props.chats[chatIndex].displayName,
+      editChatName: this.props.chats[selectedItem.index].displayName,
     });
 
     if (this.props.onSelectChat) {
@@ -185,13 +185,21 @@ class ChatMenu extends React.Component {
     return items.map((item, index) => `${index}`);
   }
 
-  setSelectedKeyToNewChat(chats) {
+  clearSelectedKey() {
+    this.setState({
+      selectedKeys: [],
+      editChat: false,
+    });
+  }
+
+  setSelectedKeyToChat(chats, chatName) {
     const items = this.chatsToItems(chats);
     const openKeys = items.map((item) => item.key);
+    const selectedKey = this.getSelectedKeyOfCurrentChat(chats, chatName);
 
     this.setState({
       openKeys: openKeys,
-      selectedKeys: ["0-0"],
+      selectedKeys: selectedKey ? [selectedKey] : [],
     });
   }
 
@@ -215,7 +223,7 @@ class ChatMenu extends React.Component {
         break;
       }
     }
-    return selectedKey === null ? "0-0" : selectedKey;
+    return selectedKey;
   }
 
   onOpenChange = (keys) => {

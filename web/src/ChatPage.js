@@ -61,6 +61,7 @@ class ChatPage extends BaseListPage {
       filteredStores: [],
       paneCount: 1,
       storeName: currentStore, // Store the current store name in state
+      draftStoreName: currentStore,
       generationMode: "text",
     });
 
@@ -193,47 +194,6 @@ class ChatPage extends BaseListPage {
     }
   }
 
-  getNextChatIndex(name) {
-    if (!name) {
-      return 1;
-    }
-    const prefix = `${i18next.t("chat:New Chat")} - `;
-    if (name.startsWith(prefix)) {
-      const numberPart = name.slice(prefix.length);
-      if (!isNaN(numberPart)) {
-        return parseInt(numberPart) + 1;
-      }
-    }
-    return 1;
-  }
-
-  newChat(chat, selectStore = {}) {
-    const randomName = Setting.getRandomName();
-    let store = selectStore.name;
-    if (!store) {
-      store = "";
-    }
-    return {
-      owner: "admin",
-      name: `chat_${randomName}`,
-      store: store,
-      createdTime: moment().format(),
-      updatedTime: moment().format(),
-      organization: this.props.account.owner,
-      displayName: `${i18next.t("chat:New Chat")} - ${this.getNextChatIndex(chat?.displayName) ?? randomName}`,
-      type: "AI",
-      user: this.props.account.name,
-      category: chat !== undefined ? chat.category : i18next.t("chat:Default Category"),
-      user1: "",
-      user2: "",
-      users: [],
-      clientIp: this.props.account.createdIp,
-      userAgent: this.props.account.education,
-      messageCount: 0,
-      needTitle: true,
-    };
-  }
-
   newMessage(text, fileName, isHidden, isRegenerated, webSearchEnabled = false) {
     const randomName = Setting.getRandomName();
     const message = {
@@ -257,7 +217,7 @@ class ChatPage extends BaseListPage {
     };
 
     if (!this.state.chat) {
-      const urlStoreName = this.state.storeName || this.getStore();
+      const urlStoreName = this.state.draftStoreName || this.state.storeName || this.getStore();
       if (urlStoreName) {
         message.store = urlStoreName;
       }
@@ -306,7 +266,10 @@ class ChatPage extends BaseListPage {
           const chat = res.data;
           this.setState({
             chat: chat,
+            draftStoreName: chat.store,
+            generationMode: Setting.loadChatGenerationMode(chat.owner, chat.name),
           });
+          this.goToLinkSoft(this.generateChatUrl(chat.name, chat.store));
 
           const field = "user";
           const value = this.props.account.name;
@@ -320,7 +283,7 @@ class ChatPage extends BaseListPage {
                   data: chats,
                 });
                 if (this.menu && this.menu.current) {
-                  this.menu.current.setSelectedKeyToNewChat(chats);
+                  this.menu.current.setSelectedKeyToChat(chats, chat.name);
                 }
               }
             });
@@ -606,31 +569,20 @@ class ChatPage extends BaseListPage {
   }
 
   addChat(chat, selectStore) {
-    const newChat = this.newChat(chat, selectStore);
-    this.goToLinkSoft(this.generateChatUrl(newChat.name, newChat.store));
-    ChatBackend.addChat(newChat)
-      .then((res) => {
-        if (res.status === "ok") {
-          Setting.showMessage("success", i18next.t("general:Successfully added"));
-          this.setState({
-            chat: newChat,
-            messages: null,
-            messageError: false,
-            generationMode: Setting.loadChatGenerationMode(newChat.owner, newChat.name),
-          }, () => {
-            this.chatBox.current?.focusInput();
-          });
-          this.getMessages(newChat);
-
-          this.fetch({}, false);
-        } else {
-          Setting.showMessage("error", `${i18next.t("general:Failed to add")}: ${res.msg}`);
-        }
-      })
-      .catch(error => {
-        Setting.showMessage("error", `${i18next.t("general:Failed to connect to server")}: ${error}`);
-      });
-    return newChat;
+    const draftStoreName = selectStore?.name || this.state.storeName || this.getStore() || this.state.defaultStore?.name || "";
+    this.goToLinkSoft(this.generateChatUrl(undefined, draftStoreName));
+    this.setState({
+      chat: undefined,
+      messages: [],
+      chatMenuVisible: false,
+      messageError: false,
+      draftStoreName: draftStoreName,
+      generationMode: "text",
+    }, () => {
+      this.menu.current?.clearSelectedKey();
+      this.chatBox.current?.focusInput();
+    });
+    return undefined;
   }
 
   deleteChat(chats, i, chat) {
@@ -779,6 +731,7 @@ class ChatPage extends BaseListPage {
         // messages: null,
         chatMenuVisible: false,
         messageError: false,
+        draftStoreName: chat.store,
         generationMode: Setting.loadChatGenerationMode(chat.owner, chat.name),
       });
       this.getMessages(chat);
@@ -898,6 +851,7 @@ class ChatPage extends BaseListPage {
                 chat={this.state.chat}
                 store={this.state.chat ?
                   this.state.stores?.find(store => store.name === this.state.chat.store) :
+                  this.state.stores?.find(store => store.name === this.state.draftStoreName) ||
                   this.state.stores?.find(store => store.name === this.state.storeName) ||
                   this.state.stores?.find(store => store.isDefault === true)}
               />
@@ -926,6 +880,8 @@ class ChatPage extends BaseListPage {
             loading: false,
             data: chats,
             messages: [],
+            chat: undefined,
+            draftStoreName: storeName,
             messageError: false,
             searchText: params.searchText,
             searchedColumn: params.searchedColumn,
@@ -940,6 +896,7 @@ class ChatPage extends BaseListPage {
             this.getMessages(chat);
             this.setState({
               chat: chat,
+              draftStoreName: chat.store,
               generationMode: Setting.loadChatGenerationMode(chat.owner, chat.name),
             });
           }
@@ -947,7 +904,7 @@ class ChatPage extends BaseListPage {
 
           if (!setLoading) {
             if (this.menu && this.menu.current) {
-              this.menu.current.setSelectedKeyToNewChat(chats);
+              this.menu.current.setSelectedKeyToChat(chats, this.state.chat?.name);
             }
           }
         }
