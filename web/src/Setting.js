@@ -1106,6 +1106,10 @@ export function getOtherProviderInfo() {
         logo: `${StaticBaseUrl}/img/social_mcp.png`,
         url: "https://github.com/the-open-agent/openagent",
       },
+      local_file: {
+        logo: `${StaticBaseUrl}/img/social_mcp.png`,
+        url: "https://github.com/the-open-agent/openagent",
+      },
       office: {
         logo: `${StaticBaseUrl}/img/social_mcp.png`,
         url: "https://github.com/the-open-agent/openagent",
@@ -1445,6 +1449,7 @@ export function getProviderTypeOptions(category) {
       {id: "time", name: "time"},
       {id: "web_search", name: "web_search"},
       {id: "shell", name: "shell"},
+      {id: "local_file", name: "local_file"},
       {id: "office", name: "office"},
       {id: "web_fetch", name: "web_fetch"},
       {id: "web_browser", name: "web_browser"},
@@ -2195,6 +2200,10 @@ export function getProviderSubTypeOptions(category, type) {
         {id: "Baidu", name: "Baidu"},
       ];
     } else if (type === "shell") {
+      return [
+        {id: "Default", name: "Default"},
+      ];
+    } else if (type === "local_file") {
       return [
         {id: "Default", name: "Default"},
       ];
@@ -2985,6 +2994,35 @@ export function getToolFunctions(tool) {
       description: "Execute shell commands on the server",
       testContent: JSON.stringify({tool: "shell", arguments: {command: "echo hello"}}, null, 2),
     }];
+  }
+  if (type === "local_file") {
+    return [
+      {
+        name: "local_special_dirs",
+        description: "Return Desktop, Documents, and Downloads paths for the OS user running the OpenAgent backend",
+        testContent: JSON.stringify({tool: "local_special_dirs", arguments: {}}, null, 2),
+      },
+      {
+        name: "local_documents_scan",
+        description: "Scan an absolute local directory for supported documents",
+        testContent: JSON.stringify({tool: "local_documents_scan", arguments: {root: "/absolute/path/to/Desktop", preview_chars: 1200}}, null, 2),
+      },
+      {
+        name: "local_document_read",
+        description: "Read text from one supported local document",
+        testContent: JSON.stringify({tool: "local_document_read", arguments: {path: "/absolute/path/to/Desktop/report.pdf", offset: 0, limit: 12000}}, null, 2),
+      },
+      {
+        name: "local_text_write",
+        description: "Write Markdown or plain text to an absolute local path",
+        testContent: JSON.stringify({tool: "local_text_write", arguments: {path: "/absolute/path/to/Desktop/Project Summaries/summary.md", content: "# Summary\\n\\nProject notes.", overwrite: false}}, null, 2),
+      },
+      {
+        name: "local_file_move",
+        description: "Move one local file after explicit user confirmation",
+        testContent: JSON.stringify({tool: "local_file_move", arguments: {source: "/absolute/path/to/Desktop/report.pdf", target: "/absolute/path/to/Desktop/Project/report.pdf", confirmed: true, overwrite: false}}, null, 2),
+      },
+    ];
   }
   if (type === "web_fetch") {
     return [{

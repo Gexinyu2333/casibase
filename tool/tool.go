@@ -45,6 +45,8 @@ func New(config Config, lang string) (Tool, error) {
 		return NewWebSearchTool(config)
 	case "shell":
 		return &ShellTool{}, nil
+	case "local_file":
+		return &LocalFileTool{lang: lang}, nil
 	case "office":
 		return &OfficeTool{subType: officeSubType(config.SubType)}, nil
 	case "web_fetch":

@@ -294,6 +294,20 @@ func initBuiltInTools() {
 		},
 		{
 			Owner:       "admin",
+			Name:        "local_file",
+			Type:        "local_file",
+			SubType:     "Default",
+			TestContent: `{"tool":"local_special_dirs","arguments":{}}`,
+			State:       "Active",
+			PromptExamples: []string{
+				"Find my Desktop folder and list supported documents with previews.",
+				"Read /Users/alice/Desktop/report.pdf and summarize its contents.",
+				"Write a project summary to /home/alice/Desktop/Project Summaries/summary.md.",
+				"Move confirmed files into project folders after I approve the plan.",
+			},
+		},
+		{
+			Owner:       "admin",
 			Name:        "office",
 			Type:        "office",
 			SubType:     "Default",

@@ -117,6 +117,8 @@ class ToolEditPage extends React.Component {
                 this.updateToolField("subType", "DuckDuckGo");
               } else if (value === "shell") {
                 this.updateToolField("subType", "Default");
+              } else if (value === "local_file") {
+                this.updateToolField("subType", "Default");
               } else if (value === "office") {
                 this.updateToolField("subType", "All");
               } else if (value === "web_fetch") {
