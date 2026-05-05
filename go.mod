@@ -23,6 +23,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.27.27
 	github.com/aws/aws-sdk-go-v2/service/bedrockruntime v1.8.0
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.203.0
+	github.com/aymanbagabas/go-pty v0.2.2
 	github.com/baidubce/bce-qianfan-sdk/go/qianfan v0.0.14
 	github.com/beego/beego v1.12.12
 	github.com/carmel/gooxml v0.0.0-20220216072414-40ff56130850
@@ -100,7 +101,7 @@ require (
 	github.com/consensys/gnark-crypto v0.18.0 // indirect
 	github.com/crate-crypto/go-eth-kzg v1.3.0 // indirect
 	github.com/crate-crypto/go-ipa v0.0.0-20240724233137-53bbb0ceb27a // indirect
-	github.com/creack/pty v1.1.18 // indirect
+	github.com/creack/pty v1.1.21 // indirect
 	github.com/deckarep/golang-set/v2 v2.6.0 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.2.1-0.20230921164230-9754217aff8e // indirect
 	github.com/ethereum/c-kzg-4844/v2 v2.1.0 // indirect
@@ -121,6 +122,7 @@ require (
 	github.com/tidwall/sjson v1.2.5 // indirect
 	github.com/tiendc/go-deepcopy v1.7.2 // indirect
 	github.com/tjfoc/gmsm v1.4.1 // indirect
+	github.com/u-root/u-root v0.11.0 // indirect
 	github.com/xlab/treeprint v1.2.0 // indirect
 	github.com/xuri/efp v0.0.1 // indirect
 	github.com/xuri/nfp v0.0.2-0.20250530014748-2ddeb826f9a9 // indirect
