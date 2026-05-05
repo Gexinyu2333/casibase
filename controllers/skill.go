@@ -176,3 +176,26 @@ func (c *ApiController) DeleteSkill() {
 
 	c.ResponseOk(success)
 }
+
+// LoadSkill
+// @Title LoadSkill
+// @Tag Skill API
+// @Description read a skill folder from the server filesystem and return a parsed Skill object (not yet saved)
+// @Param path query string true "Absolute path to the skill folder containing SKILL.md"
+// @Success 200 {object} object.Skill The Response object
+// @router /load-skill [get]
+func (c *ApiController) LoadSkill() {
+	path := c.Input().Get("path")
+	if path == "" {
+		c.ResponseError("path is required")
+		return
+	}
+
+	s, err := object.LoadSkill(path)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	c.ResponseOk(s)
+}

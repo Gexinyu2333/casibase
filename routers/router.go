@@ -101,6 +101,7 @@ func initAPI() {
 	beego.Router("/api/update-skill", &controllers.ApiController{}, "POST:UpdateSkill")
 	beego.Router("/api/add-skill", &controllers.ApiController{}, "POST:AddSkill")
 	beego.Router("/api/delete-skill", &controllers.ApiController{}, "POST:DeleteSkill")
+	beego.Router("/api/load-skill", &controllers.ApiController{}, "GET:LoadSkill")
 
 	beego.Router("/api/get-global-tools", &controllers.ApiController{}, "GET:GetGlobalTools")
 	beego.Router("/api/get-tools", &controllers.ApiController{}, "GET:GetTools")

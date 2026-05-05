@@ -20,13 +20,18 @@ import BaseListPage from "./BaseListPage";
 import * as Setting from "./Setting";
 import * as SkillBackend from "./backend/SkillBackend";
 import i18next from "i18next";
-import {DeleteOutlined} from "@ant-design/icons";
+import {DeleteOutlined, DownloadOutlined} from "@ant-design/icons";
+import LoadSkillModal from "./LoadSkillModal";
 
 const SKILL_TYPES = ["writing", "coding", "analysis", "translation", "reasoning", "search", "custom"];
 
 class SkillListPage extends BaseListPage {
   constructor(props) {
     super(props);
+    this.state = {
+      ...this.state,
+      loadModalVisible: false,
+    };
   }
 
   newSkill() {
@@ -38,7 +43,12 @@ class SkillListPage extends BaseListPage {
       displayName: "",
       type: "custom",
       description: "",
+      homepage: "",
+      emoji: "",
+      metadata: "",
       content: "",
+      skillMd: "",
+      references: [],
       state: "Active",
     };
   }
@@ -96,15 +106,18 @@ class SkillListPage extends BaseListPage {
         width: "200px",
         sorter: (a, b) => a.name.localeCompare(b.name),
         ...this.getColumnSearchProps("name"),
-        render: (text) => (
-          <Link to={`/skills/${text}`}>{text}</Link>
+        render: (text, record) => (
+          <span>
+            {record.emoji && <span style={{marginRight: 6}}>{record.emoji}</span>}
+            <Link to={`/skills/${text}`}>{text}</Link>
+          </span>
         ),
       },
       {
         title: i18next.t("general:Display name"),
         dataIndex: "displayName",
         key: "displayName",
-        width: "180px",
+        width: "160px",
         sorter: (a, b) => (a.displayName || "").localeCompare(b.displayName || ""),
         ...this.getColumnSearchProps("displayName"),
       },
@@ -112,7 +125,7 @@ class SkillListPage extends BaseListPage {
         title: i18next.t("general:Type"),
         dataIndex: "type",
         key: "type",
-        width: "130px",
+        width: "120px",
         filterMultiple: false,
         filters: SKILL_TYPES.map((t) => ({text: t, value: t})),
         onFilter: (value, record) => record.type === value,
@@ -127,10 +140,28 @@ class SkillListPage extends BaseListPage {
         ...this.getColumnSearchProps("description"),
       },
       {
+        title: i18next.t("skill:References"),
+        key: "references",
+        width: "160px",
+        render: (_, record) => {
+          const refs = record.references || [];
+          if (refs.length === 0) {
+            return null;
+          }
+          return (
+            <div style={{display: "flex", flexDirection: "column", gap: "3px"}}>
+              {refs.map(r => (
+                <Tag key={r.name} style={{fontFamily: "monospace", margin: 0}}>{r.name}</Tag>
+              ))}
+            </div>
+          );
+        },
+      },
+      {
         title: i18next.t("general:State"),
         dataIndex: "state",
         key: "state",
-        width: "110px",
+        width: "100px",
         sorter: (a, b) => (a.state || "").localeCompare(b.state || ""),
       },
       {
@@ -141,8 +172,11 @@ class SkillListPage extends BaseListPage {
         fixed: (Setting.isMobile()) ? "right" : false,
         render: (text, record) => (
           <div>
-            <Button style={{marginTop: "10px", marginBottom: "10px", marginRight: "10px"}} type="primary"
-              onClick={() => this.props.history.push(`/skills/${record.name}`)}>
+            <Button
+              style={{marginTop: "10px", marginBottom: "10px", marginRight: "10px"}}
+              type="primary"
+              onClick={() => this.props.history.push(`/skills/${record.name}`)}
+            >
               {i18next.t("general:Edit")}
             </Button>
             <Popconfirm
@@ -170,6 +204,11 @@ class SkillListPage extends BaseListPage {
 
     return (
       <div>
+        <LoadSkillModal
+          open={this.state.loadModalVisible}
+          onClose={() => this.setState({loadModalVisible: false})}
+          onImported={(skillName) => this.props.history.push(`/skills/${skillName}`)}
+        />
         <Table
           scroll={{x: "max-content"}}
           columns={columns}
@@ -183,6 +222,14 @@ class SkillListPage extends BaseListPage {
               {i18next.t("general:Skills")}&nbsp;&nbsp;&nbsp;&nbsp;
               <Button type="primary" size="small" onClick={() => this.addSkill()}>
                 {i18next.t("general:Add")}
+              </Button>
+              &nbsp;&nbsp;
+              <Button
+                size="small"
+                icon={<DownloadOutlined />}
+                onClick={() => this.setState({loadModalVisible: true})}
+              >
+                {i18next.t("skill:Load Existing Skill")}
               </Button>
             </div>
           )}

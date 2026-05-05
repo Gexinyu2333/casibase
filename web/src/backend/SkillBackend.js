@@ -79,3 +79,13 @@ export function deleteSkill(skill) {
     body: JSON.stringify(newSkill),
   }).then(res => Setting.handleFetchResponse(res));
 }
+
+export function loadSkill(path) {
+  return fetch(`${Setting.ServerUrl}/api/load-skill?path=${encodeURIComponent(path)}`, {
+    method: "GET",
+    credentials: "include",
+    headers: {
+      "Accept-Language": Setting.getAcceptLanguage(),
+    },
+  }).then(res => Setting.handleFetchResponse(res));
+}
