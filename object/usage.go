@@ -216,6 +216,13 @@ func GetUsageMetadata(lang string) (*UsageMetadata, error) {
 	return res, nil
 }
 
+func GetDefaultUsageMetadata() *UsageMetadata {
+	return &UsageMetadata{
+		Organization: "OpenAgent",
+		Application:  "OpenAgent",
+	}
+}
+
 func GetUsers(storeName, user string) ([]string, error) {
 	users := []string{}
 	userMap := map[string]bool{}

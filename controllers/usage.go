@@ -42,7 +42,7 @@ func (c *ApiController) GetUsages() {
 	if conf.IsCasdoorAvailable() {
 		usageMetadata, err = object.GetUsageMetadata(c.GetAcceptLanguage())
 	} else {
-		usageMetadata = &object.UsageMetadata{}
+		usageMetadata = object.GetDefaultUsageMetadata()
 	}
 	if err != nil {
 		c.ResponseError(err.Error())
@@ -75,7 +75,7 @@ func (c *ApiController) GetRangeUsages() {
 	if conf.IsCasdoorAvailable() {
 		usageMetadata, err = object.GetUsageMetadata(c.GetAcceptLanguage())
 	} else {
-		usageMetadata = &object.UsageMetadata{}
+		usageMetadata = object.GetDefaultUsageMetadata()
 	}
 	if err != nil {
 		c.ResponseError(err.Error())
