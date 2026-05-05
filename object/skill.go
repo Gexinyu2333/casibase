@@ -46,14 +46,14 @@ type Skill struct {
 	Name        string `xorm:"varchar(100) notnull pk" json:"name"`
 	CreatedTime string `xorm:"varchar(100)" json:"createdTime"`
 
-	DisplayName string `xorm:"varchar(200)" json:"displayName"`
-	Type        string `xorm:"varchar(100)" json:"type"`
-	Description string `xorm:"mediumtext" json:"description"`
-	Homepage    string `xorm:"varchar(500)" json:"homepage"`
-	Emoji       string `xorm:"varchar(50)" json:"emoji"`
-	Metadata    string `xorm:"mediumtext" json:"metadata"`
-	Content     string `xorm:"mediumtext" json:"content"`
-	SkillMd     string `xorm:"mediumtext" json:"skillMd"`
+	DisplayName string           `xorm:"varchar(200)" json:"displayName"`
+	Type        string           `xorm:"varchar(100)" json:"type"`
+	Description string           `xorm:"mediumtext" json:"description"`
+	Homepage    string           `xorm:"varchar(500)" json:"homepage"`
+	Emoji       string           `xorm:"varchar(50)" json:"emoji"`
+	Metadata    string           `xorm:"mediumtext" json:"metadata"`
+	Content     string           `xorm:"mediumtext" json:"content"`
+	SkillMd     string           `xorm:"mediumtext" json:"skillMd"`
 	References  []SkillReference `xorm:"mediumtext" json:"references"`
 
 	State string `xorm:"varchar(100)" json:"state"`
