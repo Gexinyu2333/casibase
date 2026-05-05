@@ -42,6 +42,7 @@ const (
 	shellMaxPollBytes          = 100000
 	shellDefaultPTYRows        = 40
 	shellDefaultPTYCols        = 120
+	shellSessionIdleTimeout    = 30 * time.Minute
 )
 
 // ShellTool is the Tool Type "shell".
@@ -54,19 +55,20 @@ func (p *ShellTool) BuiltinTools() []BuiltinTool {
 type shellBuiltin struct{}
 
 type shellSession struct {
-	id        string
-	command   string
-	workdir   string
-	usePTY    bool
-	cmd       *exec.Cmd
-	stdin     io.WriteCloser
-	ptyFile   *os.File
-	output    *shellRingBuffer
-	done      chan struct{}
-	cancel    context.CancelFunc
-	startedAt time.Time
-	exitErr   error
-	exitCode  *int
+	id           string
+	command      string
+	workdir      string
+	usePTY       bool
+	cmd          *exec.Cmd
+	stdin        io.WriteCloser
+	ptyFile      *os.File
+	output       *shellRingBuffer
+	done         chan struct{}
+	cancel       context.CancelFunc
+	startedAt    time.Time
+	lastActivity time.Time
+	exitErr      error
+	exitCode     *int
 
 	mu     sync.Mutex
 	closed bool
@@ -81,9 +83,10 @@ type shellRingBuffer struct {
 }
 
 type shellSessionManager struct {
-	mu       sync.Mutex
-	sessions map[string]*shellSession
-	nextID   uint64
+	mu          sync.Mutex
+	sessions    map[string]*shellSession
+	nextID      uint64
+	cleanupOnce sync.Once
 }
 
 var globalShellSessionManager = &shellSessionManager{
@@ -888,26 +891,32 @@ func (s *shellSession) exitErrorText() interface{} {
 
 func (s *shellSession) stop() {
 	s.mu.Lock()
-	defer s.mu.Unlock()
-
 	if s.closed {
+		s.mu.Unlock()
 		return
 	}
 	s.closed = true
-
 	if s.cancel != nil {
 		s.cancel()
 	}
 	s.closeInputLocked()
-	if s.cmd != nil && s.cmd.Process != nil {
+	done := s.done
+	var process *os.Process
+	if s.cmd != nil {
+		process = s.cmd.Process
+	}
+	s.mu.Unlock()
+
+	// Wait outside the lock so wait() can acquire it to call closeInput().
+	if process != nil {
 		if runtime.GOOS == "windows" {
-			_ = s.cmd.Process.Kill()
+			_ = process.Kill()
 		} else {
-			_ = s.cmd.Process.Signal(syscall.SIGTERM)
+			_ = process.Signal(syscall.SIGTERM)
 			select {
-			case <-s.done:
+			case <-done:
 			case <-time.After(2 * time.Second):
-				_ = s.cmd.Process.Kill()
+				_ = process.Kill()
 			}
 		}
 	}
@@ -920,11 +929,16 @@ func (s *shellSession) closeInput() {
 }
 
 func (s *shellSession) closeInputLocked() {
+	if s.ptyFile != nil {
+		_ = s.ptyFile.Close()
+		s.ptyFile = nil
+		s.stdin = nil // stdin is the same *os.File as ptyFile in PTY mode
+		return
+	}
 	if s.stdin != nil {
 		_ = s.stdin.Close()
 		s.stdin = nil
 	}
-	s.ptyFile = nil
 }
 
 func (m *shellSessionManager) nextSessionID() string {
@@ -933,19 +947,57 @@ func (m *shellSessionManager) nextSessionID() string {
 }
 
 func (m *shellSessionManager) put(session *shellSession) {
+	m.ensureCleanup()
 	m.mu.Lock()
 	defer m.mu.Unlock()
+	session.lastActivity = time.Now()
 	m.sessions[session.id] = session
 }
 
 func (m *shellSessionManager) get(id string) *shellSession {
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	return m.sessions[id]
+	s := m.sessions[id]
+	if s != nil {
+		s.lastActivity = time.Now()
+	}
+	return s
 }
 
 func (m *shellSessionManager) delete(id string) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	delete(m.sessions, id)
+}
+
+func (m *shellSessionManager) ensureCleanup() {
+	m.cleanupOnce.Do(func() {
+		go m.cleanupLoop()
+	})
+}
+
+func (m *shellSessionManager) cleanupLoop() {
+	ticker := time.NewTicker(time.Minute)
+	defer ticker.Stop()
+	for range ticker.C {
+		m.evictIdle()
+	}
+}
+
+func (m *shellSessionManager) evictIdle() {
+	m.mu.Lock()
+	var expired []*shellSession
+	for _, s := range m.sessions {
+		if time.Since(s.lastActivity) > shellSessionIdleTimeout {
+			expired = append(expired, s)
+		}
+	}
+	for _, s := range expired {
+		delete(m.sessions, s.id)
+	}
+	m.mu.Unlock()
+
+	for _, s := range expired {
+		s.stop()
+	}
 }
