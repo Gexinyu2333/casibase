@@ -26,6 +26,7 @@ import (
 func InitDb() {
 	modelProviderName, embeddingProviderName, ttsProviderName, sttProviderName, imageProviderName := initBuiltInProviders()
 	initBuiltInStore(modelProviderName, embeddingProviderName, ttsProviderName, sttProviderName, imageProviderName)
+	initBuiltInSkills()
 	initBuiltInTools()
 	initBuiltInSite()
 	InitUsers()
@@ -247,6 +248,53 @@ func initBuiltInProviders() (string, string, string, string, string) {
 	return modelProvider.Name, embeddingProvider.Name, ttsProviderName, sttProviderName, imageProviderName
 }
 
+func initBuiltInSkills() {
+	builtInSkills := []*Skill{
+		{
+			Owner:       "admin",
+			Name:        "concise-answer",
+			DisplayName: "Concise Answer",
+			Type:        "writing",
+			Description: "Always reply with concise, direct answers.",
+			Content:     "Always reply concisely and directly. Avoid unnecessary filler phrases such as \"Certainly!\", \"Of course!\", or \"Sure!\". Get straight to the point.",
+			State:       "Active",
+		},
+		{
+			Owner:       "admin",
+			Name:        "step-by-step",
+			DisplayName: "Step-by-Step Reasoning",
+			Type:        "reasoning",
+			Description: "Break down complex problems into clear numbered steps.",
+			Content:     "When answering complex questions, break your reasoning into clear numbered steps. Show your work explicitly so the user can follow along and verify each step.",
+			State:       "Active",
+		},
+		{
+			Owner:       "admin",
+			Name:        "code-expert",
+			DisplayName: "Code Expert",
+			Type:        "coding",
+			Description: "Provide production-quality code with explanations.",
+			Content:     "You are a senior software engineer. When writing code, always produce clean, production-quality code with proper error handling. Briefly explain what the code does and any important design decisions.",
+			State:       "Active",
+		},
+	}
+
+	for _, s := range builtInSkills {
+		existing, err := getSkill(s.Owner, s.Name)
+		if err != nil {
+			panic(err)
+		}
+		if existing != nil {
+			continue
+		}
+		s.CreatedTime = util.GetCurrentTime()
+		_, err = AddSkill(s)
+		if err != nil {
+			panic(err)
+		}
+	}
+}
+
 func initBuiltInTools() {
 	builtInTools := []*Tool{
 		{
@@ -432,7 +480,7 @@ func initBuiltInSite() {
 		"/chat",
 		"/stores", "/chats", "/messages",
 		"/files", "/vectors",
-		"/providers", "/tools", "/servers",
+		"/skills", "/providers", "/tools", "/servers",
 		"/records", "/sessions",
 		"/users", "/casdoor-resources", "/permissions",
 		"/sites", "/resources", "/usages", "/visitors", "/sysinfo", "/swagger",

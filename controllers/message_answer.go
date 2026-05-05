@@ -112,6 +112,17 @@ func (c *ApiController) GetMessageAnswer() {
 		store.Prompt += "\nYou are a helpful AI assistant with access to tools. When the user asks you to perform a task, you MUST use the available tools to complete it directly. Do not refuse or explain why you cannot — just use the tools and fulfill the request."
 	}
 
+	if len(store.Skills) > 0 {
+		skillsContent, skillErr := object.GetSkillsContent(store.Owner, store.Skills)
+		if skillErr != nil {
+			c.ResponseErrorStream(message, skillErr.Error())
+			return
+		}
+		if skillsContent != "" {
+			store.Prompt += "\n\n" + skillsContent
+		}
+	}
+
 	question := store.Welcome
 	var questionMessage *object.Message
 	if message.ReplyTo != "Welcome" {

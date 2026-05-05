@@ -95,6 +95,13 @@ func initAPI() {
 	beego.Router("/api/get-online-servers", &controllers.ApiController{}, "GET:GetOnlineServers")
 	beego.Router("/api/sync-intranet-servers", &controllers.ApiController{}, "POST:SyncIntranetServers")
 
+	beego.Router("/api/get-global-skills", &controllers.ApiController{}, "GET:GetGlobalSkills")
+	beego.Router("/api/get-skills", &controllers.ApiController{}, "GET:GetSkills")
+	beego.Router("/api/get-skill", &controllers.ApiController{}, "GET:GetSkill")
+	beego.Router("/api/update-skill", &controllers.ApiController{}, "POST:UpdateSkill")
+	beego.Router("/api/add-skill", &controllers.ApiController{}, "POST:AddSkill")
+	beego.Router("/api/delete-skill", &controllers.ApiController{}, "POST:DeleteSkill")
+
 	beego.Router("/api/get-global-tools", &controllers.ApiController{}, "GET:GetGlobalTools")
 	beego.Router("/api/get-tools", &controllers.ApiController{}, "GET:GetTools")
 	beego.Router("/api/get-tool", &controllers.ApiController{}, "GET:GetTool")

@@ -53,6 +53,7 @@ import {
   PictureOutlined,
   PlaySquareOutlined,
   ReadOutlined,
+  RocketOutlined,
   SafetyOutlined,
   ScanOutlined,
   SettingOutlined,
@@ -87,6 +88,8 @@ import VideoPage from "./VideoPage";
 import PublicVideoListPage from "./basic/PublicVideoListPage";
 import ProviderListPage from "./ProviderListPage";
 import ProviderEditPage from "./ProviderEditPage";
+import SkillListPage from "./SkillListPage";
+import SkillEditPage from "./SkillEditPage";
 import ToolListPage from "./ToolListPage";
 import ToolEditPage from "./ToolEditPage";
 import ServerListPage from "./ServerListPage";
@@ -554,7 +557,8 @@ function ManagementPage(props) {
         Setting.getItem(<Link to="/vectors">{i18next.t("general:Vectors")}</Link>, "/vectors", <ApartmentOutlined />),
       ]));
 
-      res.push(Setting.getItem(<Link style={{color: textColor}} to="/providers">{i18next.t("general:Connectors")}</Link>, "/connectors", <ApiOutlined />, [
+      res.push(Setting.getItem(<Link style={{color: textColor}} to="/skills">{i18next.t("general:Connectors")}</Link>, "/connectors", <ApiOutlined />, [
+        Setting.getItem(<Link to="/skills">{i18next.t("general:Skills")}</Link>, "/skills", <RocketOutlined />),
         Setting.getItem(<Link to="/providers">{i18next.t("general:Providers")}</Link>, "/providers", <ThunderboltOutlined />),
         Setting.getItem(<Link to="/tools">{i18next.t("general:Tools")}</Link>, "/tools", <ToolOutlined />),
         Setting.getItem(<Link to="/servers">{i18next.t("general:MCP Servers")}</Link>, "/servers", <ApiOutlined />),
@@ -687,6 +691,8 @@ function ManagementPage(props) {
         <Route exact path="/public-videos/:owner/:videoName" render={(props) => <VideoPage account={account} {...props} />} />
         <Route exact path="/providers" render={(props) => renderSigninIfNotSignedIn(<ProviderListPage account={account} {...props} />)} />
         <Route exact path="/providers/:providerName" render={(props) => renderSigninIfNotSignedIn(<ProviderEditPage account={account} {...props} />)} />
+        <Route exact path="/skills" render={(props) => renderSigninIfNotSignedIn(<SkillListPage account={account} {...props} />)} />
+        <Route exact path="/skills/:skillName" render={(props) => renderSigninIfNotSignedIn(<SkillEditPage account={account} {...props} />)} />
         <Route exact path="/tools" render={(props) => renderSigninIfNotSignedIn(<ToolListPage account={account} {...props} />)} />
         <Route exact path="/tools/:toolName" render={(props) => renderSigninIfNotSignedIn(<ToolEditPage account={account} {...props} />)} />
         <Route exact path="/servers" render={(props) => renderSigninIfNotSignedIn(<ServerListPage account={account} {...props} />)} />

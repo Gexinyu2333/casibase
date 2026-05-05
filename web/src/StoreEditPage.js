@@ -20,6 +20,7 @@ import * as StorageProviderBackend from "./backend/StorageProviderBackend";
 import * as ProviderBackend from "./backend/ProviderBackend";
 import * as ServerBackend from "./backend/ServerBackend";
 import * as ToolBackend from "./backend/ToolBackend";
+import * as SkillBackend from "./backend/SkillBackend";
 import * as OrganizationUserBackend from "./backend/OrganizationUserBackend";
 import * as Setting from "./Setting";
 import i18next from "i18next";
@@ -47,6 +48,7 @@ class StoreEditPage extends React.Component {
       textToSpeechProviders: [],
       speechToTextProviders: [],
       mcpServers: [],
+      skills: [],
       tools: [],
       builtinTools: [],
       enableTtsStreaming: false,
@@ -63,6 +65,7 @@ class StoreEditPage extends React.Component {
     this.getStorageProviders();
     this.getProviders();
     this.getMcpServers();
+    this.getSkills();
     this.getTools();
   }
 
@@ -177,6 +180,17 @@ class StoreEditPage extends React.Component {
       .then((res) => {
         if (res.status === "ok") {
           this.setState({mcpServers: res.data});
+        } else {
+          Setting.showMessage("error", `${i18next.t("general:Failed to get")}: ${res.msg}`);
+        }
+      });
+  }
+
+  getSkills() {
+    SkillBackend.getSkills(this.props.account.name)
+      .then((res) => {
+        if (res.status === "ok") {
+          this.setState({skills: res.data});
         } else {
           Setting.showMessage("error", `${i18next.t("general:Failed to get")}: ${res.msg}`);
         }
@@ -550,6 +564,30 @@ class StoreEditPage extends React.Component {
                   {
                     this.state.mcpServers.map((server, index) => (
                       <Option key={index} value={server.name}>{server.displayName || server.name}</Option>
+                    ))
+                  }
+                </Select>
+              </Col>
+            </Row>
+            <Row style={{marginTop: "20px"}} >
+              <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
+                {Setting.getLabel(i18next.t("general:Skills"), i18next.t("general:Skills - Tooltip"))} :
+              </Col>
+              <Col span={22} >
+                <Select
+                  virtual={false}
+                  mode="multiple"
+                  allowClear
+                  style={{width: "100%"}}
+                  placeholder={i18next.t("store:Select skills")}
+                  value={this.state.store.skills || []}
+                  onChange={(value => {this.updateStoreField("skills", value || []);})}
+                >
+                  {
+                    this.state.skills.filter(s => s.state === "Active").map((skill, index) => (
+                      <Option key={index} value={skill.name}>
+                        {skill.displayName ? `${skill.displayName} (${skill.name})` : skill.name}
+                      </Option>
                     ))
                   }
                 </Select>
