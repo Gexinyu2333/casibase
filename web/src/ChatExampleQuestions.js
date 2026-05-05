@@ -235,7 +235,7 @@ class ChatExampleQuestions extends React.Component {
                   padding: "0 16px",
                 }}
               >
-                {i18next.t("store:Refresh")}
+                {i18next.t("general:Refresh")}
               </Button>
             </div>
           )}

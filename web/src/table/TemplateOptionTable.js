@@ -204,7 +204,7 @@ class TemplateOptionTable extends React.Component {
         width: "200px",
         render: (text, record, index) => {
           if (text === "host") {
-            text = i18next.t("application:Host") + "(host)";
+            text = i18next.t("general:Host") + "(host)";
           } else if (text === "tlsSecretName") {
             text = i18next.t("application:TLS secret name") + "(tlsSecretName)";
           }

@@ -56,12 +56,12 @@ function LoadSkillModal({open, onClose, onImported}) {
         if (res.status === "ok") {
           setPreview(res.data);
         } else {
-          Setting.showMessage("error", `${i18next.t("skill:Failed to load")}: ${res.msg}`);
+          Setting.showMessage("error", `${i18next.t("general:Failed to load")}: ${res.msg}`);
         }
       })
       .catch((err) => {
         setLoading(false);
-        Setting.showMessage("error", `${i18next.t("skill:Failed to load")}: ${err}`);
+        Setting.showMessage("error", `${i18next.t("general:Failed to load")}: ${err}`);
       });
   }
 

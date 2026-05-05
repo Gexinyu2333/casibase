@@ -162,7 +162,7 @@ class NodeListPage extends BaseListPage {
         sorter: (a, b) => a.ip.localeCompare(b.ip),
       },
       {
-        title: i18next.t("machine:Port"),
+        title: i18next.t("general:Port"),
         dataIndex: "remotePort",
         key: "port",
         width: "90px",

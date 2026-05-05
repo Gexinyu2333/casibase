@@ -34,7 +34,6 @@
     "Deployment manifest - Tooltip": "Application deployment manifest, including resource allocation and deployment strategy",
     "Edit Application": "Edit Application",
     "Failed": "Failed",
-    "Host": "Host",
     "New Application": "New Application",
     "Not Deployed": "Not Deployed",
     "Parameters": "Parameters",
@@ -548,7 +547,6 @@
     "Host IP": "Host IP",
     "Host IP - Tooltip": "Host machine IP address",
     "New Machine": "New Machine",
-    "Port": "Port",
     "Port - Tooltip": "Protocol port number",
     "Private IP": "Private IP",
     "Private IP - Tooltip": "Internal network IP address",
@@ -667,7 +665,6 @@
     "Model provider - Tooltip": "Language model service used when this tool needs chat or completion APIs.",
     "Output price / 1k tokens": "Output price / 1k tokens",
     "Output price / 1k tokens - Tooltip": "Cost per 1k output tokens",
-    "Path": "Path",
     "Please select a model provider first": "Please select a model provider first",
     "Presence penalty": "Presence penalty",
     "Presence penalty - Tooltip": "Penalize repeated phrases",
@@ -764,7 +761,6 @@
   "server": {
     "Access token": "Access token",
     "Access token - Tooltip": "Access token - Tooltip",
-    "Arguments": "Arguments",
     "Base URL": "Base URL",
     "Base URL - Tooltip": "Base URL - Tooltip",
     "CIDR placeholder": "CIDR placeholder",
@@ -781,21 +777,18 @@
     "Scanned hosts": "Scanned hosts",
     "Select tool...": "Select tool...",
     "Sync tools first using the Sync button above": "Sync tools first using the Sync button above",
-    "This tool takes no arguments": "This tool takes no arguments",
-    "Tool": "Tool"
+    "This tool takes no arguments": "This tool takes no arguments"
   },
   "site": {
     "Edit Site": "Edit Site"
   },
   "skill": {
-    "Content": "Content",
     "Content - Tooltip": "Markdown body of SKILL.md (after front matter). This text is appended to the agent's system prompt when the skill is active. References are also injected automatically.",
     "Content placeholder": "Enter the skill instructions here. These will be injected into the agent's system prompt to enhance its capabilities.",
     "Content preview": "Content preview",
     "Edit Skill": "Edit Skill",
     "Emoji": "Emoji",
     "Emoji - Tooltip": "Emoji icon representing this skill",
-    "Failed to load": "Failed to load",
     "Homepage": "Homepage",
     "Homepage - Tooltip": "Official documentation or homepage URL for this skill",
     "Import to Database": "Import to Database",
@@ -884,7 +877,6 @@
     "Prompt": "Prompt",
     "Prompt - Tooltip": "Global prompt template for AI behavior",
     "Read": "Read",
-    "Refresh": "Refresh",
     "Rename": "Rename",
     "Science": "Science",
     "Search provider": "Search provider",

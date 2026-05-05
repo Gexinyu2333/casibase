@@ -69,7 +69,7 @@ class NmapResultRenderer extends React.Component {
   renderHostCard(host, index) {
     const portColumns = [
       {
-        title: i18next.t("machine:Port"),
+        title: i18next.t("general:Port"),
         dataIndex: "port",
         key: "port",
         width: "20%",

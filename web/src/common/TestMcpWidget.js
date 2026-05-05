@@ -188,7 +188,7 @@ class TestMcpWidget extends React.Component {
       <React.Fragment>
         <Row gutter={16} align="middle">
           <Col span={3} style={{textAlign: "right", paddingRight: "8px"}}>
-            {i18next.t("server:Tool")}:
+            {i18next.t("general:Tool")}:
           </Col>
           <Col span={16}>
             <Select
@@ -210,7 +210,7 @@ class TestMcpWidget extends React.Component {
         </Row>
         {argFields.length > 0 && (
           <div style={{marginTop: "12px", padding: "12px 16px", background: "#f5f5f5", borderRadius: "6px", border: "1px solid #e8e8e8"}}>
-            <div style={{marginBottom: "8px", fontWeight: 500, color: "#555"}}>{i18next.t("server:Arguments")}:</div>
+            <div style={{marginBottom: "8px", fontWeight: 500, color: "#555"}}>{i18next.t("chat:Arguments")}:</div>
             {argFields}
           </div>
         )}

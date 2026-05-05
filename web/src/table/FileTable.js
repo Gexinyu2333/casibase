@@ -184,7 +184,7 @@ class FileTable extends React.Component {
         },
       },
       // {
-      //   title: i18next.t("provider:Path"),
+      //   title: i18next.t("general:Path"),
       //   dataIndex: 'key',
       //   key: 'key',
       //   width: '100px',

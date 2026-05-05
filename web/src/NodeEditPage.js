@@ -221,7 +221,7 @@ class NodeEditPage extends React.Component {
         </Row>
         <Row style={{marginTop: "20px"}} >
           <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("machine:Port"), i18next.t("machine:Port - Tooltip"))} :
+            {Setting.getLabel(i18next.t("general:Port"), i18next.t("machine:Port - Tooltip"))} :
           </Col>
           <Col span={22} >
             <Input

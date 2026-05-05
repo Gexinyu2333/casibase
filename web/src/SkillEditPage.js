@@ -148,7 +148,7 @@ class SkillEditPage extends React.Component {
         {/* ── Content (system-prompt injection) ─────────────────────── */}
         <Row style={{marginTop: "20px"}}>
           <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("skill:Content"), i18next.t("skill:Content - Tooltip"))} :
+            {Setting.getLabel(i18next.t("article:Content"), i18next.t("skill:Content - Tooltip"))} :
           </Col>
           <Col span={22}>
             <TextArea

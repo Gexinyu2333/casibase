@@ -41,7 +41,7 @@ func GetChatProvider(typ string, clientSecret string, lang string) (ChatProvider
 	if typ == "Telegram" {
 		p, err = NewTelegramChatProvider(clientSecret, proxy.ProxyHttpClient)
 	} else {
-		return nil, fmt.Errorf(i18n.Translate(lang, "chat:the chat provider type: %s is not supported"), typ)
+		return nil, fmt.Errorf(i18n.Translate(lang, "object:the chat provider type: %s is not supported"), typ)
 	}
 
 	if err != nil {
