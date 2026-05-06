@@ -47,6 +47,8 @@ archives:
         dst: './conf/app.conf'
       - src: 'data'
         dst: './data'
+      - src: 'skills'
+        dst: './skills'
 
 changelog:
   sort: asc

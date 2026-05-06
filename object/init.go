@@ -27,6 +27,7 @@ func InitDb() {
 	modelProviderName, embeddingProviderName, ttsProviderName, sttProviderName, imageProviderName := initBuiltInProviders()
 	initBuiltInStore(modelProviderName, embeddingProviderName, ttsProviderName, sttProviderName, imageProviderName)
 	initBuiltInSkills()
+	initSkillsFromFolder()
 	initBuiltInTools()
 	initBuiltInSite()
 	InitUsers()
@@ -291,6 +292,62 @@ func initBuiltInSkills() {
 		_, err = AddSkill(s)
 		if err != nil {
 			panic(err)
+		}
+	}
+}
+
+// initSkillsFromFolder scans the skills/ directory co-located with the
+// running executable and auto-loads any skill subfolder that is not yet in the
+// database. Errors are logged but never fatal so a malformed skill folder
+// cannot prevent the server from starting.
+func initSkillsFromFolder() {
+	exePath, err := os.Executable()
+	if err != nil {
+		fmt.Printf("initSkillsFromFolder: cannot resolve executable path: %v\n", err)
+		return
+	}
+	exeDir := filepath.Dir(exePath)
+
+	skillsDir := filepath.Join(exeDir, "skills")
+	entries, err := os.ReadDir(skillsDir)
+	if err != nil {
+		if !os.IsNotExist(err) {
+			fmt.Printf("initSkillsFromFolder: cannot read %s: %v\n", skillsDir, err)
+		}
+		return
+	}
+
+	for _, entry := range entries {
+		if !entry.IsDir() {
+			continue
+		}
+		dir := filepath.Join(skillsDir, entry.Name())
+		skill, err := LoadSkill(dir)
+		if err != nil {
+			fmt.Printf("initSkillsFromFolder: skipping %s: %v\n", dir, err)
+			continue
+		}
+
+		// Default owner for folder-loaded skills is "admin"
+		if skill.Owner == "" {
+			skill.Owner = "admin"
+		}
+
+		existing, err := getSkill(skill.Owner, skill.Name)
+		if err != nil {
+			fmt.Printf("initSkillsFromFolder: DB lookup failed for %s: %v\n", skill.Name, err)
+			continue
+		}
+		if existing != nil {
+			// Already in DB — leave it as-is
+			continue
+		}
+
+		skill.CreatedTime = util.GetCurrentTime()
+		if _, err = AddSkill(skill); err != nil {
+			fmt.Printf("initSkillsFromFolder: failed to add skill %s: %v\n", skill.Name, err)
+		} else {
+			fmt.Printf("initSkillsFromFolder: loaded skill %q from %s\n", skill.Name, dir)
 		}
 	}
 }

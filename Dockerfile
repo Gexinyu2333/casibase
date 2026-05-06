@@ -36,6 +36,7 @@ WORKDIR /
 COPY --from=back --chown=$USER:$USER /go/src/openagent/server_${BUILDX_ARCH} ./server
 COPY --from=back --chown=$USER:$USER /go/src/openagent/data ./data
 COPY --from=back --chown=$USER:$USER /go/src/openagent/conf/app.conf ./conf/app.conf
+COPY --from=back --chown=$USER:$USER /go/src/openagent/skills ./skills
 COPY --from=front --chown=$USER:$USER /web/build ./web/build
 ENV RUNNING_IN_DOCKER=true
 
@@ -63,6 +64,7 @@ COPY --from=back /go/src/openagent/server_${BUILDX_ARCH} ./server
 COPY --from=back /go/src/openagent/data ./data
 COPY --from=back /go/src/openagent/docker-entrypoint.sh /docker-entrypoint.sh
 COPY --from=back /go/src/openagent/conf/app.conf ./conf/app.conf
+COPY --from=back /go/src/openagent/skills ./skills
 COPY --from=front /web/build ./web/build
 ENV RUNNING_IN_DOCKER=true
 
