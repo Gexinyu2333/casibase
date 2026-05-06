@@ -26,7 +26,6 @@ import (
 func InitDb() {
 	modelProviderName, embeddingProviderName, ttsProviderName, sttProviderName, imageProviderName := initBuiltInProviders()
 	initBuiltInStore(modelProviderName, embeddingProviderName, ttsProviderName, sttProviderName, imageProviderName)
-	initBuiltInSkills()
 	initSkillsFromFolder()
 	initBuiltInTools()
 	initBuiltInSite()
@@ -249,66 +248,20 @@ func initBuiltInProviders() (string, string, string, string, string) {
 	return modelProvider.Name, embeddingProvider.Name, ttsProviderName, sttProviderName, imageProviderName
 }
 
-func initBuiltInSkills() {
-	builtInSkills := []*Skill{
-		{
-			Owner:       "admin",
-			Name:        "concise-answer",
-			DisplayName: "Concise Answer",
-			Type:        "writing",
-			Description: "Always reply with concise, direct answers.",
-			Content:     "Always reply concisely and directly. Avoid unnecessary filler phrases such as \"Certainly!\", \"Of course!\", or \"Sure!\". Get straight to the point.",
-			State:       "Active",
-		},
-		{
-			Owner:       "admin",
-			Name:        "step-by-step",
-			DisplayName: "Step-by-Step Reasoning",
-			Type:        "reasoning",
-			Description: "Break down complex problems into clear numbered steps.",
-			Content:     "When answering complex questions, break your reasoning into clear numbered steps. Show your work explicitly so the user can follow along and verify each step.",
-			State:       "Active",
-		},
-		{
-			Owner:       "admin",
-			Name:        "code-expert",
-			DisplayName: "Code Expert",
-			Type:        "coding",
-			Description: "Provide production-quality code with explanations.",
-			Content:     "You are a senior software engineer. When writing code, always produce clean, production-quality code with proper error handling. Briefly explain what the code does and any important design decisions.",
-			State:       "Active",
-		},
-	}
-
-	for _, s := range builtInSkills {
-		existing, err := getSkill(s.Owner, s.Name)
-		if err != nil {
-			panic(err)
-		}
-		if existing != nil {
-			continue
-		}
-		s.CreatedTime = util.GetCurrentTime()
-		_, err = AddSkill(s)
-		if err != nil {
-			panic(err)
-		}
-	}
-}
-
-// initSkillsFromFolder scans the skills/ directory co-located with the
-// running executable and auto-loads any skill subfolder that is not yet in the
-// database. Errors are logged but never fatal so a malformed skill folder
-// cannot prevent the server from starting.
+// initSkillsFromFolder scans the skills/ directory and auto-loads any skill
+// subfolder that is not yet in the database. It searches for the skills/
+// directory in the following order:
+//  1. Next to the running executable (production layout)
+//  2. Current working directory (development: go run .)
+//
+// Errors are logged but never fatal so a malformed skill folder cannot prevent
+// the server from starting.
 func initSkillsFromFolder() {
-	exePath, err := os.Executable()
-	if err != nil {
-		fmt.Printf("initSkillsFromFolder: cannot resolve executable path: %v\n", err)
+	skillsDir := findSkillsDir()
+	if skillsDir == "" {
 		return
 	}
-	exeDir := filepath.Dir(exePath)
 
-	skillsDir := filepath.Join(exeDir, "skills")
 	entries, err := os.ReadDir(skillsDir)
 	if err != nil {
 		if !os.IsNotExist(err) {
@@ -317,6 +270,7 @@ func initSkillsFromFolder() {
 		return
 	}
 
+	loaded := 0
 	for _, entry := range entries {
 		if !entry.IsDir() {
 			continue
@@ -339,7 +293,7 @@ func initSkillsFromFolder() {
 			continue
 		}
 		if existing != nil {
-			// Already in DB — leave it as-is
+			fmt.Printf("initSkillsFromFolder: skill %q already in DB, skipping\n", skill.Name)
 			continue
 		}
 
@@ -348,8 +302,33 @@ func initSkillsFromFolder() {
 			fmt.Printf("initSkillsFromFolder: failed to add skill %s: %v\n", skill.Name, err)
 		} else {
 			fmt.Printf("initSkillsFromFolder: loaded skill %q from %s\n", skill.Name, dir)
+			loaded++
 		}
 	}
+
+	fmt.Printf("initSkillsFromFolder: %d skill(s) loaded from %s\n", loaded, skillsDir)
+}
+
+// findSkillsDir returns the first existing skills/ directory found next to the
+// executable or in the current working directory. Returns "" if neither exists.
+func findSkillsDir() string {
+	// 1. Next to the executable (production)
+	if exePath, err := os.Executable(); err == nil {
+		candidate := filepath.Join(filepath.Dir(exePath), "skills")
+		if _, err2 := os.Stat(candidate); err2 == nil {
+			return candidate
+		}
+	}
+
+	// 2. Current working directory (development: go run .)
+	if cwd, err := os.Getwd(); err == nil {
+		candidate := filepath.Join(cwd, "skills")
+		if _, err2 := os.Stat(candidate); err2 == nil {
+			return candidate
+		}
+	}
+
+	return ""
 }
 
 func initBuiltInTools() {
