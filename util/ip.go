@@ -24,7 +24,8 @@ import (
 	"github.com/beego/beego"
 )
 
-var isLocalIpDb bool
+// isLocalIpDb holds the resolved config string: "" = disabled, "true" = 17monipdb, "false" = MaxMind.
+var isLocalIpDb string
 
 // tryInitLocalDb tries to initialize the local IP database from different paths.
 // Returns (found, error): found=false means the data file doesn't exist (caller should skip silently).
@@ -40,46 +41,53 @@ func tryInitLocalDb() (bool, error) {
 			return true, nil
 		}
 		if errors.As(err, &pathError) {
-			// Data file not present in either location — disable silently.
 			return false, nil
 		}
 	}
 	return true, err
 }
 
-// InitIpDb initializes the IP database based on configuration
+// InitIpDb initializes the IP database based on configuration.
+// isLocalIpDb = "" : IP parsing disabled entirely (no DB loaded, no download).
+// isLocalIpDb = "true" : use local 17monipdb.
+// isLocalIpDb = "false": use MaxMind GeoIP2 (same behaviour as the old bool=false).
 func InitIpDb() {
-	isLocalIpDb = beego.AppConfig.DefaultBool("isLocalIpDb", false)
-	if isLocalIpDb {
+	isLocalIpDb = beego.AppConfig.DefaultString("isLocalIpDb", "")
+	if isLocalIpDb == "" {
+		return
+	}
+
+	if isLocalIpDb == "true" {
 		found, err := tryInitLocalDb()
 		if err != nil {
 			panic(err)
 		}
 		if !found {
-			isLocalIpDb = false
+			// Data file absent — disable silently.
+			isLocalIpDb = ""
 		}
 	} else {
-		// Try MaxMind first
-		if err := InitMaxmindDb(); err != nil {
-			if !MaxmindDownloadInProgress {
-				// Try 17monipdb as fallback; missing file is non-fatal
-				_, err = tryInitLocalDb()
-				if err != nil {
-					panic(err)
-				}
-			}
+		// "false" — MaxMind; InitMaxmindFiles() is called from main before InitIpDb,
+		// so the DB is already loaded or a background download is in progress.
+		if err := InitMaxmindDb(); err != nil && !MaxmindDownloadInProgress {
+			// MaxMind not available either — disable silently.
+			isLocalIpDb = ""
 		}
 	}
 }
 
 func GetInfoFromIP(ip string) (*LocationInfo, error) {
+	if isLocalIpDb == "" {
+		return &LocationInfo{}, nil
+	}
+
 	if !IsInternetIp(ip) {
 		return &LocationInfo{}, nil
 	}
 
 	var info *LocationInfo
 	var err error
-	if isLocalIpDb {
+	if isLocalIpDb == "true" {
 		info, err = Find(ip)
 	} else {
 		info, err = FindMaxmind(ip)

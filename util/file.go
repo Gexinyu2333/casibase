@@ -213,8 +213,13 @@ func downloadMaxmindFiles() {
 	}
 }
 
-// InitMaxmindFiles checks if MaxMind database files are valid and downloads them if needed
+// InitMaxmindFiles checks if MaxMind database files are valid and downloads them if needed.
+// It is a no-op when isLocalIpDb is not "false" (i.e. disabled or using 17monipdb).
 func InitMaxmindFiles() {
+	if conf.GetConfigString("isLocalIpDb") != "false" {
+		return
+	}
+
 	// If both databases load successfully, nothing to do
 	if InitMaxmindDb() == nil {
 		return
