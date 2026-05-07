@@ -26,31 +26,44 @@ import (
 
 var isLocalIpDb bool
 
-// tryInitLocalDb tries to initialize the local IP database from different paths
-func tryInitLocalDb() error {
+// tryInitLocalDb tries to initialize the local IP database from different paths.
+// Returns (found, error): found=false means the data file doesn't exist (caller should skip silently).
+func tryInitLocalDb() (bool, error) {
 	err := Init("data/17monipdb.dat")
+	if err == nil {
+		return true, nil
+	}
 	var pathError *os.PathError
 	if errors.As(err, &pathError) {
 		err = Init("../data/17monipdb.dat")
+		if err == nil {
+			return true, nil
+		}
+		if errors.As(err, &pathError) {
+			// Data file not present in either location — disable silently.
+			return false, nil
+		}
 	}
-	return err
+	return true, err
 }
 
 // InitIpDb initializes the IP database based on configuration
 func InitIpDb() {
 	isLocalIpDb = beego.AppConfig.DefaultBool("isLocalIpDb", false)
 	if isLocalIpDb {
-		// Use local IP database
-		err := tryInitLocalDb()
+		found, err := tryInitLocalDb()
 		if err != nil {
 			panic(err)
+		}
+		if !found {
+			isLocalIpDb = false
 		}
 	} else {
 		// Try MaxMind first
 		if err := InitMaxmindDb(); err != nil {
 			if !MaxmindDownloadInProgress {
-				// Try 17monipdb as fallback
-				err = tryInitLocalDb()
+				// Try 17monipdb as fallback; missing file is non-fatal
+				_, err = tryInitLocalDb()
 				if err != nil {
 					panic(err)
 				}
