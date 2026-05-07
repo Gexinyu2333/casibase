@@ -162,18 +162,21 @@ func getSystemMessages(prompt string, knowledgeMessages []*RawMessage) []*RawMes
 		prompt = "You are an expert in your field and you specialize in using your knowledge to answer or solve people's problems."
 	}
 
-	res := []*RawMessage{{Text: prompt, Author: "System"}}
-	for i, message := range knowledgeMessages {
-		knowledgeTag := "Knowledge"
-		if containsZh(prompt) {
-			knowledgeTag = "知识"
-		}
-
-		newMessage := &RawMessage{Text: fmt.Sprintf("%s %d: %s", knowledgeTag, i+1, message.Text), Author: "System"}
-		res = append(res, newMessage)
+	if len(knowledgeMessages) == 0 {
+		return []*RawMessage{{Text: prompt, Author: "System"}}
 	}
 
-	return res
+	knowledgeTag := "Knowledge"
+	if containsZh(prompt) {
+		knowledgeTag = "知识"
+	}
+
+	combined := prompt
+	for i, message := range knowledgeMessages {
+		combined += fmt.Sprintf("\n\n%s %d: %s", knowledgeTag, i+1, message.Text)
+	}
+
+	return []*RawMessage{{Text: combined, Author: "System"}}
 }
 
 func getHistoryMessages(recentMessages []*RawMessage, model string, leftTokens int) ([]*RawMessage, error) {
