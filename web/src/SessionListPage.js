@@ -15,11 +15,10 @@
 import BaseListPage from "./BaseListPage";
 import * as Setting from "./Setting";
 import i18next from "i18next";
-import {Button, Popconfirm, Table, Tag} from "antd";
+import {Button, Popconfirm, Table, Tag, Tooltip} from "antd";
 import React from "react";
 import * as SessionBackend from "./backend/SessionBackend";
 import {DeleteOutlined} from "@ant-design/icons";
-import PopconfirmModal from "./modal/PopconfirmModal";
 
 class SessionListPage extends BaseListPage {
   deleteItem = async(i) => {
@@ -106,16 +105,27 @@ class SessionListPage extends BaseListPage {
         title: i18next.t("general:Action"),
         dataIndex: "action",
         key: "action",
-        width: "120px",
-        fixed: (Setting.isMobile()) ? "false" : "right",
+        width: "150px",
+        fixed: "right",
         render: (text, session, index) => {
           return (
-            <div>
-              <PopconfirmModal
-                style={{marginTop: "10px", marginBottom: "10px", marginRight: "10px"}}
+            <div style={{display: "flex", alignItems: "center", gap: "2px", flexWrap: "nowrap"}}>
+              <Popconfirm
                 title={`${i18next.t("general:Sure to delete")}: ${session.name} ?`}
                 onConfirm={() => this.deleteSession(index)}
-              />
+                okText={i18next.t("general:OK")}
+                cancelText={i18next.t("general:Cancel")}
+              >
+                <Tooltip title={i18next.t("general:Delete")}>
+                  <Button
+                    type="text"
+                    size="small"
+                    danger
+                    icon={<DeleteOutlined />}
+                    style={{minWidth: "28px", width: "28px", height: "28px", padding: 0, borderRadius: "6px"}}
+                  />
+                </Tooltip>
+              </Popconfirm>
             </div>
           );
         },
