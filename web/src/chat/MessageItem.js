@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {Bubble} from "@ant-design/x";
 import {Alert, Avatar, Button, Col, Collapse, Row, Space} from "antd";
 import {FileTextOutlined, GlobalOutlined} from "@ant-design/icons";
@@ -55,6 +55,45 @@ const MessageItem = ({
   const [searchDrawerVisible, setSearchDrawerVisible] = useState(false);
   const [knowledgeDrawerVisible, setKnowledgeDrawerVisible] = useState(false);
   const themeColor = Setting.getThemeColor();
+
+  const mergedSearchResults = useMemo(() => {
+    const merged = [...(message.searchResults || [])];
+    if (message.toolCalls) {
+      message.toolCalls
+        .filter(tc => tc.name === "web_fetch" && tc.content)
+        .forEach(tc => {
+          let purpose = "";
+          let url = "";
+          try {
+            const args = JSON.parse(tc.arguments);
+            url = args.url || "";
+            purpose = args.purpose || "";
+          } catch (e) {url = "";}
+          if (!url) {return;}
+          if (purpose === "get_list") {return;}
+
+          let title = "";
+          if (tc.content) {
+            try {
+              const content = JSON.parse(tc.content);
+              const lines = content[0]["text"].split("\n");
+              const titleLine = lines.find(line => line.includes("Title:"));
+              title = titleLine ? titleLine.replace("Title:", "").trim() : "";
+            } catch (e) {title = "";}
+          }
+          if (!title) {title = url;}
+
+          merged.push({
+            url,
+            title,
+            site_name: (() => {try {return new URL(url).hostname;} catch (e) {return "";}})(),
+            icon: null,
+            index: merged.length + 1,
+          });
+        });
+    }
+    return merged;
+  }, [message.searchResults, message.toolCalls]);
 
   const isDark = Setting.getIsDark();
 
@@ -339,7 +378,7 @@ const MessageItem = ({
                     setIsRegenerating={setIsRegenerating}
                     isRegenerating={isRegenerating}
                   />
-                  {message.searchResults?.length > 0 && (
+                  {mergedSearchResults.length > 0 && (
                     <Button
                       type="text"
                       size="small"
@@ -352,7 +391,7 @@ const MessageItem = ({
                         height: "24px",
                       }}
                     >
-                      {message.searchResults.length} {i18next.t("chat:Web sources")}
+                      {mergedSearchResults.length} {i18next.t("chat:Web sources")}
                     </Button>
                   )}
                   {message.vectorScores?.length > 0 && (
@@ -435,7 +474,7 @@ const MessageItem = ({
       <SearchSourcesDrawer
         visible={searchDrawerVisible}
         onClose={() => setSearchDrawerVisible(false)}
-        searchResults={message.searchResults}
+        searchResults={mergedSearchResults}
       />
 
       <KnowledgeSourcesDrawer
