@@ -131,6 +131,9 @@ jobs:
           name: frontend-build-${{ github.run_id }}
           path: ./web/build
 
+      - name: Install UPX
+        run: sudo apt-get install -y upx-ucl
+
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:
