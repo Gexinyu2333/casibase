@@ -14,7 +14,7 @@
 
 import React from "react";
 import Loading from "./common/Loading";
-import {Button, Card, Col, Input, Row, Select, Switch} from "antd";
+import {Button, Card, Col, Input, Row, Select, Space, Switch} from "antd";
 import i18next from "i18next";
 import * as Setting from "./Setting";
 import * as MessageBackend from "./backend/MessageBackend";
@@ -34,7 +34,6 @@ class MessageEditPage extends React.Component {
       messages: [],
       message: null,
       chats: [],
-      // users: [],
       chat: null,
       provider: null,
       providers: [],
@@ -143,221 +142,191 @@ class MessageEditPage extends React.Component {
     });
   }
 
-  renderMessage() {
+  renderMessageField(label, control, span = 8) {
     return (
-      <Card size="small" title={
-        <div>
-          {i18next.t("message:Edit Message")}&nbsp;&nbsp;&nbsp;&nbsp;
-          <Button onClick={() => this.submitMessageEdit(false)}>{i18next.t("general:Save")}</Button>
-          <Button style={{marginLeft: "20px"}} type="primary" onClick={() => this.submitMessageEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
-          {this.state.isNewMessage && <Button style={{marginLeft: "20px"}} onClick={() => this.cancelMessageEdit()}>{i18next.t("general:Cancel")}</Button>}
+      <Col style={{marginTop: "12px"}} span={Setting.isMobile() ? 22 : span}>
+        <div style={{marginBottom: "6px", color: "#595959", fontWeight: 500, lineHeight: "22px", fontSize: "13px"}}>{label}</div>
+        {control}
+      </Col>
+    );
+  }
+
+  renderMessageSwitch(label, checked, onChange, span = 6) {
+    return this.renderMessageField(label, <Switch checked={checked} onChange={onChange} />, span);
+  }
+
+  renderMessageActions() {
+    const btnStyle = {
+      backgroundColor: "#F8F9FA",
+      borderColor: "rgb(229, 229, 234)",
+      border: "1px solid #E5E5EA",
+      borderRadius: "10px",
+      padding: "6px 10px",
+    };
+    return (
+      <Space wrap>
+        <Button style={btnStyle} onClick={() => this.submitMessageEdit(false)}>{i18next.t("general:Save")}</Button>
+        <Button style={btnStyle} onClick={() => this.submitMessageEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
+        {this.state.isNewMessage && <Button style={btnStyle} onClick={() => this.cancelMessageEdit()}>{i18next.t("general:Cancel")}</Button>}
+      </Space>
+    );
+  }
+
+  renderMessage() {
+    const message = this.state.message;
+    const rowGutter = [16, 8];
+    const cardHeadStyle = {background: "transparent", borderBottom: "none", fontWeight: 600, fontSize: "15px", fontFamily: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"};
+    const sectionCardStyle = {
+      marginBottom: "16px",
+      borderRadius: "14px",
+      boxShadow: "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
+      padding: "18px",
+    };
+    const renderCardTitle = (title, desc) => (
+      <div>
+        <div style={{fontWeight: 600, fontSize: "15px"}}>{title}</div>
+        {desc && <div style={{fontSize: "13px", color: "#6E6E73", fontWeight: 400, marginTop: "2px"}}>{desc}</div>}
+      </div>
+    );
+
+    return (
+      <div>
+        <div style={{marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+          <span style={{fontSize: "22px", fontWeight: 600}}>{i18next.t("message:Edit Message")}</span>
+          <div style={{display: "flex", gap: "8px", marginRight: "4px"}}>
+            {this.renderMessageActions()}
+          </div>
         </div>
-      } style={(Setting.isMobile()) ? {margin: "5px"} : {}} type="inner">
-        {/* <Row style={{marginTop: "10px"}} >*/}
-        {/*  <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>*/}
-        {/*    {Setting.getLabel(i18next.t("general:Organization"), i18next.t("general:Organization - Tooltip"))}:*/}
-        {/*  </Col>*/}
-        {/*  <Col span={22} >*/}
-        {/*    <Select virtual={false} disabled={!Setting.isAdminUser(this.props.account)} style={{width: "100%"}} value={this.state.chat.organization} onChange={(value => {this.updateChatField("organization", value);})}*/}
-        {/*      options={this.state.organizations.map((organization) => Setting.getOption(organization.name, organization.name))*/}
-        {/*      } />*/}
-        {/*  </Col>*/}
-        {/* </Row>*/}
-        <Row style={{marginTop: "10px"}}>
-          <Col style={{marginTop: "5px"}} span={2}>
-            {Setting.getLabel(i18next.t("general:Name"), i18next.t("general:Name - Tooltip"))} :
-          </Col>
-          <Col span={22}>
-            <Input
-              value={this.state.message.name}
-              onChange={(e) => {
-                this.updateMessageField("name", e.target.value);
-              }}
-            />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:User"), i18next.t("general:User - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Input value={this.state.message.user} onChange={e => {
-              this.updateMessageField("user", e.target.value);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}}>
-          <Col style={{marginTop: "5px"}} span={2}>
-            {Setting.getLabel(i18next.t("general:Chat"), i18next.t("general:Chat - Tooltip"))} :
-          </Col>
-          <Col span={22}>
-            <Button onClick={() => this.props.history.push(`/chats/${this.state.message.chat}`)} >
-              {this.state.message.chat}
-            </Button>
-            {/* <Select*/}
-            {/*  virtual={false}*/}
-            {/*  style={{width: "100%"}}*/}
-            {/*  value={this.state.message.chat}*/}
-            {/*  onChange={(value) => {*/}
-            {/*    this.updateMessageField("chat", value);*/}
-            {/*    this.getChat(value);*/}
-            {/*  }}*/}
-            {/*  options={this.state.chats.map((chat) =>*/}
-            {/*    Setting.getOption(chat.name, chat.name)*/}
-            {/*  )}*/}
-            {/* />*/}
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}}>
-          <Col style={{marginTop: "5px"}} span={2}>
-            {Setting.getLabel(i18next.t("message:Author"), i18next.t("message:Author - Tooltip"))} :
-          </Col>
-          <Col span={22}>
-            <Select
-              virtual={false}
-              style={{width: "100%"}}
-              value={this.state.message.author}
-              onChange={(value) => {
-                this.updateMessageField("author", value);
-              }}
-              options={
-                this.state.chat !== null
-                  ? this.state.chat.users.map((user) =>
-                    Setting.getOption(`${user}`, `${user}`)
-                  )
-                  : []
-              }
-            />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}}>
-          <Col style={{marginTop: "5px"}} span={2}>
-            {Setting.getLabel(i18next.t("provider:Model provider"), i18next.t("provider:Model provider - Tooltip"))} :
-          </Col>
-          <Col span={22}>
-            <Select
-              virtual={false}
-              style={{width: "100%"}}
-              value={this.state.message.modelProvider}
-              onChange={(value) => {
-                this.updateMessageField("modelProvider", value);
-                this.getProvider(value);
-              }}
-              showSearch
-              filterOption={(input, option) =>
-                option.children[1].toLowerCase().includes(input.toLowerCase())
-              }
-            >
-              {
-                this.state.providers.map((provider, index) => (
+
+        <Card size="small" title={renderCardTitle(i18next.t("general:General Settings"), i18next.t("general:General Settings desc"))} style={sectionCardStyle} headStyle={cardHeadStyle}>
+          <Row gutter={rowGutter}>
+            {this.renderMessageField(
+              Setting.getLabel(i18next.t("general:Name"), i18next.t("general:Name - Tooltip")),
+              <Input value={message.name} onChange={(e) => this.updateMessageField("name", e.target.value)} />,
+              8
+            )}
+            {this.renderMessageField(
+              Setting.getLabel(i18next.t("general:User"), i18next.t("general:User - Tooltip")),
+              <Input value={message.user} onChange={(e) => this.updateMessageField("user", e.target.value)} />,
+              8
+            )}
+            {this.renderMessageField(
+              Setting.getLabel(i18next.t("general:Chat"), i18next.t("general:Chat - Tooltip")),
+              <Button onClick={() => this.props.history.push(`/chats/${message.chat}`)}>{message.chat}</Button>,
+              8
+            )}
+            {this.renderMessageField(
+              Setting.getLabel(i18next.t("message:Author"), i18next.t("message:Author - Tooltip")),
+              <Select
+                virtual={false}
+                style={{width: "100%"}}
+                value={message.author}
+                onChange={(value) => this.updateMessageField("author", value)}
+                options={
+                  this.state.chat !== null
+                    ? this.state.chat.users.map((user) => Setting.getOption(`${user}`, `${user}`))
+                    : []
+                }
+              />,
+              8
+            )}
+            {this.renderMessageField(
+              Setting.getLabel(i18next.t("provider:Model provider"), i18next.t("provider:Model provider - Tooltip")),
+              <Select
+                virtual={false}
+                style={{width: "100%"}}
+                value={message.modelProvider}
+                onChange={(value) => {
+                  this.updateMessageField("modelProvider", value);
+                  this.getProvider(value);
+                }}
+                showSearch
+                filterOption={(input, option) =>
+                  option.children[1].toLowerCase().includes(input.toLowerCase())
+                }
+              >
+                {this.state.providers.map((provider, index) => (
                   <Option key={index} value={provider.name}>
                     <img width={20} height={20} style={{marginBottom: "3px", marginRight: "10px"}} src={Setting.getProviderLogoURL({category: provider.category, type: provider.type})} alt={provider.type} />
                     {provider.name}
                   </Option>
-                ))
-              }
-            </Select>
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}}>
-          <Col style={{marginTop: "5px"}} span={2}>
-            {Setting.getLabel(i18next.t("message:Reply to"), i18next.t("message:Reply to - Tooltip"))} :
-          </Col>
-          <Col span={22}>
-            <Select
-              virtual={false}
-              style={{width: "100%"}}
-              value={this.state.message.replyTo}
-              onChange={(value) => {
-                this.updateMessageField("replyTo", value);
-              }}
-              options={
-                this.state.messages !== null
-                  ? this.state.messages.map((message) =>
-                    Setting.getOption(`${message.name}`, `${message.name}`)
-                  )
-                  : []
-              }
-            />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}}>
-          <Col style={{marginTop: "5px"}} span={2}>
-            {Setting.getLabel(i18next.t("general:Reasoning text"), i18next.t("general:Reasoning text - Tooltip"))} :
-          </Col>
-          <Col span={22}>
-            <TextArea autoSize={{minRows: 1, maxRows: 15}} value={this.state.message.reasonText} onChange={(e) => {
-              this.updateMessageField("reasonText", e.target.value);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}}>
-          <Col style={{marginTop: "5px"}} span={2}>
-            {Setting.getLabel(i18next.t("general:Text"), i18next.t("general:Text - Tooltip"))} :
-          </Col>
-          <Col span={22}>
-            <TextArea autoSize={{minRows: 1, maxRows: 15}} value={this.state.message.text} onChange={(e) => {
-              this.updateMessageField("text", e.target.value);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}}>
-          <Col style={{marginTop: "5px"}} span={2}>
-            {Setting.getLabel(i18next.t("message:Error text"), i18next.t("message:Error text - Tooltip"))} :
-          </Col>
-          <Col span={22}>
-            <TextArea autoSize={{minRows: 1, maxRows: 15}} value={this.state.message.errorText} onChange={(e) => {
-              this.updateMessageField("errorText", e.target.value);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}}>
-          <Col style={{marginTop: "5px"}} span={2}>
-            {Setting.getLabel(i18next.t("message:Comment"), i18next.t("message:Comment - Tooltip"))} :
-          </Col>
-          <Col span={22}>
-            <TextArea autoSize={{minRows: 1, maxRows: 15}} value={this.state.message.comment} onChange={(e) => {
-              if (e.target.value !== "") {
-                this.updateMessageField("needNotify", true);
-              } else {
-                this.updateMessageField("needNotify", false);
-              }
+                ))}
+              </Select>,
+              12
+            )}
+            {this.renderMessageField(
+              Setting.getLabel(i18next.t("message:Reply to"), i18next.t("message:Reply to - Tooltip")),
+              <Select
+                virtual={false}
+                style={{width: "100%"}}
+                value={message.replyTo}
+                onChange={(value) => this.updateMessageField("replyTo", value)}
+                options={
+                  this.state.messages !== null
+                    ? this.state.messages.map((msg) => Setting.getOption(`${msg.name}`, `${msg.name}`))
+                    : []
+                }
+              />,
+              12
+            )}
+          </Row>
+        </Card>
 
-              this.updateMessageField("comment", e.target.value);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={2}>
-            {Setting.getLabel(i18next.t("message:Need notify"), i18next.t("message:Need notify - Tooltip"))} :
-          </Col>
-          <Col span={1} >
-            <Switch checked={this.state.message.needNotify} onChange={checked => {
-              this.updateMessageField("needNotify", checked);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 19 : 2}>
-            {Setting.getLabel(i18next.t("general:Is deleted"), i18next.t("general:Is deleted - Tooltip"))} :
-          </Col>
-          <Col span={1} >
-            <Switch checked={this.state.message.isDeleted} onChange={checked => {
-              this.updateMessageField("isDeleted", checked);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 19 : 2}>
-            {Setting.getLabel(i18next.t("general:Is alerted"), i18next.t("general:Is alerted - Tooltip"))} :
-          </Col>
-          <Col span={1} >
-            <Switch checked={this.state.message.isAlerted} onChange={checked => {
-              this.updateMessageField("isAlerted", checked);
-            }} />
-          </Col>
-        </Row>
-      </Card>
+        <Card size="small" title={renderCardTitle(i18next.t("general:Content"), "")} style={sectionCardStyle} headStyle={cardHeadStyle}>
+          <Row gutter={rowGutter}>
+            {this.renderMessageField(
+              Setting.getLabel(i18next.t("general:Reasoning text"), i18next.t("general:Reasoning text - Tooltip")),
+              <TextArea autoSize={{minRows: 1, maxRows: 15}} value={message.reasonText} onChange={(e) => this.updateMessageField("reasonText", e.target.value)} />,
+              24
+            )}
+            {this.renderMessageField(
+              Setting.getLabel(i18next.t("general:Text"), i18next.t("general:Text - Tooltip")),
+              <TextArea autoSize={{minRows: 1, maxRows: 15}} value={message.text} onChange={(e) => this.updateMessageField("text", e.target.value)} />,
+              24
+            )}
+            {this.renderMessageField(
+              Setting.getLabel(i18next.t("message:Error text"), i18next.t("message:Error text - Tooltip")),
+              <TextArea autoSize={{minRows: 1, maxRows: 15}} value={message.errorText} onChange={(e) => this.updateMessageField("errorText", e.target.value)} />,
+              24
+            )}
+            {this.renderMessageField(
+              Setting.getLabel(i18next.t("message:Comment"), i18next.t("message:Comment - Tooltip")),
+              <TextArea autoSize={{minRows: 1, maxRows: 15}} value={message.comment} onChange={(e) => {
+                if (e.target.value !== "") {
+                  this.updateMessageField("needNotify", true);
+                } else {
+                  this.updateMessageField("needNotify", false);
+                }
+                this.updateMessageField("comment", e.target.value);
+              }} />,
+              24
+            )}
+          </Row>
+        </Card>
+
+        <Card size="small" title={renderCardTitle(i18next.t("general:Options"), "")} style={sectionCardStyle} headStyle={cardHeadStyle}>
+          <Row gutter={rowGutter}>
+            {this.renderMessageSwitch(
+              Setting.getLabel(i18next.t("message:Need notify"), i18next.t("message:Need notify - Tooltip")),
+              message.needNotify,
+              (checked) => this.updateMessageField("needNotify", checked),
+              6
+            )}
+            {this.renderMessageSwitch(
+              Setting.getLabel(i18next.t("general:Is deleted"), i18next.t("general:Is deleted - Tooltip")),
+              message.isDeleted,
+              (checked) => this.updateMessageField("isDeleted", checked),
+              6
+            )}
+            {this.renderMessageSwitch(
+              Setting.getLabel(i18next.t("general:Is alerted"), i18next.t("general:Is alerted - Tooltip")),
+              message.isAlerted,
+              (checked) => this.updateMessageField("isAlerted", checked),
+              6
+            )}
+          </Row>
+        </Card>
+      </div>
     );
   }
 
@@ -390,18 +359,6 @@ class MessageEditPage extends React.Component {
       });
   }
 
-  render() {
-    return (
-      <div>
-        {this.state.message !== null ? this.renderMessage() : <Loading type="page" tip={i18next.t("general:Loading")} />}
-        <div style={{marginTop: "20px", marginLeft: "40px"}}>
-          <Button size="large" onClick={() => this.submitMessageEdit(false)}>{i18next.t("general:Save")}</Button>
-          <Button style={{marginLeft: "20px"}} type="primary" size="large" onClick={() => this.submitMessageEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
-          {this.state.isNewMessage && <Button style={{marginLeft: "20px"}} size="large" onClick={() => this.cancelMessageEdit()}>{i18next.t("general:Cancel")}</Button>}
-        </div>
-      </div>
-    );
-  }
   cancelMessageEdit() {
     if (this.state.isNewMessage) {
       MessageBackend.deleteMessage(this.state.message)
@@ -421,6 +378,13 @@ class MessageEditPage extends React.Component {
     }
   }
 
+  render() {
+    return (
+      <div style={{background: "#F1F3F5", padding: "16px 20px 32px", minHeight: "100vh"}}>
+        {this.state.message !== null ? this.renderMessage() : <Loading type="page" tip={i18next.t("general:Loading")} />}
+      </div>
+    );
+  }
 }
 
 export default MessageEditPage;

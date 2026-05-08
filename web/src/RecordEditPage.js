@@ -14,7 +14,7 @@
 
 import React from "react";
 import Loading from "./common/Loading";
-import {Button, Card, Col, Input, Row, Select, Switch} from "antd";
+import {Button, Card, Col, Input, Row, Select, Space, Switch} from "antd";
 import * as RecordBackend from "./backend/RecordBackend";
 import * as ProviderBackend from "./backend/ProviderBackend";
 import * as Setting from "./Setting";
@@ -84,125 +84,99 @@ class RecordEditPage extends React.Component {
     });
   }
 
-  renderRecord() {
-    // const history = useHistory();
+  renderRecordField(label, control, span = 8) {
     return (
-      <Card size="small" title={
-        <div>
-          {this.state.mode === "add" ? i18next.t("record:New Record") : i18next.t("record:View Record")}&nbsp;&nbsp;&nbsp;&nbsp;
-          {this.state.mode !== "123" ? (
-            <React.Fragment>
-              <Button onClick={() => this.submitRecordEdit(false)}>{i18next.t("general:Save")}</Button>
-              <Button style={{marginLeft: "20px"}} type="primary" onClick={() => this.submitRecordEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
-            </React.Fragment>
-          ) : (
-            <Button type="primary" onClick={() => this.props.history.push("/records")}>{i18next.t("general:Exit")}</Button>
-          )}
-          {this.state.mode === "add" ? <Button style={{marginLeft: "20px"}} onClick={() => this.deleteRecord()}>{i18next.t("general:Cancel")}</Button> : null}
+      <Col style={{marginTop: "12px"}} span={Setting.isMobile() ? 22 : span}>
+        <div style={{marginBottom: "6px", color: "#595959", fontWeight: 500, lineHeight: "22px", fontSize: "13px"}}>{label}</div>
+        {control}
+      </Col>
+    );
+  }
+
+  renderRecordSwitch(label, checked, onChange, span = 6) {
+    return this.renderRecordField(label, <Switch checked={checked} onChange={onChange} />, span);
+  }
+
+  renderRecordActions() {
+    const btnStyle = {
+      backgroundColor: "#F8F9FA",
+      borderColor: "rgb(229, 229, 234)",
+      border: "1px solid #E5E5EA",
+      borderRadius: "10px",
+      padding: "6px 10px",
+    };
+    if (this.state.mode === "123") {
+      return (
+        <Space wrap>
+          <Button style={btnStyle} onClick={() => this.props.history.push("/records")}>{i18next.t("general:Exit")}</Button>
+        </Space>
+      );
+    }
+    return (
+      <Space wrap>
+        <Button style={btnStyle} onClick={() => this.submitRecordEdit(false)}>{i18next.t("general:Save")}</Button>
+        <Button style={btnStyle} onClick={() => this.submitRecordEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
+        {this.state.mode === "add" && <Button style={btnStyle} onClick={() => this.deleteRecord()}>{i18next.t("general:Cancel")}</Button>}
+      </Space>
+    );
+  }
+
+  renderRecord() {
+    const record = this.state.record;
+    const rowGutter = [16, 8];
+    const cardHeadStyle = {background: "transparent", borderBottom: "none", fontWeight: 600, fontSize: "15px", fontFamily: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"};
+    const sectionCardStyle = {
+      marginBottom: "16px",
+      borderRadius: "14px",
+      boxShadow: "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
+      padding: "18px",
+    };
+    const renderCardTitle = (title, desc) => (
+      <div>
+        <div style={{fontWeight: 600, fontSize: "15px"}}>{title}</div>
+        {desc && <div style={{fontSize: "13px", color: "#6E6E73", fontWeight: 400, marginTop: "2px"}}>{desc}</div>}
+      </div>
+    );
+
+    const pageTitle = this.state.mode === "add"
+      ? i18next.t("record:New Record")
+      : i18next.t("record:View Record");
+
+    return (
+      <div>
+        <div style={{marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+          <span style={{fontSize: "22px", fontWeight: 600}}>{pageTitle}</span>
+          <div style={{display: "flex", gap: "8px", marginRight: "4px"}}>
+            {this.renderRecordActions()}
+          </div>
         </div>
-      } style={{marginLeft: "5px"}} type="inner">
-        <Row style={{marginTop: "10px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Organization"), i18next.t("general:Organization - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Input disabled={false} value={this.state.record.owner} onChange={e => {
-              // this.updateRecordField("owner", e.target.value);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Name"), i18next.t("general:Name - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Input disabled={false} value={this.state.record.name} onChange={e => {
-              // this.updateRecordField("name", e.target.value);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}}>
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Provider"), i18next.t("general:Provider - Tooltip"))} :
-          </Col>
-          <Col span={22}>
-            <Select disabled={false} virtual={false} style={{width: "100%"}} value={this.state.record.provider} onChange={(value => {
-              this.updateRecordField("provider", value);
-            })}>
-              {
-                this.state.blockchainProviders.map((provider, index) => (
-                  <Option key={index} value={provider.name}>{provider.name}</Option>
-                ))
-              }
-            </Select>
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}}>
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Block"), i18next.t("general:Block - Tooltip"))} :
-          </Col>
-          <Col span={22}>
-            <Input disabled={false} value={this.state.record.block} onChange={e => {
-              // this.updateRecordField("block", e.target.value);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}}>
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Provider 2"), i18next.t("general:Provider - Tooltip"))} :
-          </Col>
-          <Col span={22}>
-            <Select disabled={false} virtual={false} style={{width: "100%"}} value={this.state.record.provider2} onChange={(value => {
-              this.updateRecordField("provider2", value);
-            })}>
-              {
-                this.state.blockchainProviders.map((provider, index) => (
-                  <Option key={index} value={provider.name}>{provider.name}</Option>
-                ))
-              }
-            </Select>
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}}>
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Block 2"), i18next.t("general:Block - Tooltip"))} :
-          </Col>
-          <Col span={22}>
-            <Input disabled={false} value={this.state.record.block2} onChange={e => {
-              // this.updateRecordField("block", e.target.value);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Client IP"), i18next.t("general:Client IP - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Input disabled={false} value={this.state.record.clientIp} onChange={e => {
-              // this.updateRecordField("clientIp", e.target.value);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:User"), i18next.t("general:User - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Input disabled={false} value={this.state.record.user} onChange={e => {
-              // this.updateRecordField("user", e.target.value);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Method"), i18next.t("general:Method - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Select disabled={false} virtual={false} style={{width: "100%"}} value={this.state.record.method} onChange={(value => {
-              // this.updateRecordField("method", value);
-            })}>
-              {
-                [
+
+        <Card size="small" title={renderCardTitle(i18next.t("general:General Settings"), i18next.t("general:General Settings desc"))} style={sectionCardStyle} headStyle={cardHeadStyle}>
+          <Row gutter={rowGutter}>
+            {this.renderRecordField(
+              Setting.getLabel(i18next.t("general:Organization"), i18next.t("general:Organization - Tooltip")),
+              <Input value={record.owner} />,
+              8
+            )}
+            {this.renderRecordField(
+              Setting.getLabel(i18next.t("general:Name"), i18next.t("general:Name - Tooltip")),
+              <Input value={record.name} />,
+              8
+            )}
+            {this.renderRecordField(
+              Setting.getLabel(i18next.t("general:Client IP"), i18next.t("general:Client IP - Tooltip")),
+              <Input value={record.clientIp} />,
+              8
+            )}
+            {this.renderRecordField(
+              Setting.getLabel(i18next.t("general:User"), i18next.t("general:User - Tooltip")),
+              <Input value={record.user} />,
+              8
+            )}
+            {this.renderRecordField(
+              Setting.getLabel(i18next.t("general:Method"), i18next.t("general:Method - Tooltip")),
+              <Select virtual={false} style={{width: "100%"}} value={record.method}>
+                {[
                   {id: "GET", name: "GET"},
                   {id: "HEAD", name: "HEAD"},
                   {id: "POST", name: "POST"},
@@ -212,124 +186,123 @@ class RecordEditPage extends React.Component {
                   {id: "OPTIONS", name: "OPTIONS"},
                   {id: "TRACE", name: "TRACE"},
                   {id: "PATCH", name: "PATCH"},
-                ].map((item, index) => <Option key={index} value={item.id}>{item.name}</Option>)
-              }
-            </Select>
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Request URI"), i18next.t("general:Request URI - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Input disabled={false} value={this.state.record.requestUri} onChange={e => {
-              // this.updateRecordField("requestUri", e.target.value);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Action"), i18next.t("general:Action - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Input disabled={false} value={this.state.record.action} onChange={e => {
-              // this.updateRecordField("action", e.target.value);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Language"), i18next.t("general:Language - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Input disabled={false} value={this.state.record.language} onChange={e => {
-              // this.updateRecordField("language", e.target.value);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Region"), i18next.t("general:Region - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Input disabled={false} value={this.state.record.region} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:City"), i18next.t("general:City - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Input disabled={false} value={this.state.record.city} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Unit"), i18next.t("general:Unit - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Input disabled={false} value={this.state.record.unit} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Section"), i18next.t("general:Section - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Input disabled={false} value={this.state.record.section} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Count"), i18next.t("general:Count - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Input disabled={false} value={this.state.record.count === 0 ? 1 : this.state.record.count} onChange={e => {
-              this.updateRecordField("count", e.target.value);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Object"), i18next.t("general:Object - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <div style={{width: "900px", height: "300px"}}>
-              <Editor
-                value={Setting.formatJsonString(this.state.record.object)}
-                lang="js"
-                fillHeight
-                dark
-              />
-            </div>
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}}>
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Response"), i18next.t("general:Response - Tooltip"))} :
-          </Col>
-          <Col span={22}>
-            <div style={{width: "900px", height: "300px"}}>
-              <Editor
-                value={Setting.formatJsonString(this.state.record.response)}
-                lang="js"
-                fillHeight
-                dark
-              />
-            </div>
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 19 : 2}>
-            {Setting.getLabel(i18next.t("general:Is triggered"), i18next.t("general:Is triggered - Tooltip"))} :
-          </Col>
-          <Col span={1} >
-            <Switch disabled={false} checked={this.state.record.isTriggered} onChange={checked => {
-              // this.updateRecordField("isTriggered", checked);
-            }} />
-          </Col>
-        </Row>
-      </Card>
+                ].map((item, index) => <Option key={index} value={item.id}>{item.name}</Option>)}
+              </Select>,
+              8
+            )}
+            {this.renderRecordField(
+              Setting.getLabel(i18next.t("general:Request URI"), i18next.t("general:Request URI - Tooltip")),
+              <Input value={record.requestUri} />,
+              16
+            )}
+            {this.renderRecordField(
+              Setting.getLabel(i18next.t("general:Action"), i18next.t("general:Action - Tooltip")),
+              <Input value={record.action} />,
+              8
+            )}
+            {this.renderRecordField(
+              Setting.getLabel(i18next.t("general:Language"), i18next.t("general:Language - Tooltip")),
+              <Input value={record.language} />,
+              8
+            )}
+            {this.renderRecordField(
+              Setting.getLabel(i18next.t("general:Region"), i18next.t("general:Region - Tooltip")),
+              <Input value={record.region} />,
+              8
+            )}
+            {this.renderRecordField(
+              Setting.getLabel(i18next.t("general:City"), i18next.t("general:City - Tooltip")),
+              <Input value={record.city} />,
+              8
+            )}
+            {this.renderRecordField(
+              Setting.getLabel(i18next.t("general:Unit"), i18next.t("general:Unit - Tooltip")),
+              <Input value={record.unit} />,
+              8
+            )}
+            {this.renderRecordField(
+              Setting.getLabel(i18next.t("general:Section"), i18next.t("general:Section - Tooltip")),
+              <Input value={record.section} />,
+              8
+            )}
+            {this.renderRecordField(
+              Setting.getLabel(i18next.t("general:Count"), i18next.t("general:Count - Tooltip")),
+              <Input value={record.count === 0 ? 1 : record.count} onChange={(e) => this.updateRecordField("count", e.target.value)} />,
+              8
+            )}
+          </Row>
+        </Card>
+
+        <Card size="small" title={renderCardTitle(i18next.t("general:Providers"), i18next.t("general:Providers desc"))} style={sectionCardStyle} headStyle={cardHeadStyle}>
+          <Row gutter={rowGutter}>
+            {this.renderRecordField(
+              Setting.getLabel(i18next.t("general:Provider"), i18next.t("general:Provider - Tooltip")),
+              <Select virtual={false} style={{width: "100%"}} value={record.provider} onChange={(value) => this.updateRecordField("provider", value)}>
+                {this.state.blockchainProviders.map((provider, index) => (
+                  <Option key={index} value={provider.name}>{provider.name}</Option>
+                ))}
+              </Select>,
+              8
+            )}
+            {this.renderRecordField(
+              Setting.getLabel(i18next.t("general:Block"), i18next.t("general:Block - Tooltip")),
+              <Input value={record.block} />,
+              8
+            )}
+            {this.renderRecordField(
+              Setting.getLabel(i18next.t("general:Provider 2"), i18next.t("general:Provider - Tooltip")),
+              <Select virtual={false} style={{width: "100%"}} value={record.provider2} onChange={(value) => this.updateRecordField("provider2", value)}>
+                {this.state.blockchainProviders.map((provider, index) => (
+                  <Option key={index} value={provider.name}>{provider.name}</Option>
+                ))}
+              </Select>,
+              8
+            )}
+            {this.renderRecordField(
+              Setting.getLabel(i18next.t("general:Block 2"), i18next.t("general:Block - Tooltip")),
+              <Input value={record.block2} />,
+              8
+            )}
+          </Row>
+        </Card>
+
+        <Card size="small" title={renderCardTitle(i18next.t("general:Content"), "")} style={sectionCardStyle} headStyle={cardHeadStyle}>
+          <Row gutter={rowGutter}>
+            {this.renderRecordField(
+              Setting.getLabel(i18next.t("general:Object"), i18next.t("general:Object - Tooltip")),
+              <div style={{height: "300px"}}>
+                <Editor
+                  value={Setting.formatJsonString(record.object)}
+                  lang="js"
+                  fillHeight
+                  fillWidth
+                  dark
+                />
+              </div>,
+              24
+            )}
+            {this.renderRecordField(
+              Setting.getLabel(i18next.t("general:Response"), i18next.t("general:Response - Tooltip")),
+              <div style={{height: "300px"}}>
+                <Editor
+                  value={Setting.formatJsonString(record.response)}
+                  lang="js"
+                  fillHeight
+                  fillWidth
+                  dark
+                />
+              </div>,
+              24
+            )}
+            {this.renderRecordSwitch(
+              Setting.getLabel(i18next.t("general:Is triggered"), i18next.t("general:Is triggered - Tooltip")),
+              record.isTriggered,
+              () => {},
+              6
+            )}
+          </Row>
+        </Card>
+      </div>
     );
   }
 
@@ -377,21 +350,8 @@ class RecordEditPage extends React.Component {
 
   render() {
     return (
-      <div>
-        {
-          this.state.record !== null ? this.renderRecord() : <Loading type="page" tip={i18next.t("general:Loading")} />
-        }
-        <div style={{marginTop: "20px", marginLeft: "40px"}}>
-          {this.state.mode !== "123" ? (
-            <React.Fragment>
-              <Button size="large" onClick={() => this.submitRecordEdit(false)}>{i18next.t("general:Save")}</Button>
-              <Button style={{marginLeft: "20px"}} type="primary" size="large" onClick={() => this.submitRecordEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
-            </React.Fragment>
-          ) : (
-            <Button type="primary" size="large" onClick={() => this.props.history.push("/records")}>{i18next.t("general:Exit")}</Button>
-          )}
-          {this.state.mode === "add" ? <Button style={{marginLeft: "20px"}} size="large" onClick={() => this.deleteRecord()}>{i18next.t("general:Cancel")}</Button> : null}
-        </div>
+      <div style={{background: "#F1F3F5", padding: "16px 20px 32px", minHeight: "100vh"}}>
+        {this.state.record !== null ? this.renderRecord() : <Loading type="page" tip={i18next.t("general:Loading")} />}
       </div>
     );
   }

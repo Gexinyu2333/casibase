@@ -14,7 +14,7 @@
 
 import React from "react";
 import Loading from "./common/Loading";
-import {Button, Card, Col, Input, InputNumber, Row} from "antd";
+import {Button, Card, Col, Input, InputNumber, Row, Space} from "antd";
 import i18next from "i18next";
 import * as Setting from "./Setting";
 import * as VectorBackend from "./backend/VectorBackend";
@@ -77,120 +77,132 @@ class VectorEditPage extends React.Component {
     });
   }
 
-  renderVector() {
-    const isViewMode = this.state.mode === "view";
+  renderVectorField(label, control, span = 8) {
     return (
-      <Card size="small" title={
-        <div>
-          {isViewMode ? i18next.t("vector:View Vector") : i18next.t("vector:Edit Vector")}&nbsp;&nbsp;&nbsp;&nbsp;
-          {!isViewMode && (<>
-            <Button onClick={() => this.submitVectorEdit(false)}>{i18next.t("general:Save")}</Button>
-            <Button style={{marginLeft: "20px"}} type="primary" onClick={() => this.submitVectorEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
-            {this.state.isNewVector && <Button style={{marginLeft: "20px"}} onClick={() => this.cancelVectorEdit()}>{i18next.t("general:Cancel")}</Button>}
-          </>)}
+      <Col style={{marginTop: "12px"}} span={Setting.isMobile() ? 22 : span}>
+        <div style={{marginBottom: "6px", color: "#595959", fontWeight: 500, lineHeight: "22px", fontSize: "13px"}}>{label}</div>
+        {control}
+      </Col>
+    );
+  }
+
+  renderVectorActions() {
+    const isViewMode = this.state.mode === "view";
+    if (isViewMode) {
+      return null;
+    }
+    const btnStyle = {
+      backgroundColor: "#F8F9FA",
+      borderColor: "rgb(229, 229, 234)",
+      border: "1px solid #E5E5EA",
+      borderRadius: "10px",
+      padding: "6px 10px",
+    };
+    return (
+      <Space wrap>
+        <Button style={btnStyle} onClick={() => this.submitVectorEdit(false)}>{i18next.t("general:Save")}</Button>
+        <Button style={btnStyle} onClick={() => this.submitVectorEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
+        {this.state.isNewVector && <Button style={btnStyle} onClick={() => this.cancelVectorEdit()}>{i18next.t("general:Cancel")}</Button>}
+      </Space>
+    );
+  }
+
+  renderVector() {
+    const vector = this.state.vector;
+    const isViewMode = this.state.mode === "view";
+    const rowGutter = [16, 8];
+    const cardHeadStyle = {background: "transparent", borderBottom: "none", fontWeight: 600, fontSize: "15px", fontFamily: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"};
+    const sectionCardStyle = {
+      marginBottom: "16px",
+      borderRadius: "14px",
+      boxShadow: "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
+      padding: "18px",
+    };
+    const renderCardTitle = (title, desc) => (
+      <div>
+        <div style={{fontWeight: 600, fontSize: "15px"}}>{title}</div>
+        {desc && <div style={{fontSize: "13px", color: "#6E6E73", fontWeight: 400, marginTop: "2px"}}>{desc}</div>}
+      </div>
+    );
+
+    return (
+      <div>
+        <div style={{marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+          <span style={{fontSize: "22px", fontWeight: 600}}>
+            {isViewMode ? i18next.t("vector:View Vector") : i18next.t("vector:Edit Vector")}
+          </span>
+          <div style={{display: "flex", gap: "8px", marginRight: "4px"}}>
+            {this.renderVectorActions()}
+          </div>
         </div>
-      } style={{marginLeft: "5px"}} type="inner">
-        <Row style={{marginTop: "10px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Name"), i18next.t("general:Name - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Input value={this.state.vector.name} disabled={isViewMode} onChange={e => {
-              this.updateVectorField("name", e.target.value);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Display name"), i18next.t("general:Display name - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Input value={this.state.vector.displayName} disabled={isViewMode} onChange={e => {
-              this.updateVectorField("displayName", e.target.value);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Store"), i18next.t("general:Store - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Input value={this.state.vector.store} disabled={isViewMode} onChange={e => {
-              this.updateVectorField("store", e.target.value);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Provider"), i18next.t("general:Provider - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Input value={this.state.vector.provider} disabled={isViewMode} onChange={e => {
-              this.updateVectorField("provider", e.target.value);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("store:File"), i18next.t("store:File - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Input value={this.state.vector.file} disabled={isViewMode} onChange={e => {
-              this.updateVectorField("file", e.target.value);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Text"), i18next.t("general:Text - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Editor
-              value={this.state.vector.text}
-              lang="markdown"
-              dark
-              fillHeight
-              fillWidth
-              readOnly={isViewMode}
-              onChange={value => {
-                if (!isViewMode) {
-                  this.updateVectorField("text", value);
-                }
-              }}
-            />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Size"), i18next.t("general:Size - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <InputNumber disabled={true} value={this.state.vector.size} onChange={value => {
-              this.updateVectorField("size", value);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("vector:Dimension"), i18next.t("vector:Dimension - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <InputNumber disabled={true} value={this.state.vector.dimension} onChange={value => {
-              this.updateVectorField("dimension", value);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Data"), i18next.t("general:Data - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <TextArea autoSize={{minRows: 1, maxRows: 15}} value={this.state.vector.data} disabled={isViewMode} onChange={(e) => {
-              this.updateVectorField("data", e.target.value);
-            }} />
-          </Col>
-        </Row>
-      </Card>
+
+        <Card size="small" title={renderCardTitle(i18next.t("general:General Settings"), i18next.t("general:General Settings desc"))} style={sectionCardStyle} headStyle={cardHeadStyle}>
+          <Row gutter={rowGutter}>
+            {this.renderVectorField(
+              Setting.getLabel(i18next.t("general:Name"), i18next.t("general:Name - Tooltip")),
+              <Input value={vector.name} disabled={isViewMode} onChange={(e) => this.updateVectorField("name", e.target.value)} />,
+              8
+            )}
+            {this.renderVectorField(
+              Setting.getLabel(i18next.t("general:Display name"), i18next.t("general:Display name - Tooltip")),
+              <Input value={vector.displayName} disabled={isViewMode} onChange={(e) => this.updateVectorField("displayName", e.target.value)} />,
+              8
+            )}
+            {this.renderVectorField(
+              Setting.getLabel(i18next.t("general:Store"), i18next.t("general:Store - Tooltip")),
+              <Input value={vector.store} disabled={isViewMode} onChange={(e) => this.updateVectorField("store", e.target.value)} />,
+              8
+            )}
+            {this.renderVectorField(
+              Setting.getLabel(i18next.t("general:Provider"), i18next.t("general:Provider - Tooltip")),
+              <Input value={vector.provider} disabled={isViewMode} onChange={(e) => this.updateVectorField("provider", e.target.value)} />,
+              8
+            )}
+            {this.renderVectorField(
+              Setting.getLabel(i18next.t("store:File"), i18next.t("store:File - Tooltip")),
+              <Input value={vector.file} disabled={isViewMode} onChange={(e) => this.updateVectorField("file", e.target.value)} />,
+              8
+            )}
+            {this.renderVectorField(
+              Setting.getLabel(i18next.t("general:Size"), i18next.t("general:Size - Tooltip")),
+              <InputNumber disabled={true} style={{width: "100%"}} value={vector.size} onChange={(value) => this.updateVectorField("size", value)} />,
+              4
+            )}
+            {this.renderVectorField(
+              Setting.getLabel(i18next.t("vector:Dimension"), i18next.t("vector:Dimension - Tooltip")),
+              <InputNumber disabled={true} style={{width: "100%"}} value={vector.dimension} onChange={(value) => this.updateVectorField("dimension", value)} />,
+              4
+            )}
+          </Row>
+        </Card>
+
+        <Card size="small" title={renderCardTitle(i18next.t("general:Content"), "")} style={sectionCardStyle} headStyle={cardHeadStyle}>
+          <Row gutter={rowGutter}>
+            {this.renderVectorField(
+              Setting.getLabel(i18next.t("general:Text"), i18next.t("general:Text - Tooltip")),
+              <Editor
+                value={vector.text}
+                lang="markdown"
+                dark
+                fillHeight
+                fillWidth
+                readOnly={isViewMode}
+                onChange={(value) => {
+                  if (!isViewMode) {
+                    this.updateVectorField("text", value);
+                  }
+                }}
+              />,
+              24
+            )}
+            {this.renderVectorField(
+              Setting.getLabel(i18next.t("general:Data"), i18next.t("general:Data - Tooltip")),
+              <TextArea autoSize={{minRows: 1, maxRows: 15}} value={vector.data} disabled={isViewMode} onChange={(e) => this.updateVectorField("data", e.target.value)} />,
+              24
+            )}
+          </Row>
+        </Card>
+      </div>
     );
   }
 
@@ -245,19 +257,9 @@ class VectorEditPage extends React.Component {
   }
 
   render() {
-    const isViewMode = this.state.mode === "view";
     return (
-      <div>
-        {
-          this.state.vector !== null ? this.renderVector() : <Loading type="page" tip={i18next.t("general:Loading")} />
-        }
-        {!isViewMode && (
-          <div style={{marginTop: "20px", marginLeft: "40px"}}>
-            <Button size="large" onClick={() => this.submitVectorEdit(false)}>{i18next.t("general:Save")}</Button>
-            <Button style={{marginLeft: "20px"}} type="primary" size="large" onClick={() => this.submitVectorEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
-            {this.state.isNewVector && <Button style={{marginLeft: "20px"}} size="large" onClick={() => this.cancelVectorEdit()}>{i18next.t("general:Cancel")}</Button>}
-          </div>
-        )}
+      <div style={{background: "#F1F3F5", padding: "16px 20px 32px", minHeight: "100vh"}}>
+        {this.state.vector !== null ? this.renderVector() : <Loading type="page" tip={i18next.t("general:Loading")} />}
       </div>
     );
   }
