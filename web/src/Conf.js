@@ -19,7 +19,6 @@ export let EnableExtraPages = false;
 export let ShortcutPageItems = [];
 export let UsageEndpoints = [];
 export let IframeUrl = "";
-export let ForceLanguage = "";
 export let DefaultLanguage = "";
 export let StaticBaseUrl = "";
 export let HtmlTitle = "";
@@ -27,15 +26,12 @@ export let FaviconUrl = "";
 export let LogoUrl = "";
 export let NavbarHtml = "";
 export let FooterHtml = "";
-export let AppUrl = "";
 export let ShowGithubCorner = false;
 export let IsDemoMode = false;
 // eslint-disable-next-line
 export let ThemeDefault = {
   themeType: "default",
   colorPrimary: DefaultColorPrimary,
-  borderRadius: 10,
-  isCompact: false,
 };
 export let AvatarErrorUrl = "";
 
@@ -52,7 +48,6 @@ export function setConfig(config) {
   if (config.shortcutPageItems) {ShortcutPageItems = config.shortcutPageItems;}
   if (config.usageEndpoints) {UsageEndpoints = config.usageEndpoints;}
   if (config.iframeUrl !== undefined) {IframeUrl = config.iframeUrl;}
-  if (config.forceLanguage !== undefined) {ForceLanguage = config.forceLanguage;}
   if (config.defaultLanguage !== undefined) {DefaultLanguage = config.defaultLanguage;}
   if (config.staticBaseUrl !== undefined) {StaticBaseUrl = config.staticBaseUrl;}
   if (config.htmlTitle !== undefined) {HtmlTitle = config.htmlTitle;}
@@ -60,7 +55,6 @@ export function setConfig(config) {
   if (config.logoUrl !== undefined) {LogoUrl = config.logoUrl;}
   if (config.navbarHtml !== undefined) {NavbarHtml = config.navbarHtml;}
   if (config.footerHtml !== undefined) {FooterHtml = config.footerHtml;}
-  if (config.appUrl !== undefined) {AppUrl = config.appUrl;}
   if (config.showGithubCorner !== undefined) {ShowGithubCorner = config.showGithubCorner;}
 
   if (config.isDemoMode !== undefined) {

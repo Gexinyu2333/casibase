@@ -322,7 +322,6 @@ class App extends Component {
               ...getShadcnThemeToken(this.state.themeAlgorithm.includes("dark")),
               colorPrimary: this.state.themeData.colorPrimary,
               colorInfo: this.state.themeData.colorPrimary,
-              borderRadius: this.state.themeData.borderRadius,
             },
             components: getShadcnThemeComponents(this.state.themeAlgorithm.includes("dark")),
             algorithm: Setting.getAlgorithm(this.state.themeAlgorithm),

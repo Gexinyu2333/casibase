@@ -36,7 +36,6 @@ type WebConfig struct {
 	ShortcutPageItems []string `json:"shortcutPageItems"`
 	UsageEndpoints    []string `json:"usageEndpoints"`
 	IframeUrl         string   `json:"iframeUrl"`
-	ForceLanguage     string   `json:"forceLanguage"`
 	DefaultLanguage   string   `json:"defaultLanguage"`
 	StaticBaseUrl     string   `json:"staticBaseUrl"`
 	HtmlTitle         string   `json:"htmlTitle"`
@@ -44,14 +43,11 @@ type WebConfig struct {
 	LogoUrl           string   `json:"logoUrl"`
 	NavbarHtml        string   `json:"navbarHtml"`
 	FooterHtml        string   `json:"footerHtml"`
-	AppUrl            string   `json:"appUrl"`
 	ShowGithubCorner  bool     `json:"showGithubCorner"`
 	IsDemoMode        bool     `json:"isDemoMode"`
 	ThemeDefault      struct {
 		ThemeType    string `json:"themeType"`
 		ColorPrimary string `json:"colorPrimary"`
-		BorderRadius int    `json:"borderRadius"`
-		IsCompact    bool   `json:"isCompact"`
 	} `json:"themeDefault"`
 	AvatarErrorUrl string `json:"avatarErrorUrl"`
 }
@@ -79,9 +75,7 @@ func GetConfigString(key string) string {
 
 	tokens := ReadGlobalConfigTokens()
 	if len(tokens) > 0 {
-		if key == "forceLanguage" {
-			return tokens[6]
-		} else if key == "defaultLanguage" {
+		if key == "defaultLanguage" {
 			return tokens[7]
 		} else if key == "htmlTitle" {
 			return tokens[8]
@@ -208,7 +202,6 @@ func GetWebConfig() *WebConfig {
 	config.ShortcutPageItems = GetStringArray("shortcutPageItems")
 	config.UsageEndpoints = GetStringArray("usageEndpoints")
 	config.IframeUrl = GetConfigString("iframeUrl")
-	config.ForceLanguage = GetConfigString("forceLanguage")
 	config.DefaultLanguage = GetLanguage(GetConfigString("defaultLanguage"))
 	config.StaticBaseUrl = GetConfigString("staticBaseUrl")
 	config.HtmlTitle = GetConfigString("htmlTitle")
@@ -216,14 +209,11 @@ func GetWebConfig() *WebConfig {
 	config.LogoUrl = GetConfigString("logoUrl")
 	config.NavbarHtml = GetConfigString("navbarHtml")
 	config.FooterHtml = GetConfigString("footerHtml")
-	config.AppUrl = GetConfigString("appUrl")
 	config.ShowGithubCorner = GetConfigBool("showGithubCorner")
 	config.IsDemoMode = GetConfigBool("isDemoMode")
 
 	config.ThemeDefault.ThemeType = GetConfigString("defaultThemeType")
 	config.ThemeDefault.ColorPrimary = GetDefaultColorPrimary()
-	config.ThemeDefault.BorderRadius = GetConfigInt("defaultBorderRadius")
-	config.ThemeDefault.IsCompact = GetConfigBool("defaultIsCompact")
 
 	config.AvatarErrorUrl = GetConfigString("avatarErrorUrl")
 

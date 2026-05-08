@@ -143,7 +143,7 @@ class FileTree extends React.Component {
     if (Conf.EnableExtraPages) {
       for (let i = 0; i < info.fileList.length; i++) {
         const filename = info.fileList[i].name;
-        if (this.getCacheApp(filename) === "" && filename.endsWith(".txt")) {
+        if (filename.endsWith(".txt")) {
           return true;
         }
       }
@@ -179,7 +179,7 @@ class FileTree extends React.Component {
           if (uploadFileType !== "Other") {
             for (let i = 0; i < newInfo.fileList.length; i++) {
               const filename = newInfo.fileList[i].name;
-              if (this.getCacheApp(filename) === "" && filename.endsWith(".txt")) {
+              if (filename.endsWith(".txt")) {
                 newInfo.fileList[i].name = `${uploadFileType}_${newInfo.fileList[i].name}`;
               }
             }
@@ -392,14 +392,6 @@ class FileTree extends React.Component {
     );
   }
 
-  getCacheApp(filename) {
-    if (!filename.startsWith("ECG_") && !filename.startsWith("EEG_") && !filename.startsWith("Impedance_")) {
-      return "";
-    }
-
-    return filename;
-  }
-
   findFileNodeByKey(file, targetKey) {
     if (!file) {
       return null;
@@ -502,28 +494,7 @@ class FileTree extends React.Component {
           }
         };
 
-        const key = info.node.key;
-        const filename = info.node.title;
-        if (this.getCacheApp(filename) !== "") {
-          TreeFileBackend.activateFile(key, filename)
-            .then((res) => {
-              if (res.status === "ok") {
-                if (res.data === true) {
-                  // Setting.showMessage("success", `File activated successfully`);
-                  fetchFile();
-                } else {
-                  Setting.showMessage("error", i18next.t("general:Failed to connect to server"));
-                }
-              } else {
-                Setting.showMessage("error", `${i18next.t("general:Failed to activate")}: ${res.msg}`);
-              }
-            })
-            .catch(error => {
-              Setting.showMessage("error", `${i18next.t("general:Failed to activate")}: ${error}`);
-            });
-        } else {
-          fetchFile();
-        }
+        fetchFile();
       }
 
       this.setState({
@@ -844,13 +815,7 @@ class FileTree extends React.Component {
     const ext = Setting.getExtFromPath(path);
     const url = this.state.selectedFile.url;
 
-    const app = this.getCacheApp(filename);
-    if (app !== "") {
-      return (
-        <iframe key={path} title={app} src={`${Conf.AppUrl}${app}`} width={"100%"} height={"100%"} />
-        // <DataChart filename={filename} url={url} height={this.getEditorHeightCss()} />
-      );
-    } else if (this.isExtForDocViewer(ext)) {
+    if (this.isExtForDocViewer(ext)) {
       // https://github.com/Alcumus/react-doc-viewer
       return (
         <DocViewer

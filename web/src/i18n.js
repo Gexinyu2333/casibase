@@ -28,26 +28,22 @@ const supportedLanguages = ["en", "zh"];
 function initLanguage() {
   let language = localStorage.getItem("language");
   if (language === undefined || language === null) {
-    if (Conf.ForceLanguage !== "") {
-      language = Conf.ForceLanguage;
-    } else {
-      const userLanguage = navigator.language;
-      switch (userLanguage) {
-      case "en":
-        language = "en";
-        break;
-      case "en-US":
-        language = "en";
-        break;
-      case "zh-CN":
-        language = "zh";
-        break;
-      case "zh":
-        language = "zh";
-        break;
-      default:
-        language = Conf.DefaultLanguage;
-      }
+    const userLanguage = navigator.language;
+    switch (userLanguage) {
+    case "en":
+      language = "en";
+      break;
+    case "en-US":
+      language = "en";
+      break;
+    case "zh-CN":
+      language = "zh";
+      break;
+    case "zh":
+      language = "zh";
+      break;
+    default:
+      language = Conf.DefaultLanguage;
     }
   }
 
