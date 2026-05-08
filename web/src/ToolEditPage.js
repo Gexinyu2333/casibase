@@ -14,7 +14,7 @@
 
 import React from "react";
 import Loading from "./common/Loading";
-import {Alert, Button, Card, Col, Input, Row, Select, Switch, Table, Tag} from "antd";
+import {Alert, Button, Card, Col, Input, Row, Select, Space, Switch, Table, Tag} from "antd";
 import * as ToolBackend from "./backend/ToolBackend";
 import * as Setting from "./Setting";
 import i18next from "i18next";
@@ -84,231 +84,246 @@ class ToolEditPage extends React.Component {
     return Setting.getLabel(i18next.t("general:Provider URL"), i18next.t("general:Provider URL - Tooltip"));
   }
 
-  renderTool() {
+  renderToolField(label, control, span = 8, style = {}) {
     return (
-      <Card size="small" title={
-        <div>
-          {i18next.t("tool:Edit Tool")}&nbsp;&nbsp;&nbsp;&nbsp;
-          <Button onClick={() => this.submitToolEdit(false)}>{i18next.t("general:Save")}</Button>
-          <Button style={{marginLeft: "20px"}} type="primary" onClick={() => this.submitToolEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
-          {this.state.isNewTool && <Button style={{marginLeft: "20px"}} onClick={() => this.cancelToolEdit()}>{i18next.t("general:Cancel")}</Button>}
+      <Col style={{marginTop: "12px", ...style}} span={Setting.isMobile() ? 22 : span}>
+        <div style={{marginBottom: "6px", color: "#595959", fontWeight: 500, lineHeight: "22px", fontSize: "13px"}}>{label}</div>
+        {control}
+      </Col>
+    );
+  }
+
+  renderToolSwitch(label, checked, onChange, span = 6) {
+    return this.renderToolField(label, <Switch checked={checked} onChange={onChange} />, span);
+  }
+
+  renderTool() {
+    const tool = this.state.tool;
+    const rowGutter = [16, 8];
+    const cardHeadStyle = {background: "transparent", borderBottom: "none", fontWeight: 600, fontSize: "15px", fontFamily: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"};
+    const sectionCardStyle = {
+      marginBottom: "16px",
+      borderRadius: "14px",
+      boxShadow: "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
+      padding: "18px",
+    };
+    const btnStyle = {
+      backgroundColor: "#F8F9FA",
+      borderColor: "rgb(229, 229, 234)",
+      border: "1px solid #E5E5EA",
+      borderRadius: "10px",
+      padding: "6px 10px",
+    };
+
+    const renderCardTitle = (title, desc) => (
+      <div>
+        <div style={{fontWeight: 600, fontSize: "15px"}}>{title}</div>
+        <div style={{fontSize: "13px", color: "#6E6E73", fontWeight: 400, marginTop: "2px"}}>{desc}</div>
+      </div>
+    );
+
+    return (
+      <div>
+        <div style={{marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+          <span style={{fontSize: "22px", fontWeight: 600}}>{i18next.t("tool:Edit Tool")}</span>
+          <div style={{display: "flex", gap: "8px", marginRight: "4px"}}>
+            <Space wrap>
+              <Button style={btnStyle} onClick={() => this.submitToolEdit(false)}>{i18next.t("general:Save")}</Button>
+              <Button style={btnStyle} onClick={() => this.submitToolEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
+              {this.state.isNewTool && <Button style={btnStyle} onClick={() => this.cancelToolEdit()}>{i18next.t("general:Cancel")}</Button>}
+            </Space>
+          </div>
         </div>
-      } style={{marginLeft: "5px"}} type="inner">
-        <Row style={{marginTop: "10px"}}>
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Name"), i18next.t("general:Name - Tooltip"))} :
-          </Col>
-          <Col span={22}>
-            <Input value={this.state.tool.name} onChange={e => {
-              this.updateToolField("name", e.target.value);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}}>
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Type"), i18next.t("general:Type - Tooltip"))} :
-          </Col>
-          <Col span={22}>
-            <Select virtual={false} style={{width: "100%"}} value={this.state.tool.type} onChange={(value) => {
-              this.updateToolField("type", value);
-              if (value === "time") {
-                this.updateToolField("subType", "Default");
-              } else if (value === "web_search") {
-                this.updateToolField("subType", "DuckDuckGo");
-              } else if (value === "shell") {
-                this.updateToolField("subType", "Default");
-              } else if (value === "local_file") {
-                this.updateToolField("subType", "Default");
-              } else if (value === "office") {
-                this.updateToolField("subType", "All");
-              } else if (value === "web_fetch") {
-                this.updateToolField("subType", "Default");
-              } else if (value === "web_browser") {
-                this.updateToolField("subType", "Default");
-              } else if (value === "gui") {
-                this.updateToolField("subType", "Windows UIA");
-              } else if (value === "video_download") {
-                this.updateToolField("subType", "Default");
-              } else if (value === "browser_use") {
-                this.updateToolField("subType", "Default");
-              }
-            }}
-            showSearch
-            filterOption={(input, option) =>
-              option.children[1].toLowerCase().includes(input.toLowerCase())
-            }
-            >
-              {
-                Setting.getProviderTypeOptions("Tool")
-                  .map((item, index) => (
-                    <Option key={index} value={item.name}>
-                      <img width={20} height={20} style={{marginBottom: "3px", marginRight: "10px"}}
-                        src={Setting.getProviderLogoURL({category: "Tool", type: item.name})} alt={item.name} />
-                      {item.name}
-                    </Option>
-                  ))
-              }
-            </Select>
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}}>
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("provider:Sub type"), i18next.t("provider:Sub type - Tooltip"))} :
-          </Col>
-          <Col span={22}>
-            <Select virtual={false} style={{width: "100%"}} value={this.state.tool.subType}
-              onChange={(value) => this.updateToolField("subType", value)}
+
+        <Card size="small" title={renderCardTitle(i18next.t("general:General Settings"), i18next.t("general:General Settings desc"))} style={sectionCardStyle} headStyle={cardHeadStyle}>
+          <Row gutter={rowGutter}>
+            {this.renderToolField(
+              Setting.getLabel(i18next.t("general:Name"), i18next.t("general:Name - Tooltip")),
+              <Input value={tool.name} onChange={e => {
+                this.updateToolField("name", e.target.value);
+              }} />,
+              8
+            )}
+            {this.renderToolField(
+              Setting.getLabel(i18next.t("general:Type"), i18next.t("general:Type - Tooltip")),
+              <Select virtual={false} style={{width: "100%"}} value={tool.type} onChange={(value) => {
+                this.updateToolField("type", value);
+                if (value === "time") {
+                  this.updateToolField("subType", "Default");
+                } else if (value === "web_search") {
+                  this.updateToolField("subType", "DuckDuckGo");
+                } else if (value === "shell") {
+                  this.updateToolField("subType", "Default");
+                } else if (value === "local_file") {
+                  this.updateToolField("subType", "Default");
+                } else if (value === "office") {
+                  this.updateToolField("subType", "All");
+                } else if (value === "web_fetch") {
+                  this.updateToolField("subType", "Default");
+                } else if (value === "web_browser") {
+                  this.updateToolField("subType", "Default");
+                } else if (value === "gui") {
+                  this.updateToolField("subType", "Windows UIA");
+                } else if (value === "video_download") {
+                  this.updateToolField("subType", "Default");
+                } else if (value === "browser_use") {
+                  this.updateToolField("subType", "Default");
+                }
+              }}
               showSearch
               filterOption={(input, option) =>
-                option.children.toLowerCase().includes(input.toLowerCase())
+                option.children[1].toLowerCase().includes(input.toLowerCase())
               }
-            >
-              {Setting.getProviderSubTypeOptions("Tool", this.state.tool.type)
-                .map((item, index) => (
-                  <Option key={index} value={item.id}>{item.name}</Option>
-                ))
-              }
-            </Select>
-          </Col>
-        </Row>
-        {Setting.getToolFunctions(this.state.tool).length > 0 && (
-          <Row style={{marginTop: "20px"}}>
-            <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-              {Setting.getLabel(i18next.t("tool:Functions"), i18next.t("tool:Functions - Tooltip"))} :
-            </Col>
-            <Col span={22}>
-              <Table
-                size="small"
-                pagination={false}
-                columns={[
-                  {
-                    title: i18next.t("tool:Function name"),
-                    dataIndex: "name",
-                    key: "name",
-                    width: 280,
-                    render: (text) => <Tag style={{fontFamily: "monospace"}}>{text}</Tag>,
-                  },
-                  {
-                    title: i18next.t("general:Description"),
-                    dataIndex: "description",
-                    key: "description",
-                  },
-                ]}
-                dataSource={Setting.getToolFunctions(this.state.tool).map((f, i) => ({...f, key: i}))}
-              />
-            </Col>
-          </Row>
-        )}
-        {this.shouldShowClientIdInput(this.state.tool) ? (
-          <Row style={{marginTop: "20px"}}>
-            <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-              {this.getClientIdLabel(this.state.tool)} :
-            </Col>
-            <Col span={22}>
-              <Input value={this.state.tool.clientId} onChange={e => {
-                this.updateToolField("clientId", e.target.value);
-              }} />
-            </Col>
-          </Row>
-        ) : null}
-        {this.shouldShowClientSecretInput(this.state.tool) ? (
-          <Row style={{marginTop: "20px"}}>
-            <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-              {this.getClientSecretLabel(this.state.tool)} :
-            </Col>
-            <Col span={22}>
-              <Input.Password value={this.state.tool.clientSecret} onChange={e => {
-                this.updateToolField("clientSecret", e.target.value);
-              }} />
-            </Col>
-          </Row>
-        ) : null}
-        {["web_search", "web_fetch", "web_browser"].includes(this.state.tool.type) ? (
-          <Row style={{marginTop: "20px"}}>
-            <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-              {this.getProviderUrlLabel(this.state.tool)} :
-            </Col>
-            <Col span={22}>
-              <Input value={this.state.tool.providerUrl} onChange={e => {
-                this.updateToolField("providerUrl", e.target.value);
-              }} />
-            </Col>
-          </Row>
-        ) : null}
-        {["web_search", "web_fetch", "web_browser", "browser_use"].includes(this.state.tool.type) ? (
-          <Row style={{marginTop: "20px"}}>
-            <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-              {Setting.getLabel(i18next.t("provider:Enable proxy"), i18next.t("provider:Enable proxy - Tooltip"))} :
-            </Col>
-            <Col span={1}>
-              <Switch checked={this.state.tool.enableProxy} onChange={checked => {
-                this.updateToolField("enableProxy", checked);
-              }} />
-            </Col>
-          </Row>
-        ) : null}
-        {this.state.tool.type === "browser_use" ? (
-          <Row style={{marginTop: "20px"}}>
-            <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-              {Setting.getLabel(i18next.t("tool:Chrome mode"), i18next.t("tool:Chrome mode - Tooltip"))} :
-            </Col>
-            <Col span={22}>
-              <Select virtual={false} style={{width: "100%"}} value={this.state.tool.mode || "User Chrome"}
-                onChange={value => this.updateToolField("mode", value)}
               >
-                <Option value="User Chrome">{i18next.t("tool:User Chrome")}</Option>
-                <Option value="Chrome for Testing">{i18next.t("tool:Chrome for Testing")}</Option>
-                <Option value="OpenAgent Chrome Extension">{i18next.t("tool:OpenAgent Chrome Extension")}</Option>
-              </Select>
-            </Col>
-          </Row>
-        ) : null}
-        {this.state.tool.type === "browser_use" && this.state.tool.mode === "OpenAgent Chrome Extension" ? (
-          <Row style={{marginTop: "20px"}}>
-            <Col span={(Setting.isMobile()) ? 22 : 2} />
-            <Col span={22}>
-              <Alert
-                type="info"
-                showIcon
-                message={i18next.t("tool:OpenAgent Chrome Extension - Setup title")}
-                description={
-                  <ol style={{marginTop: "8px", marginBottom: "0", paddingLeft: "20px"}}>
-                    <li>
-                      {i18next.t("tool:OpenAgent Chrome Extension - Step 1 prefix")}
-                      {" "}
-                      <a href="https://github.com/the-open-agent/openagent-chrome" target="_blank" rel="noopener noreferrer">
-                        {i18next.t("tool:OpenAgent Chrome Extension - Step 1 link")}
-                      </a>
-                    </li>
-                    <li>{i18next.t("tool:OpenAgent Chrome Extension - Step 2")}</li>
-                    <li>{i18next.t("tool:OpenAgent Chrome Extension - Step 3")}</li>
-                    <li>{i18next.t("tool:OpenAgent Chrome Extension - Step 4")}</li>
-                  </ol>
+                {
+                  Setting.getProviderTypeOptions("Tool")
+                    .map((item, index) => (
+                      <Option key={index} value={item.name}>
+                        <img width={20} height={20} style={{marginBottom: "3px", marginRight: "10px"}}
+                          src={Setting.getProviderLogoURL({category: "Tool", type: item.name})} alt={item.name} />
+                        {item.name}
+                      </Option>
+                    ))
                 }
-              />
-            </Col>
+              </Select>,
+              8
+            )}
+            {this.renderToolField(
+              Setting.getLabel(i18next.t("provider:Sub type"), i18next.t("provider:Sub type - Tooltip")),
+              <Select virtual={false} style={{width: "100%"}} value={tool.subType}
+                onChange={(value) => this.updateToolField("subType", value)}
+                showSearch
+                filterOption={(input, option) =>
+                  option.children.toLowerCase().includes(input.toLowerCase())
+                }
+              >
+                {Setting.getProviderSubTypeOptions("Tool", tool.type)
+                  .map((item, index) => (
+                    <Option key={index} value={item.id}>{item.name}</Option>
+                  ))
+                }
+              </Select>,
+              8
+            )}
+            {this.shouldShowClientIdInput(tool) ? (
+              this.renderToolField(
+                this.getClientIdLabel(tool),
+                <Input value={tool.clientId} onChange={e => {
+                  this.updateToolField("clientId", e.target.value);
+                }} />,
+                12
+              )
+            ) : null}
+            {this.shouldShowClientSecretInput(tool) ? (
+              this.renderToolField(
+                this.getClientSecretLabel(tool),
+                <Input.Password value={tool.clientSecret} onChange={e => {
+                  this.updateToolField("clientSecret", e.target.value);
+                }} />,
+                12
+              )
+            ) : null}
+            {["web_search", "web_fetch", "web_browser"].includes(tool.type) ? (
+              this.renderToolField(
+                this.getProviderUrlLabel(tool),
+                <Input value={tool.providerUrl} onChange={e => {
+                  this.updateToolField("providerUrl", e.target.value);
+                }} />,
+                12
+              )
+            ) : null}
+            {["web_search", "web_fetch", "web_browser", "browser_use"].includes(tool.type) ? (
+              this.renderToolSwitch(
+                Setting.getLabel(i18next.t("provider:Enable proxy"), i18next.t("provider:Enable proxy - Tooltip")),
+                tool.enableProxy,
+                checked => {
+                  this.updateToolField("enableProxy", checked);
+                },
+                6
+              )
+            ) : null}
+            {tool.type === "browser_use" ? (
+              this.renderToolField(
+                Setting.getLabel(i18next.t("tool:Chrome mode"), i18next.t("tool:Chrome mode - Tooltip")),
+                <Select virtual={false} style={{width: "100%"}} value={tool.mode || "User Chrome"}
+                  onChange={value => this.updateToolField("mode", value)}
+                >
+                  <Option value="User Chrome">{i18next.t("tool:User Chrome")}</Option>
+                  <Option value="Chrome for Testing">{i18next.t("tool:Chrome for Testing")}</Option>
+                  <Option value="OpenAgent Chrome Extension">{i18next.t("tool:OpenAgent Chrome Extension")}</Option>
+                </Select>,
+                12
+              )
+            ) : null}
+            {tool.type === "browser_use" && tool.mode === "OpenAgent Chrome Extension" ? (
+              <Col span={24} style={{marginTop: "12px"}}>
+                <Alert
+                  type="info"
+                  showIcon
+                  message={i18next.t("tool:OpenAgent Chrome Extension - Setup title")}
+                  description={
+                    <ol style={{marginTop: "8px", marginBottom: "0", paddingLeft: "20px"}}>
+                      <li>
+                        {i18next.t("tool:OpenAgent Chrome Extension - Step 1 prefix")}
+                        {" "}
+                        <a href="https://github.com/the-open-agent/openagent-chrome" target="_blank" rel="noopener noreferrer">
+                          {i18next.t("tool:OpenAgent Chrome Extension - Step 1 link")}
+                        </a>
+                      </li>
+                      <li>{i18next.t("tool:OpenAgent Chrome Extension - Step 2")}</li>
+                      <li>{i18next.t("tool:OpenAgent Chrome Extension - Step 3")}</li>
+                      <li>{i18next.t("tool:OpenAgent Chrome Extension - Step 4")}</li>
+                    </ol>
+                  }
+                />
+              </Col>
+            ) : null}
+            {this.renderToolField(
+              Setting.getLabel(i18next.t("general:State"), i18next.t("general:State - Tooltip")),
+              <Select virtual={false} style={{width: "100%"}} value={tool.state}
+                onChange={value => this.updateToolField("state", value)}
+                options={[
+                  {value: "Active", label: i18next.t("general:Active")},
+                  {value: "Inactive", label: i18next.t("general:Inactive")},
+                ].map(item => Setting.getOption(item.label, item.value))} />,
+              8
+            )}
           </Row>
-        ) : null}
-        <TestToolWidget
-          tool={this.state.tool}
-          originalTool={this.state.originalTool}
-          onUpdateTool={this.updateToolField.bind(this)}
-          account={this.props.account}
-        />
-        <Row style={{marginTop: "20px"}}>
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:State"), i18next.t("general:State - Tooltip"))} :
-          </Col>
-          <Col span={22}>
-            <Select virtual={false} style={{width: "100%"}} value={this.state.tool.state}
-              onChange={value => this.updateToolField("state", value)}
-              options={[
-                {value: "Active", label: i18next.t("general:Active")},
-                {value: "Inactive", label: i18next.t("general:Inactive")},
-              ].map(item => Setting.getOption(item.label, item.value))} />
-          </Col>
-        </Row>
-      </Card>
+        </Card>
+
+        {Setting.getToolFunctions(tool).length > 0 && (
+          <Card size="small" title={renderCardTitle(i18next.t("tool:Functions"), i18next.t("tool:Functions desc"))} style={sectionCardStyle} headStyle={cardHeadStyle}>
+            <Table
+              size="small"
+              pagination={false}
+              columns={[
+                {
+                  title: i18next.t("tool:Function name"),
+                  dataIndex: "name",
+                  key: "name",
+                  width: 280,
+                  render: (text) => <Tag style={{fontFamily: "monospace"}}>{text}</Tag>,
+                },
+                {
+                  title: i18next.t("general:Description"),
+                  dataIndex: "description",
+                  key: "description",
+                },
+              ]}
+              dataSource={Setting.getToolFunctions(tool).map((f, i) => ({...f, key: i}))}
+            />
+          </Card>
+        )}
+
+        <Card size="small" title={renderCardTitle(i18next.t("general:Test"), i18next.t("general:Test desc"))} style={sectionCardStyle} headStyle={cardHeadStyle}>
+          <TestToolWidget
+            tool={tool}
+            originalTool={this.state.originalTool}
+            onUpdateTool={this.updateToolField.bind(this)}
+            account={this.props.account}
+          />
+        </Card>
+      </div>
     );
   }
 
@@ -363,15 +378,10 @@ class ToolEditPage extends React.Component {
 
   render() {
     return (
-      <div>
+      <div style={{background: "#F1F3F5", padding: "16px 20px 32px", minHeight: "100vh"}}>
         {
           this.state.tool !== null ? this.renderTool() : <Loading type="page" tip={i18next.t("general:Loading")} />
         }
-        <div style={{marginTop: "20px", marginLeft: "40px"}}>
-          <Button size="large" onClick={() => this.submitToolEdit(false)}>{i18next.t("general:Save")}</Button>
-          <Button style={{marginLeft: "20px"}} type="primary" size="large" onClick={() => this.submitToolEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
-          {this.state.isNewTool && <Button style={{marginLeft: "20px"}} size="large" onClick={() => this.cancelToolEdit()}>{i18next.t("general:Cancel")}</Button>}
-        </div>
       </div>
     );
   }

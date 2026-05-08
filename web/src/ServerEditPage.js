@@ -14,7 +14,7 @@
 
 import React from "react";
 import Loading from "./common/Loading";
-import {Button, Card, Col, Input, Row} from "antd";
+import {Button, Card, Col, Input, Row, Space} from "antd";
 import {LinkOutlined} from "@ant-design/icons";
 import * as ServerBackend from "./backend/ServerBackend";
 import * as Setting from "./Setting";
@@ -105,88 +105,110 @@ class ServerEditPage extends React.Component {
       });
   }
 
-  renderServer() {
+  renderCardTitle(title, desc) {
     return (
-      <Card size="small" title={
-        <div>
-          {i18next.t("server:Edit MCP Server")}&nbsp;&nbsp;&nbsp;&nbsp;
-          <Button onClick={() => this.submitServerEdit(false)}>{i18next.t("general:Save")}</Button>
-          <Button style={{marginLeft: "20px"}} type="primary" onClick={() => this.submitServerEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
-          {this.state.isNewServer && <Button style={{marginLeft: "20px"}} onClick={() => this.cancelServerEdit()}>{i18next.t("general:Cancel")}</Button>}
+      <div>
+        <div style={{fontWeight: 600, fontSize: "15px"}}>{title}</div>
+        <div style={{fontSize: "13px", color: "#6E6E73", fontWeight: 400, marginTop: "2px"}}>{desc}</div>
+      </div>
+    );
+  }
+
+  renderServerField(label, control, span = 8, style = {}) {
+    return (
+      <Col style={{marginTop: "12px", ...style}} span={Setting.isMobile() ? 22 : span}>
+        <div style={{marginBottom: "6px", color: "#595959", fontWeight: 500, lineHeight: "22px", fontSize: "13px"}}>{label}</div>
+        {control}
+      </Col>
+    );
+  }
+
+  renderServer() {
+    const server = this.state.server;
+    const rowGutter = [16, 8];
+    const cardHeadStyle = {background: "transparent", borderBottom: "none", fontWeight: 600, fontSize: "15px", fontFamily: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"};
+    const sectionCardStyle = {
+      marginBottom: "16px",
+      borderRadius: "14px",
+      boxShadow: "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
+      padding: "18px",
+    };
+    const btnStyle = {
+      backgroundColor: "#F8F9FA",
+      borderColor: "rgb(229, 229, 234)",
+      border: "1px solid #E5E5EA",
+      borderRadius: "10px",
+      padding: "6px 10px",
+    };
+
+    return (
+      <div>
+        <div style={{marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+          <span style={{fontSize: "22px", fontWeight: 600}}>{i18next.t("server:Edit MCP Server")}</span>
+          <div style={{display: "flex", gap: "8px", marginRight: "4px"}}>
+            <Space wrap>
+              <Button style={btnStyle} onClick={() => this.submitServerEdit(false)}>{i18next.t("general:Save")}</Button>
+              <Button style={btnStyle} onClick={() => this.submitServerEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
+              {this.state.isNewServer && <Button style={btnStyle} onClick={() => this.cancelServerEdit()}>{i18next.t("general:Cancel")}</Button>}
+            </Space>
+          </div>
         </div>
-      } style={{marginLeft: "5px"}} type="inner">
-        <Row style={{marginTop: "10px"}}>
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Name"), i18next.t("general:Name - Tooltip"))} :
-          </Col>
-          <Col span={22}>
-            <Input value={this.state.server.name} onChange={e => this.updateServerField("name", e.target.value)} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}}>
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Display name"), i18next.t("general:Display name - Tooltip"))} :
-          </Col>
-          <Col span={22}>
-            <Input value={this.state.server.displayName} onChange={e => this.updateServerField("displayName", e.target.value)} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}}>
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:URL"), i18next.t("general:URL - Tooltip"))} :
-          </Col>
-          <Col span={22}>
-            <Input prefix={<LinkOutlined />} value={this.state.server.url} onChange={e => this.updateServerField("url", e.target.value)} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}}>
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("server:Access token"), i18next.t("server:Access token - Tooltip"))} :
-          </Col>
-          <Col span={22}>
-            <Input.Password placeholder={"***"} value={this.state.server.token} onChange={e => this.updateServerField("token", e.target.value)} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}}>
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Tool"), i18next.t("general:Tool - Tooltip"))} :
-          </Col>
-          <Col span={22}>
-            {!this.state.isNewServer && (
-              <>
-                <Button type="primary" loading={this.state.syncButtonLoading} style={{marginBottom: "5px"}} onClick={() => this.syncMcpTool(false)}>{i18next.t("general:Sync")}</Button>
-                <Button style={{marginBottom: "5px", marginLeft: "10px"}} onClick={() => this.syncMcpTool(true)}>{i18next.t("general:Clear")}</Button>
-              </>
+
+        <Card size="small" title={this.renderCardTitle(i18next.t("general:General Settings"), i18next.t("general:General Settings desc"))} style={sectionCardStyle} headStyle={cardHeadStyle}>
+          <Row gutter={rowGutter}>
+            {this.renderServerField(
+              Setting.getLabel(i18next.t("general:Name"), i18next.t("general:Name - Tooltip")),
+              <Input value={server.name} onChange={e => this.updateServerField("name", e.target.value)} />,
+              8
             )}
-            <ToolTable
-              tools={this.state.server.tools || []}
-              onUpdateTable={(value) => this.updateServerField("tools", value)}
-            />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}}>
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("server:MCP test"), i18next.t("server:MCP test - Tooltip"))} :
-          </Col>
-          <Col span={22}>
-            <TestMcpWidget server={this.state.server} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}}>
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("server:Base URL"), i18next.t("server:Base URL - Tooltip"))} :
-          </Col>
-          <Col span={22}>
-            <Input prefix={<LinkOutlined />} readOnly value={`${window.location.origin}/api/get-server?id=${this.state.server.owner}/${this.state.server.name}`} />
-          </Col>
-        </Row>
-      </Card>
+            {this.renderServerField(
+              Setting.getLabel(i18next.t("general:Display name"), i18next.t("general:Display name - Tooltip")),
+              <Input value={server.displayName} onChange={e => this.updateServerField("displayName", e.target.value)} />,
+              8
+            )}
+            {this.renderServerField(
+              Setting.getLabel(i18next.t("general:URL"), i18next.t("general:URL - Tooltip")),
+              <Input prefix={<LinkOutlined />} value={server.url} onChange={e => this.updateServerField("url", e.target.value)} />,
+              16
+            )}
+            {this.renderServerField(
+              Setting.getLabel(i18next.t("server:Access token"), i18next.t("server:Access token - Tooltip")),
+              <Input.Password placeholder={"***"} value={server.token} onChange={e => this.updateServerField("token", e.target.value)} />,
+              16
+            )}
+          </Row>
+        </Card>
+
+        <Card size="small" title={this.renderCardTitle(i18next.t("general:Tools"), i18next.t("general:Tools desc"))} style={sectionCardStyle} headStyle={cardHeadStyle}>
+          {!this.state.isNewServer && (
+            <div style={{marginBottom: "8px"}}>
+              <Button type="primary" loading={this.state.syncButtonLoading} onClick={() => this.syncMcpTool(false)}>{i18next.t("general:Sync")}</Button>
+              <Button style={{marginLeft: "10px"}} onClick={() => this.syncMcpTool(true)}>{i18next.t("general:Clear")}</Button>
+            </div>
+          )}
+          <ToolTable
+            tools={server.tools || []}
+            onUpdateTable={(value) => this.updateServerField("tools", value)}
+          />
+        </Card>
+
+        <Card size="small" title={this.renderCardTitle(i18next.t("general:Test"), i18next.t("general:Test desc"))} style={sectionCardStyle} headStyle={cardHeadStyle}>
+          <TestMcpWidget server={server} />
+          <Row gutter={rowGutter}>
+            {this.renderServerField(
+              Setting.getLabel(i18next.t("server:Base URL"), i18next.t("server:Base URL - Tooltip")),
+              <Input prefix={<LinkOutlined />} readOnly value={`${window.location.origin}/api/get-server?id=${server.owner}/${server.name}`} />,
+              24
+            )}
+          </Row>
+        </Card>
+      </div>
     );
   }
 
   render() {
     return (
-      <div>
+      <div style={{background: "#F1F3F5", padding: "16px 20px 32px", minHeight: "100vh"}}>
         {this.state.server === null ? <Loading /> : this.renderServer()}
       </div>
     );

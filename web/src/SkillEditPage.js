@@ -14,7 +14,7 @@
 
 import React from "react";
 import Loading from "./common/Loading";
-import {Button, Card, Col, Collapse, Input, Row, Select, Tag, Typography} from "antd";
+import {Button, Card, Col, Collapse, Input, Row, Select, Space, Tag, Typography} from "antd";
 import * as SkillBackend from "./backend/SkillBackend";
 import * as Setting from "./Setting";
 import i18next from "i18next";
@@ -62,185 +62,195 @@ class SkillEditPage extends React.Component {
     this.setState({skill});
   }
 
+  renderSkillField(label, control, span = 8, style = {}) {
+    return (
+      <Col style={{marginTop: "12px", ...style}} span={Setting.isMobile() ? 22 : span}>
+        <div style={{marginBottom: "6px", color: "#595959", fontWeight: 500, lineHeight: "22px", fontSize: "13px"}}>{label}</div>
+        {control}
+      </Col>
+    );
+  }
+
+  renderSkillSwitch(label, checked, onChange, span = 6) {
+    const {Switch} = require("antd");
+    return this.renderSkillField(label, <Switch checked={checked} onChange={onChange} />, span);
+  }
+
   renderSkill() {
     const {skill} = this.state;
+    const rowGutter = [16, 8];
+    const cardHeadStyle = {background: "transparent", borderBottom: "none", fontWeight: 600, fontSize: "15px", fontFamily: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"};
+    const sectionCardStyle = {
+      marginBottom: "16px",
+      borderRadius: "14px",
+      boxShadow: "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
+      padding: "18px",
+    };
+
+    const btnStyle = {
+      backgroundColor: "#F8F9FA",
+      borderColor: "rgb(229, 229, 234)",
+      border: "1px solid #E5E5EA",
+      borderRadius: "10px",
+      padding: "6px 10px",
+    };
+
+    const renderCardTitle = (title, desc) => (
+      <div>
+        <div style={{fontWeight: 600, fontSize: "15px"}}>{title}</div>
+        <div style={{fontSize: "13px", color: "#6E6E73", fontWeight: 400, marginTop: "2px"}}>{desc}</div>
+      </div>
+    );
 
     return (
-      <Card size="small" title={
-        <div>
-          {skill.emoji && <span style={{marginRight: 8, fontSize: 18}}>{skill.emoji}</span>}
-          {i18next.t("skill:Edit Skill")}&nbsp;&nbsp;&nbsp;&nbsp;
-          <Button onClick={() => this.submitSkillEdit(false)}>{i18next.t("general:Save")}</Button>
-          <Button style={{marginLeft: "20px"}} type="primary" onClick={() => this.submitSkillEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
-          {this.state.isNewSkill && <Button style={{marginLeft: "20px"}} onClick={() => this.cancelSkillEdit()}>{i18next.t("general:Cancel")}</Button>}
+      <div>
+        <div style={{marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+          <span style={{fontSize: "22px", fontWeight: 600}}>{i18next.t("skill:Edit Skill")}</span>
+          <div style={{display: "flex", gap: "8px", marginRight: "4px"}}>
+            <Space wrap>
+              <Button style={btnStyle} onClick={() => this.submitSkillEdit(false)}>{i18next.t("general:Save")}</Button>
+              <Button style={btnStyle} onClick={() => this.submitSkillEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
+              {this.state.isNewSkill && <Button style={btnStyle} onClick={() => this.cancelSkillEdit()}>{i18next.t("general:Cancel")}</Button>}
+            </Space>
+          </div>
         </div>
-      } style={{marginLeft: "5px"}} type="inner">
 
-        {/* ── Basic identity ─────────────────────────────────────────── */}
-        <Row style={{marginTop: "10px"}}>
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Name"), i18next.t("general:Name - Tooltip"))} :
-          </Col>
-          <Col span={22}>
-            <Input value={skill.name} onChange={e => this.updateSkillField("name", e.target.value)} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}}>
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Display name"), i18next.t("general:Display name - Tooltip"))} :
-          </Col>
-          <Col span={22}>
-            <Input value={skill.displayName} onChange={e => this.updateSkillField("displayName", e.target.value)} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}}>
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("skill:Emoji"), i18next.t("skill:Emoji - Tooltip"))} :
-          </Col>
-          <Col span={22}>
-            <Input
-              value={skill.emoji}
-              onChange={e => this.updateSkillField("emoji", e.target.value)}
-              style={{maxWidth: 120}}
-              placeholder="🚀"
-            />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}}>
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Type"), i18next.t("general:Type - Tooltip"))} :
-          </Col>
-          <Col span={22}>
-            <Select virtual={false} style={{width: "100%"}} value={skill.type}
-              onChange={(value) => this.updateSkillField("type", value)}
-            >
-              {SKILL_TYPES.map((t, index) => (
-                <Option key={index} value={t}>{t}</Option>
-              ))}
-            </Select>
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}}>
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Description"), i18next.t("general:Description - Tooltip"))} :
-          </Col>
-          <Col span={22}>
-            <TextArea
-              rows={3}
-              value={skill.description}
-              onChange={e => this.updateSkillField("description", e.target.value)}
-            />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}}>
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("skill:Homepage"), i18next.t("skill:Homepage - Tooltip"))} :
-          </Col>
-          <Col span={22}>
-            <Input
-              value={skill.homepage}
-              onChange={e => this.updateSkillField("homepage", e.target.value)}
-              placeholder="https://..."
-            />
-          </Col>
-        </Row>
-
-        {/* ── Content (system-prompt injection) ─────────────────────── */}
-        <Row style={{marginTop: "20px"}}>
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("article:Content"), i18next.t("skill:Content - Tooltip"))} :
-          </Col>
-          <Col span={22}>
-            <TextArea
-              rows={14}
-              value={skill.content}
-              onChange={e => this.updateSkillField("content", e.target.value)}
-              placeholder={i18next.t("skill:Content placeholder")}
-              style={{fontFamily: "monospace", fontSize: 13}}
-            />
-          </Col>
-        </Row>
-
-        {/* ── References ────────────────────────────────────────────── */}
-        {skill.references && skill.references.length > 0 && (
-          <Row style={{marginTop: "20px"}}>
-            <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-              {Setting.getLabel(i18next.t("skill:References"), i18next.t("skill:References - Tooltip"))} :
-            </Col>
-            <Col span={22}>
-              <Collapse size="small" ghost>
-                {skill.references.map((ref, idx) => (
-                  <Panel
-                    key={idx}
-                    header={
-                      <span>
-                        <Tag style={{fontFamily: "monospace"}}>{ref.name}</Tag>
-                        <Text type="secondary" style={{fontSize: 12}}>
-                          {ref.content ? `${ref.content.length} chars` : "empty"}
-                        </Text>
-                      </span>
-                    }
-                  >
-                    <TextArea
-                      rows={8}
-                      value={ref.content}
-                      onChange={e => {
-                        const refs = Setting.deepCopy(skill.references);
-                        refs[idx].content = e.target.value;
-                        this.updateSkillField("references", refs);
-                      }}
-                      style={{fontFamily: "monospace", fontSize: 12}}
-                    />
-                  </Panel>
+        <Card size="small" title={renderCardTitle(i18next.t("general:General Settings"), i18next.t("general:General Settings desc"))} style={sectionCardStyle} headStyle={cardHeadStyle}>
+          <Row gutter={rowGutter}>
+            {this.renderSkillField(
+              Setting.getLabel(i18next.t("general:Name"), i18next.t("general:Name - Tooltip")),
+              <Input value={skill.name} onChange={e => this.updateSkillField("name", e.target.value)} />,
+              8
+            )}
+            {this.renderSkillField(
+              Setting.getLabel(i18next.t("general:Display name"), i18next.t("general:Display name - Tooltip")),
+              <Input value={skill.displayName} onChange={e => this.updateSkillField("displayName", e.target.value)} />,
+              8
+            )}
+            {this.renderSkillField(
+              Setting.getLabel(i18next.t("skill:Emoji"), i18next.t("skill:Emoji - Tooltip")),
+              <Input
+                value={skill.emoji}
+                onChange={e => this.updateSkillField("emoji", e.target.value)}
+                style={{maxWidth: 120}}
+                placeholder="🚀"
+              />,
+              4
+            )}
+            {this.renderSkillField(
+              Setting.getLabel(i18next.t("general:Type"), i18next.t("general:Type - Tooltip")),
+              <Select virtual={false} style={{width: "100%"}} value={skill.type}
+                onChange={(value) => this.updateSkillField("type", value)}
+              >
+                {SKILL_TYPES.map((t, index) => (
+                  <Option key={index} value={t}>{t}</Option>
                 ))}
-              </Collapse>
-            </Col>
+              </Select>,
+              8
+            )}
+            {this.renderSkillField(
+              Setting.getLabel(i18next.t("general:State"), i18next.t("general:State - Tooltip")),
+              <Select virtual={false} style={{width: "100%"}} value={skill.state}
+                onChange={value => this.updateSkillField("state", value)}
+                options={[
+                  {value: "Active", label: i18next.t("general:Active")},
+                  {value: "Inactive", label: i18next.t("general:Inactive")},
+                ].map(item => Setting.getOption(item.label, item.value))}
+              />,
+              8
+            )}
           </Row>
-        )}
+        </Card>
 
-        {/* ── Raw SKILL.md (read-only reference) ────────────────────── */}
-        {skill.skillMd && (
-          <Row style={{marginTop: "20px"}}>
-            <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-              {Setting.getLabel(i18next.t("skill:SKILL.md"), i18next.t("skill:SKILL.md - Tooltip"))} :
-            </Col>
-            <Col span={22}>
-              <Collapse size="small" ghost>
-                <Panel header={<Text type="secondary">{i18next.t("skill:SKILL.md view")}</Text>}>
-                  <pre style={{
-                    background: "#f5f5f5",
-                    padding: "12px",
-                    borderRadius: "6px",
-                    fontSize: "12px",
-                    maxHeight: "320px",
-                    overflow: "auto",
-                    whiteSpace: "pre-wrap",
-                    wordBreak: "break-word",
-                    margin: 0,
-                  }}>
-                    {skill.skillMd}
-                  </pre>
-                </Panel>
-              </Collapse>
-            </Col>
+        <Card size="small" title={renderCardTitle(i18next.t("general:Content"), i18next.t("general:Content desc"))} style={sectionCardStyle} headStyle={cardHeadStyle}>
+          <Row gutter={rowGutter}>
+            {this.renderSkillField(
+              Setting.getLabel(i18next.t("general:Description"), i18next.t("general:Description - Tooltip")),
+              <TextArea
+                rows={3}
+                value={skill.description}
+                onChange={e => this.updateSkillField("description", e.target.value)}
+              />,
+              24
+            )}
+            {this.renderSkillField(
+              Setting.getLabel(i18next.t("skill:Homepage"), i18next.t("skill:Homepage - Tooltip")),
+              <Input
+                value={skill.homepage}
+                onChange={e => this.updateSkillField("homepage", e.target.value)}
+                placeholder="https://..."
+              />,
+              12
+            )}
+            {this.renderSkillField(
+              Setting.getLabel(i18next.t("article:Content"), i18next.t("skill:Content - Tooltip")),
+              <TextArea
+                rows={14}
+                value={skill.content}
+                onChange={e => this.updateSkillField("content", e.target.value)}
+                placeholder={i18next.t("skill:Content placeholder")}
+                style={{fontFamily: "monospace", fontSize: 13}}
+              />,
+              24
+            )}
+            {skill.references && skill.references.length > 0 && (
+              this.renderSkillField(
+                Setting.getLabel(i18next.t("skill:References"), i18next.t("skill:References - Tooltip")),
+                <Collapse size="small" ghost>
+                  {skill.references.map((ref, idx) => (
+                    <Panel
+                      key={idx}
+                      header={
+                        <span>
+                          <Tag style={{fontFamily: "monospace"}}>{ref.name}</Tag>
+                          <Text type="secondary" style={{fontSize: 12}}>
+                            {ref.content ? `${ref.content.length} chars` : "empty"}
+                          </Text>
+                        </span>
+                      }
+                    >
+                      <TextArea
+                        rows={8}
+                        value={ref.content}
+                        onChange={e => {
+                          const refs = Setting.deepCopy(skill.references);
+                          refs[idx].content = e.target.value;
+                          this.updateSkillField("references", refs);
+                        }}
+                        style={{fontFamily: "monospace", fontSize: 12}}
+                      />
+                    </Panel>
+                  ))}
+                </Collapse>,
+                24
+              )
+            )}
+            {skill.skillMd && (
+              this.renderSkillField(
+                Setting.getLabel(i18next.t("skill:SKILL.md"), i18next.t("skill:SKILL.md - Tooltip")),
+                <Collapse size="small" ghost>
+                  <Panel header={<Text type="secondary">{i18next.t("skill:SKILL.md view")}</Text>}>
+                    <pre style={{
+                      background: "#f5f5f5",
+                      padding: "12px",
+                      borderRadius: "6px",
+                      fontSize: "12px",
+                      maxHeight: "320px",
+                      overflow: "auto",
+                      whiteSpace: "pre-wrap",
+                      wordBreak: "break-word",
+                      margin: 0,
+                    }}>
+                      {skill.skillMd}
+                    </pre>
+                  </Panel>
+                </Collapse>,
+                24
+              )
+            )}
           </Row>
-        )}
-
-        {/* ── State ─────────────────────────────────────────────────── */}
-        <Row style={{marginTop: "20px"}}>
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:State"), i18next.t("general:State - Tooltip"))} :
-          </Col>
-          <Col span={22}>
-            <Select virtual={false} style={{width: "100%"}} value={skill.state}
-              onChange={value => this.updateSkillField("state", value)}
-              options={[
-                {value: "Active", label: i18next.t("general:Active")},
-                {value: "Inactive", label: i18next.t("general:Inactive")},
-              ].map(item => Setting.getOption(item.label, item.value))} />
-          </Col>
-        </Row>
-      </Card>
+        </Card>
+      </div>
     );
   }
 
@@ -295,15 +305,10 @@ class SkillEditPage extends React.Component {
 
   render() {
     return (
-      <div>
+      <div style={{background: "#F1F3F5", padding: "16px 20px 32px", minHeight: "100vh"}}>
         {
           this.state.skill !== null ? this.renderSkill() : <Loading type="page" tip={i18next.t("general:Loading")} />
         }
-        <div style={{marginTop: "20px", marginLeft: "40px"}}>
-          <Button size="large" onClick={() => this.submitSkillEdit(false)}>{i18next.t("general:Save")}</Button>
-          <Button style={{marginLeft: "20px"}} type="primary" size="large" onClick={() => this.submitSkillEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
-          {this.state.isNewSkill && <Button style={{marginLeft: "20px"}} size="large" onClick={() => this.cancelSkillEdit()}>{i18next.t("general:Cancel")}</Button>}
-        </div>
       </div>
     );
   }
