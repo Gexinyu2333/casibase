@@ -371,6 +371,45 @@ func (c *ApiController) isSafePassword() (bool, error) {
 	}
 }
 
+// autoLoginAdmin automatically signs in the admin user when the default password is still in use.
+// Returns true if the session was established successfully, false if an error occurred (response already written).
+func (c *ApiController) autoLoginAdmin() bool {
+	accountUser, ok, err := object.VerifyUser("admin", "123")
+	if err != nil {
+		c.ResponseError(err.Error())
+		return false
+	}
+	if !ok {
+		c.ResponseError(c.T("auth:Please sign in first"))
+		return false
+	}
+
+	user := accountUser.ToCasdoorUser()
+	claims := &auth.Claims{
+		User:         user,
+		SigninMethod: "Sign In",
+	}
+
+	if err = c.addInitialChatAndMessage(&claims.User); err != nil {
+		c.ResponseError(err.Error())
+		return false
+	}
+
+	c.SetSessionClaims(claims)
+	userId := util.GetIdFromOwnerAndName(claims.User.Owner, claims.User.Name)
+
+	sessionId := c.Ctx.Input.CruSession.SessionID()
+	if sessionId != "" && userId != "" {
+		object.AddSession(&object.Session{
+			Owner:     claims.User.Owner,
+			Name:      claims.User.Name,
+			SessionId: []string{sessionId},
+		})
+	}
+
+	return true
+}
+
 // GetAccount
 // @Title GetAccount
 // @Tag Account API
@@ -385,9 +424,15 @@ func (c *ApiController) GetAccount() {
 
 	if object.IsSigninEnabled() {
 		if !c.isPublicDomain() {
-			_, ok := c.RequireSignedIn()
-			if !ok {
-				return
+			if c.GetSessionUsername() == "" {
+				if object.IsAdminUsingDefaultPassword() {
+					if !c.autoLoginAdmin() {
+						return
+					}
+				} else {
+					c.ResponseError(c.T("auth:Please sign in first"))
+					return
+				}
 			}
 		} else {
 			_, ok := c.CheckSignedIn()

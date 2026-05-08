@@ -193,24 +193,7 @@ class App extends Component {
           return;
         }
 
-        if (Setting.isCasdoorAvailable() || window.location.pathname === "/signin") {
-          this.setState({account: null});
-          return;
-        }
-
-        AccountBackend.getSigninOptions().then((optRes) => {
-          if (optRes.status === "ok" && optRes.data?.autoSignin) {
-            AccountBackend.signinWithPassword("admin", "123").then((signinRes) => {
-              if (signinRes.status === "ok") {
-                window.location.reload();
-              } else {
-                this.setState({account: null});
-              }
-            }).catch(() => this.setState({account: null}));
-          } else {
-            this.setState({account: null});
-          }
-        }).catch(() => this.setState({account: null}));
+        this.setState({account: null});
       });
   }
 
