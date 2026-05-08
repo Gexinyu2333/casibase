@@ -15,7 +15,6 @@
 import i18n from "i18next";
 import zh from "./locales/zh/data.json";
 import en from "./locales/en/data.json";
-import * as Conf from "./Conf";
 import {initReactI18next} from "react-i18next";
 
 const resources = {
@@ -43,14 +42,12 @@ function initLanguage() {
       language = "zh";
       break;
     default:
-      language = Conf.DefaultLanguage;
+      language = "en";
     }
   }
 
   if (!supportedLanguages.includes(language)) {
-    language = (Conf.DefaultLanguage && supportedLanguages.includes(Conf.DefaultLanguage))
-      ? Conf.DefaultLanguage
-      : "en";
+    language = "en";
   }
 
   return language;

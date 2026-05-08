@@ -28,11 +28,6 @@ func AuthzFilter(ctx *context.Context) {
 	method := ctx.Request.Method
 	urlPath := ctx.Request.URL.Path
 
-	adminDomain := conf.GetConfigString("adminDomain")
-	if adminDomain != "" && ctx.Request.Host == adminDomain {
-		return
-	}
-
 	if conf.IsDemoMode() {
 		if !isAllowedInDemoMode(method, urlPath) {
 			controllers.DenyRequest(ctx)

@@ -15,11 +15,6 @@
 export const DefaultColorPrimary = "#404040";
 
 export const AuthConfig = {serverUrl: "", clientId: "", appName: "", organizationName: "", redirectPath: ""};
-export let EnableExtraPages = false;
-export let ShortcutPageItems = [];
-export let UsageEndpoints = [];
-export let IframeUrl = "";
-export let DefaultLanguage = "";
 export let StaticBaseUrl = "";
 export let HtmlTitle = "";
 export let FaviconUrl = "";
@@ -44,11 +39,6 @@ export function setConfig(config) {
     Object.assign(AuthConfig, config.authConfig);
   }
 
-  if (config.enableExtraPages !== undefined) {EnableExtraPages = config.enableExtraPages;}
-  if (config.shortcutPageItems) {ShortcutPageItems = config.shortcutPageItems;}
-  if (config.usageEndpoints) {UsageEndpoints = config.usageEndpoints;}
-  if (config.iframeUrl !== undefined) {IframeUrl = config.iframeUrl;}
-  if (config.defaultLanguage !== undefined) {DefaultLanguage = config.defaultLanguage;}
   if (config.staticBaseUrl !== undefined) {StaticBaseUrl = config.staticBaseUrl;}
   if (config.htmlTitle !== undefined) {HtmlTitle = config.htmlTitle;}
   if (config.faviconUrl !== undefined) {FaviconUrl = config.faviconUrl;}

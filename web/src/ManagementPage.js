@@ -421,25 +421,7 @@ function ManagementPage(props) {
       return res;
     }
 
-    const domain = Setting.getSubdomain();
-
-    if (Conf.ShortcutPageItems.length > 0 && domain === "data") {
-      res.push(Setting.getItem(<Link to="/stores">{i18next.t("general:Stores")}</Link>, "/stores", <AppstoreOutlined />));
-      res.push(Setting.getItem(<Link to="/providers">{i18next.t("general:Providers")}</Link>, "/providers", <ThunderboltOutlined />));
-      res.push(Setting.getItem(<Link to="/sessions">{i18next.t("general:Sessions")}</Link>, "/sessions", <OrderedListOutlined />));
-      res.push(Setting.getItem(<Link to="/records">{i18next.t("general:Logs")}</Link>, "/records", <DatabaseOutlined />));
-    } else if (Conf.ShortcutPageItems.length > 0 && domain === "ai") {
-      res.push(Setting.getItem(<Link to="/chat">{i18next.t("general:Chat")}</Link>, "/chat", <CommentOutlined />));
-      res.push(Setting.getItem(<Link to="/stores">{i18next.t("general:Stores")}</Link>, "/stores", <AppstoreOutlined />));
-      res.push(Setting.getItem(<Link to="/providers">{i18next.t("general:Providers")}</Link>, "/providers", <ThunderboltOutlined />));
-      res.push(Setting.getItem(<Link to="/vectors">{i18next.t("general:Vectors")}</Link>, "/vectors", <ApartmentOutlined />));
-      res.push(Setting.getItem(<Link to="/chats">{i18next.t("general:Chats")}</Link>, "/chats", <BulbOutlined />));
-      res.push(Setting.getItem(<Link to="/messages">{i18next.t("general:Messages")}</Link>, "/messages", <MessageOutlined />));
-      res.push(Setting.getItem(<Link to="/usages">{i18next.t("general:Usages")}</Link>, "/usages", <LineChartOutlined />));
-      if (Setting.isAdminUser(account)) {
-        res.push(Setting.getItem(<Link to="/visitors">{i18next.t("general:Visitors")}</Link>, "/visitors", <DashboardOutlined />));
-      }
-    } else if (Setting.isChatAdminUser(account)) {
+    if (Setting.isChatAdminUser(account)) {
       res.push(Setting.getItem(<Link to="/chat">{i18next.t("general:Chat")}</Link>, "/chat", <CommentOutlined />));
       res.push(Setting.getItem(<Link to="/stores">{i18next.t("general:Stores")}</Link>, "/stores", <AppstoreOutlined />));
       res.push(Setting.getItem(<Link to="/vectors">{i18next.t("general:Vectors")}</Link>, "/vectors", <ApartmentOutlined />));
@@ -485,14 +467,6 @@ function ManagementPage(props) {
 
       if (window.location.pathname === "/") {
         Setting.goToLinkSoft({props}, "/tasks");
-      }
-    } else if (Conf.ShortcutPageItems.length > 0 && domain === "video") {
-      if (Conf.EnableExtraPages) {
-        res.push(Setting.getItem(<Link to="/videos">{i18next.t("general:Videos")}</Link>, "/videos", <VideoCameraOutlined />));
-      }
-
-      if (window.location.pathname === "/") {
-        Setting.goToLinkSoft({props}, "/videos");
       }
     } else if (!Setting.isAdminUser(account) && !Setting.isChatAdminUser(account)) {
       res.push(Setting.getItem(<Link to="/chat">{i18next.t("general:Chat")}</Link>, "/chat", <CommentOutlined />));

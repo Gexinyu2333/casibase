@@ -13,12 +13,11 @@
 // limitations under the License.
 
 import React from "react";
-import {Button, Col, Radio, Row, Select, Statistic} from "antd";
+import {Col, Radio, Row, Select, Statistic} from "antd";
 import BaseListPage from "./BaseListPage";
 import * as Setting from "./Setting";
 import * as UsageBackend from "./backend/UsageBackend";
 import ReactEcharts from "echarts-for-react";
-import * as Conf from "./Conf";
 import i18next from "i18next";
 import UsageTable from "./UsageTable";
 
@@ -28,8 +27,6 @@ const CHART_COLORS = [
   "#8b5cf6", "#0958d9", "#0284c7", "#0891b2", "#0f766e",
   "#5734d3", "#7c3aed", "#38bdf8", "#5eead4",
 ];
-
-const {Option} = Select;
 
 class UsagePage extends BaseListPage {
   constructor(props) {
@@ -511,20 +508,6 @@ class UsagePage extends BaseListPage {
                   prefix={lastUsage.currency && "$"}
                 />
               </Col>
-              {
-                Conf.DefaultLanguage === "en" ? null : (
-                  <React.Fragment>
-                    <Col span={3}>
-                      <Statistic
-                        loading={isLoading}
-                        title={i18next.t("chat:CPrice")}
-                        value={parseFloat((lastUsage.price * 7.2).toFixed(2))}
-                        prefix={"￥"}
-                      />
-                    </Col>
-                  </React.Fragment>
-                )
-              }
             </React.Fragment>
           )
         }
@@ -587,30 +570,7 @@ class UsagePage extends BaseListPage {
   }
 
   renderSelect() {
-    if (Conf.UsageEndpoints.length === 0 || this.props.account.name !== "admin") {
-      return null;
-    }
-
-    return (
-      <React.Fragment>
-        <br />
-        <Select virtual={false} listHeight={360} style={{width: "280px", marginRight: "10px"}}
-          value={this.state.endpoint} onChange={(value => {
-            const endpoint = value;
-            this.setState({
-              endpoint: endpoint,
-            });
-
-            this.getUsagesForAllCases(endpoint, "");
-          })}>
-          {
-            Conf.UsageEndpoints.map((item, index) => <Option key={index}
-              value={item.id}>{`${item.name} (${item.id})`}</Option>)
-          }
-        </Select>
-        <Button disabled={this.getHost() === this.state.endpoint} type="primary" onClick={() => Setting.openLink(`https://${this.state.endpoint}`)}>{i18next.t("usage:Go")}</Button>
-      </React.Fragment>
-    );
+    return null;
   }
 
   renderDropdown() {

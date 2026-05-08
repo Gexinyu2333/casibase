@@ -312,12 +312,6 @@ class ChatPage extends BaseListPage {
           messages: res.data,
         });
 
-        if (Conf.IframeUrl !== "" && Setting.isAnonymousUser(this.props.account) && res.data.filter(message => message.author === "AI").length >= 3) {
-          this.setState({
-            isModalOpen: true,
-          });
-        }
-
         if (res.data.length > 0) {
           const lastMessage = res.data[res.data.length - 1];
           if (lastMessage.author === "AI" && lastMessage.replyTo !== "" && lastMessage.text === "") {
@@ -655,35 +649,7 @@ class ChatPage extends BaseListPage {
   };
 
   renderModal() {
-    if (Conf.IframeUrl === "" || this.state.messages === null) {
-      return null;
-    }
-
-    const aiMessages = this.state.messages.filter(message => message.author === "AI");
-    const lastMessage = aiMessages[aiMessages.length - 1];
-    const json = (lastMessage === undefined) ? "" : Setting.parseJsonFromText(lastMessage.text);
-
-    return (
-      <Modal
-        width={850}
-        height={550}
-        bodyStyle={{width: "800px", height: "500px"}}
-        title={""}
-        closable={false}
-        open={this.state.isModalOpen}
-        okButtonProps={{style: {display: "none"}}}
-        cancelButtonProps={{style: {display: "none"}}}
-        onOk={null}
-        onCancel={() => {
-          this.setState({
-            isModalOpen: false,
-          });
-        }}
-      >
-        {/* eslint-disable-next-line react/no-unknown-property */}
-        <iframe key={"provider"} title={"provider"} src={`${Conf.IframeUrl}&json=${encodeURIComponent(json)}`} width={"100%"} height={"100%"} frameBorder={0} seamless="seamless" scrolling="no" allowtransparency="true" />
-      </Modal>
-    );
+    return null;
   }
 
   renderUnsafePasswordModal() {

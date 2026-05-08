@@ -14,7 +14,7 @@
 
 import React from "react";
 import {withRouter} from "react-router-dom";
-import {Button, Card, Col, DatePicker, Descriptions, Empty, Input, Modal, Popconfirm, Radio, Result, Row, Select, Spin, Tooltip, Tree, Upload} from "antd";
+import {Button, Card, Col, Descriptions, Empty, Input, Modal, Popconfirm, Radio, Result, Row, Spin, Tooltip, Tree, Upload} from "antd";
 import {CloudUploadOutlined, DeleteOutlined, DownloadOutlined, FileDoneOutlined, FolderAddOutlined, InfoCircleTwoTone, UploadOutlined, createFromIconfontCN} from "@ant-design/icons";
 import moment from "moment";
 import * as Setting from "./Setting";
@@ -32,7 +32,6 @@ import FileTable from "./table/FileTable";
 import Editor from "./common/Editor";
 
 const {Search} = Input;
-const {Option} = Select;
 
 const IconFont = createFromIconfontCN({
   scriptUrl: "https://cdn.open-ct.com/icon/iconfont.js",
@@ -139,15 +138,7 @@ class FileTree extends React.Component {
     this.props.onUpdateStore(store);
   }
 
-  checkUploadFile(info) {
-    if (Conf.EnableExtraPages) {
-      for (let i = 0; i < info.fileList.length; i++) {
-        const filename = info.fileList[i].name;
-        if (filename.endsWith(".txt")) {
-          return true;
-        }
-      }
-    }
+  checkUploadFile() {
     return false;
   }
 
@@ -930,26 +921,6 @@ class FileTree extends React.Component {
       return null;
     }
 
-    const subjectOptions = [
-      {id: "Math", name: i18next.t("store:Math")},
-      {id: "Chinese", name: i18next.t("store:Chinese")},
-      {id: "English", name: i18next.t("store:English")},
-      {id: "Science", name: i18next.t("store:Science")},
-      {id: "Physics", name: i18next.t("store:Physics")},
-      {id: "Chemistry", name: i18next.t("store:Chemistry")},
-      {id: "Biology", name: i18next.t("store:Biology")},
-      {id: "History", name: i18next.t("connection:History")},
-    ];
-
-    const getSubjectDisplayName = (id) => {
-      const options = subjectOptions.filter(option => option.id === id);
-      if (options.length === 0) {
-        return "";
-      } else {
-        return options[0].name;
-      }
-    };
-
     return (
       <div ref={this.filePane}>
         <Descriptions
@@ -963,40 +934,12 @@ class FileTree extends React.Component {
           <Descriptions.Item label={i18next.t("store:File name")}>
             {file.title}
           </Descriptions.Item>
-          {
-            !Conf.EnableExtraPages ? null : (
-              <Descriptions.Item label={i18next.t("store:File type")}>
-                {Setting.getExtFromFile(file)}
-              </Descriptions.Item>
-            )
-          }
           <Descriptions.Item label={i18next.t("store:File size")}>
             {Setting.getFriendlyFileSize(file.size)}
           </Descriptions.Item>
           <Descriptions.Item label={i18next.t("general:Created time")}>
             {Setting.getFormattedDate(file.createdTime)}
           </Descriptions.Item>
-          {
-            !Conf.EnableExtraPages ? null : (
-              <React.Fragment>
-                <Descriptions.Item label={i18next.t("store:Collected time")}>
-                  {Setting.getFormattedDate(Setting.getCollectedTime(file.title))}
-                  <DatePicker key={file.key} showTime defaultValue={this.getMomentTime(this.getPropertyValue(file, "collectedTime"))} onChange={(value, dateString) => {
-                    this.setPropertyValue(file, "collectedTime", value.format());
-                  }} onOk={(value) => {}} />
-                </Descriptions.Item>
-                <Descriptions.Item label={i18next.t("store:Subject")}>
-                  <Select virtual={false} style={{width: "120px"}} value={getSubjectDisplayName(this.getPropertyValue(file, "subject"))} onChange={(value => {
-                    this.setPropertyValue(file, "subject", value);
-                  })}>
-                    {
-                      subjectOptions.map((item, index) => <Option key={index} value={item.id}>{item.name}</Option>)
-                    }
-                  </Select>
-                </Descriptions.Item>
-              </React.Fragment>
-            )
-          }
         </Descriptions>
       </div>
     );
@@ -1009,7 +952,7 @@ class FileTree extends React.Component {
       filePaneHeight = 0;
     }
 
-    return `calc(100vh - ${filePaneHeight + 186 - (Conf.EnableExtraPages ? 0 : 50)}px)`;
+    return `calc(100vh - ${filePaneHeight + 136}px)`;
   }
 
   render() {

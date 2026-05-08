@@ -291,69 +291,6 @@ func (c *ApiController) addInitialChatAndMessage(user *auth.User) error {
 	return err
 }
 
-func (c *ApiController) anonymousSignin() {
-	username := c.getAnonymousUsername()
-
-	casdoorOrganization := conf.GetConfigString("casdoorOrganization")
-	user := auth.User{
-		Owner:           casdoorOrganization,
-		Name:            username,
-		CreatedTime:     util.GetCurrentTime(),
-		Id:              username,
-		Type:            "anonymous-user",
-		DisplayName:     "User",
-		Avatar:          "https://cdn.openagentai.org/img/user.png",
-		AvatarType:      "",
-		PermanentAvatar: "",
-		Email:           "",
-		EmailVerified:   false,
-		Phone:           "",
-		CountryCode:     "",
-		Region:          "",
-		Location:        "",
-		Education:       "",
-		IsAdmin:         false,
-		CreatedIp:       "",
-	}
-
-	err := c.addInitialChatAndMessage(&user)
-	if err != nil {
-		c.ResponseError(err.Error())
-		return
-	}
-
-	c.ResponseOk(user)
-}
-
-func (c *ApiController) getAnonymousUsername() string {
-	clientIp := c.getClientIp()
-	userAgent := c.getUserAgent()
-	hash := getContentHash(fmt.Sprintf("%s|%s", clientIp, userAgent))
-	return fmt.Sprintf("u-%s", hash)
-}
-
-func (c *ApiController) isPublicDomain() bool {
-	configPublicDomain := conf.GetConfigString("publicDomain")
-	if configPublicDomain == "" {
-		return false
-	}
-
-	if strings.Contains(configPublicDomain, ",") {
-		configPublicDomains := strings.Split(configPublicDomain, ",")
-		for _, domain := range configPublicDomains {
-			if c.Ctx.Request.Host == domain {
-				return true
-			}
-		}
-	} else {
-		if c.Ctx.Request.Host == configPublicDomain {
-			return true
-		}
-	}
-
-	return false
-}
-
 func (c *ApiController) isSafePassword() (bool, error) {
 	claims := c.GetSessionClaims()
 	if claims == nil {
@@ -424,33 +361,19 @@ func (c *ApiController) GetAccount() {
 	}
 
 	if object.IsSigninEnabled() {
-		if !c.isPublicDomain() {
-			if c.GetSessionUsername() == "" {
-				if c.Ctx.GetCookie("signed_out") != "1" && object.IsAdminUsingDefaultPassword() {
-					if !c.autoLoginAdmin() {
-						return
-					}
-				} else {
-					c.ResponseError(c.T("auth:Please sign in first"))
+		if c.GetSessionUsername() == "" {
+			if c.Ctx.GetCookie("signed_out") != "1" && object.IsAdminUsingDefaultPassword() {
+				if !c.autoLoginAdmin() {
 					return
 				}
-			}
-		} else {
-			_, ok := c.CheckSignedIn()
-			if !ok {
-				c.anonymousSignin()
+			} else {
+				c.ResponseError(c.T("auth:Please sign in first"))
 				return
 			}
 		}
-	} else if !c.isPublicDomain() {
+	} else {
 		_, ok := c.RequireSignedIn()
 		if !ok {
-			return
-		}
-	} else {
-		_, ok := c.CheckSignedIn()
-		if !ok {
-			c.anonymousSignin()
 			return
 		}
 	}

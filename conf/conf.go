@@ -32,20 +32,15 @@ type WebConfig struct {
 		OrganizationName string `json:"organizationName"`
 		RedirectPath     string `json:"redirectPath"`
 	} `json:"authConfig"`
-	EnableExtraPages  bool     `json:"enableExtraPages"`
-	ShortcutPageItems []string `json:"shortcutPageItems"`
-	UsageEndpoints    []string `json:"usageEndpoints"`
-	IframeUrl         string   `json:"iframeUrl"`
-	DefaultLanguage   string   `json:"defaultLanguage"`
-	StaticBaseUrl     string   `json:"staticBaseUrl"`
-	HtmlTitle         string   `json:"htmlTitle"`
-	FaviconUrl        string   `json:"faviconUrl"`
-	LogoUrl           string   `json:"logoUrl"`
-	NavbarHtml        string   `json:"navbarHtml"`
-	FooterHtml        string   `json:"footerHtml"`
-	ShowGithubCorner  bool     `json:"showGithubCorner"`
-	IsDemoMode        bool     `json:"isDemoMode"`
-	ThemeDefault      struct {
+	StaticBaseUrl    string `json:"staticBaseUrl"`
+	HtmlTitle        string `json:"htmlTitle"`
+	FaviconUrl       string `json:"faviconUrl"`
+	LogoUrl          string `json:"logoUrl"`
+	NavbarHtml       string `json:"navbarHtml"`
+	FooterHtml       string `json:"footerHtml"`
+	ShowGithubCorner bool   `json:"showGithubCorner"`
+	IsDemoMode       bool   `json:"isDemoMode"`
+	ThemeDefault     struct {
 		ThemeType    string `json:"themeType"`
 		ColorPrimary string `json:"colorPrimary"`
 	} `json:"themeDefault"`
@@ -75,9 +70,7 @@ func GetConfigString(key string) string {
 
 	tokens := ReadGlobalConfigTokens()
 	if len(tokens) > 0 {
-		if key == "defaultLanguage" {
-			return tokens[7]
-		} else if key == "htmlTitle" {
+		if key == "htmlTitle" {
 			return tokens[8]
 		} else if key == "faviconUrl" {
 			return tokens[9]
@@ -198,11 +191,6 @@ func GetWebConfig() *WebConfig {
 	config.AuthConfig.OrganizationName = GetConfigString("casdoorOrganization")
 	config.AuthConfig.RedirectPath = GetConfigString("redirectPath")
 
-	config.EnableExtraPages = GetConfigBool("enableExtraPages")
-	config.ShortcutPageItems = GetStringArray("shortcutPageItems")
-	config.UsageEndpoints = GetStringArray("usageEndpoints")
-	config.IframeUrl = GetConfigString("iframeUrl")
-	config.DefaultLanguage = GetLanguage(GetConfigString("defaultLanguage"))
 	config.StaticBaseUrl = GetConfigString("staticBaseUrl")
 	config.HtmlTitle = GetConfigString("htmlTitle")
 	config.FaviconUrl = GetConfigString("faviconUrl")

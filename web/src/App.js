@@ -24,7 +24,6 @@ import * as AccountBackend from "./backend/AccountBackend";
 import * as Conf from "./Conf";
 import {getShadcnThemeComponents, getShadcnThemeToken} from "./shadcnTheme";
 import HomePage from "./HomePage";
-import ShortcutsPage from "./basic/ShortcutsPage";
 import * as FormBackend from "./backend/FormBackend";
 import * as SiteBackend from "./backend/SiteBackend";
 import * as FetchFilter from "./backend/FetchFilter";
@@ -244,10 +243,6 @@ class App extends Component {
     if (Setting.getUrlParam("isRaw") !== null) {
       return (
         <HomePage account={this.state.account} />
-      );
-    } else if (Setting.getSubdomain() === "portal") {
-      return (
-        <ShortcutsPage account={this.state.account} />
       );
     }
 
