@@ -19,7 +19,6 @@ import {DeleteOutlined, EditOutlined} from "@ant-design/icons";
 import moment from "moment";
 import * as Setting from "./Setting";
 import * as ScanBackend from "./backend/ScanBackend";
-import * as AssetBackend from "./backend/AssetBackend";
 import * as ProviderBackend from "./backend/ProviderBackend";
 import i18next from "i18next";
 import BaseListPage from "./BaseListPage";
@@ -30,26 +29,13 @@ class ScanListPage extends BaseListPage {
     super(props);
     this.state = {
       ...this.state,
-      assets: [],
       providers: [],
     };
   }
 
   componentDidMount() {
     super.componentDidMount();
-    this.getAssets();
     this.getProviders();
-  }
-
-  getAssets() {
-    AssetBackend.getAssets(this.props.account.name)
-      .then((res) => {
-        if (res.status === "ok") {
-          this.setState({
-            assets: res.data || [],
-          });
-        }
-      });
   }
 
   getProviders() {
@@ -63,35 +49,11 @@ class ScanListPage extends BaseListPage {
       });
   }
 
-  getAssetInfo(assetName) {
-    if (!assetName) {
-      return null;
-    }
-    return this.state.assets.find(asset => asset.name === assetName);
-  }
-
   getProviderInfo(providerName) {
     if (!providerName) {
       return null;
     }
     return this.state.providers.find(provider => provider.name === providerName);
-  }
-
-  getAssetTypeIcon(assetName) {
-    const asset = this.getAssetInfo(assetName);
-    if (!asset) {
-      return null;
-    }
-    const typeIcons = Setting.getAssetTypeIcons();
-    return typeIcons[asset.type] || null;
-  }
-
-  getAssetDisplayName(assetName) {
-    const asset = this.getAssetInfo(assetName);
-    if (!asset) {
-      return assetName;
-    }
-    return asset.displayName || assetName;
   }
 
   getProviderLogo(providerName) {
@@ -126,7 +88,6 @@ class ScanListPage extends BaseListPage {
       provider: "",
       targetMode: "Manual Input",
       target: "127.0.0.1",
-      asset: "",
       state: "Created",
       runner: "",
       errorText: "",
@@ -228,26 +189,6 @@ class ScanListPage extends BaseListPage {
         width: "160px",
         sorter: true,
         ...this.getColumnSearchProps("target"),
-      },
-      {
-        title: i18next.t("general:Asset"),
-        dataIndex: "asset",
-        key: "asset",
-        // width: "150px",
-        sorter: true,
-        ...this.getColumnSearchProps("asset"),
-        render: (text, record, index) => {
-          const icon = this.getAssetTypeIcon(text);
-          const displayName = this.getAssetDisplayName(text);
-          return (
-            <Link to={`/assets/${text}`}>
-              <div style={{display: "flex", alignItems: "center", gap: "8px"}}>
-                {icon && <img src={icon} alt={text} style={{width: "20px", height: "20px"}} />}
-                <span>{displayName}</span>
-              </div>
-            </Link>
-          );
-        },
       },
       {
         title: i18next.t("general:Provider"),

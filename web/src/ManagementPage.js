@@ -21,24 +21,18 @@ import {
   AppstoreOutlined,
   AuditOutlined,
   BarsOutlined,
-  BlockOutlined,
   BranchesOutlined,
   BulbOutlined,
   CloudOutlined,
   CloudServerOutlined,
   CommentOutlined,
-  ContainerOutlined,
   DashboardOutlined,
   DatabaseOutlined,
-  DeploymentUnitOutlined,
   DesktopOutlined,
   DownOutlined,
-  FileTextOutlined,
   FolderOpenOutlined,
   FormOutlined,
   FundOutlined,
-  GoldOutlined,
-  HddOutlined,
   HomeOutlined,
   InboxOutlined,
   LayoutOutlined,
@@ -50,7 +44,6 @@ import {
   MenuUnfoldOutlined,
   MessageOutlined,
   OrderedListOutlined,
-  PictureOutlined,
   PlaySquareOutlined,
   ReadOutlined,
   RocketOutlined,
@@ -58,7 +51,6 @@ import {
   ScanOutlined,
   SettingOutlined,
   ShareAltOutlined,
-  ShopOutlined,
   TeamOutlined,
   ThunderboltOutlined,
   ToolOutlined,
@@ -107,18 +99,8 @@ import GraphListPage from "./GraphListPage";
 import GraphEditPage from "./GraphEditPage";
 import NodeListPage from "./NodeListPage";
 import NodeEditPage from "./NodeEditPage";
-import MachineListPage from "./MachineListPage";
-import MachineEditPage from "./MachineEditPage";
-import AssetListPage from "./AssetListPage";
-import AssetEditPage from "./AssetEditPage";
 import ScanListPage from "./ScanListPage";
 import ScanEditPage from "./ScanEditPage";
-import ImageListPage from "./ImageListPage";
-import ImageEditPage from "./ImageEditPage";
-import ContainerListPage from "./ContainerListPage";
-import ContainerEditPage from "./ContainerEditPage";
-import PodListPage from "./PodListPage";
-import PodEditPage from "./PodEditPage";
 import SessionListPage from "./SessionListPage";
 import ConnectionListPage from "./ConnectionListPage";
 import RecordListPage from "./RecordListPage";
@@ -142,12 +124,6 @@ import AccessPage from "./component/access/AccessPage";
 import AuditPage from "./frame/AuditPage";
 import SystemInfo from "./SystemInfo";
 import OsDesktop from "./OsDesktop";
-import TemplateListPage from "./TemplateListPage";
-import TemplateEditPage from "./TemplateEditPage";
-import ApplicationListPage from "./ApplicationListPage";
-import ApplicationEditPage from "./ApplicationEditPage";
-import ApplicationStorePage from "./ApplicationStorePage";
-import ApplicationDetailsPage from "./ApplicationViewPage";
 import ResourceListPage from "./ResourceListPage";
 import SiteListPage from "./SiteListPage";
 import SiteEditPage from "./SiteEditPage";
@@ -158,7 +134,7 @@ function getMenuParentKey(uri) {
   if (uri.includes("/chats") || uri.includes("/messages") || uri.includes("/stores")) {return "/basic";}
   if (uri.includes("/providers") || uri.includes("/tools") || uri.includes("/servers")) {return "/connectors";}
   if (uri.includes("/files") || uri.includes("/vectors") || uri.includes("/resources")) {return "/knowledge-base";}
-  if (uri.includes("/templates") || uri.includes("/application-store") || uri.includes("/applications") || uri.includes("/nodes") || uri.includes("/machines") || uri.includes("/assets") || uri.includes("/images") || uri.includes("/containers") || uri.includes("/pods") || uri.includes("/workbench") || uri.includes("/desktop") || uri.includes("/connections")) {return "/cloud";}
+  if (uri.includes("/nodes") || uri.includes("/workbench") || uri.includes("/desktop") || uri.includes("/connections")) {return "/cloud";}
   if (uri.includes("/videos") || uri.includes("/public-videos") || uri.includes("/tasks") || uri.includes("/scales") || uri.includes("/forms") || uri.includes("/workflows") || uri.includes("/audit") || uri.includes("/articles") || uri.includes("/graphs") || uri.includes("/scans")) {return "/multimedia";}
   if (uri.includes("/sessions") || uri.includes("/records")) {return "/logs";}
   if (uri.includes("/users") || uri.includes("/casdoor-resources") || uri.includes("/permissions")) {return "/identity";}
@@ -565,16 +541,8 @@ function ManagementPage(props) {
       ]));
 
       res.push(Setting.getItem(<Link style={{color: textColor}} to="/nodes">{i18next.t("general:Cloud")}</Link>, "/cloud", <CloudOutlined />, [
-        Setting.getItem(<Link to="/templates">{i18next.t("general:Templates")}</Link>, "/templates", <FileTextOutlined />),
-        Setting.getItem(<Link to="/application-store">{i18next.t("general:Application Store")}</Link>, "/application-store", <ShopOutlined />),
-        Setting.getItem(<Link to="/applications">{i18next.t("general:Applications")}</Link>, "/applications", <DeploymentUnitOutlined />),
         Setting.getItem(<Link to="/nodes">{i18next.t("general:Nodes")}</Link>, "/nodes", <CloudServerOutlined />),
         Setting.getItem(<Link to="/connections">{i18next.t("general:Connections")}</Link>, "/connections", <ApiOutlined />),
-        Setting.getItem(<Link to="/machines">{i18next.t("general:Machines")}</Link>, "/machines", <HddOutlined />),
-        Setting.getItem(<Link to="/assets">{i18next.t("general:Assets")}</Link>, "/assets", <GoldOutlined />),
-        Setting.getItem(<Link to="/images">{i18next.t("general:Images")}</Link>, "/images", <PictureOutlined />),
-        Setting.getItem(<Link to="/containers">{i18next.t("general:Containers")}</Link>, "/containers", <ContainerOutlined />),
-        Setting.getItem(<Link to="/pods">{i18next.t("general:Pods")}</Link>, "/pods", <BlockOutlined />),
         Setting.getItem(<Link to="/workbench" target="_blank">{i18next.t("general:Workbench")}</Link>, "workbench", <ToolOutlined />),
         Setting.getItem(<Link to="/desktop">{i18next.t("general:OS Desktop")}</Link>, "/desktop", <DesktopOutlined />),
       ]));
@@ -711,12 +679,6 @@ function ManagementPage(props) {
         <Route exact path="/sites/:siteName" render={(props) => renderSigninIfNotSignedIn(<SiteEditPage account={account} {...props} />)} />
         <Route exact path="/visitors" render={(props) => renderSigninIfNotSignedIn(<VisitorPage account={account} themeAlgorithm={themeAlgorithm} {...props} />)} />
         <Route exact path="/desktop" render={(props) => <OsDesktop account={account} {...props} />} />
-        <Route exact path="/templates" render={(props) => renderSigninIfNotSignedIn(<TemplateListPage account={account} {...props} />)} />
-        <Route exact path="/templates/:templateName" render={(props) => renderSigninIfNotSignedIn(<TemplateEditPage account={account} {...props} />)} />
-        <Route exact path="/applications" render={(props) => renderSigninIfNotSignedIn(<ApplicationListPage account={account} {...props} />)} />
-        <Route exact path="/applications/:applicationName" render={(props) => renderSigninIfNotSignedIn(<ApplicationEditPage account={account} {...props} />)} />
-        <Route exact path="/applications/:applicationName/view" render={(props) => renderSigninIfNotSignedIn(<ApplicationDetailsPage account={account} {...props} />)} />
-        <Route exact path="/application-store" render={(props) => renderSigninIfNotSignedIn(<ApplicationStorePage account={account} {...props} />)} />
         <Route exact path="/nodes" render={(props) => renderSigninIfNotSignedIn(<NodeListPage account={account} {...props} />)} />
         <Route exact path="/nodes/:nodeName" render={(props) => renderSigninIfNotSignedIn(<NodeEditPage account={account} {...props} />)} />
         <Route exact path="/sessions" render={(props) => renderSigninIfNotSignedIn(<SessionListPage account={account} {...props} />)} />
@@ -724,18 +686,8 @@ function ManagementPage(props) {
         <Route exact path="/records" render={(props) => renderSigninIfNotSignedIn(<RecordListPage account={account} {...props} />)} />
         <Route exact path="/records/:organizationName/:recordName" render={(props) => renderSigninIfNotSignedIn(<RecordEditPage account={account} {...props} />)} />
         <Route exact path="/workbench" render={(props) => renderSigninIfNotSignedIn(<NodeWorkbench account={account} {...props} />)} />
-        <Route exact path="/machines" render={(props) => renderSigninIfNotSignedIn(<MachineListPage account={account} {...props} />)} />
-        <Route exact path="/machines/:organizationName/:machineName" render={(props) => renderSigninIfNotSignedIn(<MachineEditPage account={account} {...props} />)} />
-        <Route exact path="/assets" render={(props) => renderSigninIfNotSignedIn(<AssetListPage account={account} {...props} />)} />
-        <Route exact path="/assets/:assetName" render={(props) => renderSigninIfNotSignedIn(<AssetEditPage account={account} {...props} />)} />
         <Route exact path="/scans" render={(props) => renderSigninIfNotSignedIn(<ScanListPage account={account} {...props} />)} />
         <Route exact path="/scans/:scanName" render={(props) => renderSigninIfNotSignedIn(<ScanEditPage account={account} {...props} />)} />
-        <Route exact path="/images" render={(props) => renderSigninIfNotSignedIn(<ImageListPage account={account} {...props} />)} />
-        <Route exact path="/images/:organizationName/:imageName" render={(props) => renderSigninIfNotSignedIn(<ImageEditPage account={account} {...props} />)} />
-        <Route exact path="/containers" render={(props) => renderSigninIfNotSignedIn(<ContainerListPage account={account} {...props} />)} />
-        <Route exact path="/containers/:organizationName/:containerName" render={(props) => renderSigninIfNotSignedIn(<ContainerEditPage account={account} {...props} />)} />
-        <Route exact path="/pods" render={(props) => renderSigninIfNotSignedIn(<PodListPage account={account} {...props} />)} />
-        <Route exact path="/pods/:organizationName/:podName" render={(props) => renderSigninIfNotSignedIn(<PodEditPage account={account} {...props} />)} />
         <Route exact path="/workflows" render={(props) => renderSigninIfNotSignedIn(<WorkflowListPage account={account} {...props} />)} />
         <Route exact path="/workflows/:workflowName" render={(props) => renderSigninIfNotSignedIn(<WorkflowEditPage account={account} {...props} />)} />
         <Route exact path="/audit" render={(props) => renderSigninIfNotSignedIn(<AuditPage account={account} {...props} />)} />

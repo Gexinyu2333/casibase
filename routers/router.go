@@ -155,21 +155,6 @@ func initAPI() {
 	beego.Router("/api/add-graph", &controllers.ApiController{}, "POST:AddGraph")
 	beego.Router("/api/delete-graph", &controllers.ApiController{}, "POST:DeleteGraph")
 
-	beego.Router("/api/get-templates", &controllers.ApiController{}, "GET:GetTemplates")
-	beego.Router("/api/get-template", &controllers.ApiController{}, "GET:GetTemplate")
-	beego.Router("/api/update-template", &controllers.ApiController{}, "POST:UpdateTemplate")
-	beego.Router("/api/add-template", &controllers.ApiController{}, "POST:AddTemplate")
-	beego.Router("/api/delete-template", &controllers.ApiController{}, "POST:DeleteTemplate")
-	beego.Router("/api/get-k8s-status", &controllers.ApiController{}, "GET:GetK8sStatus")
-
-	beego.Router("/api/get-applications", &controllers.ApiController{}, "GET:GetApplications")
-	beego.Router("/api/get-application", &controllers.ApiController{}, "GET:GetApplication")
-	beego.Router("/api/update-application", &controllers.ApiController{}, "POST:UpdateApplication")
-	beego.Router("/api/add-application", &controllers.ApiController{}, "POST:AddApplication")
-	beego.Router("/api/delete-application", &controllers.ApiController{}, "POST:DeleteApplication")
-
-	beego.Router("/api/deploy-application", &controllers.ApiController{}, "POST:DeployApplication")
-	beego.Router("/api/undeploy-application", &controllers.ApiController{}, "POST:UndeployApplication")
 
 	beego.Router("/api/get-usages", &controllers.ApiController{}, "GET:GetUsages")
 	beego.Router("/api/get-range-usages", &controllers.ApiController{}, "GET:GetRangeUsages")
@@ -248,20 +233,6 @@ func initAPI() {
 	beego.Router("/api/add-node", &controllers.ApiController{}, "POST:AddNode")
 	beego.Router("/api/delete-node", &controllers.ApiController{}, "POST:DeleteNode")
 
-	beego.Router("/api/get-machines", &controllers.ApiController{}, "GET:GetMachines")
-	beego.Router("/api/get-machine", &controllers.ApiController{}, "GET:GetMachine")
-	beego.Router("/api/update-machine", &controllers.ApiController{}, "POST:UpdateMachine")
-	beego.Router("/api/add-machine", &controllers.ApiController{}, "POST:AddMachine")
-	beego.Router("/api/delete-machine", &controllers.ApiController{}, "POST:DeleteMachine")
-
-	beego.Router("/api/get-assets", &controllers.ApiController{}, "GET:GetAssets")
-	beego.Router("/api/get-asset", &controllers.ApiController{}, "GET:GetAsset")
-	beego.Router("/api/update-asset", &controllers.ApiController{}, "POST:UpdateAsset")
-	beego.Router("/api/add-asset", &controllers.ApiController{}, "POST:AddAsset")
-	beego.Router("/api/delete-asset", &controllers.ApiController{}, "POST:DeleteAsset")
-	beego.Router("/api/scan-asset", &controllers.ApiController{}, "POST:ScanAsset")
-	beego.Router("/api/scan-assets", &controllers.ApiController{}, "POST:ScanAssets")
-
 	beego.Router("/api/get-scans", &controllers.ApiController{}, "GET:GetScans")
 	beego.Router("/api/get-scan", &controllers.ApiController{}, "GET:GetScan")
 	beego.Router("/api/update-scan", &controllers.ApiController{}, "POST:UpdateScan")
@@ -270,23 +241,7 @@ func initAPI() {
 
 	beego.Router("/api/install-patch", &controllers.ApiController{}, "POST:InstallPatch")
 
-	beego.Router("/api/get-images", &controllers.ApiController{}, "GET:GetImages")
-	beego.Router("/api/get-image", &controllers.ApiController{}, "GET:GetImage")
-	beego.Router("/api/update-image", &controllers.ApiController{}, "POST:UpdateImage")
-	beego.Router("/api/add-image", &controllers.ApiController{}, "POST:AddImage")
-	beego.Router("/api/delete-image", &controllers.ApiController{}, "POST:DeleteImage")
-
-	beego.Router("/api/get-containers", &controllers.ApiController{}, "GET:GetContainers")
-	beego.Router("/api/get-container", &controllers.ApiController{}, "GET:GetContainer")
-	beego.Router("/api/update-container", &controllers.ApiController{}, "POST:UpdateContainer")
-	beego.Router("/api/add-container", &controllers.ApiController{}, "POST:AddContainer")
-	beego.Router("/api/delete-container", &controllers.ApiController{}, "POST:DeleteContainer")
-
-	beego.Router("/api/get-pods", &controllers.ApiController{}, "GET:GetPods")
-	beego.Router("/api/get-pod", &controllers.ApiController{}, "GET:GetPod")
-	beego.Router("/api/update-pod", &controllers.ApiController{}, "POST:UpdatePod")
-	beego.Router("/api/add-pod", &controllers.ApiController{}, "POST:AddPod")
-	beego.Router("/api/delete-pod", &controllers.ApiController{}, "POST:DeletePod")
+	beego.Router("/api/scan-asset", &controllers.ApiController{}, "POST:ScanAsset")
 
 	beego.Router("/api/add-node-tunnel", &controllers.ApiController{}, "POST:AddNodeTunnel")
 	beego.Router("/api/get-node-tunnel", &controllers.ApiController{}, "GET:GetNodeTunnel")

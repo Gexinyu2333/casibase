@@ -142,20 +142,6 @@ class App extends Component {
       this.setState({selectedMenuKey: "/visitors"});
     } else if (uri.includes("/nodes")) {
       this.setState({selectedMenuKey: "/nodes"});
-    } else if (uri.includes("/machines")) {
-      this.setState({selectedMenuKey: "/machines"});
-    } else if (uri.includes("/assets")) {
-      this.setState({selectedMenuKey: "/assets"});
-    } else if (uri.includes("/images")) {
-      this.setState({selectedMenuKey: "/images"});
-    } else if (uri.includes("/containers")) {
-      this.setState({selectedMenuKey: "/containers"});
-    } else if (uri.includes("/pods")) {
-      this.setState({selectedMenuKey: "/pods"});
-    } else if (uri.includes("/templates")) {
-      this.setState({selectedMenuKey: "/templates"});
-    } else if (uri.includes("/applications")) {
-      this.setState({selectedMenuKey: "/applications"});
     } else if (uri.includes("/sessions")) {
       this.setState({selectedMenuKey: "/sessions"});
     } else if (uri.includes("/connections")) {

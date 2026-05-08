@@ -30,7 +30,6 @@ type Scan struct {
 
 	TargetMode    string `xorm:"varchar(100)" json:"targetMode"`
 	Target        string `xorm:"varchar(100)" json:"target"`
-	Asset         string `xorm:"varchar(100)" json:"asset"`
 	Provider      string `xorm:"varchar(100)" json:"provider"`
 	State         string `xorm:"varchar(100)" json:"state"`
 	Runner        string `xorm:"varchar(100)" json:"runner"`
@@ -66,14 +65,6 @@ func GetPaginationScans(owner string, offset, limit int, field, value, sortField
 	return scans, nil
 }
 
-func GetScansByAsset(owner string, assetName string) ([]*Scan, error) {
-	scans := []*Scan{}
-	err := adapter.engine.Desc("created_time").Find(&scans, &Scan{Owner: owner, Asset: assetName})
-	if err != nil {
-		return scans, err
-	}
-	return scans, nil
-}
 
 func getScan(owner string, name string) (*Scan, error) {
 	if owner == "" || name == "" {

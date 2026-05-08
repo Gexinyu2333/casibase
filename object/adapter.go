@@ -289,37 +289,7 @@ func (a *Adapter) createTable() {
 		panic(err)
 	}
 
-	err = a.engine.Sync2(new(Template))
-	if err != nil {
-		panic(err)
-	}
-
-	err = a.engine.Sync2(new(Application))
-	if err != nil {
-		panic(err)
-	}
-
 	err = a.engine.Sync2(new(Node))
-	if err != nil {
-		panic(err)
-	}
-
-	err = a.engine.Sync2(new(Machine))
-	if err != nil {
-		panic(err)
-	}
-
-	err = a.engine.Sync2(new(Image))
-	if err != nil {
-		panic(err)
-	}
-
-	err = a.engine.Sync2(new(Container))
-	if err != nil {
-		panic(err)
-	}
-
-	err = a.engine.Sync2(new(Pod))
 	if err != nil {
 		panic(err)
 	}
@@ -370,11 +340,6 @@ func (a *Adapter) createTable() {
 	}
 
 	err = a.engine.Sync2(new(Graph))
-	if err != nil {
-		panic(err)
-	}
-
-	err = a.engine.Sync2(new(Asset))
 	if err != nil {
 		panic(err)
 	}

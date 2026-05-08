@@ -39,19 +39,6 @@ func (c *ApiController) GetScans() {
 	value := c.Input().Get("value")
 	sortField := c.Input().Get("sortField")
 	sortOrder := c.Input().Get("sortOrder")
-	asset := c.Input().Get("asset")
-
-	// If asset filter is provided, use GetScansByAsset
-	if asset != "" {
-		scans, err := object.GetScansByAsset(owner, asset)
-		if err != nil {
-			c.ResponseError(err.Error())
-			return
-		}
-		c.ResponseOk(scans)
-		return
-	}
-
 	if limit == "" || page == "" {
 		scans, err := object.GetScans(owner)
 		if err != nil {
@@ -153,4 +140,27 @@ func (c *ApiController) DeleteScan() {
 	}
 
 	c.ResponseOk(object.DeleteScan(&scan))
+}
+
+// ScanAsset
+// @Title ScanAsset
+// @Tag Scan API
+// @Description execute a scan against a target
+// @router /scan-asset [post]
+func (c *ApiController) ScanAsset() {
+	provider := c.Input().Get("provider")
+	scan := c.Input().Get("scan")
+	targetMode := c.Input().Get("targetMode")
+	target := c.Input().Get("target")
+	asset := c.Input().Get("asset")
+	command := c.Input().Get("command")
+	saveToScan := c.Input().Get("saveToScan") == "true"
+
+	scanResult, err := object.ScanAsset(provider, scan, targetMode, target, asset, command, saveToScan, c.GetAcceptLanguage())
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	c.ResponseOk(scanResult)
 }

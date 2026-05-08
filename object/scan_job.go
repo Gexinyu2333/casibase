@@ -120,40 +120,17 @@ func claimScanJob(scan *Scan, hostname string) (bool, error) {
 		}
 	}
 
-	// For scans in Asset mode, check if the target asset matches this instance's hostname
-	if scan.TargetMode == "Asset" {
-		if scan.Asset == "" {
-			return false, fmt.Errorf("scan's target mode is \"Asset\" and scan's asset should not be empty for scan job: %s", scan.Name)
-		}
+	if scan.Target == "" {
+		return false, fmt.Errorf("scan's target should not be empty for scan job: %s", scan.Name)
+	}
 
-		assetId := util.GetIdFromOwnerAndName(scan.Owner, scan.Asset)
-		asset, err := GetAsset(assetId)
-		if err != nil {
-			return false, err
-		}
-		if asset == nil {
-			return false, nil
-		}
-		// Check if the asset name matches the current hostname
-		// This ensures only the OpenAgent instance on the target machine picks up the job
-		if asset.DisplayName != hostname {
-			if provider.Type == "OS Patch" {
-				return false, nil
-			}
-		}
-	} else if scan.TargetMode == "Manual Input" {
-		if scan.Target == "" {
-			return false, fmt.Errorf("scan's target mode is \"Manual Input\" and scan's target should not be empty for scan job: %s", scan.Name)
-		}
-
-		// For manual input mode, use enhanced target matching logic
-		match, err := util.MatchTargetWithMachine(scan.Target, hostname)
-		if err != nil {
-			return false, fmt.Errorf("error matching target with machine: %v", err)
-		}
-		if !match {
-			return false, nil
-		}
+	// For manual input mode, use enhanced target matching logic
+	match, err := util.MatchTargetWithMachine(scan.Target, hostname)
+	if err != nil {
+		return false, fmt.Errorf("error matching target with machine: %v", err)
+	}
+	if !match {
+		return false, nil
 	}
 
 	// Try to update the scan state from "Pending" to "Running"
@@ -190,7 +167,7 @@ func executeScanJob(scan *Scan, hostname string) {
 
 	// Execute the scan
 	provider := util.GetIdFromOwnerAndName(scan.Owner, scan.Provider)
-	scanResult, err := executeScan(provider, scan.GetId(), scan.TargetMode, scan.Target, scan.Asset, scan.Command, scan.Owner, "en")
+	scanResult, err := executeScan(provider, scan.GetId(), scan.Target, scan.Command, scan.Owner, "en")
 
 	// Update scan with results
 	scan.UpdatedTime = util.GetCurrentTime()

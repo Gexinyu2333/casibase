@@ -26,7 +26,6 @@ import TtsTestWidget from "./common/TestTtsWidget";
 import EmbedTestWidget from "./common/TestEmbedWidget";
 import TestMcpWidget from "./common/TestMcpWidget";
 import TestScanWidget from "./common/TestScanWidget";
-import Editor from "./common/Editor";
 
 const {Option} = Select;
 const {TextArea} = Input;
@@ -177,7 +176,7 @@ class ProviderEditPage extends React.Component {
   }
 
   shouldShowClientIdInput(provider) {
-    if ((provider.category === "Private Cloud" && provider.type === "Kubernetes") || provider.category === "Scan") {
+    if (provider.category === "Scan") {
       return false;
     }
     return (
@@ -394,8 +393,6 @@ class ProviderEditPage extends React.Component {
                 } else if (value === "Speech-to-Text") {
                   this.updateProviderField("type", "Alibaba Cloud");
                   this.updateProviderField("subType", "paraformer-realtime-v1");
-                } else if (value === "Private Cloud") {
-                  this.updateProviderField("type", "Kubernetes");
                 } else if (value === "Bot") {
                   this.updateProviderField("type", "Tencent");
                   this.updateProviderField("subType", "WeCom Bot");
@@ -411,8 +408,6 @@ class ProviderEditPage extends React.Component {
                     {id: "Storage", name: "Storage"},
                     {id: "Model", name: "Model"},
                     {id: "Embedding", name: "Embedding"},
-                    {id: "Public Cloud", name: "Public Cloud"},
-                    {id: "Private Cloud", name: "Private Cloud"},
                     {id: "Blockchain", name: "Blockchain"},
                     {id: "Video", name: "Video"},
                     {id: "Text-to-Speech", name: "Text-to-Speech"},
@@ -798,7 +793,7 @@ class ProviderEditPage extends React.Component {
             ) : null
           }
           {
-            ["Storage", "Model", "Embedding", "Text-to-Speech", "Speech-to-Text", "Scan"].includes(this.state.provider.category) || (this.state.provider.category === "Blockchain" && this.state.provider.type === "Ethereum") || (this.state.provider.category === "Private Cloud" && this.state.provider.type === "Kubernetes") ? null : (
+            ["Storage", "Model", "Embedding", "Text-to-Speech", "Speech-to-Text", "Scan"].includes(this.state.provider.category) || (this.state.provider.category === "Blockchain" && this.state.provider.type === "Ethereum") ? null : (
               <Row style={{marginTop: "20px"}} >
                 <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
                   {this.getRegionLabel(this.state.provider)}
@@ -1260,27 +1255,6 @@ class ProviderEditPage extends React.Component {
                 <Button disabled={isRemote} type="primary" onClick={() => this.setTelegramWebhook()}>
                   {i18next.t("provider:Set Webhook")}
                 </Button>
-              </Col>
-            </Row>
-          ) : null
-        }
-        {
-          this.state.provider.category === "Private Cloud" && this.state.provider.type === "Kubernetes" ? (
-            <Row style={{marginTop: "20px"}} >
-              <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-                {Setting.getLabel(i18next.t("provider:Config text"), i18next.t("provider:Config text - Tooltip"))}
-              </Col>
-              <Col span={22} >
-                <Editor
-                  value={this.state.provider.configText}
-                  lang="yaml"
-                  fillHeight
-                  dark
-                  readOnly={isRemote || !Setting.isAdminUser(this.props.account)}
-                  onChange={value => {
-                    this.updateProviderField("configText", value);
-                  }}
-                />
               </Col>
             </Row>
           ) : null

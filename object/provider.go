@@ -78,9 +78,8 @@ type Provider struct {
 	ModelProvider  string `xorm:"varchar(100)" json:"modelProvider"`
 
 	// New fields for unified scan widget (for Scan category providers)
-	TargetMode    string `xorm:"varchar(100)" json:"targetMode"`    // "Manual Input" or "Asset"
+	TargetMode    string `xorm:"varchar(100)" json:"targetMode"`    // "Manual Input"
 	Target        string `xorm:"varchar(500)" json:"target"`        // Manual input target (IP address or network range)
-	Asset         string `xorm:"varchar(200)" json:"asset"`         // Selected asset for scan
 	Runner        string `xorm:"varchar(100)" json:"runner"`        // Hostname about who runs the scan job
 	ErrorText     string `xorm:"mediumtext" json:"errorText"`       // Error message for the job execution
 	ResultSummary string `xorm:"varchar(500)" json:"resultSummary"` // Short summary of scan results
@@ -319,19 +318,6 @@ func (provider *Provider) GetId() string {
 	return fmt.Sprintf("%s/%s", provider.Owner, provider.Name)
 }
 
-func GetDefaultKubernetesProvider(lang string) (*Provider, error) {
-	providers, err := GetProviders("admin")
-	if err != nil {
-		return nil, fmt.Errorf(i18n.Translate(lang, "object:failed to get providers: %v"), err)
-	}
-
-	for _, provider := range providers {
-		if provider.Category == "Private Cloud" && provider.Type == "Kubernetes" && provider.State == "Active" {
-			return provider, nil
-		}
-	}
-	return nil, fmt.Errorf(i18n.Translate(lang, "object:no Kubernetes provider found"))
-}
 
 func (p *Provider) GetStorageProviderObj(vectorStoreId string, lang string) (storage.StorageProvider, error) {
 	pProvider, err := storage.GetStorageProvider(p.Type, p.ClientId, p.ClientSecret, p.Name, vectorStoreId, lang)

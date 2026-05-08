@@ -1135,54 +1135,6 @@ export function getOtherProviderInfo() {
         url: "https://github.com/the-open-agent/openagent",
       },
     },
-    "Public Cloud": {
-      "Aliyun": {
-        logo: `${StaticBaseUrl}/img/social_aliyun.png`,
-        url: "https://www.alibabacloud.com/",
-      },
-      "Amazon Web Services": {
-        logo: `${StaticBaseUrl}/img/social_aws.png`,
-        url: "https://aws.amazon.com/",
-      },
-      "Azure": {
-        logo: `${StaticBaseUrl}/img/social_azure.png`,
-        url: "https://azure.microsoft.com/",
-      },
-      "Google Cloud": {
-        logo: `${StaticBaseUrl}/img/social_google_cloud.png`,
-        url: "https://cloud.google.com/",
-      },
-      "Tencent Cloud": {
-        logo: `${StaticBaseUrl}/img/social_tencent_cloud.jpg`,
-        url: "https://cloud.tencent.com/",
-      },
-    },
-    "Private Cloud": {
-      "KVM": {
-        logo: `${StaticBaseUrl}/img/social_kvm.png`,
-        url: "https://www.linux-kvm.org/",
-      },
-      "Xen": {
-        logo: `${StaticBaseUrl}/img/social_xen.png`,
-        url: "https://xenproject.org/",
-      },
-      "VMware": {
-        logo: `${StaticBaseUrl}/img/social_vmware.png`,
-        url: "https://www.vmware.com/",
-      },
-      "PVE": {
-        logo: `${StaticBaseUrl}/img/social_pve.png`,
-        url: "https://www.proxmox.com/",
-      },
-      "Kubernetes": {
-        logo: `${StaticBaseUrl}/img/social_kubernetes.png`,
-        url: "https://kubernetes.io/",
-      },
-      "Docker": {
-        logo: `${StaticBaseUrl}/img/social_docker.png`,
-        url: "https://www.docker.com/",
-      },
-    },
     "Text-to-Speech": {
       "Alibaba Cloud": {
         logo: `${StaticBaseUrl}/img/social_aliyun.png`,
@@ -1237,20 +1189,6 @@ export function getOtherProviderInfo() {
   };
 
   return res;
-}
-
-export function getAssetTypeIcons() {
-  return {
-    "VPC": `${StaticBaseUrl}/img/cloud/vpc.png`,
-    "VSwitch": `${StaticBaseUrl}/img/cloud/vswitch.png`,
-    "Network Interface": `${StaticBaseUrl}/img/cloud/network.png`,
-    "Security Group": `${StaticBaseUrl}/img/cloud/securitygroup.png`,
-    "Virtual Machine": `${StaticBaseUrl}/img/cloud/vm.png`,
-    "Disk": `${StaticBaseUrl}/img/cloud/disk.png`,
-    "Snapshot": `${StaticBaseUrl}/img/cloud/snapshot.png`,
-    "Image": `${StaticBaseUrl}/img/cloud/image.png`,
-    "Snapshot Policy": `${StaticBaseUrl}/img/cloud/policy.png`,
-  };
 }
 
 export function getItem(label, key, icon, children, type) {
@@ -1457,23 +1395,6 @@ export function getProviderTypeOptions(category) {
       {id: "video_download", name: "video_download"},
       {id: "browser_use", name: "browser_use"},
     ];
-  } else if (category === "Public Cloud") {
-    return ([
-      {id: "Amazon Web Services", name: "Amazon Web Services"},
-      {id: "Azure", name: "Azure"},
-      {id: "Google Cloud", name: "Google Cloud"},
-      {id: "Aliyun", name: "Aliyun"},
-      {id: "Tencent Cloud", name: "Tencent Cloud"},
-    ]);
-  } else if (category === "Private Cloud") {
-    return ([
-      {id: "KVM", name: "KVM"},
-      {id: "Xen", name: "Xen"},
-      {id: "VMware", name: "VMware"},
-      {id: "PVE", name: "PVE"},
-      {id: "Kubernetes", name: "Kubernetes"},
-      {id: "Docker", name: "Docker"},
-    ]);
   } else if (category === "Blockchain") {
     return ([
       {id: "Hyperledger Fabric", name: "Hyperledger Fabric"},

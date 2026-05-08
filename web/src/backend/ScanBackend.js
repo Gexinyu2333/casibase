@@ -24,16 +24,6 @@ export function getScans(owner, page = "", pageSize = "", field = "", value = ""
   }).then(res => Setting.handleFetchResponse(res));
 }
 
-export function getScansByAsset(owner, assetName) {
-  return fetch(`${Setting.ServerUrl}/api/get-scans?owner=${owner}&asset=${encodeURIComponent(assetName)}`, {
-    method: "GET",
-    credentials: "include",
-    headers: {
-      "Accept-Language": Setting.getAcceptLanguage(),
-    },
-  }).then(res => Setting.handleFetchResponse(res));
-}
-
 export function getScan(owner, name) {
   return fetch(`${Setting.ServerUrl}/api/get-scan?id=${owner}/${encodeURIComponent(name)}`, {
     method: "GET",
@@ -74,6 +64,31 @@ export function deleteScan(scan) {
     method: "POST",
     credentials: "include",
     body: JSON.stringify(newScan),
+    headers: {
+      "Accept-Language": Setting.getAcceptLanguage(),
+    },
+  }).then(res => Setting.handleFetchResponse(res));
+}
+
+export function scanAsset(provider, scan, targetMode, target, asset, command, saveToScan) {
+  let url = `${Setting.ServerUrl}/api/scan-asset?provider=${encodeURIComponent(provider)}&targetMode=${encodeURIComponent(targetMode)}`;
+
+  if (scan) {
+    url += `&scan=${encodeURIComponent(scan)}`;
+  }
+  if (target) {
+    url += `&target=${encodeURIComponent(target)}`;
+  }
+  if (command) {
+    url += `&command=${encodeURIComponent(command)}`;
+  }
+  if (saveToScan !== undefined) {
+    url += `&saveToScan=${saveToScan}`;
+  }
+
+  return fetch(url, {
+    method: "POST",
+    credentials: "include",
     headers: {
       "Accept-Language": Setting.getAcceptLanguage(),
     },
