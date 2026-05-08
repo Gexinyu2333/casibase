@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const AuthConfig = {serverUrl: "", clientId: "", appName: "", organizationName: "", redirectPath: ""};
+export const AuthConfig = {serverUrl: "", clientId: "", appName: "", organizationName: "", redirectPath: "/callback"};
 export let StaticBaseUrl = "";
 export let HtmlTitle = "";
 export let FaviconUrl = "";
@@ -26,7 +26,6 @@ export let ThemeDefault = {
   themeType: "default",
   colorPrimary: "",
 };
-export let AvatarErrorUrl = "";
 
 export function setConfig(config) {
   if (config === null || config === undefined) {
@@ -52,6 +51,4 @@ export function setConfig(config) {
   if (config.themeDefault) {
     Object.assign(ThemeDefault, config.themeDefault);
   }
-
-  if (config.avatarErrorUrl !== undefined) {AvatarErrorUrl = config.avatarErrorUrl;}
 }

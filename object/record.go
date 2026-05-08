@@ -25,12 +25,6 @@ import (
 	"github.com/the-open-agent/openagent/util"
 )
 
-var logPostOnly bool
-
-func init() {
-	logPostOnly = conf.GetConfigBool("logPostOnly")
-}
-
 type Record struct {
 	Id int `xorm:"int notnull pk autoincr" json:"id"`
 
@@ -175,7 +169,7 @@ func GetRecord(id string, lang string) (*Record, error) {
 }
 
 func prepareRecord(record *Record, providerFirst, providerSecond *Provider) (bool, error) {
-	if logPostOnly && record.Method == "GET" {
+	if record.Method == "GET" {
 		return false, nil
 	}
 

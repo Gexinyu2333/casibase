@@ -30,7 +30,6 @@ type WebConfig struct {
 		ClientId         string `json:"clientId"`
 		AppName          string `json:"appName"`
 		OrganizationName string `json:"organizationName"`
-		RedirectPath     string `json:"redirectPath"`
 	} `json:"authConfig"`
 	StaticBaseUrl    string `json:"staticBaseUrl"`
 	HtmlTitle        string `json:"htmlTitle"`
@@ -41,10 +40,8 @@ type WebConfig struct {
 	ShowGithubCorner bool   `json:"showGithubCorner"`
 	IsDemoMode       bool   `json:"isDemoMode"`
 	ThemeDefault     struct {
-		ThemeType    string `json:"themeType"`
 		ColorPrimary string `json:"colorPrimary"`
 	} `json:"themeDefault"`
-	AvatarErrorUrl string `json:"avatarErrorUrl"`
 }
 
 func ReadGlobalConfigTokens() []string {
@@ -87,8 +84,6 @@ func GetConfigString(key string) string {
 			res = "https://cdn.openagentai.org"
 		} else if key == "logConfig" {
 			res = "{\"filename\": \"logs/openagent.log\", \"maxdays\":99999, \"perm\":\"0770\"}"
-		} else if key == "avatarErrorUrl" {
-			res = "https://cdn.openagentai.org/gravatar/error.png"
 		}
 	}
 
@@ -189,7 +184,6 @@ func GetWebConfig() *WebConfig {
 	config.AuthConfig.ClientId = GetConfigString("clientId")
 	config.AuthConfig.AppName = GetConfigString("casdoorApplication")
 	config.AuthConfig.OrganizationName = GetConfigString("casdoorOrganization")
-	config.AuthConfig.RedirectPath = GetConfigString("redirectPath")
 
 	config.StaticBaseUrl = GetConfigString("staticBaseUrl")
 	config.HtmlTitle = GetConfigString("htmlTitle")
@@ -200,10 +194,7 @@ func GetWebConfig() *WebConfig {
 	config.ShowGithubCorner = GetConfigBool("showGithubCorner")
 	config.IsDemoMode = GetConfigBool("isDemoMode")
 
-	config.ThemeDefault.ThemeType = GetConfigString("defaultThemeType")
 	config.ThemeDefault.ColorPrimary = GetDefaultColorPrimary()
-
-	config.AvatarErrorUrl = GetConfigString("avatarErrorUrl")
 
 	return config
 }

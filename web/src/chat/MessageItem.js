@@ -19,7 +19,6 @@ import {FileTextOutlined, GlobalOutlined} from "@ant-design/icons";
 import moment from "moment";
 import * as Setting from "../Setting";
 import i18next from "i18next";
-import {AvatarErrorUrl} from "../Conf";
 import {renderText} from "../ChatMessageRender";
 import MessageActions, {CopyButton} from "./MessageActions";
 import MessageSuggestions from "./MessageSuggestions";
@@ -165,8 +164,7 @@ const MessageItem = ({
   }, [message.author, avatar, account, message]);
 
   const handleAvatarError = () => {
-    // Set fallback URL when avatar fails to load
-    setAvatarSrc(AvatarErrorUrl);
+    setAvatarSrc("https://cdn.openagentai.org/gravatar/error.png");
   };
 
   const renderMessageContent = () => {

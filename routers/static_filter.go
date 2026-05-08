@@ -67,20 +67,6 @@ func StaticFilter(ctx *context.Context) {
 		return
 	}
 
-	landingFolder := conf.GetConfigString("landingFolder")
-	if landingFolder != "" {
-		if urlPath == "" || urlPath == "/" || urlPath == "/about" {
-			makeGzipResponse(ctx.ResponseWriter, ctx.Request, fmt.Sprintf("../%s/web/build/index.html", landingFolder))
-			return
-		}
-
-		landingPath := fmt.Sprintf("../%s/web/build%s", landingFolder, urlPath)
-		if util.FileExist(landingPath) {
-			makeGzipResponse(ctx.ResponseWriter, ctx.Request, landingPath)
-			return
-		}
-	}
-
 	if strings.HasPrefix(urlPath, "/storage") {
 		// Check if user is authenticated
 		user := GetSessionUser(ctx)

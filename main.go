@@ -65,6 +65,7 @@ func main() {
 	beego.InsertFilter("*", beego.AfterExec, routers.AfterRecordMessage, false)
 	beego.InsertFilter("*", beego.AfterExec, routers.SecureCookieFilter, false)
 
+	beego.BConfig.CopyRequestBody = true
 	beego.BConfig.WebConfig.Session.SessionOn = true
 	beego.BConfig.WebConfig.Session.SessionName = "openagent_session_id"
 	if conf.GetConfigString("redisEndpoint") == "" {
