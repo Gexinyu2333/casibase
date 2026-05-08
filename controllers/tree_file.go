@@ -90,19 +90,13 @@ func (c *ApiController) AddTreeFile() {
 		defer file.Close()
 	}
 
-	res, bs, err := object.AddTreeFile(storeId, userName, key, isLeaf, filename, file, c.GetAcceptLanguage())
+	res, _, err := object.AddTreeFile(storeId, userName, key, isLeaf, filename, file, c.GetAcceptLanguage())
 	if err != nil {
 		c.ResponseError(err.Error())
 		return
 	}
 
 	if res {
-		err = addFileToCache(key, filename, bs)
-		if err != nil {
-			c.ResponseError(err.Error())
-			return
-		}
-
 		err = addRecordForFile(c, userName, "Add", storeId, key, filename, isLeaf, c.GetAcceptLanguage())
 		if err != nil {
 			c.ResponseError(err.Error())

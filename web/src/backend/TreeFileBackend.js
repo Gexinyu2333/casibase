@@ -14,18 +14,6 @@
 
 import * as Setting from "../Setting";
 
-export function updateFile(storeId, name, file) {
-  const newFile = Setting.deepCopy(file);
-  return fetch(`${Setting.ServerUrl}/api/update-tree-file?store=${storeId}&name=${name}`, {
-    method: "POST",
-    credentials: "include",
-    headers: {
-      "Accept-Language": Setting.getAcceptLanguage(),
-    },
-    body: JSON.stringify(newFile),
-  }).then(res => Setting.handleFetchResponse(res));
-}
-
 export function addFile(storeId, key, isLeaf, filename, file) {
   const formData = new FormData();
   formData.append("file", file);
@@ -46,30 +34,5 @@ export function deleteFile(storeId, key, isLeaf) {
     headers: {
       "Accept-Language": Setting.getAcceptLanguage(),
     },
-  }).then(res => Setting.handleFetchResponse(res));
-}
-
-export function activateFile(key, filename) {
-  return fetch(`${Setting.ServerUrl}/api/activate-file?key=${key}&filename=${filename}`, {
-    method: "POST",
-    credentials: "include",
-    headers: {
-      "Accept-Language": Setting.getAcceptLanguage(),
-    },
-  }).then(res => Setting.handleFetchResponse(res));
-}
-
-export function uploadFile(base64, filename, filetype) {
-  const formData = new FormData();
-  formData.append("file", base64);
-  formData.append("name", filename);
-  formData.append("type", filetype);
-  return fetch(`${Setting.ServerUrl}/api/upload-file`, {
-    method: "POST",
-    credentials: "include",
-    headers: {
-      "Accept-Language": Setting.getAcceptLanguage(),
-    },
-    body: formData,
   }).then(res => Setting.handleFetchResponse(res));
 }
