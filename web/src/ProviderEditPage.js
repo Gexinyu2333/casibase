@@ -346,7 +346,7 @@ class ProviderEditPage extends React.Component {
         </div>
 
         {/* Card 1: General Settings */}
-        <Card size="small" title={i18next.t("provider:General Settings")} style={sectionCardStyle} headStyle={cardHeadStyle}>
+        <Card size="small" title={i18next.t("general:General Settings")} style={sectionCardStyle} headStyle={cardHeadStyle}>
           <Row style={{marginTop: "10px"}} gutter={16}>
             <Col style={{marginTop: "5px"}} span={Setting.isMobile() ? 22 : 11}>
               <div style={{marginBottom: "4px"}}>{Setting.getLabel(i18next.t("general:ID"), i18next.t("general:Name - Tooltip"))}</div>
