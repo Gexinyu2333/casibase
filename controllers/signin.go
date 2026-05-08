@@ -193,6 +193,7 @@ func (c *ApiController) signinWithPassword() {
 	}
 
 	c.SetSessionClaims(claims)
+	c.Ctx.SetCookie("signed_out", "", -1, "/")
 	userId := util.GetIdFromOwnerAndName(claims.User.Owner, claims.User.Name)
 	c.Ctx.Input.SetParam("recordUserId", userId)
 
