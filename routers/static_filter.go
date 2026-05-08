@@ -27,6 +27,7 @@ import (
 
 	"github.com/beego/beego/context"
 	"github.com/the-open-agent/openagent/conf"
+	"github.com/the-open-agent/openagent/embedsupport"
 	"github.com/the-open-agent/openagent/util"
 )
 
@@ -125,6 +126,8 @@ func StaticFilter(ctx *context.Context) {
 				fmt.Println(err)
 			}
 			makeGzipResponse(ctx.ResponseWriter, ctx.Request, fallback)
+		} else if embedsupport.WebFS() != nil {
+			embedsupport.ServeEmbedded(ctx.ResponseWriter, ctx.Request, urlPath)
 		} else {
 			ctx.ResponseWriter.Header().Set("Content-Type", "text/html; charset=utf-8")
 			ctx.ResponseWriter.WriteHeader(http.StatusNotFound)

@@ -1,0 +1,78 @@
+// Copyright 2026 The OpenAgent Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package embedsupport
+
+import (
+	"fmt"
+	"io/fs"
+	"os"
+	"path/filepath"
+
+	"github.com/beego/beego"
+)
+
+// setupConf reloads Beego's app config from the embedded conf/app.conf when
+// no on-disk conf/app.conf can be found next to the executable or in the cwd.
+// If confFS is nil (non-embed build), this is a no-op.
+func setupConf(confFS fs.FS) {
+	if confFS == nil {
+		return
+	}
+
+	// On-disk conf takes priority.
+	for _, candidate := range confSearchPaths() {
+		if _, err := os.Stat(candidate); err == nil {
+			return
+		}
+	}
+
+	data, err := fs.ReadFile(confFS, "app.conf")
+	if err != nil {
+		fmt.Printf("embedsupport: cannot read embedded app.conf: %v\n", err)
+		return
+	}
+
+	tmpDir, err := os.MkdirTemp("", "openagent-conf-*")
+	if err != nil {
+		fmt.Printf("embedsupport: cannot create temp dir for conf: %v\n", err)
+		return
+	}
+
+	tmpConf := filepath.Join(tmpDir, "app.conf")
+	if err = os.WriteFile(tmpConf, data, 0600); err != nil {
+		fmt.Printf("embedsupport: cannot write temp conf: %v\n", err)
+		return
+	}
+
+	if err = beego.LoadAppConfig("ini", tmpConf); err != nil {
+		fmt.Printf("embedsupport: cannot load embedded conf: %v\n", err)
+		return
+	}
+
+	fmt.Println("embedsupport: loaded conf/app.conf from embedded binary")
+}
+
+// confSearchPaths returns candidate on-disk paths for conf/app.conf, in
+// priority order: executable directory first, then cwd.
+func confSearchPaths() []string {
+	var paths []string
+	if exePath, err := os.Executable(); err == nil {
+		paths = append(paths, filepath.Join(filepath.Dir(exePath), "conf", "app.conf"))
+	}
+	if cwd, err := os.Getwd(); err == nil {
+		paths = append(paths, filepath.Join(cwd, "conf", "app.conf"))
+	}
+	return paths
+}

@@ -16,10 +16,12 @@ package object
 
 import (
 	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 
 	"github.com/the-open-agent/openagent/conf"
+	"github.com/the-open-agent/openagent/embedsupport"
 	"github.com/the-open-agent/openagent/util"
 )
 
@@ -259,6 +261,10 @@ func initBuiltInProviders() (string, string, string, string, string) {
 func initSkillsFromFolder() {
 	skillsDir := findSkillsDir()
 	if skillsDir == "" {
+		// No on-disk skills directory — try the embedded one.
+		if fsys := embedsupport.SkillsFS(); fsys != nil {
+			loadSkillsFromFS(fsys)
+		}
 		return
 	}
 
@@ -329,6 +335,106 @@ func findSkillsDir() string {
 	}
 
 	return ""
+}
+
+// loadSkillsFromFS loads skills from an fs.FS (typically the embedded skills
+// filesystem). Each top-level directory in fsys is treated as a skill folder
+// containing SKILL.md and an optional references/ subdirectory.
+func loadSkillsFromFS(fsys fs.FS) {
+	entries, err := fs.ReadDir(fsys, ".")
+	if err != nil {
+		fmt.Printf("initSkillsFromFolder(embedded): cannot list skills: %v\n", err)
+		return
+	}
+
+	loaded := 0
+	for _, entry := range entries {
+		if !entry.IsDir() {
+			continue
+		}
+
+		skillFS, err := fs.Sub(fsys, entry.Name())
+		if err != nil {
+			fmt.Printf("initSkillsFromFolder(embedded): cannot sub %s: %v\n", entry.Name(), err)
+			continue
+		}
+
+		skill, err := loadSkillFromFS(skillFS, entry.Name())
+		if err != nil {
+			fmt.Printf("initSkillsFromFolder(embedded): skipping %s: %v\n", entry.Name(), err)
+			continue
+		}
+
+		if skill.Owner == "" {
+			skill.Owner = "admin"
+		}
+
+		existing, err := getSkill(skill.Owner, skill.Name)
+		if err != nil {
+			fmt.Printf("initSkillsFromFolder(embedded): DB lookup failed for %s: %v\n", skill.Name, err)
+			continue
+		}
+		if existing != nil {
+			fmt.Printf("initSkillsFromFolder(embedded): skill %q already in DB, skipping\n", skill.Name)
+			continue
+		}
+
+		skill.CreatedTime = util.GetCurrentTime()
+		if _, err = AddSkill(skill); err != nil {
+			fmt.Printf("initSkillsFromFolder(embedded): failed to add skill %s: %v\n", skill.Name, err)
+		} else {
+			fmt.Printf("initSkillsFromFolder(embedded): loaded skill %q\n", skill.Name)
+			loaded++
+		}
+	}
+
+	fmt.Printf("initSkillsFromFolder(embedded): %d skill(s) loaded\n", loaded)
+}
+
+// loadSkillFromFS reads a skill from an fs.FS rooted at the skill's directory.
+// dirName is used as the fallback skill name when SKILL.md has no name field.
+func loadSkillFromFS(skillFS fs.FS, dirName string) (*Skill, error) {
+	rawBytes, err := fs.ReadFile(skillFS, "SKILL.md")
+	if err != nil {
+		return nil, fmt.Errorf("cannot read SKILL.md in %s: %w", dirName, err)
+	}
+	raw := string(rawBytes)
+
+	name, description, homepage, metadata, emoji, content := parseSkillMd(raw)
+	if name == "" {
+		name = dirName
+	}
+
+	var refs []SkillReference
+	if refEntries, err2 := fs.ReadDir(skillFS, "references"); err2 == nil {
+		for _, e := range refEntries {
+			if e.IsDir() {
+				continue
+			}
+			refBytes, err3 := fs.ReadFile(skillFS, "references/"+e.Name())
+			if err3 != nil {
+				continue
+			}
+			refs = append(refs, SkillReference{
+				Name:    e.Name(),
+				Content: string(refBytes),
+			})
+		}
+	}
+
+	return &Skill{
+		Name:        name,
+		DisplayName: name,
+		Type:        "custom",
+		Description: description,
+		Homepage:    homepage,
+		Emoji:       emoji,
+		Metadata:    metadata,
+		Content:     content,
+		SkillMd:     raw,
+		References:  refs,
+		State:       "Active",
+	}, nil
 }
 
 func initBuiltInTools() {
