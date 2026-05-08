@@ -105,7 +105,7 @@ func GetConfigString(key string) string {
 	return res
 }
 
-// GetDefaultColorPrimary returns app.conf `defaultColorPrimary` (hex), the default Ant Design primary color.
+// GetDefaultColorPrimary returns the default Ant Design primary color.
 func GetDefaultColorPrimary() string {
 	return GetConfigString("defaultColorPrimary")
 }

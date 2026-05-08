@@ -202,6 +202,40 @@ class SiteEditPage extends React.Component {
         </Row>
         <Row style={{marginTop: "20px"}} >
           <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
+            {Setting.getLabel(i18next.t("general:Static base URL"), i18next.t("general:Static base URL - Tooltip"))} :
+          </Col>
+          <Col span={22} >
+            <Input prefix={<LinkOutlined />} value={this.state.site.staticBaseUrl} onChange={e => {
+              this.updateSiteField("staticBaseUrl", e.target.value);
+            }} />
+          </Col>
+        </Row>
+        <Row style={{marginTop: "20px"}} >
+          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
+            {Setting.getLabel(i18next.t("general:Navbar HTML"), i18next.t("general:Navbar HTML - Tooltip"))} :
+          </Col>
+          <Col span={22} >
+            <Popover placement="right" content={
+              <div style={{width: "900px", height: "300px"}} >
+                <Editor
+                  value={this.state.site.navbarHtml}
+                  lang="html"
+                  fillHeight
+                  dark
+                  onChange={value => {
+                    this.updateSiteField("navbarHtml", value);
+                  }}
+                />
+              </div>
+            } title={i18next.t("general:Navbar HTML - Edit")} trigger="click">
+              <Input value={this.state.site.navbarHtml} style={{marginBottom: "10px"}} onChange={e => {
+                this.updateSiteField("navbarHtml", e.target.value);
+              }} />
+            </Popover>
+          </Col>
+        </Row>
+        <Row style={{marginTop: "20px"}} >
+          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
             {Setting.getLabel(i18next.t("general:Footer HTML"), i18next.t("general:Footer HTML - Tooltip"))} :
           </Col>
           <Col span={22} >

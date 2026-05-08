@@ -25,14 +25,18 @@ type Site struct {
 	CreatedTime string `xorm:"varchar(100)" json:"createdTime"`
 	DisplayName string `xorm:"varchar(100)" json:"displayName"`
 
-	ThemeColor       string   `xorm:"varchar(100)" json:"themeColor"`
-	HtmlTitle        string   `xorm:"varchar(100)" json:"htmlTitle"`
-	FaviconUrl       string   `xorm:"varchar(200)" json:"faviconUrl"`
-	LogoUrl          string   `xorm:"varchar(200)" json:"logoUrl"`
-	FooterHtml       string   `xorm:"mediumtext" json:"footerHtml"`
-	NavItems         []string `xorm:"text" json:"navItems"`
-	CheckUserBalance bool     `xorm:"bool" json:"checkUserBalance"`
+	ThemeColor    string   `xorm:"varchar(100)" json:"themeColor"`
+	HtmlTitle     string   `xorm:"varchar(100)" json:"htmlTitle"`
+	FaviconUrl    string   `xorm:"varchar(200)" json:"faviconUrl"`
+	LogoUrl       string   `xorm:"varchar(200)" json:"logoUrl"`
+	NavbarHtml    string   `xorm:"mediumtext" json:"navbarHtml"`
+	FooterHtml    string   `xorm:"mediumtext" json:"footerHtml"`
+	StaticBaseUrl string   `xorm:"varchar(500)" json:"staticBaseUrl"`
+	NavItems      []string `xorm:"text" json:"navItems"`
+
+	CheckUserBalance bool `xorm:"bool" json:"checkUserBalance"`
 }
+
 
 func GetGlobalSites() ([]*Site, error) {
 	sites := []*Site{}

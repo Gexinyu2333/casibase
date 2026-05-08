@@ -2671,7 +2671,7 @@ export function getLogo(themes, storeLogoUrl) {
 }
 
 export function getFooterHtml(themes, storeFooterHtml) {
-  const defaultFooterHtml = "Powered by <a target=\"_blank\" href=\"https://github.com/the-open-agent/openagent\" rel=\"noreferrer\"><img style=\"padding-bottom: 3px;\" height=\"20\" alt=\"OpenAgent\" src=\"https://cdn.openagentai.org/img/openagent-logo_1600x276.png\" /></a>";
+  const defaultFooterHtml = "<a target=\"_blank\" href=\"https://github.com/the-open-agent/openagent\" rel=\"noreferrer\"><img style=\"padding-bottom: 3px;\" height=\"20\" alt=\"OpenAgent\" src=\"https://cdn.openagentai.org/img/openagent-logo_1600x276.png\" /></a>";
   let footerHtml = Conf.FooterHtml;
   if (storeFooterHtml && storeFooterHtml !== defaultFooterHtml) {
     footerHtml = storeFooterHtml;

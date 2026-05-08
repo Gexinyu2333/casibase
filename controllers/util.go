@@ -227,10 +227,6 @@ func (c *ApiController) getUserAgent() string {
 
 func (c *ApiController) IsCurrentUser(usernameInput string) bool {
 	username := c.GetSessionUsername()
-	if username == "" && c.getAnonymousUsername() == usernameInput {
-		username = c.getAnonymousUsername()
-	}
-
 	if !c.IsAdmin() && username != usernameInput {
 		c.ResponseError(c.T("auth:Unauthorized operation"))
 		return false
