@@ -26,9 +26,8 @@ const progName = "openagent"
 // EarlyDispatch handles CLI-only commands (help, version) and normalizes argv for
 // optional serve-style subcommands. If it returns handled=true, the process should
 // exit with code exitCode. When handled is false, InitFlag may parse remaining flags
-// (e.g. -createDatabase). openBrowser is true only when the user explicitly passed a
-// serve-style subcommand (serve / gateway / run / start); bare invocation returns false
-// so the browser is not opened automatically.
+// (e.g. -createDatabase). openBrowser is always false here; main() calls
+// util.IsDoubleClicked() to decide whether to open a browser after the server starts.
 func EarlyDispatch() (handled bool, exitCode int, openBrowser bool) {
 	for {
 		if len(os.Args) <= 1 {
@@ -47,7 +46,7 @@ func EarlyDispatch() (handled bool, exitCode int, openBrowser bool) {
 		case "serve", "gateway", "run", "start":
 			// Match OpenClaw-style explicit "gateway" while keeping zero-arg default as serve.
 			os.Args = append([]string{os.Args[0]}, os.Args[2:]...)
-			return false, 0, true
+			return false, 0, false
 		default:
 			if len(first) > 0 && first[0] == '-' {
 				// Legacy/global flags such as -createDatabase — leave argv for flag.Parse.
