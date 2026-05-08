@@ -133,6 +133,13 @@ class ProviderEditPage extends React.Component {
     return Setting.getLabel(i18next.t("general:Provider URL"), i18next.t("general:Provider URL - Tooltip"));
   }
 
+  getProviderKeyLabel(provider) {
+    if (provider.category === "Chat" && provider.type === "Discord") {
+      return Setting.getLabel(i18next.t("provider:Public key"), i18next.t("provider:Public key - Tooltip"));
+    }
+    return Setting.getLabel(i18next.t("provider:Provider key"), i18next.t("provider:Provider key - Tooltip"));
+  }
+
   modelCategoryShowsProviderUrlInput(type) {
     return ["Local", "Ollama", "Azure", "Volcano Engine", "Tencent Cloud"].includes(type);
   }
@@ -167,7 +174,7 @@ class ProviderEditPage extends React.Component {
         return Setting.getLabel(i18next.t("provider:Token"), i18next.t("provider:Token - Tooltip"));
       }
     } else if (provider.category === "Chat") {
-      if (provider.type === "Telegram") {
+      if (["Telegram", "Discord"].includes(provider.type)) {
         return Setting.getLabel(i18next.t("provider:Bot token"), i18next.t("provider:Bot token - Tooltip"));
       }
     }
@@ -1021,10 +1028,10 @@ class ProviderEditPage extends React.Component {
             </Col>
           </Row>
           {
-            this.state.provider.category === "Model" ? (
+            (this.state.provider.category === "Model" || (this.state.provider.category === "Chat" && this.state.provider.type === "Discord")) ? (
               <Row style={{marginTop: "20px"}} >
                 <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-                  {Setting.getLabel(i18next.t("provider:Provider key"), i18next.t("provider:Provider key - Tooltip"))}
+                  {this.getProviderKeyLabel(this.state.provider)}
                 </Col>
                 <Col span={22} >
                   <Input.Password
@@ -1239,13 +1246,13 @@ class ProviderEditPage extends React.Component {
           ) : null
         }
         {
-          (this.state.provider.category === "Chat" && this.state.provider.type === "Telegram") ? (
+          this.state.provider.category === "Chat" ? (
             <Row style={{marginTop: "20px"}} >
               <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
                 {Setting.getLabel(i18next.t("provider:Webhook"), i18next.t("provider:Webhook - Tooltip"))}
               </Col>
               <Col span={22} >
-                <Button disabled={isRemote} type="primary" onClick={() => this.setTelegramWebhook()}>
+                <Button disabled={isRemote} type="primary" onClick={() => this.setChatWebhook()}>
                   {i18next.t("provider:Set Webhook")}
                 </Button>
               </Col>
@@ -1300,9 +1307,9 @@ class ProviderEditPage extends React.Component {
     );
   }
 
-  setTelegramWebhook() {
+  setChatWebhook() {
     const id = `${this.state.provider.owner}/${this.state.provider.name}`;
-    ProviderBackend.setTelegramWebhook(id)
+    ProviderBackend.setChatWebhook(id)
       .then((res) => {
         if (res.status === "ok") {
           Setting.showMessage("success", `${i18next.t("provider:Webhook set successfully")}: ${res.data}`);

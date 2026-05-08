@@ -82,8 +82,8 @@ func initAPI() {
 	beego.Router("/api/update-provider", &controllers.ApiController{}, "POST:UpdateProvider")
 	beego.Router("/api/add-provider", &controllers.ApiController{}, "POST:AddProvider")
 	beego.Router("/api/delete-provider", &controllers.ApiController{}, "POST:DeleteProvider")
-	beego.Router("/api/set-telegram-webhook", &controllers.ApiController{}, "POST:SetTelegramWebhook")
-	beego.Router("/webhook/telegram/:providerName", &controllers.ApiController{}, "POST:TelegramWebhook")
+	beego.Router("/api/set-chat-webhook", &controllers.ApiController{}, "POST:SetChatWebhook")
+	beego.Router("/api/chat-webhook/:providerType/:providerName", &controllers.ApiController{}, "POST:ChatWebhook")
 
 	beego.Router("/api/get-servers", &controllers.ApiController{}, "GET:GetServers")
 	beego.Router("/api/get-server", &controllers.ApiController{}, "GET:GetServer")

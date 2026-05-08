@@ -15,10 +15,8 @@
 package chat
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 )
 
@@ -63,27 +61,7 @@ func (p *TelegramChatProvider) buildUrl(method string) string {
 }
 
 func (p *TelegramChatProvider) doPost(method string, payload interface{}) ([]byte, error) {
-	body, err := json.Marshal(payload)
-	if err != nil {
-		return nil, err
-	}
-
-	resp, err := p.httpClient.Post(p.buildUrl(method), "application/json", bytes.NewReader(body))
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	respBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("Telegram API error (status %d): %s", resp.StatusCode, string(respBody))
-	}
-
-	return respBody, nil
+	return doJSONRequest(p.httpClient, "Telegram", http.MethodPost, p.buildUrl(method), nil, payload, http.StatusOK)
 }
 
 func (p *TelegramChatProvider) SendMessage(chatId string, text string) error {

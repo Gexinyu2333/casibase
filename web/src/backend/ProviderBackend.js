@@ -92,8 +92,8 @@ export function testTool(provider) {
   }).then(res => Setting.handleFetchResponse(res));
 }
 
-export function setTelegramWebhook(id) {
-  return fetch(`${Setting.ServerUrl}/api/set-telegram-webhook?id=${encodeURIComponent(id)}`, {
+export function setChatWebhook(id) {
+  return fetch(`${Setting.ServerUrl}/api/set-chat-webhook?id=${encodeURIComponent(id)}`, {
     method: "POST",
     credentials: "include",
     headers: {

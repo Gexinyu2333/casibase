@@ -1161,6 +1161,10 @@ export function getOtherProviderInfo() {
         logo: `${StaticBaseUrl}/img/social_telegram.png`,
         url: "https://telegram.org/",
       },
+      "Discord": {
+        logo: `${StaticBaseUrl}/img/social_discord.png`,
+        url: "https://discord.com/",
+      },
     },
     "Scan": {
       "Nmap": {
@@ -1429,6 +1433,7 @@ export function getProviderTypeOptions(category) {
   } else if (category === "Chat") {
     return [
       {id: "Telegram", name: "Telegram"},
+      {id: "Discord", name: "Discord"},
     ];
   } else if (category === "Scan") {
     return [

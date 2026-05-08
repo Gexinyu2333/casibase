@@ -16,6 +16,8 @@ package chat
 
 import (
 	"fmt"
+	"net/http"
+	"strings"
 
 	"github.com/the-open-agent/openagent/i18n"
 	"github.com/the-open-agent/openagent/proxy"
@@ -34,12 +36,28 @@ type ChatProvider interface {
 	SetWebhook(webhookUrl string) error
 }
 
-func GetChatProvider(typ string, clientSecret string, lang string) (ChatProvider, error) {
+type WebhookResponse struct {
+	StatusCode  int
+	ContentType string
+	Body        []byte
+}
+
+type ImmediateWebhookResponder interface {
+	GetWebhookResponse(body []byte, header http.Header) (*WebhookResponse, error)
+}
+
+func NormalizeChatProviderType(typ string) string {
+	return strings.ToLower(strings.ReplaceAll(typ, " ", "-"))
+}
+
+func GetChatProvider(typ string, clientSecret string, providerKey string, lang string) (ChatProvider, error) {
 	var p ChatProvider
 	var err error
 
 	if typ == "Telegram" {
 		p, err = NewTelegramChatProvider(clientSecret, proxy.ProxyHttpClient)
+	} else if typ == "Discord" {
+		p, err = NewDiscordChatProvider(clientSecret, providerKey, proxy.ProxyHttpClient)
 	} else {
 		return nil, fmt.Errorf(i18n.Translate(lang, "object:the chat provider type: %s is not supported"), typ)
 	}

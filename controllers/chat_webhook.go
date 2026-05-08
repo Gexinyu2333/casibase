@@ -17,73 +17,117 @@ package controllers
 import (
 	"fmt"
 	"io"
+	"net/http"
 
+	"github.com/the-open-agent/openagent/chat"
 	"github.com/the-open-agent/openagent/object"
 	"github.com/the-open-agent/openagent/util"
 )
 
-// TelegramWebhook receives incoming updates from Telegram for a given Chat provider.
-// The URL format is: /webhook/telegram/:providerName
-// This endpoint does not require authentication because it is called by Telegram servers.
-// @router /webhook/telegram/:providerName [post]
-func (c *ApiController) TelegramWebhook() {
+// ChatWebhook receives incoming updates from a Chat provider.
+// The URL format is: /api/chat-webhook/:providerType/:providerName
+// This endpoint does not require authentication because it is called by chat provider servers.
+// @router /api/chat-webhook/:providerType/:providerName [post]
+func (c *ApiController) ChatWebhook() {
+	providerType := c.Ctx.Input.Param(":providerType")
 	providerName := c.Ctx.Input.Param(":providerName")
 
 	provider, err := object.GetProvider(util.GetIdFromOwnerAndName("admin", providerName))
 	if err != nil {
-		c.Ctx.ResponseWriter.WriteHeader(500)
+		c.Ctx.ResponseWriter.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	if provider == nil || provider.Category != "Chat" || provider.Type != "Telegram" {
-		c.Ctx.ResponseWriter.WriteHeader(404)
+	if provider == nil || provider.Category != "Chat" || chat.NormalizeChatProviderType(provider.Type) != providerType {
+		c.Ctx.ResponseWriter.WriteHeader(http.StatusNotFound)
 		return
 	}
 
 	chatProviderObj, err := provider.GetChatProvider(c.GetAcceptLanguage())
 	if err != nil {
-		c.Ctx.ResponseWriter.WriteHeader(500)
+		c.Ctx.ResponseWriter.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	body, err := io.ReadAll(c.Ctx.Request.Body)
 	if err != nil {
-		c.Ctx.ResponseWriter.WriteHeader(400)
+		c.Ctx.ResponseWriter.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	immediateResponse, err := getImmediateWebhookResponse(chatProviderObj, body, c.Ctx.Request.Header)
+	if err != nil {
+		c.Ctx.ResponseWriter.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	incoming, err := chatProviderObj.ParseWebhookRequest(body)
 	if err != nil {
-		// Return 200 so Telegram does not retry malformed updates
-		c.Ctx.ResponseWriter.WriteHeader(200)
+		// Acknowledge malformed updates so chat providers do not keep retrying them.
+		c.Ctx.ResponseWriter.WriteHeader(http.StatusOK)
 		return
 	}
 	if incoming == nil {
-		// Non-text update (sticker, photo, etc.) — acknowledge silently
-		c.Ctx.ResponseWriter.WriteHeader(200)
+		writeChatWebhookResponse(c, immediateResponse)
 		return
 	}
 
-	// Use clientId as the model provider name; empty string falls back to default store
-	modelProvider := provider.ClientId
-	answer, _, err := object.GetAnswer(modelProvider, incoming.Text, c.GetAcceptLanguage())
+	if immediateResponse != nil {
+		writeChatWebhookResponse(c, immediateResponse)
+		go sendChatProviderAnswer(chatProviderObj, provider.ClientId, incoming, c.GetAcceptLanguage())
+		return
+	}
+
+	sendChatProviderAnswer(chatProviderObj, provider.ClientId, incoming, c.GetAcceptLanguage())
+	c.Ctx.ResponseWriter.WriteHeader(http.StatusOK)
+}
+
+func getImmediateWebhookResponse(chatProviderObj chat.ChatProvider, body []byte, header http.Header) (*chat.WebhookResponse, error) {
+	responder, ok := chatProviderObj.(chat.ImmediateWebhookResponder)
+	if !ok {
+		return nil, nil
+	}
+	return responder.GetWebhookResponse(body, header)
+}
+
+func writeChatWebhookResponse(c *ApiController, response *chat.WebhookResponse) {
+	if response == nil {
+		c.Ctx.ResponseWriter.WriteHeader(http.StatusOK)
+		return
+	}
+
+	if response.ContentType != "" {
+		c.Ctx.Output.Header("Content-Type", response.ContentType)
+	}
+	statusCode := response.StatusCode
+	if statusCode == 0 {
+		statusCode = http.StatusOK
+	}
+
+	c.Ctx.ResponseWriter.WriteHeader(statusCode)
+	if len(response.Body) > 0 {
+		_, _ = c.Ctx.ResponseWriter.Write(response.Body)
+	}
+}
+
+func sendChatProviderAnswer(chatProviderObj chat.ChatProvider, modelProvider string, incoming *chat.IncomingMessage, lang string) {
+	// Use clientId as the model provider name; empty string falls back to default store.
+	answer, _, err := object.GetAnswer(modelProvider, incoming.Text, lang)
 	if err != nil {
 		_ = chatProviderObj.SendMessage(incoming.ChatId, fmt.Sprintf("Error: %v", err))
-		c.Ctx.ResponseWriter.WriteHeader(200)
 		return
 	}
 
 	_ = chatProviderObj.SendMessage(incoming.ChatId, answer)
-	c.Ctx.ResponseWriter.WriteHeader(200)
 }
 
-// SetTelegramWebhook calls the Telegram Bot API to register the webhook URL for the given provider.
-// @Title SetTelegramWebhook
+// SetChatWebhook calls the provider API to register the webhook URL for the given provider.
+// @Title SetChatWebhook
 // @Tag Provider API
-// @Description set Telegram webhook for a Chat provider
+// @Description set webhook for a Chat provider
 // @Param   id     query    string  true  "The id of the provider (owner/name)"
 // @Success 200 {object} controllers.Response The Response object
-// @router /api/set-telegram-webhook [post]
-func (c *ApiController) SetTelegramWebhook() {
+// @router /api/set-chat-webhook [post]
+func (c *ApiController) SetChatWebhook() {
 	id := c.Input().Get("id")
 
 	provider, err := object.GetProvider(id)
@@ -95,8 +139,8 @@ func (c *ApiController) SetTelegramWebhook() {
 		c.ResponseError("provider not found")
 		return
 	}
-	if provider.Category != "Chat" || provider.Type != "Telegram" {
-		c.ResponseError("provider is not a Telegram Chat provider")
+	if provider.Category != "Chat" {
+		c.ResponseError("provider is not a Chat provider")
 		return
 	}
 
@@ -111,7 +155,7 @@ func (c *ApiController) SetTelegramWebhook() {
 		return
 	}
 
-	webhookUrl := fmt.Sprintf("%s/webhook/telegram/%s", provider.Domain, provider.Name)
+	webhookUrl := fmt.Sprintf("%s/api/chat-webhook/%s/%s", provider.Domain, chat.NormalizeChatProviderType(provider.Type), provider.Name)
 	if err = chatProviderObj.SetWebhook(webhookUrl); err != nil {
 		c.ResponseError(err.Error())
 		return
