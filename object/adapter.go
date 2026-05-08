@@ -240,9 +240,25 @@ func (a *Adapter) open() {
 		dataSourceName = a.dataSourceName
 	}
 
+	if a.driverName == "sqlite3" {
+		// Append SQLite pragmas to avoid SQLITE_BUSY under concurrent requests:
+		// WAL journal allows concurrent reads alongside a single writer;
+		// busy_timeout makes SQLite retry for up to 5 s instead of returning BUSY immediately.
+		sep := "?"
+		if strings.Contains(dataSourceName, "?") {
+			sep = "&"
+		}
+		dataSourceName += sep + "_journal_mode=WAL&_busy_timeout=5000"
+	}
+
 	engine, err := xorm.NewEngine(a.driverName, dataSourceName)
 	if err != nil {
 		panic(err)
+	}
+
+	if a.driverName == "sqlite3" {
+		// SQLite supports only one writer at a time; a single connection avoids lock contention.
+		engine.SetMaxOpenConns(1)
 	}
 
 	a.engine = engine
