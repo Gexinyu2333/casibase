@@ -429,12 +429,15 @@ export function setLanguage(language) {
 }
 
 export function setThemeColor(color) {
+  if (!color) {
+    return;
+  }
   localStorage.setItem("themeColor", color);
   updateTheme(color);
 }
 
 export function getThemeColor() {
-  return localStorage.getItem("themeColor") ?? ThemeDefault.colorPrimary;
+  return localStorage.getItem("themeColor") ?? "";
 }
 
 export function getAcceptLanguage() {

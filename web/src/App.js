@@ -59,8 +59,6 @@ class App extends Component {
   initConfig() {
     Setting.initServerUrl();
     Setting.initWebConfig();
-    Setting.setThemeColor(Conf.ThemeDefault.colorPrimary);
-
     FetchFilter.initDemoMode();
     Setting.initCasdoorSdk(Conf.AuthConfig);
   }
@@ -75,15 +73,13 @@ class App extends Component {
   setTheme() {
     SiteBackend.getBuiltInSite().then((res) => {
       if (res.status !== "ok") {
-        Setting.setThemeColor(Conf.ThemeDefault.colorPrimary);
         return;
       }
       const site = res.data;
       if (!site) {
-        Setting.setThemeColor(Conf.ThemeDefault.colorPrimary);
         return;
       }
-      Setting.setThemeColor(site.themeColor || Conf.ThemeDefault.colorPrimary);
+      Setting.setThemeColor(site.themeColor);
       this.setState({site});
     });
   }

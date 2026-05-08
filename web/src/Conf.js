@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const DefaultColorPrimary = "#404040";
-
 export const AuthConfig = {serverUrl: "", clientId: "", appName: "", organizationName: "", redirectPath: ""};
 export let StaticBaseUrl = "";
 export let HtmlTitle = "";
@@ -26,7 +24,7 @@ export let IsDemoMode = false;
 // eslint-disable-next-line
 export let ThemeDefault = {
   themeType: "default",
-  colorPrimary: DefaultColorPrimary,
+  colorPrimary: "",
 };
 export let AvatarErrorUrl = "";
 

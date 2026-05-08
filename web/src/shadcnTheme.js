@@ -15,7 +15,7 @@
 // Shadcn-style Ant Design theme configuration.
 // Adapted from the "shadcn" preset on https://ant.design/
 
-import {DefaultColorPrimary} from "./Conf";
+const DefaultColorPrimary = "#404040";
 
 function hexToRgbComma(hex) {
   const h = hex.replace(/^#/, "");

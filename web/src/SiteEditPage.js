@@ -18,7 +18,6 @@ import {Button, Card, Col, Image, Input, Popover, Row, Space, Switch, Upload} fr
 import * as SiteBackend from "./backend/SiteBackend";
 import * as ResourceBackend from "./backend/ResourceBackend";
 import * as Setting from "./Setting";
-import {ThemeDefault} from "./Conf";
 import i18next from "i18next";
 import {LinkOutlined, UploadOutlined} from "@ant-design/icons";
 import Editor from "./common/Editor";
@@ -137,7 +136,7 @@ class SiteEditPage extends React.Component {
             {Setting.getLabel(i18next.t("store:Theme color"), i18next.t("store:Theme color - Tooltip"))} :
           </Col>
           <Col span={22} >
-            <input type="color" value={this.state.site.themeColor || ThemeDefault.colorPrimary} onChange={(e) => {
+            <input type="color" value={this.state.site.themeColor || ""} onChange={(e) => {
               this.updateSiteField("themeColor", e.target.value);
             }} />
           </Col>
