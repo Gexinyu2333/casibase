@@ -2657,7 +2657,7 @@ export function getStoreIconUrl(store) {
 }
 
 export function getLogo(themes, storeLogoUrl) {
-  const defaultLogoUrl = "https://cdn.openagentai.org/img/openagent-logo_1600x276.png";
+  const defaultLogoUrl = "https://cdn.openagentai.org/img/openagent-logo_1900x450.png";
   let logoUrl = Conf.LogoUrl;
   if (storeLogoUrl && storeLogoUrl !== defaultLogoUrl) {
     logoUrl = storeLogoUrl;
