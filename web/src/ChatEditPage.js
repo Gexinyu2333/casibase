@@ -14,7 +14,7 @@
 
 import React from "react";
 import Loading from "./common/Loading";
-import {Button, Card, Col, Input, Row, Select, Switch} from "antd";
+import {Button, Card, Col, Input, Row, Select, Space, Switch} from "antd";
 import * as ChatBackend from "./backend/ChatBackend";
 import * as ProviderBackend from "./backend/ProviderBackend";
 import * as Setting from "./Setting";
@@ -35,7 +35,6 @@ class ChatEditPage extends React.Component {
       messages: null,
       provider: null,
       providers: [],
-      // users: [],
       isNewChat: props.location?.state?.isNewChat || false,
     };
   }
@@ -44,7 +43,6 @@ class ChatEditPage extends React.Component {
     this.getChat();
     this.getMessages(this.state.chatName);
     this.getProviders();
-    // this.getUser();
   }
 
   getProviders() {
@@ -115,175 +113,184 @@ class ChatEditPage extends React.Component {
     });
   }
 
-  renderChat() {
+  renderChatActions() {
+    const btnStyle = {
+      backgroundColor: "#F8F9FA",
+      borderColor: "rgb(229, 229, 234)",
+      border: "1px solid #E5E5EA",
+      borderRadius: "10px",
+      padding: "6px 10px",
+    };
+
     return (
-      <Card size="small" title={
-        <div>
-          {i18next.t("chat:Edit Chat")}&nbsp;&nbsp;&nbsp;&nbsp;
-          <Button onClick={() => this.submitChatEdit(false)}>{i18next.t("general:Save")}</Button>
-          <Button style={{marginLeft: "20px"}} type="primary" onClick={() => this.submitChatEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
-          {this.state.isNewChat && <Button style={{marginLeft: "20px"}} onClick={() => this.cancelChatEdit()}>{i18next.t("general:Cancel")}</Button>}
+      <Space wrap>
+        <Button style={btnStyle} onClick={() => this.submitChatEdit(false)}>{i18next.t("general:Save")}</Button>
+        <Button style={btnStyle} onClick={() => this.submitChatEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
+        {this.state.isNewChat && <Button style={btnStyle} onClick={() => this.cancelChatEdit()}>{i18next.t("general:Cancel")}</Button>}
+      </Space>
+    );
+  }
+
+  renderChatField(label, control, span = 8, style = {}) {
+    return (
+      <Col style={{marginTop: "12px", ...style}} span={Setting.isMobile() ? 22 : span}>
+        <div style={{marginBottom: "6px", color: "#595959", fontWeight: 500, lineHeight: "22px", fontSize: "13px"}}>{label}</div>
+        {control}
+      </Col>
+    );
+  }
+
+  renderChatSwitch(label, checked, onChange, span = 6) {
+    return this.renderChatField(label, <Switch checked={checked} onChange={onChange} />, span);
+  }
+
+  renderChat() {
+    const chat = this.state.chat;
+    const rowGutter = [16, 8];
+    const cardHeadStyle = {background: "transparent", borderBottom: "none", fontWeight: 600, fontSize: "15px", fontFamily: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"};
+    const sectionCardStyle = {
+      marginBottom: "16px",
+      borderRadius: "14px",
+      boxShadow: "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
+      padding: "18px",
+    };
+
+    const renderCardTitle = (title, desc) => (
+      <div>
+        <div style={{fontWeight: 600, fontSize: "15px"}}>{title}</div>
+        <div style={{fontSize: "13px", color: "#6E6E73", fontWeight: 400, marginTop: "2px"}}>{desc}</div>
+      </div>
+    );
+
+    return (
+      <div>
+        <div style={{marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+          <span style={{fontSize: "22px", fontWeight: 600}}>{i18next.t("chat:Edit Chat")}</span>
+          <div style={{display: "flex", gap: "8px", marginRight: "4px"}}>
+            {this.renderChatActions()}
+          </div>
         </div>
-      } style={(Setting.isMobile()) ? {margin: "5px"} : {}} type="inner">
-        {/* <Row style={{marginTop: "10px"}} >*/}
-        {/*  <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>*/}
-        {/*    {Setting.getLabel(i18next.t("general:Organization"), i18next.t("general:Organization - Tooltip"))}:*/}
-        {/*  </Col>*/}
-        {/*  <Col span={22} >*/}
-        {/*    <Select virtual={false} disabled={!Setting.isAdminUser(this.props.account)} style={{width: "100%"}} value={this.state.chat.organization} onChange={(value => {this.updateChatField("organization", value);})}*/}
-        {/*      options={this.state.organizations.map((organization) => Setting.getOption(organization.name, organization.name))*/}
-        {/*      } />*/}
-        {/*  </Col>*/}
-        {/* </Row>*/}
-        <Row style={{marginTop: "10px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Name"), i18next.t("general:Name - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Input value={this.state.chat.name} onChange={e => {
-              this.updateChatField("name", e.target.value);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Display name"), i18next.t("general:Display name - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Input value={this.state.chat.displayName} onChange={e => {
-              this.updateChatField("displayName", e.target.value);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Type"), i18next.t("general:Type - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Select virtual={false} style={{width: "100%"}} value={this.state.chat.type} onChange={(value => {
-              this.updateChatField("type", value);
-            })}>
-              {
-                [
-                  {id: "Single", name: i18next.t("chat:Single")},
-                  {id: "Group", name: i18next.t("chat:Group")},
-                  {id: "AI", name: i18next.t("chat:AI")},
-                ].map((item, index) => <Option key={index} value={item.id}>{item.name}</Option>)
-              }
-            </Select>
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Store"), i18next.t("general:Store - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Input value={this.state.chat.store} onChange={e => {
-              this.updateChatField("store", e.target.value);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("provider:Model provider"), i18next.t("provider:Model provider - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Select
-              virtual={false}
-              style={{width: "100%"}}
-              value={this.state.chat.modelProvider}
-              onChange={(value) => {
-                this.updateChatField("modelProvider", value);
-                this.getProvider(value);
-              }}
-              showSearch
-              filterOption={(input, option) =>
-                option.children[1].toLowerCase().includes(input.toLowerCase())
-              }
-            >
-              {
-                this.state.providers.map((provider, index) => (
-                  <Option key={index} value={provider.name}>
-                    <img width={20} height={20} style={{marginBottom: "3px", marginRight: "10px"}} src={Setting.getProviderLogoURL({category: provider.category, type: provider.type})} alt={provider.type} />
-                    {provider.name}
-                  </Option>
-                ))
-              }
-            </Select>
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Category"), i18next.t("provider:Category - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Input value={this.state.chat.category} onChange={e => {
-              this.updateChatField("category", e.target.value);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:User"), i18next.t("general:User - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Input value={this.state.chat.user} onChange={e => {
-              this.updateChatField("user", e.target.value);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("chat:User1"), i18next.t("chat:User1 - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Select virtual={false} style={{width: "100%"}} value={this.state.chat.user1} onChange={(value => {this.updateChatField("user1", value);})}
-              options={this.state.chat.users.map((user) => Setting.getOption(`${user}`, `${user}`))
-              } />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("chat:User2"), i18next.t("chat:User2 - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Select virtual={false} style={{width: "100%"}} value={this.state.chat.user2} onChange={(value => {this.updateChatField("user2", value);})}
-              options={[{label: "None", value: ""}, ...this.state.chat.users.map((user) => Setting.getOption(`${user}`, `${user}`))]
-              } />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Users"), i18next.t("general:Users - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Select virtual={false} mode="multiple" style={{width: "100%"}} value={this.state.chat.users}
-              onChange={(value => {this.updateChatField("users", value);})}
-              options={this.state.chat.users.map((user) => Setting.getOption(`${user}`, `${user}`))}
-            />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 19 : 2}>
-            {Setting.getLabel(i18next.t("general:Is deleted"), i18next.t("general:Is deleted - Tooltip"))} :
-          </Col>
-          <Col span={1} >
-            <Switch checked={this.state.chat.isDeleted} onChange={checked => {
-              this.updateChatField("isDeleted", checked);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Messages"), i18next.t("general:Messages - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <div style={{width: "50%", height: "800px"}}>
-              <ChatBox disableInput={true} hideInput={true} messages={this.state.messages} sendMessage={null} account={this.props.account} />
-            </div>
-          </Col>
-        </Row>
-      </Card>
+
+        <Card size="small" title={renderCardTitle(i18next.t("general:General Settings"), i18next.t("general:General Settings desc"))} style={sectionCardStyle} headStyle={cardHeadStyle}>
+          <Row gutter={rowGutter}>
+            {this.renderChatField(
+              Setting.getLabel(i18next.t("general:Name"), i18next.t("general:Name - Tooltip")),
+              <Input value={chat.name} onChange={e => {
+                this.updateChatField("name", e.target.value);
+              }} />,
+              8
+            )}
+            {this.renderChatField(
+              Setting.getLabel(i18next.t("general:Display name"), i18next.t("general:Display name - Tooltip")),
+              <Input value={chat.displayName} onChange={e => {
+                this.updateChatField("displayName", e.target.value);
+              }} />,
+              8
+            )}
+            {this.renderChatField(
+              Setting.getLabel(i18next.t("general:Type"), i18next.t("general:Type - Tooltip")),
+              <Select virtual={false} style={{width: "100%"}} value={chat.type} onChange={(value => {
+                this.updateChatField("type", value);
+              })}>
+                {
+                  [
+                    {id: "Single", name: i18next.t("chat:Single")},
+                    {id: "Group", name: i18next.t("chat:Group")},
+                    {id: "AI", name: i18next.t("chat:AI")},
+                  ].map((item, index) => <Option key={index} value={item.id}>{item.name}</Option>)
+                }
+              </Select>,
+              8
+            )}
+            {this.renderChatField(
+              Setting.getLabel(i18next.t("general:Store"), i18next.t("general:Store - Tooltip")),
+              <Input value={chat.store} onChange={e => {
+                this.updateChatField("store", e.target.value);
+              }} />,
+              8
+            )}
+            {this.renderChatField(
+              Setting.getLabel(i18next.t("provider:Model provider"), i18next.t("provider:Model provider - Tooltip")),
+              <Select
+                virtual={false}
+                style={{width: "100%"}}
+                value={chat.modelProvider}
+                onChange={(value) => {
+                  this.updateChatField("modelProvider", value);
+                  this.getProvider(value);
+                }}
+                showSearch
+                filterOption={(input, option) =>
+                  option.children[1].toLowerCase().includes(input.toLowerCase())
+                }
+              >
+                {
+                  this.state.providers.map((provider, index) => (
+                    <Option key={index} value={provider.name}>
+                      <img width={20} height={20} style={{marginBottom: "3px", marginRight: "10px"}} src={Setting.getProviderLogoURL({category: provider.category, type: provider.type})} alt={provider.type} />
+                      {provider.name}
+                    </Option>
+                  ))
+                }
+              </Select>,
+              8
+            )}
+            {this.renderChatField(
+              Setting.getLabel(i18next.t("general:Category"), i18next.t("provider:Category - Tooltip")),
+              <Input value={chat.category} onChange={e => {
+                this.updateChatField("category", e.target.value);
+              }} />,
+              8
+            )}
+          </Row>
+        </Card>
+
+        <Card size="small" title={renderCardTitle(i18next.t("general:Users"), i18next.t("general:Users desc"))} style={sectionCardStyle} headStyle={cardHeadStyle}>
+          <Row gutter={rowGutter}>
+            {this.renderChatField(
+              Setting.getLabel(i18next.t("general:User"), i18next.t("general:User - Tooltip")),
+              <Input value={chat.user} onChange={e => {
+                this.updateChatField("user", e.target.value);
+              }} />,
+              8
+            )}
+            {this.renderChatField(
+              Setting.getLabel(i18next.t("chat:User1"), i18next.t("chat:User1 - Tooltip")),
+              <Select virtual={false} style={{width: "100%"}} value={chat.user1} onChange={(value => {this.updateChatField("user1", value);})}
+                options={chat.users.map((user) => Setting.getOption(`${user}`, `${user}`))} />,
+              8
+            )}
+            {this.renderChatField(
+              Setting.getLabel(i18next.t("chat:User2"), i18next.t("chat:User2 - Tooltip")),
+              <Select virtual={false} style={{width: "100%"}} value={chat.user2} onChange={(value => {this.updateChatField("user2", value);})}
+                options={[{label: "None", value: ""}, ...chat.users.map((user) => Setting.getOption(`${user}`, `${user}`))]} />,
+              8
+            )}
+            {this.renderChatField(
+              Setting.getLabel(i18next.t("general:Users"), i18next.t("general:Users - Tooltip")),
+              <Select virtual={false} mode="multiple" style={{width: "100%"}} value={chat.users}
+                onChange={(value => {this.updateChatField("users", value);})}
+                options={chat.users.map((user) => Setting.getOption(`${user}`, `${user}`))}
+              />,
+              12
+            )}
+            {this.renderChatSwitch(
+              Setting.getLabel(i18next.t("general:Is deleted"), i18next.t("general:Is deleted - Tooltip")),
+              chat.isDeleted,
+              checked => {
+                this.updateChatField("isDeleted", checked);
+              },
+              6
+            )}
+          </Row>
+        </Card>
+
+        <Card size="small" title={renderCardTitle(i18next.t("general:Messages"), i18next.t("general:Messages desc"))} style={sectionCardStyle} headStyle={cardHeadStyle}>
+          <div style={{width: "100%", height: "800px"}}>
+            <ChatBox disableInput={true} hideInput={true} messages={this.state.messages} sendMessage={null} account={this.props.account} />
+          </div>
+        </Card>
+      </div>
     );
   }
 
@@ -338,15 +345,10 @@ class ChatEditPage extends React.Component {
 
   render() {
     return (
-      <div>
+      <div style={{background: "#F1F3F5", padding: "16px 20px 32px", minHeight: "100vh"}}>
         {
           this.state.chat !== null ? this.renderChat() : <Loading type="page" tip={i18next.t("general:Loading")} />
         }
-        <div style={{marginTop: "20px", marginLeft: "40px"}}>
-          <Button size="large" onClick={() => this.submitChatEdit(false)}>{i18next.t("general:Save")}</Button>
-          <Button style={{marginLeft: "20px"}} type="primary" size="large" onClick={() => this.submitChatEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
-          {this.state.isNewChat && <Button style={{marginLeft: "20px"}} size="large" onClick={() => this.cancelChatEdit()}>{i18next.t("general:Cancel")}</Button>}
-        </div>
       </div>
     );
   }

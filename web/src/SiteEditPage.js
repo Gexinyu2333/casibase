@@ -84,11 +84,7 @@ class SiteEditPage extends React.Component {
             Setting.showMessage("success", i18next.t("general:Successfully saved"));
             Setting.setThemeColor(this.state.site.themeColor || Setting.getThemeColor());
             this.setState({siteName: this.state.site.name});
-            if (exitAfterSave) {
-              this.props.history.push(`/sites/${this.state.site.name}`);
-            } else {
-              this.props.history.push(`/sites/${this.state.site.name}`);
-            }
+            this.props.history.push(`/sites/${this.state.site.name}`);
           } else {
             Setting.showMessage("error", i18next.t("general:Failed to connect to server"));
             this.updateSiteField("name", this.state.siteName);
@@ -102,198 +98,229 @@ class SiteEditPage extends React.Component {
       });
   }
 
-  renderSite() {
+  renderSiteField(label, control, span = 8, style = {}) {
     return (
-      <Card size="small" title={
-        <div>
-          {i18next.t("site:Edit Site")}&nbsp;&nbsp;&nbsp;&nbsp;
-          <Button onClick={() => this.submitSiteEdit(false)}>{i18next.t("general:Save")}</Button>
-          <Button style={{marginLeft: "20px"}} type="primary" onClick={() => this.submitSiteEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
+      <Col style={{marginTop: "12px", ...style}} span={Setting.isMobile() ? 22 : span}>
+        <div style={{marginBottom: "6px", color: "#595959", fontWeight: 500, lineHeight: "22px", fontSize: "13px"}}>{label}</div>
+        {control}
+      </Col>
+    );
+  }
+
+  renderSiteSwitch(label, checked, onChange, span = 6) {
+    return this.renderSiteField(label, <Switch checked={checked} onChange={onChange} />, span);
+  }
+
+  renderSiteActions() {
+    const btnStyle = {
+      backgroundColor: "#F8F9FA",
+      borderColor: "rgb(229, 229, 234)",
+      border: "1px solid #E5E5EA",
+      borderRadius: "10px",
+      padding: "6px 10px",
+    };
+
+    return (
+      <Space wrap>
+        <Button style={btnStyle} onClick={() => this.submitSiteEdit(false)}>{i18next.t("general:Save")}</Button>
+        <Button style={btnStyle} onClick={() => this.submitSiteEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
+      </Space>
+    );
+  }
+
+  renderSite() {
+    const site = this.state.site;
+    const rowGutter = [16, 8];
+    const cardHeadStyle = {background: "transparent", borderBottom: "none", fontWeight: 600, fontSize: "15px", fontFamily: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"};
+    const sectionCardStyle = {
+      marginBottom: "16px",
+      borderRadius: "14px",
+      boxShadow: "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
+      padding: "18px",
+    };
+
+    const renderCardTitle = (title, desc) => (
+      <div>
+        <div style={{fontWeight: 600, fontSize: "15px"}}>{title}</div>
+        <div style={{fontSize: "13px", color: "#6E6E73", fontWeight: 400, marginTop: "2px"}}>{desc}</div>
+      </div>
+    );
+
+    return (
+      <div>
+        <div style={{marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+          <span style={{fontSize: "22px", fontWeight: 600}}>{i18next.t("site:Edit Site")}</span>
+          <div style={{display: "flex", gap: "8px", marginRight: "4px"}}>
+            {this.renderSiteActions()}
+          </div>
         </div>
-      } style={{marginLeft: "5px"}} type="inner">
-        <Row style={{marginTop: "10px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Name"), i18next.t("general:Name - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Input value={this.state.site.name} disabled={this.state.site.name === "site-built-in"} onChange={e => {
-              this.updateSiteField("name", e.target.value);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Display name"), i18next.t("general:Display name - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Input value={this.state.site.displayName} onChange={e => {
-              this.updateSiteField("displayName", e.target.value);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("store:Theme color"), i18next.t("store:Theme color - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <input type="color" value={this.state.site.themeColor || ""} onChange={(e) => {
-              this.updateSiteField("themeColor", e.target.value);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:HTML title"), i18next.t("general:HTML title - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Input value={this.state.site.htmlTitle} onChange={e => {
-              this.updateSiteField("htmlTitle", e.target.value);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Favicon URL"), i18next.t("general:Favicon URL - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Space direction="vertical" style={{width: "100%"}}>
-              <Space.Compact style={{width: "100%"}}>
-                <Input prefix={<LinkOutlined />} value={this.state.site.faviconUrl} onChange={e => {
-                  this.updateSiteField("faviconUrl", e.target.value);
+
+        <Card size="small" title={renderCardTitle(i18next.t("general:General Settings"), i18next.t("general:General Settings desc"))} style={sectionCardStyle} headStyle={cardHeadStyle}>
+          <Row gutter={rowGutter}>
+            {this.renderSiteField(
+              Setting.getLabel(i18next.t("general:Name"), i18next.t("general:Name - Tooltip")),
+              <Input value={site.name} disabled={site.name === "site-built-in"} onChange={e => {
+                this.updateSiteField("name", e.target.value);
+              }} />,
+              8
+            )}
+            {this.renderSiteField(
+              Setting.getLabel(i18next.t("general:Display name"), i18next.t("general:Display name - Tooltip")),
+              <Input value={site.displayName} onChange={e => {
+                this.updateSiteField("displayName", e.target.value);
+              }} />,
+              8
+            )}
+            {this.renderSiteField(
+              Setting.getLabel(i18next.t("general:HTML title"), i18next.t("general:HTML title - Tooltip")),
+              <Input value={site.htmlTitle} onChange={e => {
+                this.updateSiteField("htmlTitle", e.target.value);
+              }} />,
+              8
+            )}
+            {this.renderSiteField(
+              Setting.getLabel(i18next.t("store:Theme color"), i18next.t("store:Theme color - Tooltip")),
+              <input type="color" value={site.themeColor || ""} style={{height: "32px", width: "64px", cursor: "pointer", border: "1px solid #d9d9d9", borderRadius: "6px", padding: "2px"}} onChange={(e) => {
+                this.updateSiteField("themeColor", e.target.value);
+              }} />,
+              8
+            )}
+          </Row>
+        </Card>
+
+        <Card size="small" title={renderCardTitle(i18next.t("general:Branding"), i18next.t("general:Branding desc"))} style={sectionCardStyle} headStyle={cardHeadStyle}>
+          <Row gutter={rowGutter}>
+            {this.renderSiteField(
+              Setting.getLabel(i18next.t("general:Favicon URL"), i18next.t("general:Favicon URL - Tooltip")),
+              <Space direction="vertical" style={{width: "100%"}}>
+                <Space.Compact style={{width: "100%"}}>
+                  <Input prefix={<LinkOutlined />} value={site.faviconUrl} onChange={e => {
+                    this.updateSiteField("faviconUrl", e.target.value);
+                  }} />
+                  <Upload name="file" accept="image/*" showUploadList={false} customRequest={({file}) => this.handleImageUpload("faviconUrl", file)}>
+                    <Button icon={<UploadOutlined />} loading={this.state.uploadingFavicon}>
+                      {i18next.t("general:Upload")}
+                    </Button>
+                  </Upload>
+                </Space.Compact>
+                {site.faviconUrl ? (
+                  <Image src={Setting.getFaviconUrl("", site.faviconUrl)} alt={site.faviconUrl} height={90}
+                    preview={{mask: i18next.t("general:Preview")}}
+                  />
+                ) : null}
+              </Space>,
+              12
+            )}
+            {this.renderSiteField(
+              Setting.getLabel(i18next.t("general:Logo URL"), i18next.t("general:Logo URL - Tooltip")),
+              <Space direction="vertical" style={{width: "100%"}}>
+                <Space.Compact style={{width: "100%"}}>
+                  <Input prefix={<LinkOutlined />} value={site.logoUrl} onChange={e => {
+                    this.updateSiteField("logoUrl", e.target.value);
+                  }} />
+                  <Upload name="file" accept="image/*" showUploadList={false} customRequest={({file}) => this.handleImageUpload("logoUrl", file)}>
+                    <Button icon={<UploadOutlined />} loading={this.state.uploadingLogo}>
+                      {i18next.t("general:Upload")}
+                    </Button>
+                  </Upload>
+                </Space.Compact>
+                {site.logoUrl ? (
+                  <Image src={Setting.getLogo("", site.logoUrl)} alt={site.logoUrl} height={90}
+                    preview={{mask: i18next.t("general:Preview")}}
+                  />
+                ) : null}
+              </Space>,
+              12
+            )}
+            {this.renderSiteField(
+              Setting.getLabel(i18next.t("general:Static base URL"), i18next.t("general:Static base URL - Tooltip")),
+              <Input prefix={<LinkOutlined />} value={site.staticBaseUrl} onChange={e => {
+                this.updateSiteField("staticBaseUrl", e.target.value);
+              }} />,
+              12
+            )}
+          </Row>
+        </Card>
+
+        <Card size="small" title={renderCardTitle(i18next.t("general:Content"), i18next.t("general:Content desc"))} style={sectionCardStyle} headStyle={cardHeadStyle}>
+          <Row gutter={rowGutter}>
+            {this.renderSiteField(
+              Setting.getLabel(i18next.t("general:Navbar HTML"), i18next.t("general:Navbar HTML - Tooltip")),
+              <Popover placement="right" content={
+                <div style={{width: "900px", height: "300px"}}>
+                  <Editor
+                    value={site.navbarHtml}
+                    lang="html"
+                    fillHeight
+                    dark
+                    onChange={value => {
+                      this.updateSiteField("navbarHtml", value);
+                    }}
+                  />
+                </div>
+              } title={i18next.t("general:Navbar HTML - Edit")} trigger="click">
+                <Input value={site.navbarHtml} onChange={e => {
+                  this.updateSiteField("navbarHtml", e.target.value);
                 }} />
-                <Upload name="file" accept="image/*" showUploadList={false} customRequest={({file}) => this.handleImageUpload("faviconUrl", file)}>
-                  <Button icon={<UploadOutlined />} loading={this.state.uploadingFavicon}>
-                    {i18next.t("general:Upload")}
-                  </Button>
-                </Upload>
-              </Space.Compact>
-              {this.state.site.faviconUrl ? (
-                <Image src={Setting.getFaviconUrl("", this.state.site.faviconUrl)} alt={this.state.site.faviconUrl} height={90}
-                  preview={{mask: i18next.t("general:Preview")}}
-                />
-              ) : null}
-            </Space>
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Logo URL"), i18next.t("general:Logo URL - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Space direction="vertical" style={{width: "100%"}}>
-              <Space.Compact style={{width: "100%"}}>
-                <Input prefix={<LinkOutlined />} value={this.state.site.logoUrl} onChange={e => {
-                  this.updateSiteField("logoUrl", e.target.value);
+              </Popover>,
+              12
+            )}
+            {this.renderSiteField(
+              Setting.getLabel(i18next.t("general:Footer HTML"), i18next.t("general:Footer HTML - Tooltip")),
+              <Popover placement="right" content={
+                <div style={{width: "900px", height: "300px"}}>
+                  <Editor
+                    value={site.footerHtml}
+                    lang="html"
+                    fillHeight
+                    dark
+                    onChange={value => {
+                      this.updateSiteField("footerHtml", value);
+                    }}
+                  />
+                </div>
+              } title={i18next.t("store:Footer HTML - Edit")} trigger="click">
+                <Input value={site.footerHtml} onChange={e => {
+                  this.updateSiteField("footerHtml", e.target.value);
                 }} />
-                <Upload name="file" accept="image/*" showUploadList={false} customRequest={({file}) => this.handleImageUpload("logoUrl", file)}>
-                  <Button icon={<UploadOutlined />} loading={this.state.uploadingLogo}>
-                    {i18next.t("general:Upload")}
-                  </Button>
-                </Upload>
-              </Space.Compact>
-              {this.state.site.logoUrl ? (
-                <Image src={Setting.getLogo("", this.state.site.logoUrl)} alt={this.state.site.logoUrl} height={90}
-                  preview={{mask: i18next.t("general:Preview")}}
-                />
-              ) : null}
-            </Space>
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Static base URL"), i18next.t("general:Static base URL - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Input prefix={<LinkOutlined />} value={this.state.site.staticBaseUrl} onChange={e => {
-              this.updateSiteField("staticBaseUrl", e.target.value);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Navbar HTML"), i18next.t("general:Navbar HTML - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Popover placement="right" content={
-              <div style={{width: "900px", height: "300px"}} >
-                <Editor
-                  value={this.state.site.navbarHtml}
-                  lang="html"
-                  fillHeight
-                  dark
-                  onChange={value => {
-                    this.updateSiteField("navbarHtml", value);
-                  }}
-                />
-              </div>
-            } title={i18next.t("general:Navbar HTML - Edit")} trigger="click">
-              <Input value={this.state.site.navbarHtml} style={{marginBottom: "10px"}} onChange={e => {
-                this.updateSiteField("navbarHtml", e.target.value);
-              }} />
-            </Popover>
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Footer HTML"), i18next.t("general:Footer HTML - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Popover placement="right" content={
-              <div style={{width: "900px", height: "300px"}} >
-                <Editor
-                  value={this.state.site.footerHtml}
-                  lang="html"
-                  fillHeight
-                  dark
-                  onChange={value => {
-                    this.updateSiteField("footerHtml", value);
-                  }}
-                />
-              </div>
-            } title={i18next.t("store:Footer HTML - Edit")} trigger="click">
-              <Input value={this.state.site.footerHtml} style={{marginBottom: "10px"}} onChange={e => {
-                this.updateSiteField("footerHtml", e.target.value);
-              }} />
-            </Popover>
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("store:Navbar items"), i18next.t("store:Navbar items - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <NavItemTree
-              disabled={!Setting.isAdminUser(this.props.account)}
-              checkedKeys={this.state.site.navItems ?? ["all"]}
-              defaultExpandedKeys={["all"]}
-              onCheck={(checked) => {
-                this.updateSiteField("navItems", checked);
-              }}
-            />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("site:Check user balance"), i18next.t("site:Check user balance - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Switch checked={this.state.site.checkUserBalance} onChange={checked => {
-              this.updateSiteField("checkUserBalance", checked);
-            }} />
-          </Col>
-        </Row>
-      </Card>
+              </Popover>,
+              12
+            )}
+            {this.renderSiteField(
+              Setting.getLabel(i18next.t("store:Navbar items"), i18next.t("store:Navbar items - Tooltip")),
+              <NavItemTree
+                disabled={!Setting.isAdminUser(this.props.account)}
+                checkedKeys={site.navItems ?? ["all"]}
+                defaultExpandedKeys={["all"]}
+                onCheck={(checked) => {
+                  this.updateSiteField("navItems", checked);
+                }}
+              />,
+              24
+            )}
+          </Row>
+        </Card>
+
+        <Card size="small" title={renderCardTitle(i18next.t("general:Options"), i18next.t("general:Options desc"))} style={sectionCardStyle} headStyle={cardHeadStyle}>
+          <Row gutter={rowGutter}>
+            {this.renderSiteSwitch(
+              Setting.getLabel(i18next.t("site:Check user balance"), i18next.t("site:Check user balance - Tooltip")),
+              site.checkUserBalance,
+              checked => {
+                this.updateSiteField("checkUserBalance", checked);
+              },
+              8
+            )}
+          </Row>
+        </Card>
+      </div>
     );
   }
 
   render() {
     return (
-      <div>
+      <div style={{background: "#F1F3F5", padding: "16px 20px 32px", minHeight: "100vh"}}>
         {this.state.site !== null ? this.renderSite() : <Loading type="page" tip={i18next.t("general:Loading")} />}
-        <div style={{marginTop: "20px", marginLeft: "40px"}}>
-          <Button size="large" onClick={() => this.submitSiteEdit(false)}>{i18next.t("general:Save")}</Button>
-          <Button style={{marginLeft: "20px"}} type="primary" size="large" onClick={() => this.submitSiteEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
-        </div>
       </div>
     );
   }
