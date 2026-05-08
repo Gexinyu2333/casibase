@@ -25,7 +25,6 @@ import ModelTestWidget from "./common/TestModelWidget";
 import TtsTestWidget from "./common/TestTtsWidget";
 import EmbedTestWidget from "./common/TestEmbedWidget";
 import TestMcpWidget from "./common/TestMcpWidget";
-import TestScanWidget from "./common/TestScanWidget";
 
 const {Option} = Select;
 const {TextArea} = Input;
@@ -1222,12 +1221,6 @@ class ProviderEditPage extends React.Component {
           <TestMcpWidget
             provider={this.state.provider}
             originalProvider={this.state.originalProvider}
-            onUpdateProvider={this.updateProviderField.bind(this)}
-          />
-          <TestScanWidget
-            provider={this.state.provider}
-            originalProvider={this.state.originalProvider}
-            account={this.props.account}
             onUpdateProvider={this.updateProviderField.bind(this)}
           />
         </Card>

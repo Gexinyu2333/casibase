@@ -227,24 +227,6 @@ func initAPI() {
 	beego.Router("/api/add-permission", &controllers.ApiController{}, "POST:AddPermission")
 	beego.Router("/api/delete-permission", &controllers.ApiController{}, "POST:DeletePermission")
 
-	beego.Router("/api/get-nodes", &controllers.ApiController{}, "GET:GetNodes")
-	beego.Router("/api/get-node", &controllers.ApiController{}, "GET:GetNode")
-	beego.Router("/api/update-node", &controllers.ApiController{}, "POST:UpdateNode")
-	beego.Router("/api/add-node", &controllers.ApiController{}, "POST:AddNode")
-	beego.Router("/api/delete-node", &controllers.ApiController{}, "POST:DeleteNode")
-
-	beego.Router("/api/get-scans", &controllers.ApiController{}, "GET:GetScans")
-	beego.Router("/api/get-scan", &controllers.ApiController{}, "GET:GetScan")
-	beego.Router("/api/update-scan", &controllers.ApiController{}, "POST:UpdateScan")
-	beego.Router("/api/add-scan", &controllers.ApiController{}, "POST:AddScan")
-	beego.Router("/api/delete-scan", &controllers.ApiController{}, "POST:DeleteScan")
-
-	beego.Router("/api/install-patch", &controllers.ApiController{}, "POST:InstallPatch")
-
-	beego.Router("/api/scan-asset", &controllers.ApiController{}, "POST:ScanAsset")
-
-	beego.Router("/api/add-node-tunnel", &controllers.ApiController{}, "POST:AddNodeTunnel")
-	beego.Router("/api/get-node-tunnel", &controllers.ApiController{}, "GET:GetNodeTunnel")
 
 	beego.Router("/api/get-sessions", &controllers.ApiController{}, "GET:GetSessions")
 	beego.Router("/api/get-session", &controllers.ApiController{}, "GET:GetSession")
@@ -253,13 +235,6 @@ func initAPI() {
 	beego.Router("/api/delete-session", &controllers.ApiController{}, "POST:DeleteSession")
 	beego.Router("/api/is-session-duplicated", &controllers.ApiController{}, "GET:IsSessionDuplicated")
 
-	beego.Router("/api/get-connections", &controllers.ApiController{}, "GET:GetConnections")
-	beego.Router("/api/get-connection", &controllers.ApiController{}, "GET:GetConnection")
-	beego.Router("/api/update-connection", &controllers.ApiController{}, "POST:UpdateConnection")
-	beego.Router("/api/add-connection", &controllers.ApiController{}, "POST:AddConnection")
-	beego.Router("/api/delete-connection", &controllers.ApiController{}, "POST:DeleteConnection")
-	beego.Router("/api/start-connection", &controllers.ApiController{}, "POST:StartConnection")
-	beego.Router("/api/stop-connection", &controllers.ApiController{}, "POST:StopConnection")
 
 	beego.Router("/api/get-records", &controllers.ApiController{}, "GET:GetRecords")
 	beego.Router("/api/get-record", &controllers.ApiController{}, "GET:GetRecord")

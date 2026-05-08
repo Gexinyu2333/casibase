@@ -49,7 +49,6 @@ func main() {
 	object.InitCleanupChats()
 	object.InitStoreCount()
 	object.InitCommitRecordsTask()
-	object.InitScanJobProcessor()
 	object.InitMessageTransactionRetry()
 
 	beego.SetStaticPath("/swagger", "swagger")

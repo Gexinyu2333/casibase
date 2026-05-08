@@ -16,9 +16,7 @@ import React from "react";
 import ReactEcharts from "echarts-for-react";
 import i18next from "i18next";
 import * as Setting from "./Setting";
-import * as ScanBackend from "./backend/ScanBackend";
 import * as ProviderBackend from "./backend/ProviderBackend";
-import {ScanDetailPopover} from "./common/ScanDetailPopover";
 
 class GraphErrorBoundary extends React.Component {
   constructor(props) {
@@ -54,9 +52,6 @@ class GraphDataPage extends React.Component {
       errorText: "",
       renderError: "",
       selectedNode: null,
-      nodeScans: [],
-      loadingScans: false,
-      allScans: [],
       allProviders: [],
     };
     this.chartRef = React.createRef();
@@ -66,24 +61,8 @@ class GraphDataPage extends React.Component {
 
   componentDidMount() {
     this.loadGraphData();
-    this.loadAllScans();
     this.loadAllProviders();
   }
-
-  loadAllScans = async() => {
-    const category = this.props.category || "Default";
-    if (category === "Assets") {
-      try {
-        const owner = this.props.owner || this.props.account?.name || "admin";
-        const res = await ScanBackend.getScans(owner);
-        if (res.status === "ok") {
-          this.setState({allScans: res.data || []});
-        }
-      } catch (error) {
-        // Ignore errors
-      }
-    }
-  };
 
   loadAllProviders = async() => {
     const category = this.props.category || "Default";
@@ -98,13 +77,6 @@ class GraphDataPage extends React.Component {
         // Ignore errors
       }
     }
-  };
-
-  getProviderForScan = (scanProviderName) => {
-    if (!scanProviderName) {
-      return null;
-    }
-    return this.state.allProviders.find(provider => provider.name === scanProviderName);
   };
 
   componentDidUpdate(prevProps) {
@@ -412,19 +384,8 @@ class GraphDataPage extends React.Component {
     const echartNodes = processedNodes.map(node => {
       const sanitizedIcon = sanitizeIconUrl(node.icon);
       const isSelected = this.state.selectedNode && this.state.selectedNode.id === node.id;
-      const scanCount = node.assetName ? this.getScanCountForAsset(node.assetName) : 0;
       const nodeName = node.name || node.id;
-
-      // Create label with badge for scan count
-      let labelFormatter;
-      if (scanCount > 0) {
-        // Add badge indicator for nodes with scans - positioned next to name with spacing
-        labelFormatter = sanitizedIcon ?
-          `{name|${nodeName}} {badge|${scanCount}}` :
-          `${nodeName} {badge|${scanCount}}`;
-      } else {
-        labelFormatter = sanitizedIcon ? `{name|${nodeName}}` : nodeName;
-      }
+      const labelFormatter = sanitizedIcon ? `{name|${nodeName}}` : nodeName;
 
       return {
         id: node.id,
@@ -563,33 +524,9 @@ class GraphDataPage extends React.Component {
       if (node) {
         this.setState({
           selectedNode: node,
-          loadingScans: true,
-          nodeScans: [],
         });
-        // Load scans for this asset
-        this.loadNodeScans(node);
       }
     }
-  };
-
-  loadNodeScans = (node) => {
-    // Only load scans if this is an asset node
-    if (node.assetName) {
-      // Filter scans from cached data
-      const nodeScans = this.state.allScans.filter(scan => scan.asset === node.assetName);
-      this.setState({
-        nodeScans: nodeScans,
-        loadingScans: false,
-      });
-    } else {
-      this.setState({
-        loadingScans: false,
-      });
-    }
-  };
-
-  getScanCountForAsset = (assetName) => {
-    return this.state.allScans.filter(scan => scan.asset === assetName).length;
   };
 
   handleMouseOver = (params) => {
@@ -615,8 +552,6 @@ class GraphDataPage extends React.Component {
   handleClosePanel = () => {
     this.setState({
       selectedNode: null,
-      nodeScans: [],
-      loadingScans: false,
     });
   };
 
@@ -743,36 +678,6 @@ class GraphDataPage extends React.Component {
                 {selectedNode.properties.expireTime && (
                   <div style={{marginBottom: "4px"}}>
                     <strong>Expire Time:</strong> {selectedNode.properties.expireTime}
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-          {selectedNode.assetName && (
-            <div style={{marginTop: "16px", borderTop: "1px solid #e8e8e8", paddingTop: "12px"}}>
-              <strong style={{fontSize: "14px"}}>{i18next.t("scan:Related Scans")}:</strong>
-              <div style={{marginTop: "8px"}}>
-                {this.state.loadingScans ? (
-                  <div style={{textAlign: "center", padding: "20px", color: "#999"}}>
-                    {i18next.t("general:Loading")}...
-                  </div>
-                ) : this.state.nodeScans.length > 0 ? (
-                  <div style={{display: "flex", flexWrap: "wrap", gap: "4px"}}>
-                    {this.state.nodeScans.map((scan) => {
-                      const provider = this.getProviderForScan(scan.provider);
-                      return (
-                        <ScanDetailPopover
-                          key={scan.name}
-                          scan={scan}
-                          provider={provider}
-                          placement="left"
-                        />
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <div style={{textAlign: "center", padding: "20px", color: "#999"}}>
-                    {i18next.t("scan:No scans found")}
                   </div>
                 )}
               </div>

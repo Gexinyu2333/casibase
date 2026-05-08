@@ -289,11 +289,6 @@ func (a *Adapter) createTable() {
 		panic(err)
 	}
 
-	err = a.engine.Sync2(new(Node))
-	if err != nil {
-		panic(err)
-	}
-
 	err = a.engine.Sync2(new(Task))
 	if err != nil {
 		panic(err)
@@ -329,22 +324,12 @@ func (a *Adapter) createTable() {
 		panic(err)
 	}
 
-	err = a.engine.Sync2(new(Connection))
-	if err != nil {
-		panic(err)
-	}
-
 	err = a.engine.Sync2(new(Record))
 	if err != nil {
 		panic(err)
 	}
 
 	err = a.engine.Sync2(new(Graph))
-	if err != nil {
-		panic(err)
-	}
-
-	err = a.engine.Sync2(new(Scan))
 	if err != nil {
 		panic(err)
 	}

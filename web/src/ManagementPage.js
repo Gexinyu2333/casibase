@@ -23,12 +23,9 @@ import {
   BarsOutlined,
   BranchesOutlined,
   BulbOutlined,
-  CloudOutlined,
-  CloudServerOutlined,
   CommentOutlined,
   DashboardOutlined,
   DatabaseOutlined,
-  DesktopOutlined,
   DownOutlined,
   FolderOpenOutlined,
   FormOutlined,
@@ -48,7 +45,6 @@ import {
   ReadOutlined,
   RocketOutlined,
   SafetyOutlined,
-  ScanOutlined,
   SettingOutlined,
   ShareAltOutlined,
   TeamOutlined,
@@ -97,12 +93,7 @@ import MessageListPage from "./MessageListPage";
 import MessageEditPage from "./MessageEditPage";
 import GraphListPage from "./GraphListPage";
 import GraphEditPage from "./GraphEditPage";
-import NodeListPage from "./NodeListPage";
-import NodeEditPage from "./NodeEditPage";
-import ScanListPage from "./ScanListPage";
-import ScanEditPage from "./ScanEditPage";
 import SessionListPage from "./SessionListPage";
-import ConnectionListPage from "./ConnectionListPage";
 import RecordListPage from "./RecordListPage";
 import RecordEditPage from "./RecordEditPage";
 import WorkflowListPage from "./WorkflowListPage";
@@ -119,11 +110,8 @@ import ArticleEditPage from "./ArticleEditPage";
 import ChatPage from "./ChatPage";
 import UsagePage from "./UsagePage";
 import VisitorPage from "./VisitorPage";
-import NodeWorkbench from "./NodeWorkbench";
-import AccessPage from "./component/access/AccessPage";
 import AuditPage from "./frame/AuditPage";
 import SystemInfo from "./SystemInfo";
-import OsDesktop from "./OsDesktop";
 import ResourceListPage from "./ResourceListPage";
 import SiteListPage from "./SiteListPage";
 import SiteEditPage from "./SiteEditPage";
@@ -134,8 +122,7 @@ function getMenuParentKey(uri) {
   if (uri.includes("/chats") || uri.includes("/messages") || uri.includes("/stores")) {return "/basic";}
   if (uri.includes("/providers") || uri.includes("/tools") || uri.includes("/servers")) {return "/connectors";}
   if (uri.includes("/files") || uri.includes("/vectors") || uri.includes("/resources")) {return "/knowledge-base";}
-  if (uri.includes("/nodes") || uri.includes("/workbench") || uri.includes("/desktop") || uri.includes("/connections")) {return "/cloud";}
-  if (uri.includes("/videos") || uri.includes("/public-videos") || uri.includes("/tasks") || uri.includes("/scales") || uri.includes("/forms") || uri.includes("/workflows") || uri.includes("/audit") || uri.includes("/articles") || uri.includes("/graphs") || uri.includes("/scans")) {return "/multimedia";}
+  if (uri.includes("/videos") || uri.includes("/public-videos") || uri.includes("/tasks") || uri.includes("/scales") || uri.includes("/forms") || uri.includes("/workflows") || uri.includes("/audit") || uri.includes("/articles") || uri.includes("/graphs")) {return "/multimedia";}
   if (uri.includes("/sessions") || uri.includes("/records")) {return "/logs";}
   if (uri.includes("/users") || uri.includes("/casdoor-resources") || uri.includes("/permissions")) {return "/identity";}
   if (uri.includes("/sysinfo") || uri.includes("/swagger") || uri.includes("/visitors") || uri.includes("/sites") || uri.includes("/usages")) {return "/admin";}
@@ -439,8 +426,6 @@ function ManagementPage(props) {
     if (Conf.ShortcutPageItems.length > 0 && domain === "data") {
       res.push(Setting.getItem(<Link to="/stores">{i18next.t("general:Stores")}</Link>, "/stores", <AppstoreOutlined />));
       res.push(Setting.getItem(<Link to="/providers">{i18next.t("general:Providers")}</Link>, "/providers", <ThunderboltOutlined />));
-      res.push(Setting.getItem(<Link to="/nodes">{i18next.t("general:Nodes")}</Link>, "/nodes", <CloudServerOutlined />));
-      res.push(Setting.getItem(<Link to="/connections">{i18next.t("general:Connections")}</Link>, "/connections", <ApiOutlined />));
       res.push(Setting.getItem(<Link to="/sessions">{i18next.t("general:Sessions")}</Link>, "/sessions", <OrderedListOutlined />));
       res.push(Setting.getItem(<Link to="/records">{i18next.t("general:Logs")}</Link>, "/records", <DatabaseOutlined />));
     } else if (Conf.ShortcutPageItems.length > 0 && domain === "ai") {
@@ -540,13 +525,6 @@ function ManagementPage(props) {
         Setting.getItem(<Link to="/servers">{i18next.t("general:MCP Servers")}</Link>, "/servers", <ApiOutlined />),
       ]));
 
-      res.push(Setting.getItem(<Link style={{color: textColor}} to="/nodes">{i18next.t("general:Cloud")}</Link>, "/cloud", <CloudOutlined />, [
-        Setting.getItem(<Link to="/nodes">{i18next.t("general:Nodes")}</Link>, "/nodes", <CloudServerOutlined />),
-        Setting.getItem(<Link to="/connections">{i18next.t("general:Connections")}</Link>, "/connections", <ApiOutlined />),
-        Setting.getItem(<Link to="/workbench" target="_blank">{i18next.t("general:Workbench")}</Link>, "workbench", <ToolOutlined />),
-        Setting.getItem(<Link to="/desktop">{i18next.t("general:OS Desktop")}</Link>, "/desktop", <DesktopOutlined />),
-      ]));
-
       res.push(Setting.getItem(<Link style={{color: textColor}} to="/videos">{i18next.t("general:Multimedia")}</Link>, "/multimedia", <VideoCameraOutlined />, [
         Setting.getItem(<Link to="/videos">{i18next.t("general:Videos")}</Link>, "/videos", <VideoCameraOutlined />),
         Setting.getItem(<Link to="/public-videos">{i18next.t("general:Public Videos")}</Link>, "/public-videos", <PlaySquareOutlined />),
@@ -557,7 +535,6 @@ function ManagementPage(props) {
         Setting.getItem(<Link to="/audit">{i18next.t("general:Audit")}</Link>, "/audit", <AuditOutlined />),
         Setting.getItem(<Link to="/articles">{i18next.t("general:Articles")}</Link>, "/articles", <ReadOutlined />),
         Setting.getItem(<Link to="/graphs">{i18next.t("general:Graphs")}</Link>, "/graphs", <ShareAltOutlined />),
-        Setting.getItem(<Link to="/scans">{i18next.t("general:Scans")}</Link>, "/scans", <ScanOutlined />),
       ]));
 
       res.push(Setting.getItem(<Link style={{color: textColor}} to="/records">{i18next.t("general:Auditing Logs")}</Link>, "/logs", <WalletOutlined />, [
@@ -641,7 +618,6 @@ function ManagementPage(props) {
 
     return (
       <Switch>
-        <Route exact path="/access/:owner/:name" render={(props) => renderSigninIfNotSignedIn(<AccessPage account={account} {...props} />)} />
         <Route exact path="/callback" component={AuthCallback} />
         <Route exact path="/account" render={(props) => renderSigninIfNotSignedIn(Setting.isBasicLoginMode(account) ? <AccountPage account={account} {...props} /> : <Redirect to="/" />)} />
         <Route exact path="/signin" render={(props) => Setting.isAnonymousUser(account) ? <SigninPage logo={siderLogo} {...props} /> : renderHomeIfSignedIn(<SigninPage logo={siderLogo} {...props} />)} />
@@ -678,16 +654,9 @@ function ManagementPage(props) {
         <Route exact path="/sites" render={(props) => renderSigninIfNotSignedIn(<SiteListPage account={account} {...props} />)} />
         <Route exact path="/sites/:siteName" render={(props) => renderSigninIfNotSignedIn(<SiteEditPage account={account} {...props} />)} />
         <Route exact path="/visitors" render={(props) => renderSigninIfNotSignedIn(<VisitorPage account={account} themeAlgorithm={themeAlgorithm} {...props} />)} />
-        <Route exact path="/desktop" render={(props) => <OsDesktop account={account} {...props} />} />
-        <Route exact path="/nodes" render={(props) => renderSigninIfNotSignedIn(<NodeListPage account={account} {...props} />)} />
-        <Route exact path="/nodes/:nodeName" render={(props) => renderSigninIfNotSignedIn(<NodeEditPage account={account} {...props} />)} />
         <Route exact path="/sessions" render={(props) => renderSigninIfNotSignedIn(<SessionListPage account={account} {...props} />)} />
-        <Route exact path="/connections" render={(props) => renderSigninIfNotSignedIn(<ConnectionListPage account={account} {...props} />)} />
         <Route exact path="/records" render={(props) => renderSigninIfNotSignedIn(<RecordListPage account={account} {...props} />)} />
         <Route exact path="/records/:organizationName/:recordName" render={(props) => renderSigninIfNotSignedIn(<RecordEditPage account={account} {...props} />)} />
-        <Route exact path="/workbench" render={(props) => renderSigninIfNotSignedIn(<NodeWorkbench account={account} {...props} />)} />
-        <Route exact path="/scans" render={(props) => renderSigninIfNotSignedIn(<ScanListPage account={account} {...props} />)} />
-        <Route exact path="/scans/:scanName" render={(props) => renderSigninIfNotSignedIn(<ScanEditPage account={account} {...props} />)} />
         <Route exact path="/workflows" render={(props) => renderSigninIfNotSignedIn(<WorkflowListPage account={account} {...props} />)} />
         <Route exact path="/workflows/:workflowName" render={(props) => renderSigninIfNotSignedIn(<WorkflowEditPage account={account} {...props} />)} />
         <Route exact path="/audit" render={(props) => renderSigninIfNotSignedIn(<AuditPage account={account} {...props} />)} />
@@ -719,7 +688,7 @@ function ManagementPage(props) {
     if (!u) {
       return false;
     }
-    const hiddenPaths = ["/workbench", "/access"];
+    const hiddenPaths = ["/access"];
     for (const path of hiddenPaths) {
       if (u.startsWith(path)) {
         return true;

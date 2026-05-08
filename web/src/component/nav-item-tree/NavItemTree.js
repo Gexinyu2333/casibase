@@ -50,24 +50,6 @@ export const NavItemTree = ({disabled, checkedKeys, defaultExpandedKeys, onCheck
           ],
         },
         {
-          title: i18next.t("general:Cloud"),
-          key: "/cloud",
-          children: [
-            {title: i18next.t("general:Templates"), key: "/templates"},
-            {title: i18next.t("general:Application Store"), key: "/application-store"},
-            {title: i18next.t("general:Applications"), key: "/applications"},
-            {title: i18next.t("general:Nodes"), key: "/nodes"},
-            {title: i18next.t("general:Connections"), key: "/connections"},
-            {title: i18next.t("general:Machines"), key: "/machines"},
-            {title: i18next.t("general:Assets"), key: "/assets"},
-            {title: i18next.t("general:Images"), key: "/images"},
-            {title: i18next.t("general:Containers"), key: "/containers"},
-            {title: i18next.t("general:Pods"), key: "/pods"},
-            {title: i18next.t("general:Workbench"), key: "workbench"},
-            {title: i18next.t("general:OS Desktop"), key: "/desktop"},
-          ],
-        },
-        {
           title: i18next.t("general:Multimedia"),
           key: "/multimedia",
           children: [
@@ -80,7 +62,6 @@ export const NavItemTree = ({disabled, checkedKeys, defaultExpandedKeys, onCheck
             {title: i18next.t("general:Audit"), key: "/audit"},
             {title: i18next.t("general:Articles"), key: "/articles"},
             {title: i18next.t("general:Graphs"), key: "/graphs"},
-            {title: i18next.t("general:Scans"), key: "/scans"},
           ],
         },
         {
