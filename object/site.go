@@ -29,8 +29,9 @@ type Site struct {
 	HtmlTitle  string   `xorm:"varchar(100)" json:"htmlTitle"`
 	FaviconUrl string   `xorm:"varchar(200)" json:"faviconUrl"`
 	LogoUrl    string   `xorm:"varchar(200)" json:"logoUrl"`
-	FooterHtml string   `xorm:"mediumtext" json:"footerHtml"`
-	NavItems   []string `xorm:"text" json:"navItems"`
+	FooterHtml        string   `xorm:"mediumtext" json:"footerHtml"`
+	NavItems          []string `xorm:"text" json:"navItems"`
+	CheckUserBalance  bool     `xorm:"bool" json:"checkUserBalance"`
 }
 
 func GetGlobalSites() ([]*Site, error) {

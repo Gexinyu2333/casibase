@@ -14,7 +14,7 @@
 
 import React from "react";
 import Loading from "./common/Loading";
-import {Button, Card, Col, Image, Input, Popover, Row, Space, Upload} from "antd";
+import {Button, Card, Col, Image, Input, Popover, Row, Space, Switch, Upload} from "antd";
 import * as SiteBackend from "./backend/SiteBackend";
 import * as ResourceBackend from "./backend/ResourceBackend";
 import * as Setting from "./Setting";
@@ -237,6 +237,16 @@ class SiteEditPage extends React.Component {
                 this.updateSiteField("navItems", checked);
               }}
             />
+          </Col>
+        </Row>
+        <Row style={{marginTop: "20px"}} >
+          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
+            {Setting.getLabel(i18next.t("site:Check user balance"), i18next.t("site:Check user balance - Tooltip"))} :
+          </Col>
+          <Col span={22} >
+            <Switch checked={this.state.site.checkUserBalance} onChange={checked => {
+              this.updateSiteField("checkUserBalance", checked);
+            }} />
           </Col>
         </Row>
       </Card>

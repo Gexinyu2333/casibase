@@ -648,6 +648,8 @@
     "This tool takes no arguments": "This tool takes no arguments"
   },
   "site": {
+    "Check user balance": "检查用户余额",
+    "Check user balance - Tooltip": "开启后，系统在处理每个AI请求前会检查用户是否有足够的余额。内网部署无需计费时可关闭此选项。",
     "Edit Site": "Edit Site"
   },
   "skill": {

@@ -648,6 +648,8 @@
     "This tool takes no arguments": "This tool takes no arguments"
   },
   "site": {
+    "Check user balance": "Check user balance",
+    "Check user balance - Tooltip": "When enabled, the system checks whether the user has sufficient balance before processing each AI request. Disable this for internal deployments where billing is not required.",
     "Edit Site": "Edit Site"
   },
   "skill": {

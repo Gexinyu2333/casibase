@@ -61,6 +61,11 @@ func ValidateTransactionForMessage(message *Message) error {
 		return nil
 	}
 
+	site, err := GetBuiltInSite()
+	if err != nil || site == nil || !site.CheckUserBalance {
+		return nil
+	}
+
 	// Only validate transaction if message has a price
 	if message.Price <= 0 {
 		return nil
@@ -70,7 +75,7 @@ func ValidateTransactionForMessage(message *Message) error {
 	transaction := createTransactionFromMessage(message)
 
 	// Validate transaction via Casdoor SDK with dry run mode
-	_, _, err := auth.AddTransactionWithDryRun(transaction, true)
+	_, _, err = auth.AddTransactionWithDryRun(transaction, true)
 	if err != nil {
 		return fmt.Errorf("failed to validate transaction: %s", err.Error())
 	}
