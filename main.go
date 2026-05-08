@@ -23,6 +23,7 @@ import (
 	"github.com/beego/beego"
 	"github.com/beego/beego/logs"
 	_ "github.com/beego/beego/session/redis"
+	"github.com/the-open-agent/openagent/authz"
 	"github.com/the-open-agent/openagent/conf"
 	"github.com/the-open-agent/openagent/internal/cli"
 	"github.com/the-open-agent/openagent/object"
@@ -42,6 +43,7 @@ func main() {
 	object.CreateTables()
 
 	object.InitDb()
+	authz.InitEnforcer()
 	proxy.InitHttpClient()
 	util.InitMaxmindFiles()
 	util.InitIpDb()

@@ -19,6 +19,7 @@ require (
 	github.com/baidubce/bce-qianfan-sdk/go/qianfan v0.0.14
 	github.com/beego/beego v1.12.12
 	github.com/carmel/gooxml v0.0.0-20220216072414-40ff56130850
+	github.com/casbin/casbin/v2 v2.135.0
 	github.com/casdoor/casdoor-go-sdk v1.44.0
 	github.com/casibase/dashscope-go-sdk v0.0.2
 	github.com/casibase/dashscopego v0.6.0
@@ -44,6 +45,7 @@ require (
 	github.com/pkoukk/tiktoken-go v0.1.7
 	github.com/prometheus/client_golang v1.15.0
 	github.com/prometheus/client_model v0.3.0
+	github.com/qiangmzsx/string-adapter/v2 v2.2.0
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/sashabaranov/go-openai v1.32.0
 	github.com/schollz/progressbar/v3 v3.18.0
@@ -75,6 +77,8 @@ require (
 	github.com/alibabacloud-go/tea-xml v1.1.3 // indirect
 	github.com/aliyun/credentials-go v1.4.5 // indirect
 	github.com/bits-and-blooms/bitset v1.20.0 // indirect
+	github.com/bmatcuk/doublestar/v4 v4.6.1 // indirect
+	github.com/casbin/govaluate v1.3.0 // indirect
 	github.com/chromedp/sysutil v1.0.0 // indirect
 	github.com/clbanning/mxj/v2 v2.7.0 // indirect
 	github.com/consensys/gnark-crypto v0.18.0 // indirect

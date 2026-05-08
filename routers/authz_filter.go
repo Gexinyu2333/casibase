@@ -18,6 +18,7 @@ import (
 	"strings"
 
 	"github.com/beego/beego/context"
+	"github.com/the-open-agent/openagent/authz"
 	"github.com/the-open-agent/openagent/conf"
 	"github.com/the-open-agent/openagent/controllers"
 	"github.com/the-open-agent/openagent/util"
@@ -53,58 +54,38 @@ func isAllowedInDemoMode(method string, urlPath string) bool {
 }
 
 func permissionFilter(ctx *context.Context) {
-	path := ctx.Request.URL.Path
-	controllerName := strings.TrimPrefix(path, "/api/")
+	urlPath := ctx.Request.URL.Path
+	method := ctx.Request.Method
 
-	if !strings.HasPrefix(path, "/api/") {
+	if !strings.HasPrefix(urlPath, "/api/") {
 		return
 	}
 
-	exemptedPaths := []string{
-		// Auth endpoints — must remain public
-		"signin", "signout", "health",
-		// Local Chrome extension browser bridge
-		"chrome-connect",
-		// Get paths accessible to regular users
-		"get-account", "get-signin-options", "get-chats", "get-forms", "get-global-videos", "get-videos", "get-video", "get-messages",
-		"delete-welcome-message", "get-message-answer", "get-answer",
-		"get-storage-providers", "get-store", "get-providers", "get-global-stores",
-		"get-chat", "get-message",
-		"get-tasks", "get-task", "get-public-scales",
-		// Mutation paths accessible to regular users
-		"update-chat", "add-chat", "delete-chat", "update-message", "add-message",
-		"update-task", "add-task", "delete-task", "upload-task-document",
-		// Action paths accessible to regular users
-		"start-connection", "stop-connection",
-		"commit-record", "commit-record-second",
-		"query-record", "query-record-second",
-		"generate-text-to-speech-audio", "generate-text-to-speech-audio-stream",
-		"process-speech-to-text",
-		"analyze-task",
-		"claim-store",
-		"is-session-duplicated",
-	}
+	controllerName := strings.TrimPrefix(urlPath, "/api/")
 
-	for _, exemptPath := range exemptedPaths {
-		if controllerName == exemptPath {
-			return
-		}
-	}
-
-	// Webhook callbacks must remain publicly accessible for external services
+	// Webhook callbacks use their own auth mechanism
 	if strings.HasPrefix(controllerName, "wecom-bot/callback/") {
 		return
 	}
 
-	// chat/completions uses its own Bearer token auth, not session-based admin check
+	// OpenAI-compatible endpoint uses Bearer token auth
 	if controllerName == "chat/completions" {
 		return
 	}
 
 	user := GetSessionUser(ctx)
 
-	if !util.IsAdmin(user) {
+	var role string
+	switch {
+	case util.IsAdmin(user):
+		role = "admin"
+	case user != nil:
+		role = "user"
+	default:
+		role = "anonymous"
+	}
+
+	if !authz.IsAllowed(role, method, urlPath) {
 		responseError(ctx, "auth:this operation requires admin privilege")
-		return
 	}
 }
