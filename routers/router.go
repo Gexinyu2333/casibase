@@ -155,7 +155,6 @@ func initAPI() {
 	beego.Router("/api/add-graph", &controllers.ApiController{}, "POST:AddGraph")
 	beego.Router("/api/delete-graph", &controllers.ApiController{}, "POST:DeleteGraph")
 
-
 	beego.Router("/api/get-usages", &controllers.ApiController{}, "GET:GetUsages")
 	beego.Router("/api/get-range-usages", &controllers.ApiController{}, "GET:GetRangeUsages")
 	beego.Router("/api/get-users", &controllers.ApiController{}, "GET:GetUsers")
@@ -227,14 +226,12 @@ func initAPI() {
 	beego.Router("/api/add-permission", &controllers.ApiController{}, "POST:AddPermission")
 	beego.Router("/api/delete-permission", &controllers.ApiController{}, "POST:DeletePermission")
 
-
 	beego.Router("/api/get-sessions", &controllers.ApiController{}, "GET:GetSessions")
 	beego.Router("/api/get-session", &controllers.ApiController{}, "GET:GetSession")
 	beego.Router("/api/update-session", &controllers.ApiController{}, "POST:UpdateSession")
 	beego.Router("/api/add-session", &controllers.ApiController{}, "POST:AddSession")
 	beego.Router("/api/delete-session", &controllers.ApiController{}, "POST:DeleteSession")
 	beego.Router("/api/is-session-duplicated", &controllers.ApiController{}, "GET:IsSessionDuplicated")
-
 
 	beego.Router("/api/get-records", &controllers.ApiController{}, "GET:GetRecords")
 	beego.Router("/api/get-record", &controllers.ApiController{}, "GET:GetRecord")

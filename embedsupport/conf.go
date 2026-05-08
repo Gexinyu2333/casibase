@@ -51,7 +51,7 @@ func setupConf(confFS fs.FS) {
 	}
 
 	tmpConf := filepath.Join(tmpDir, "app.conf")
-	if err = os.WriteFile(tmpConf, data, 0600); err != nil {
+	if err = os.WriteFile(tmpConf, data, 0o600); err != nil {
 		fmt.Printf("embedsupport: cannot write temp conf: %v\n", err)
 		return
 	}

@@ -109,7 +109,6 @@ func SetDefaultVodClient(lang string) error {
 	return err
 }
 
-
 func GetActiveBlockchainProvider(owner string) (*Provider, error) {
 	providers, err := GetProviders(owner)
 	if err != nil {
