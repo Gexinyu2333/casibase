@@ -344,7 +344,7 @@ class StoreListPage extends BaseListPage {
         },
       },
       {
-        title: i18next.t("store:Message count"),
+        title: i18next.t("chat:Message count"),
         dataIndex: "messageCount",
         key: "messageCount",
         width: "140px",

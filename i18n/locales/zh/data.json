@@ -94,9 +94,6 @@
     "Target user not found": "目标用户不存在",
     "The task does not exist": "任务不存在"
   },
-  "message_answer": {
-    "object.GetNearestKnowledge() error, %s": "object.GetNearestKnowledge() 错误，%s"
-  },
   "model": {
     "QueryText() error: unknown model type: %s": "QueryText() 错误：未知模型类型：%s",
     "The token count: [%d] exceeds the model: [%s]'s maximum token count: [%d]": "标记（token）数量：[%d] 超过模型：[%s] 的最大标记数量：[%d]",
@@ -115,7 +112,6 @@
     "writer does not implement http.Flusher": "写入器（writer）未实现 http.Flusher 接口"
   },
   "object": {
-    "Cannot generate word cloud, the dict file: [%s] does not exist": "无法生成词云，词典文件：[%s] 不存在",
     "Casdoor application: [%s] doesn't exist": "Casdoor 应用：[%s] 不存在",
     "Casdoor organization: [%s] doesn't exist": "Casdoor 组织：[%s] 不存在",
     "Casdoor user: [%s] doesn't exist": "Casdoor user: [%s] doesn't exist",
@@ -127,7 +123,6 @@
     "Server URL is empty": "Server URL is empty",
     "The MCP server: %s is not found": "The MCP server: %s is not found",
     "The chat: %s is not found": "聊天：%s 未找到",
-    "The default video provider should not be empty": "默认视频提供商不能为空",
     "The embedding provider for store: %s is not found": "存储 %s 的嵌入提供商未找到",
     "The embedding provider: %s is expected to be ": "The embedding provider: %s is expected to be ",
     "The embedding provider: %s is not found": "嵌入提供商：%s 未找到",
@@ -160,10 +155,10 @@
     "the STT provider type: %s is not supported": "不支持的 STT 提供商类型：%s",
     "the TTS provider type: %s is not supported": "不支持的 TTS 提供商类型：%s",
     "the blockchain provider: %s is not found": "区块链提供商：%s 未找到",
-    "the pipe type: %s is not supported": "不支持的管道类型：%s",
     "the embedding provider type: %s is not supported": "不支持的嵌入提供商类型：%s",
     "the form: %s is not found": "表单：%s 未找到",
     "the model provider type: %s is not supported": "不支持的模型提供商类型：%s",
+    "the pipe type: %s is not supported": "不支持的管道类型：%s",
     "the record: %s does not exist": "记录：%s 不存在",
     "the record: %s has already been committed, blockId = %s": "记录：%s 已提交，blockId = %s",
     "the record: %s's block ID should not be empty": "记录：%s 的区块 ID 不能为空",
@@ -209,9 +204,5 @@
     "GetTextFromMarkitdown() error, markitdown does not exist": "GetTextFromMarkitdown() 错误，markitdown 不存在",
     "GetTextFromMarkitdown() error, markitdown failed to run: %v: %s": "GetTextFromMarkitdown() 错误，markitdown 运行失败：%v：%s",
     "unsupported file type: %s": "不支持的文件类型：%s"
-  },
-  "video": {
-    "The video can only be updated when there are no remarks and the state is \"Draft\"": "只有在没有备注且状态为\"草稿\"时才能更新视频",
-    "UploadVideo() error, videoId should not be empty": "UploadVideo() error, videoId 不应为空"
   }
 }

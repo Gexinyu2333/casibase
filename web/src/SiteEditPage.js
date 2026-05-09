@@ -330,14 +330,14 @@ class SiteEditPage extends React.Component {
               12
             )}
             {this.renderSiteField(
-              Setting.getLabel(i18next.t("site:Client ID"), i18next.t("site:Client ID - Tooltip")),
+              Setting.getLabel(i18next.t("provider:Client ID"), i18next.t("provider:Client ID - Tooltip")),
               <Input value={site.clientId} onChange={e => {
                 this.updateSiteField("clientId", e.target.value);
               }} />,
               6
             )}
             {this.renderSiteField(
-              Setting.getLabel(i18next.t("site:Client secret"), i18next.t("site:Client secret - Tooltip")),
+              Setting.getLabel(i18next.t("provider:Client secret"), i18next.t("provider:Client secret - Tooltip")),
               <Input.Password
                 value={site.clientSecret}
                 iconRender={visible => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}

@@ -2693,7 +2693,7 @@ export function getFormTypeItems(formType) {
       {name: "displayName", label: "general:Display name", visible: true},
       {name: "isDefault", label: "store:Is default", visible: true, width: "120"},
       {name: "chatCount", label: "store:Chat count", visible: true, width: "150"},
-      {name: "messageCount", label: "store:Message count", visible: true, width: "150"},
+      {name: "messageCount", label: "chat:Message count", visible: true, width: "150"},
       {name: "vectorCount", label: "store:Vector count", visible: true, width: "150"},
       {name: "storageProvider", label: "store:Storage provider", visible: true, width: "250"},
       // { name: "splitProvider", label: "store:Split provider", visible: false, width: "200" },
