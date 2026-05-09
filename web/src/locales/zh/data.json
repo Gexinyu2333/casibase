@@ -581,14 +581,6 @@
     "Format": "格式",
     "Upload a file...": "上传文件..."
   },
-  "scan": {
-    "Error - Tooltip": "扫描或补丁步骤失败时返回的错误信息或代码",
-    "Latency": "延迟",
-    "Result summary": "结果摘要",
-    "Result summary - Tooltip": "扫描或补丁结果的简短文字摘要",
-    "Runner": "执行器",
-    "Runner - Tooltip": "执行本次扫描的组件、代理或任务名称"
-  },
   "server": {
     "Access token": "访问令牌",
     "Access token - Tooltip": "用于认证此MCP服务器请求的令牌。",

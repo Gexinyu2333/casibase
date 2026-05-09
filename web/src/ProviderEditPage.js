@@ -169,9 +169,6 @@ class ProviderEditPage extends React.Component {
   }
 
   shouldShowClientIdInput(provider) {
-    if (provider.category === "Scan") {
-      return false;
-    }
     return (
       ((provider.category === "Embedding" && provider.type === "Baidu Cloud") ||
         (provider.category === "Embedding" && provider.type === "Tencent Cloud") ||
@@ -186,7 +183,6 @@ class ProviderEditPage extends React.Component {
     return !(
       (provider.category === "Storage" && provider.type !== "OpenAI File System") ||
       (provider.category === "Blockchain" && provider.type === "ChainMaker") ||
-      provider.category === "Scan" ||
       provider.type === "Dummy" ||
       provider.type === "Ollama"
     );
@@ -388,9 +384,6 @@ class ProviderEditPage extends React.Component {
                   this.updateProviderField("subType", "paraformer-realtime-v1");
                 } else if (value === "Chat") {
                   this.updateProviderField("type", "Telegram");
-                } else if (value === "Scan") {
-                  this.updateProviderField("type", "Nmap");
-                  this.updateProviderField("subType", "Default");
                 }
               })}>
                 {
@@ -403,7 +396,6 @@ class ProviderEditPage extends React.Component {
                     {id: "Text-to-Speech", name: "Text-to-Speech"},
                     {id: "Speech-to-Text", name: "Speech-to-Text"},
                     {id: "Chat", name: "Chat"},
-                    {id: "Scan", name: "Scan"},
                   ].map((item, index) => <Option key={index} value={item.id}>{item.name}</Option>)
                 }
               </Select>
@@ -778,7 +770,7 @@ class ProviderEditPage extends React.Component {
             ) : null
           }
           {
-            ["Storage", "Model", "Embedding", "Text-to-Speech", "Speech-to-Text", "Scan"].includes(this.state.provider.category) || (this.state.provider.category === "Blockchain" && this.state.provider.type === "Ethereum") ? null : (
+            ["Storage", "Model", "Embedding", "Text-to-Speech", "Speech-to-Text"].includes(this.state.provider.category) || (this.state.provider.category === "Blockchain" && this.state.provider.type === "Ethereum") ? null : (
               <Row style={{marginTop: "20px"}} >
                 <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
                   {this.getRegionLabel(this.state.provider)}
@@ -1236,36 +1228,6 @@ class ProviderEditPage extends React.Component {
                 </Button>
               </Col>
             </Row>
-          ) : null
-        }
-        {
-          this.state.provider.category === "Scan" ? (
-            <>
-              <Row style={{marginTop: "20px"}} >
-                <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-                  {Setting.getLabel(i18next.t("scan:Result summary"), i18next.t("scan:Result summary - Tooltip"))}
-                </Col>
-                <Col span={22} >
-                  <Input value={this.state.provider.resultSummary} disabled />
-                </Col>
-              </Row>
-              <Row style={{marginTop: "20px"}} >
-                <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-                  {Setting.getLabel(i18next.t("scan:Runner"), i18next.t("scan:Runner - Tooltip"))}
-                </Col>
-                <Col span={22} >
-                  <Input value={this.state.provider.runner} disabled />
-                </Col>
-              </Row>
-              <Row style={{marginTop: "20px"}} >
-                <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-                  {Setting.getLabel(i18next.t("general:Error"), i18next.t("scan:Error - Tooltip"))}
-                </Col>
-                <Col span={22} >
-                  <Input.TextArea value={this.state.provider.errorText} disabled rows={4} />
-                </Col>
-              </Row>
-            </>
           ) : null
         }
         {

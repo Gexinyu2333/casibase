@@ -1160,33 +1160,6 @@ export function getOtherProviderInfo() {
         url: "https://discord.com/",
       },
     },
-    "Scan": {
-      "Nmap": {
-        logo: `${StaticBaseUrl}/img/social_nmap.png`,
-        url: "https://nmap.org/",
-      },
-      "OS Patch": {
-        // Note: social_windows.png should be added to the img/ directory
-        logo: `${StaticBaseUrl}/img/social_windows.png`,
-        url: "https://learn.microsoft.com/en-us/windows/deployment/update/",
-      },
-      "Nuclei": {
-        logo: `${StaticBaseUrl}/img/social_nuclei.png`,
-        url: "https://github.com/projectdiscovery/nuclei",
-      },
-      "ZAP": {
-        logo: `${StaticBaseUrl}/img/social_zap.png`,
-        url: "https://github.com/zaproxy/zaproxy",
-      },
-      "Subfinder": {
-        logo: `${StaticBaseUrl}/img/social_subfinder.png`,
-        url: "https://github.com/projectdiscovery/subfinder",
-      },
-      "httpx": {
-        logo: `${StaticBaseUrl}/img/social_httpx.png`,
-        url: "https://github.com/projectdiscovery/httpx",
-      },
-    },
   };
 
   return res;
@@ -1424,15 +1397,6 @@ export function getProviderTypeOptions(category) {
     return [
       {id: "Telegram", name: "Telegram"},
       {id: "Discord", name: "Discord"},
-    ];
-  } else if (category === "Scan") {
-    return [
-      {id: "Nmap", name: "Nmap"},
-      {id: "OS Patch", name: "OS Patch"},
-      {id: "Nuclei", name: "Nuclei"},
-      {id: "ZAP", name: "ZAP"},
-      {id: "Subfinder", name: "Subfinder"},
-      {id: "httpx", name: "httpx"},
     ];
   } else {
     return [];

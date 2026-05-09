@@ -23,7 +23,6 @@ import (
 	"github.com/the-open-agent/openagent/embedding"
 	"github.com/the-open-agent/openagent/i18n"
 	"github.com/the-open-agent/openagent/model"
-	"github.com/the-open-agent/openagent/scan"
 	"github.com/the-open-agent/openagent/storage"
 	"github.com/the-open-agent/openagent/stt"
 	"github.com/the-open-agent/openagent/tts"
@@ -53,7 +52,7 @@ type Provider struct {
 	Domain             string `xorm:"varchar(200)" json:"domain"`
 	Text               string `xorm:"mediumtext" json:"text"`
 	ConfigText         string `xorm:"mediumtext" json:"configText"`
-	RawText            string `xorm:"mediumtext" json:"rawText"` // Raw result from scan (for Scan category providers)
+	RawText            string `xorm:"mediumtext" json:"rawText"`
 
 	EnableThinking   bool    `json:"enableThinking"`
 	Temperature      float32 `xorm:"float" json:"temperature"`
@@ -76,13 +75,6 @@ type Provider struct {
 	Chain          string `xorm:"varchar(100)" json:"chain"`
 	TestContent    string `xorm:"varchar(500)" json:"testContent"`
 	ModelProvider  string `xorm:"varchar(100)" json:"modelProvider"`
-
-	// New fields for unified scan widget (for Scan category providers)
-	TargetMode    string `xorm:"varchar(100)" json:"targetMode"`    // "Manual Input"
-	Target        string `xorm:"varchar(500)" json:"target"`        // Manual input target (IP address or network range)
-	Runner        string `xorm:"varchar(100)" json:"runner"`        // Hostname about who runs the scan job
-	ErrorText     string `xorm:"mediumtext" json:"errorText"`       // Error message for the job execution
-	ResultSummary string `xorm:"varchar(500)" json:"resultSummary"` // Short summary of scan results
 
 	EnableProxy bool   `json:"enableProxy"`
 	IsDefault   bool   `json:"isDefault"`
@@ -391,19 +383,6 @@ func (p *Provider) GetChatProvider(lang string) (chat.ChatProvider, error) {
 
 	if pProvider == nil {
 		return nil, fmt.Errorf(i18n.Translate(lang, "object:the chat provider type: %s is not supported"), p.Type)
-	}
-
-	return pProvider, nil
-}
-
-func (p *Provider) GetScanProvider(lang string) (scan.ScanProvider, error) {
-	pProvider, err := scan.GetScanProvider(p.Type, p.ClientId, lang)
-	if err != nil {
-		return nil, err
-	}
-
-	if pProvider == nil {
-		return nil, fmt.Errorf(i18n.Translate(lang, "object:the scan provider type: %s is not supported"), p.Type)
 	}
 
 	return pProvider, nil

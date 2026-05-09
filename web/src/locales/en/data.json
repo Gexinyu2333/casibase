@@ -581,14 +581,6 @@
     "Format": "Format",
     "Upload a file...": "Upload a file..."
   },
-  "scan": {
-    "Error - Tooltip": "Error message or code returned when the scan or patch step failed.",
-    "Latency": "Latency",
-    "Result summary": "Result summary",
-    "Result summary - Tooltip": "Short human-readable summary of scan or patch results.",
-    "Runner": "Runner",
-    "Runner - Tooltip": "Component, agent, or job name that executed this scan."
-  },
   "server": {
     "Access token": "Access token",
     "Access token - Tooltip": "Token used to authenticate requests to this MCP server.",

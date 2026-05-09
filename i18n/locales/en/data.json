@@ -167,7 +167,6 @@
     "the record: %s does not exist": "the record: %s does not exist",
     "the record: %s has already been committed, blockId = %s": "the record: %s has already been committed, blockId = %s",
     "the record: %s's block ID should not be empty": "the record: %s's block ID should not be empty",
-    "the scan provider type: %s is not supported": "the scan provider type: %s is not supported",
     "the storage provider type: %s is not supported": "the storage provider type: %s is not supported",
     "there is no active blockchain provider": "there is no active blockchain provider",
     "tool test JSON must include non-empty \"tool\"": "tool test JSON must include non-empty \"tool\""
