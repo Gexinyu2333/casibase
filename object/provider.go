@@ -310,7 +310,7 @@ func (provider *Provider) GetId() string {
 }
 
 func (p *Provider) GetStorageProviderObj(vectorStoreId string, lang string) (storage.StorageProvider, error) {
-	pProvider, err := storage.GetStorageProvider(p.Type, p.ClientId, p.ClientSecret, p.Name, vectorStoreId, lang)
+	pProvider, err := storage.GetStorageProvider(p.Type, p.ClientId, p.ClientSecret, p.Region, p.Domain, p.ProviderUrl, p.Name, vectorStoreId, lang)
 	if err != nil {
 		return nil, err
 	}

@@ -1023,7 +1023,7 @@ export function getOtherProviderInfo() {
         logo: "https://min.io/resources/img/logo.svg",
         url: "https://min.io/",
       },
-      "Aliyun OSS": {
+      "Alibaba Cloud OSS": {
         logo: `${StaticBaseUrl}/img/social_aliyun.png`,
         url: "https://aliyun.com/product/oss",
       },
@@ -1301,6 +1301,7 @@ export function getProviderTypeOptions(category) {
     return (
       [
         {id: "Local File System", name: "Local File System"},
+        {id: "Alibaba Cloud OSS", name: "Alibaba Cloud OSS"},
       ]
     );
   } else if (category === "Model") {

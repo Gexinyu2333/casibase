@@ -72,6 +72,9 @@ class ProviderEditPage extends React.Component {
       }
     }
     if (provider.category === "Storage") {
+      if (provider.type === "Alibaba Cloud OSS") {
+        return Setting.getLabel(i18next.t("provider:Client ID"), i18next.t("provider:Client ID - Tooltip"));
+      }
       return Setting.getLabel(i18next.t("store:Storage subpath"), i18next.t("store:Storage subpath - Tooltip"));
     }
     return Setting.getLabel(i18next.t("provider:Client ID"), i18next.t("provider:Client ID - Tooltip"));
@@ -145,7 +148,7 @@ class ProviderEditPage extends React.Component {
 
   shouldShowClientSecretInput(provider) {
     return !(
-      provider.category === "Storage" ||
+      (provider.category === "Storage" && provider.type !== "Alibaba Cloud OSS") ||
       (provider.category === "Blockchain" && provider.type === "ChainMaker") ||
       provider.type === "Dummy" ||
       provider.type === "Ollama"
@@ -710,6 +713,42 @@ class ProviderEditPage extends React.Component {
             ) : null
           }
           {
+            (this.state.provider.category === "Storage" && this.state.provider.type === "Alibaba Cloud OSS") ? (
+              <>
+                <Row style={{marginTop: "20px"}} >
+                  <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
+                    {Setting.getLabel(i18next.t("general:Region"), i18next.t("general:Region - Tooltip"))}
+                  </Col>
+                  <Col span={22} >
+                    <Input disabled={isRemote} value={this.state.provider.region} onChange={e => {
+                      this.updateProviderField("region", e.target.value);
+                    }} />
+                  </Col>
+                </Row>
+                <Row style={{marginTop: "20px"}} >
+                  <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
+                    {Setting.getLabel(i18next.t("provider:Bucket"), i18next.t("provider:Bucket - Tooltip"))}
+                  </Col>
+                  <Col span={22} >
+                    <Input disabled={isRemote} value={this.state.provider.domain} onChange={e => {
+                      this.updateProviderField("domain", e.target.value);
+                    }} />
+                  </Col>
+                </Row>
+                <Row style={{marginTop: "20px"}} >
+                  <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
+                    {Setting.getLabel(i18next.t("provider:Endpoint"), i18next.t("provider:Endpoint - Tooltip"))}
+                  </Col>
+                  <Col span={22} >
+                    <Input disabled={isRemote} value={this.state.provider.providerUrl} onChange={e => {
+                      this.updateProviderField("providerUrl", e.target.value);
+                    }} />
+                  </Col>
+                </Row>
+              </>
+            ) : null
+          }
+          {
             ["Storage", "Model", "Embedding", "Text-to-Speech", "Speech-to-Text"].includes(this.state.provider.category) || (this.state.provider.category === "Blockchain" && this.state.provider.type === "Ethereum") ? null : (
               <Row style={{marginTop: "20px"}} >
                 <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
@@ -1143,7 +1182,7 @@ class ProviderEditPage extends React.Component {
           />
         </Card>
         {
-          (this.state.provider.category !== "Model" || this.modelCategoryShowsProviderUrlInput(this.state.provider.type)) ? (
+          (this.state.provider.category !== "Model" || this.modelCategoryShowsProviderUrlInput(this.state.provider.type)) && !(this.state.provider.category === "Storage" && this.state.provider.type === "Alibaba Cloud OSS") ? (
             <Row style={{marginTop: "20px"}} >
               <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
                 {this.getProviderUrlLabel(this.state.provider)}
