@@ -58,11 +58,6 @@ func permissionFilter(ctx *context.Context) {
 
 	controllerName := strings.TrimPrefix(urlPath, "/api/")
 
-	// Webhook callbacks use their own auth mechanism
-	if strings.HasPrefix(controllerName, "wecom-bot/callback/") {
-		return
-	}
-
 	// OpenAI-compatible endpoint uses Bearer token auth
 	if controllerName == "chat/completions" {
 		return

@@ -100,11 +100,6 @@ class ProviderEditPage extends React.Component {
     if (provider.category === "Storage") {
       return Setting.getLabel(i18next.t("store:Storage subpath"), i18next.t("store:Storage subpath - Tooltip"));
     }
-    if (provider.category === "Bot") {
-      if (provider.type === "Tencent") {
-        return Setting.getLabel(i18next.t("provider:Bot ID"), i18next.t("provider:Bot ID - Tooltip"));
-      }
-    }
     if (provider.category === "Chat") {
       return Setting.getLabel(i18next.t("provider:Model provider"), i18next.t("provider:Model provider - Tooltip"));
     }
@@ -149,10 +144,6 @@ class ProviderEditPage extends React.Component {
       if (provider.type === "ChainMaker") {
         return Setting.getLabel(i18next.t("general:Org ID"), i18next.t("general:Org ID - Tooltip"));
       }
-    } else if (provider.category === "Bot") {
-      if (provider.type === "Tencent") {
-        return Setting.getLabel(i18next.t("provider:AES key"), i18next.t("provider:AES key - Tooltip"));
-      }
     }
     return Setting.getLabel(i18next.t("general:Region"), i18next.t("general:Region - Tooltip"));
   }
@@ -168,10 +159,6 @@ class ProviderEditPage extends React.Component {
     } else if (provider.category === "Blockchain") {
       if (provider.type === "Ethereum") {
         return Setting.getLabel(i18next.t("provider:Private key"), i18next.t("provider:Private key - Tooltip"));
-      }
-    } else if (provider.category === "Bot") {
-      if (provider.type === "Tencent") {
-        return Setting.getLabel(i18next.t("provider:Token"), i18next.t("provider:Token - Tooltip"));
       }
     } else if (provider.category === "Chat") {
       if (["Telegram", "Discord"].includes(provider.type)) {
@@ -399,9 +386,6 @@ class ProviderEditPage extends React.Component {
                 } else if (value === "Speech-to-Text") {
                   this.updateProviderField("type", "Alibaba Cloud");
                   this.updateProviderField("subType", "paraformer-realtime-v1");
-                } else if (value === "Bot") {
-                  this.updateProviderField("type", "Tencent");
-                  this.updateProviderField("subType", "WeCom Bot");
                 } else if (value === "Chat") {
                   this.updateProviderField("type", "Telegram");
                 } else if (value === "Scan") {
@@ -418,7 +402,6 @@ class ProviderEditPage extends React.Component {
                     {id: "Video", name: "Video"},
                     {id: "Text-to-Speech", name: "Text-to-Speech"},
                     {id: "Speech-to-Text", name: "Speech-to-Text"},
-                    {id: "Bot", name: "Bot"},
                     {id: "Chat", name: "Chat"},
                     {id: "Scan", name: "Scan"},
                   ].map((item, index) => <Option key={index} value={item.id}>{item.name}</Option>)
@@ -511,10 +494,6 @@ class ProviderEditPage extends React.Component {
                   if (value === "Alibaba Cloud") {
                     this.updateProviderField("subType", "paraformer-realtime-v1");
                   }
-                } else if (provider.category === "Bot") {
-                  if (value === "Tencent") {
-                    this.updateProviderField("subType", "WeCom Bot");
-                  }
                 }
               })}
               showSearch
@@ -532,7 +511,7 @@ class ProviderEditPage extends React.Component {
               </Select>
             </Col>
             {
-              !["Model", "Embedding", "Text-to-Speech", "Speech-to-Text", "Bot"].includes(provider.category) ? null : (
+              !["Model", "Embedding", "Text-to-Speech", "Speech-to-Text"].includes(provider.category) ? null : (
                 <Col style={{marginTop: "5px"}} span={Setting.isMobile() ? 22 : 7}>
                   <div style={{marginBottom: "4px"}}>{Setting.getLabel(i18next.t("provider:Sub type"), i18next.t("provider:Sub type - Tooltip"))}</div>
                   {provider.type === "Ollama" ? (

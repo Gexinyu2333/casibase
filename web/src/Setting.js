@@ -1150,12 +1150,6 @@ export function getOtherProviderInfo() {
         url: "https://www.alibabacloud.com/",
       },
     },
-    "Bot": {
-      "Tencent": {
-        logo: `${StaticBaseUrl}/img/social_tencent_cloud.jpg`,
-        url: "https://cloud.tencent.com/",
-      },
-    },
     "Chat": {
       "Telegram": {
         logo: `${StaticBaseUrl}/img/social_telegram.png`,
@@ -1425,10 +1419,6 @@ export function getProviderTypeOptions(category) {
   } else if (category === "Speech-to-Text") {
     return [
       {id: "Alibaba Cloud", name: "Alibaba Cloud"},
-    ];
-  } else if (category === "Bot") {
-    return [
-      {id: "Tencent", name: "Tencent"},
     ];
   } else if (category === "Chat") {
     return [
@@ -2180,14 +2170,6 @@ export function getProviderSubTypeOptions(category, type) {
     if (type === "Alibaba Cloud") {
       return [
         {id: "paraformer-realtime-v1", name: "paraformer-realtime-v1"},
-      ];
-    } else {
-      return [];
-    }
-  } else if (category === "Bot") {
-    if (type === "Tencent") {
-      return [
-        {id: "WeCom Bot", name: "WeCom Bot"},
       ];
     } else {
       return [];
