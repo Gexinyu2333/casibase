@@ -2495,7 +2495,7 @@ export function getLabel(text, tooltip) {
     <React.Fragment>
       <span style={{marginRight: 4}}>{text}</span>
       <Tooltip placement="top" title={tooltip}>
-        <QuestionCircleOutlined style={{color: "var(--ant-color-primary)"}} />
+        <QuestionCircleOutlined style={{color: "var(--ant-color-text-secondary)"}} />
       </Tooltip>
     </React.Fragment>
   );
