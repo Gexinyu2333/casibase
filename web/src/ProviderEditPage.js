@@ -521,6 +521,35 @@ class ProviderEditPage extends React.Component {
             ) : null
           }
           {
+            (this.state.provider.category !== "Model" || this.modelCategoryShowsProviderUrlInput(this.state.provider.type)) && !(this.state.provider.category === "Storage" && this.state.provider.type === "Alibaba Cloud OSS") && this.state.provider.category !== "Blockchain" ? (
+              <Row style={{marginTop: "20px"}} >
+                <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
+                  {this.getProviderUrlLabel(this.state.provider)}
+                </Col>
+                <Col span={22} >
+                  <Input prefix={<LinkOutlined />} value={this.state.provider.providerUrl} onChange={e => {
+                    this.updateProviderField("providerUrl", e.target.value);
+                  }} />
+                </Col>
+              </Row>
+            ) : null
+          }
+          {
+            ((this.state.provider.category === "Model" || this.state.provider.category === "Embedding") && this.state.provider.type === "Azure") ? (
+              <Row style={{marginTop: "20px"}}>
+                <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
+                  {Setting.getLabel(i18next.t("provider:API version"), i18next.t("provider:API version - Tooltip"))}
+                </Col>
+                <Col span={22} >
+                  <AutoComplete disabled={isRemote} style={{width: "100%"}} value={this.state.provider.apiVersion}
+                    options={Setting.getProviderAzureApiVersionOptions().map((item) => Setting.getOption(item.name, item.id))}
+                    onChange={(value) => {this.updateProviderField("apiVersion", value);}}
+                  />
+                </Col>
+              </Row>
+            ) : null
+          }
+          {
             (this.state.provider.type === "Cohere" && this.state.provider.category === "Embedding") && (
               <Row style={{marginTop: "20px"}} >
                 <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
@@ -765,6 +794,16 @@ class ProviderEditPage extends React.Component {
           {
             this.state.provider.category === "Blockchain" && (
               <>
+                <Row style={{marginTop: "20px"}}>
+                  <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
+                    {this.getProviderUrlLabel(this.state.provider)}
+                  </Col>
+                  <Col span={22}>
+                    <Input prefix={<LinkOutlined />} value={this.state.provider.providerUrl} onChange={e => {
+                      this.updateProviderField("providerUrl", e.target.value);
+                    }} />
+                  </Col>
+                </Row>
                 {this.state.provider.type === "Ethereum" ? null : (
                   <>
                     <Row style={{marginTop: "20px"}}>
@@ -1139,23 +1178,6 @@ class ProviderEditPage extends React.Component {
             ) : null}
           </Card>
         )}
-        {
-          ((this.state.provider.category === "Model" || this.state.provider.category === "Embedding") && this.state.provider.type === "Azure") ? (
-            <>
-              <Row style={{marginTop: "20px"}}>
-                <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-                  {Setting.getLabel(i18next.t("provider:API version"), i18next.t("provider:API version - Tooltip"))}
-                </Col>
-                <Col span={22} >
-                  <AutoComplete disabled={isRemote} style={{width: "100%"}} value={this.state.provider.apiVersion}
-                    options={Setting.getProviderAzureApiVersionOptions().map((item) => Setting.getOption(item.name, item.id))}
-                    onChange={(value) => {this.updateProviderField("apiVersion", value);}}
-                  />
-                </Col>
-              </Row>
-            </>
-          ) : null
-        }
         {/* Card 3: Provider Test */}
         <Card size="small" title={i18next.t("provider:Provider Test")} style={sectionCardStyle} headStyle={cardHeadStyle}>
           <ModelTestWidget
@@ -1181,20 +1203,6 @@ class ProviderEditPage extends React.Component {
             onUpdateProvider={this.updateProviderField.bind(this)}
           />
         </Card>
-        {
-          (this.state.provider.category !== "Model" || this.modelCategoryShowsProviderUrlInput(this.state.provider.type)) && !(this.state.provider.category === "Storage" && this.state.provider.type === "Alibaba Cloud OSS") ? (
-            <Row style={{marginTop: "20px"}} >
-              <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-                {this.getProviderUrlLabel(this.state.provider)}
-              </Col>
-              <Col span={22} >
-                <Input prefix={<LinkOutlined />} value={this.state.provider.providerUrl} onChange={e => {
-                  this.updateProviderField("providerUrl", e.target.value);
-                }} />
-              </Col>
-            </Row>
-          ) : null
-        }
       </div>
     );
   }
