@@ -215,18 +215,21 @@ func (r *pipeSSERecorder) Write(p []byte) (int, error) {
 
 func (r *pipeSSERecorder) Flush() {}
 
+var sseDelimiter = []byte("\n\n")
+
 func (r *pipeSSERecorder) consumeBody() {
 	for {
-		body := r.body.String()
-		idx := strings.Index(body, "\n\n")
+		buf := r.body.Bytes()
+		idx := bytes.Index(buf, sseDelimiter)
 		if idx == -1 {
 			return
 		}
 
-		chunk := body[:idx]
-		rest := body[idx+2:]
+		chunk := string(buf[:idx])
+		remaining := make([]byte, len(buf)-idx-2)
+		copy(remaining, buf[idx+2:])
 		r.body.Reset()
-		_, _ = r.body.WriteString(rest)
+		_, _ = r.body.Write(remaining)
 
 		r.consumeChunk(chunk)
 	}
@@ -304,11 +307,7 @@ func ensurePipeChat(pipeObj *object.Pipe, incoming *pipepkg.IncomingMessage) (*o
 		Store:         storeName,
 		ModelProvider: "",
 		Category:      "Pipe",
-		Type:          "AI",
 		User:          chatName,
-		User1:         "",
-		User2:         "",
-		Users:         []string{},
 		ClientIp:      "",
 		UserAgent:     fmt.Sprintf("pipe/%s", pipeObj.Type),
 		MessageCount:  0,
@@ -422,10 +421,18 @@ func (s *defaultPipeAnswerSender) WriteError(text string) error {
 }
 
 func (s *defaultPipeAnswerSender) CloseMessage(text string) error {
-	if text == "" {
-		return nil
+	finalText := text
+	if finalText == "" {
+		switch {
+		case s.text != "":
+			finalText = s.text
+		case s.errorText != "":
+			finalText = s.errorText
+		default:
+			return nil
+		}
 	}
-	return s.provider.SendMessage(s.chatId, text)
+	return s.provider.SendMessage(s.chatId, finalText)
 }
 
 func newStreamPipeAnswerSender(writer pipepkg.PipeMessageWriter) *streamPipeAnswerSender {

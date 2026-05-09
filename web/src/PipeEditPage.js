@@ -71,9 +71,13 @@ class PipeEditPage extends React.Component {
     PipeBackend.getPipe("admin", this.state.pipeName)
       .then((res) => {
         if (res.status === "ok") {
+          const pipe = res.data;
+          if (!pipe.store) {
+            pipe.store = "store-built-in";
+          }
           this.setState({
-            pipe: res.data,
-            originalPipe: Setting.deepCopy(res.data),
+            pipe: pipe,
+            originalPipe: Setting.deepCopy(pipe),
           });
         } else {
           Setting.showMessage("error", `${i18next.t("general:Failed to get")}: ${res.msg}`);
