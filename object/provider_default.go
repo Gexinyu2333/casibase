@@ -88,7 +88,7 @@ func getFilteredProviders(providers []*Provider, needStorage bool) []*Provider {
 }
 
 func GetDefaultStorageProvider() (*Provider, error) {
-	provider := Provider{Owner: "admin", Category: "Storage"}
+	provider := Provider{Owner: "admin", Category: "Storage", State: "Active"}
 	existed, err := adapter.engine.Get(&provider)
 	if err != nil {
 		return &provider, err
