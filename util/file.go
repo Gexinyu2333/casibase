@@ -159,7 +159,7 @@ func DownloadFile(url string) (*bytes.Buffer, error) {
 
 // downloadMaxmindFiles downloads MaxMind database files from GitHub
 func downloadMaxmindFiles() {
-	frontendBaseDir := conf.GetConfigString("frontendBaseDir")
+	frontendBaseDir := conf.FrontendBaseDir
 
 	// GitHub repo for the data files
 	repoURL := "https://github.com/the-open-agent/data"

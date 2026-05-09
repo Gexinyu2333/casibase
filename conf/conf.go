@@ -24,6 +24,8 @@ import (
 	"github.com/beego/beego"
 )
 
+const FrontendBaseDir = "../openagent"
+
 type WebConfig struct {
 	AuthConfig struct {
 		ServerUrl        string `json:"serverUrl"`
@@ -91,10 +93,6 @@ func GetConfigString(key string) string {
 		if strings.HasSuffix(beego.AppConfig.String("casdoorEndpoint"), ".casdoor.net") && res == "https://cdn.openagentai.org" {
 			res = "https://cdn.casibase.com"
 		}
-	}
-
-	if key == "frontendBaseDir" && os.Getenv("RUNNING_IN_DOCKER") == "true" {
-		res = ""
 	}
 
 	return res

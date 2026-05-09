@@ -31,20 +31,18 @@ var (
 
 // InitMaxmindDb initializes the MaxMind GeoIP2 databases
 func InitMaxmindDb() error {
-	frontendBaseDir := conf.GetConfigString("frontendBaseDir")
-
 	var cityErr, asnErr error
 
 	// Try to open the City database file
-	maxmindCityDB, cityErr = geoip2.Open(filepath.Join(frontendBaseDir, "data", "GeoLite2-City.mmdb"))
+	maxmindCityDB, cityErr = geoip2.Open(filepath.Join(conf.FrontendBaseDir, "data", "GeoLite2-City.mmdb"))
 	if cityErr != nil {
-		maxmindCityDB, cityErr = geoip2.Open(filepath.Join(frontendBaseDir, "..", "data", "GeoLite2-City.mmdb"))
+		maxmindCityDB, cityErr = geoip2.Open(filepath.Join(conf.FrontendBaseDir, "..", "data", "GeoLite2-City.mmdb"))
 	}
 
 	// Try to open the ASN database file
-	maxmindASNDB, asnErr = geoip2.Open(filepath.Join(frontendBaseDir, "data", "GeoLite2-ASN.mmdb"))
+	maxmindASNDB, asnErr = geoip2.Open(filepath.Join(conf.FrontendBaseDir, "data", "GeoLite2-ASN.mmdb"))
 	if asnErr != nil {
-		maxmindASNDB, asnErr = geoip2.Open(filepath.Join(frontendBaseDir, "..", "data", "GeoLite2-ASN.mmdb"))
+		maxmindASNDB, asnErr = geoip2.Open(filepath.Join(conf.FrontendBaseDir, "..", "data", "GeoLite2-ASN.mmdb"))
 	}
 
 	if cityErr != nil {

@@ -31,14 +31,13 @@ import (
 	"github.com/the-open-agent/openagent/util"
 )
 
-var frontendBaseDir = conf.GetConfigString("frontendBaseDir")
-
 func getWebBuildFolder() string {
 	path := "web/build"
-	if util.FileExist(filepath.Join(path, "index.html")) || frontendBaseDir == "" {
+	if util.FileExist(filepath.Join(path, "index.html")) {
 		return path
 	}
 
+	frontendBaseDir := conf.FrontendBaseDir
 	if util.FileExist(filepath.Join(frontendBaseDir, "index.html")) {
 		return frontendBaseDir
 	}
@@ -48,8 +47,7 @@ func getWebBuildFolder() string {
 		return path
 	}
 
-	// Fallback: if frontendBaseDir points to "../openagent" but the directory
-	// doesn't exist, try "../casibase" for backward compatibility.
+	// Fallback: try "../casibase" for backward compatibility.
 	casibaseDir := filepath.Join(filepath.Dir(frontendBaseDir), "casibase")
 	if util.FileExist(filepath.Join(casibaseDir, "index.html")) {
 		return casibaseDir
