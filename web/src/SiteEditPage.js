@@ -14,7 +14,7 @@
 
 import React from "react";
 import Loading from "./common/Loading";
-import {Button, Card, Col, Image, Input, Popover, Row, Space, Switch, Upload} from "antd";
+import {Button, Card, Col, Image, Input, Modal, Popover, Row, Space, Switch, Upload} from "antd";
 import * as SiteBackend from "./backend/SiteBackend";
 import * as ResourceBackend from "./backend/ResourceBackend";
 import * as Setting from "./Setting";
@@ -293,10 +293,21 @@ class SiteEditPage extends React.Component {
               Setting.getLabel(i18next.t("store:Navbar items"), i18next.t("store:Navbar items - Tooltip")),
               <NavItemTree
                 disabled={!Setting.isAdminUser(this.props.account)}
+                casdoorAvailable={Setting.isCasdoorAvailable()}
                 checkedKeys={site.navItems ?? ["all"]}
                 defaultExpandedKeys={["all"]}
                 onCheck={(checked) => {
                   const checkedArr = Array.isArray(checked) ? [...checked] : [...checked.checked];
+                  const identityKeys = ["/identity", "/users", "/casdoor-resources", "/permissions"];
+                  const prevChecked = site.navItems ?? ["all"];
+                  const newlyChecked = checkedArr.filter(k => identityKeys.includes(k) && !prevChecked.includes(k));
+                  if (!Setting.isCasdoorAvailable() && newlyChecked.length > 0) {
+                    Modal.warning({
+                      title: i18next.t("general:Identity requires Casdoor"),
+                      content: i18next.t("general:Identity requires Casdoor - Tooltip"),
+                    });
+                    return;
+                  }
                   if (!checkedArr.includes("/sites")) {
                     checkedArr.push("/sites");
                   }

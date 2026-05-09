@@ -13,9 +13,13 @@
 // limitations under the License.
 
 import i18next from "i18next";
-import {Tree} from "antd";
+import {Tooltip, Tree} from "antd";
 
-export const NavItemTree = ({disabled, checkedKeys, defaultExpandedKeys, onCheck}) => {
+export const NavItemTree = ({disabled, casdoorAvailable, checkedKeys, defaultExpandedKeys, onCheck}) => {
+  const casdoorTooltip = (title) => casdoorAvailable ? title : (
+    <Tooltip title={i18next.t("general:Requires Casdoor to be installed")}>{title}</Tooltip>
+  );
+
   const NavItemNodes = [
     {
       title: i18next.t("store:All"),
@@ -74,12 +78,12 @@ export const NavItemTree = ({disabled, checkedKeys, defaultExpandedKeys, onCheck
           ],
         },
         {
-          title: i18next.t("general:Identity"),
+          title: casdoorTooltip(i18next.t("general:Identity")),
           key: "/identity",
           children: [
-            {title: i18next.t("general:Users"), key: "/users"},
-            {title: i18next.t("general:Resources"), key: "/casdoor-resources"},
-            {title: i18next.t("general:Permissions"), key: "/permissions"},
+            {title: casdoorTooltip(i18next.t("general:Users")), key: "/users"},
+            {title: casdoorTooltip(i18next.t("general:Resources")), key: "/casdoor-resources"},
+            {title: casdoorTooltip(i18next.t("general:Permissions")), key: "/permissions"},
           ],
         },
         {

@@ -183,6 +183,8 @@
     "Down": "Down",
     "Download": "Download",
     "Edit": "Edit",
+    "Endpoint": "Endpoint",
+    "Endpoint - Tooltip": "Endpoint - Tooltip",
     "Error": "Error",
     "Exit": "Exit",
     "Expand row": "Expand row",
@@ -221,6 +223,8 @@
     "Icon": "Icon",
     "Icon URL (optional)": "Icon URL (optional)",
     "Identity": "Identity",
+    "Identity requires Casdoor": "Identity Requires Casdoor",
+    "Identity requires Casdoor - Tooltip": "The Identity section (Users, Resources, Permissions) requires Casdoor to be installed. Please set up Casdoor first.",
     "Image": "Image",
     "Inactive": "Inactive",
     "Invert selection": "Invert selection",
@@ -286,6 +290,7 @@
     "Path": "Path",
     "Pause": "Pause",
     "Permissions": "Permissions",
+    "Pipes": "Pipes",
     "Please input your search": "Please input your search",
     "Port": "Port",
     "Preview": "Preview",
@@ -309,6 +314,7 @@
     "Region - Tooltip": "Cloud service region",
     "Request URI": "Request URI",
     "Request URI - Tooltip": "Full request path",
+    "Requires Casdoor to be installed": "Requires Casdoor to be installed",
     "Reset": "Reset",
     "Reset to Default": "Reset to Default",
     "Resources": "Resources",
@@ -381,6 +387,8 @@
     "This is a read-only demo site!": "This is a read-only demo site!",
     "Title": "Web page title",
     "Title - Tooltip": "Title for the web page in the browser",
+    "Token": "Token",
+    "Token - Tooltip": "Token - Tooltip",
     "Tokens": "Tokens",
     "Tool": "Tool",
     "Tools": "Tools",
@@ -473,8 +481,6 @@
     "WhatsApp verify token hint": "Set the webhook verify token in Meta Developer Console to your pipe name:"
   },
   "provider": {
-    "AES key": "AES key",
-    "AES key - Tooltip": "AES encryption key for secure communications",
     "API key": "API key",
     "API key - Tooltip": "API key for authentication",
     "API version": "API version",
@@ -482,12 +488,10 @@
     "Advanced Model Parameters": "Advanced Model Parameters",
     "Auth type": "Auth type",
     "Auth type - Tooltip": "Authentication type",
-    "Bot ID": "Bot ID",
-    "Bot ID - Tooltip": "Unique bot identifier",
-    "Bot token": "Bot token",
-    "Bot token - Tooltip": "Secret token used to authenticate API calls to this bot or chat integration.",
     "Browser URL": "Browser URL",
     "Browser URL - Tooltip": "Blockchain explorer URL",
+    "Bucket": "Bucket",
+    "Bucket - Tooltip": "OSS bucket name",
     "Category - Tooltip": "High-level category of this provider (model, embedding, search, tool, etc.).",
     "Chain": "Chain",
     "Chain - Tooltip": "Blockchain network or ledger chain identifier this provider connects to.",
@@ -566,8 +570,6 @@
     "Temperature - Tooltip": "Creativity control (0-2)",
     "Thinking tokens": "Thinking tokens",
     "Thinking tokens - Tooltip": "Token count used for reasoning process",
-    "Token": "Token",
-    "Token - Tooltip": "Authentication or access token",
     "Tool function": "Tool function",
     "Tool function - Tooltip": "Function name or schema exposed by the tool for invocation.",
     "Tool result": "Tool result",
@@ -578,7 +580,6 @@
     "Top K - Tooltip": "Number of candidate tokens",
     "Top P": "Top P",
     "Top P - Tooltip": "Probability sampling threshold",
-    "Webhook": "Webhook",
     "Webhook - Tooltip": "HTTPS URL that receives asynchronous callbacks or events for this integration.",
     "Webhook set successfully": "Webhook set successfully"
   },
@@ -593,6 +594,9 @@
   "resource": {
     "Format": "Format",
     "Upload a file...": "Upload a file..."
+  },
+  "scan": {
+    "Latency": "Latency"
   },
   "server": {
     "Access token": "Access token",

@@ -183,6 +183,8 @@
     "Down": "下移",
     "Download": "下载",
     "Edit": "编辑",
+    "Endpoint": "Endpoint",
+    "Endpoint - Tooltip": "Endpoint - Tooltip",
     "Error": "错误",
     "Exit": "退出",
     "Expand row": "展开行",
@@ -221,6 +223,8 @@
     "Icon": "图标",
     "Icon URL (optional)": "图标URL（可选）",
     "Identity": "身份认证",
+    "Identity requires Casdoor": "身份认证需要Casdoor",
+    "Identity requires Casdoor - Tooltip": "身份认证模块（用户、资源、权限）需要安装Casdoor才能使用，请先安装并配置Casdoor。",
     "Image": "图片",
     "Inactive": "已关闭",
     "Invert selection": "反选",
@@ -286,6 +290,7 @@
     "Path": "路径",
     "Pause": "暂停",
     "Permissions": "权限",
+    "Pipes": "Pipes",
     "Please input your search": "请输入搜索内容",
     "Port": "端口",
     "Preview": "预览",
@@ -309,6 +314,7 @@
     "Region - Tooltip": "云服务区域",
     "Request URI": "请求URI",
     "Request URI - Tooltip": "完整请求路径",
+    "Requires Casdoor to be installed": "需要安装Casdoor",
     "Reset": "重置",
     "Reset to Default": "重置为默认",
     "Resources": "资源",
@@ -381,6 +387,8 @@
     "This is a read-only demo site!": "这是一个只读的演示站点！",
     "Title": "网页标题",
     "Title - Tooltip": "浏览器中显示的网页标题",
+    "Token": "Token",
+    "Token - Tooltip": "Token - Tooltip",
     "Tokens": "Token数量",
     "Tool": "工具",
     "Tools": "工具",
@@ -473,8 +481,6 @@
     "WhatsApp verify token hint": "在Meta开发者控制台中，将Webhook验证令牌设置为管道名称："
   },
   "provider": {
-    "AES key": "AES密钥",
-    "AES key - Tooltip": "用于安全通信的AES加密密钥",
     "API key": "API密钥",
     "API key - Tooltip": "用于身份验证的API密钥",
     "API version": "API版本",
@@ -482,12 +488,10 @@
     "Advanced Model Parameters": "高级模型参数",
     "Auth type": "认证类型",
     "Auth type - Tooltip": "认证类型",
-    "Bot ID": "机器人ID",
-    "Bot ID - Tooltip": "唯一的机器人标识符",
-    "Bot token": "机器人令牌",
-    "Bot token - Tooltip": "调用该机器人或对话接口API时用于认证的密钥令牌",
     "Browser URL": "浏览器URL",
     "Browser URL - Tooltip": "区块链浏览器URL",
+    "Bucket": "Bucket",
+    "Bucket - Tooltip": "OSS Bucket名称",
     "Category - Tooltip": "该提供商的大类（模型、嵌入、搜索、工具等）",
     "Chain": "链",
     "Chain - Tooltip": "该提供商所连接的区块链网络或账本链标识",
@@ -566,8 +570,6 @@
     "Temperature - Tooltip": "生成多样性控制（0=保守，2=创意）",
     "Thinking tokens": "思考token",
     "Thinking tokens - Tooltip": "推理过程使用的令牌数",
-    "Token": "令牌",
-    "Token - Tooltip": "认证或访问令牌",
     "Tool function": "工具函数",
     "Tool function - Tooltip": "工具暴露给调用方的函数名称或结构定义。",
     "Tool result": "工具返回结果",
@@ -578,7 +580,6 @@
     "Top K - Tooltip": "候选token数量限制（1-6）",
     "Top P": "TopP参数",
     "Top P - Tooltip": "概率采样阈值（0-1）",
-    "Webhook": "Webhook回调",
     "Webhook - Tooltip": "用于接收异步事件或回调的HTTPS地址",
     "Webhook set successfully": "Webhook设置成功"
   },
@@ -593,6 +594,9 @@
   "resource": {
     "Format": "格式",
     "Upload a file...": "上传文件..."
+  },
+  "scan": {
+    "Latency": "Latency"
   },
   "server": {
     "Access token": "访问令牌",

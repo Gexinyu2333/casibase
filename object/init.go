@@ -624,7 +624,6 @@ func initBuiltInSite() {
 		"/files", "/vectors",
 		"/providers", "/pipes", "/skills", "/tools", "/servers",
 		"/records", "/sessions",
-		"/users", "/casdoor-resources", "/permissions",
 		"/sites", "/resources", "/usages", "/visitors", "/sysinfo", "/swagger",
 	}
 
