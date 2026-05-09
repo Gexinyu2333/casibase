@@ -30,6 +30,7 @@ type IncomingMessage struct {
 	Username string
 }
 
+// ChatProvider is the core interface every chat platform must implement.
 type ChatProvider interface {
 	SendMessage(chatId string, text string) error
 	ParseWebhookRequest(body []byte) (*IncomingMessage, error)
@@ -42,15 +43,26 @@ type WebhookResponse struct {
 	Body        []byte
 }
 
+// ImmediateWebhookResponder is implemented by providers that must reply to the
+// webhook HTTP request before processing the message (e.g. Discord interactions).
 type ImmediateWebhookResponder interface {
 	GetWebhookResponse(body []byte, header http.Header) (*WebhookResponse, error)
+}
+
+// WebhookVerifier is implemented by providers that verify webhook ownership via
+// a GET request challenge (e.g. WhatsApp Cloud API hub.challenge handshake).
+type WebhookVerifier interface {
+	VerifyWebhook(params map[string]string) (*WebhookResponse, error)
 }
 
 func NormalizeChatProviderType(typ string) string {
 	return strings.ToLower(strings.ReplaceAll(typ, " ", "-"))
 }
 
-func GetChatProvider(typ string, token string, providerKey string, lang string) (ChatProvider, error) {
+// GetChatProvider returns a ChatProvider for the given type.
+// pipeName is passed to providers that use it as part of their configuration
+// (e.g. WhatsApp uses it as the webhook verify token).
+func GetChatProvider(typ string, token string, providerKey string, pipeName string, lang string) (ChatProvider, error) {
 	var p ChatProvider
 	var err error
 
@@ -58,6 +70,8 @@ func GetChatProvider(typ string, token string, providerKey string, lang string) 
 		p, err = NewTelegramChatProvider(token, proxy.ProxyHttpClient)
 	} else if typ == "Discord" {
 		p, err = NewDiscordChatProvider(token, providerKey, proxy.ProxyHttpClient)
+	} else if typ == "WhatsApp" {
+		p, err = NewWhatsAppChatProvider(token, providerKey, pipeName, proxy.ProxyHttpClient)
 	} else {
 		return nil, fmt.Errorf(i18n.Translate(lang, "object:the chat provider type: %s is not supported"), typ)
 	}

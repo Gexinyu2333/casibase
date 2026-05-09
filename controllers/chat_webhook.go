@@ -23,6 +23,53 @@ import (
 	"github.com/the-open-agent/openagent/object"
 )
 
+// ChatWebhookVerify handles the HTTP GET challenge that some platforms (e.g. WhatsApp
+// Cloud API) send to verify webhook ownership before they start delivering events.
+// The URL format is: /api/chat-webhook/:pipeType/:pipeName
+// This endpoint does not require authentication.
+// @router /api/chat-webhook/:pipeType/:pipeName [get]
+func (c *ApiController) ChatWebhookVerify() {
+	pipeType := c.Ctx.Input.Param(":pipeType")
+	pipeName := c.Ctx.Input.Param(":pipeName")
+
+	pipe, err := object.GetPipeByName("admin", pipeName)
+	if err != nil {
+		c.Ctx.ResponseWriter.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	if pipe == nil || chat.NormalizeChatProviderType(pipe.Type) != pipeType {
+		c.Ctx.ResponseWriter.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	chatProviderObj, err := pipe.GetChatProvider(c.GetAcceptLanguage())
+	if err != nil {
+		c.Ctx.ResponseWriter.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	verifier, ok := chatProviderObj.(chat.WebhookVerifier)
+	if !ok {
+		c.Ctx.ResponseWriter.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	params := map[string]string{}
+	for key, values := range c.Ctx.Request.URL.Query() {
+		if len(values) > 0 {
+			params[key] = values[0]
+		}
+	}
+
+	response, err := verifier.VerifyWebhook(params)
+	if err != nil {
+		c.Ctx.ResponseWriter.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	writeChatWebhookResponse(c, response)
+}
+
 // ChatWebhook receives incoming updates from a chat pipe.
 // The URL format is: /api/chat-webhook/:pipeType/:pipeName
 // This endpoint does not require authentication because it is called by chat platform servers.

@@ -155,7 +155,7 @@ func (p *Pipe) GetId() string {
 }
 
 func (p *Pipe) GetChatProvider(lang string) (chat.ChatProvider, error) {
-	pProvider, err := chat.GetChatProvider(p.Type, p.Token, p.ProviderKey, lang)
+	pProvider, err := chat.GetChatProvider(p.Type, p.Token, p.ProviderKey, p.Name, lang)
 	if err != nil {
 		return nil, err
 	}

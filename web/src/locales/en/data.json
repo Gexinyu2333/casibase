@@ -459,6 +459,19 @@
     "Reply to - Tooltip": "The ID of the message to which this message is replied",
     "Suggestions": "Suggestions"
   },
+  "pipe": {
+    "Chat ID": "Chat ID",
+    "Chat ID placeholder": "Enter the chat ID or phone number",
+    "Chat Test": "Chat Test",
+    "Edit Pipe": "Edit Pipe",
+    "Phone Number ID": "Phone Number ID",
+    "Phone Number ID - Tooltip": "The WhatsApp phone number ID from the Meta Developer Console.",
+    "Pipe Test": "Pipe Test",
+    "Send": "Send",
+    "Test message": "Test message",
+    "Test message placeholder": "Enter a test message",
+    "WhatsApp verify token hint": "Set the webhook verify token in Meta Developer Console to your pipe name:"
+  },
   "provider": {
     "AES key": "AES key",
     "AES key - Tooltip": "AES encryption key for secure communications",

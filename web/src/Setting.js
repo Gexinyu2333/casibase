@@ -1155,6 +1155,10 @@ export function getOtherProviderInfo() {
         logo: `${StaticBaseUrl}/img/social_discord.png`,
         url: "https://discord.com/",
       },
+      "WhatsApp": {
+        logo: `${StaticBaseUrl}/img/social_whatsapp.png`,
+        url: "https://www.whatsapp.com/",
+      },
     },
   };
 

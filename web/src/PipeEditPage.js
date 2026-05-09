@@ -213,6 +213,7 @@ class PipeEditPage extends React.Component {
                 {[
                   {id: "Telegram", name: "Telegram"},
                   {id: "Discord", name: "Discord"},
+                  {id: "WhatsApp", name: "WhatsApp"},
                 ].map((item, index) => (
                   <Option key={index} value={item.id}>
                     <img width={20} height={20} style={{marginBottom: "3px", marginRight: "10px"}}
@@ -234,10 +235,13 @@ class PipeEditPage extends React.Component {
             </Col>
           </Row>
 
-          {pipe.type === "Discord" && (
+          {(pipe.type === "Discord" || pipe.type === "WhatsApp") && (
             <Row style={{marginTop: "20px"}}>
               <Col style={{marginTop: "5px"}} span={Setting.isMobile() ? 22 : 2}>
-                {Setting.getLabel(i18next.t("provider:Public key"), i18next.t("provider:Public key - Tooltip"))}
+                {pipe.type === "WhatsApp"
+                  ? Setting.getLabel(i18next.t("pipe:Phone Number ID"), i18next.t("pipe:Phone Number ID - Tooltip"))
+                  : Setting.getLabel(i18next.t("provider:Public key"), i18next.t("provider:Public key - Tooltip"))
+                }
               </Col>
               <Col span={22}>
                 <Input.Password
@@ -245,6 +249,16 @@ class PipeEditPage extends React.Component {
                   disabled={!Setting.isAdminUser(this.props.account)}
                   onChange={e => this.updatePipeField("providerKey", e.target.value)}
                 />
+              </Col>
+            </Row>
+          )}
+
+          {pipe.type === "WhatsApp" && (
+            <Row style={{marginTop: "20px"}}>
+              <Col span={22} offset={Setting.isMobile() ? 0 : 2}>
+                <span style={{color: "var(--ant-color-text-secondary)", fontSize: "13px"}}>
+                  {i18next.t("pipe:WhatsApp verify token hint")}&nbsp;<strong>{pipe.name}</strong>
+                </span>
               </Col>
             </Row>
           )}

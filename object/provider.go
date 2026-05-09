@@ -376,7 +376,7 @@ func (p *Provider) GetSpeechToTextProvider(lang string) (stt.SpeechToTextProvide
 }
 
 func (p *Provider) GetChatProvider(lang string) (chat.ChatProvider, error) {
-	pProvider, err := chat.GetChatProvider(p.Type, p.ClientSecret, p.ProviderKey, lang)
+	pProvider, err := chat.GetChatProvider(p.Type, p.ClientSecret, p.ProviderKey, p.Name, lang)
 	if err != nil {
 		return nil, err
 	}

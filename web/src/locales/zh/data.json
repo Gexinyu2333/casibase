@@ -459,6 +459,19 @@
     "Reply to - Tooltip": "回复的目标消息ID",
     "Suggestions": "建议"
   },
+  "pipe": {
+    "Chat ID": "会话ID",
+    "Chat ID placeholder": "输入会话ID或手机号",
+    "Chat Test": "消息测试",
+    "Edit Pipe": "编辑管道",
+    "Phone Number ID": "手机号ID",
+    "Phone Number ID - Tooltip": "Meta开发者控制台中的WhatsApp手机号ID。",
+    "Pipe Test": "管道测试",
+    "Send": "发送",
+    "Test message": "测试消息",
+    "Test message placeholder": "输入测试消息",
+    "WhatsApp verify token hint": "在Meta开发者控制台中，将Webhook验证令牌设置为管道名称："
+  },
   "provider": {
     "AES key": "AES密钥",
     "AES key - Tooltip": "用于安全通信的AES加密密钥",
