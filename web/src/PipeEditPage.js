@@ -82,18 +82,18 @@ class PipeEditPage extends React.Component {
   }
 
   chatTest() {
-    const {testChatId, testMessage} = this.state;
-    if (!testChatId) {
+    const {pipe} = this.state;
+    if (!pipe.chatId) {
       Setting.showMessage("error", "Please enter a Chat ID");
       return;
     }
-    if (!testMessage) {
+    if (!pipe.chatTestMessage) {
       Setting.showMessage("error", "Please enter a test message");
       return;
     }
     this.setState({isTesting: true, testResult: ""});
-    const id = `${this.state.pipe.owner}/${this.state.pipe.name}`;
-    PipeBackend.chatTest(id, testChatId, testMessage)
+    const id = `${pipe.owner}/${pipe.name}`;
+    PipeBackend.chatTest(id, pipe.chatId, pipe.chatTestMessage)
       .then((res) => {
         this.setState({isTesting: false});
         if (res.status === "ok") {
@@ -322,16 +322,16 @@ class PipeEditPage extends React.Component {
               <div style={{marginBottom: "4px"}}>{i18next.t("pipe:Chat ID")}</div>
               <Input
                 placeholder={i18next.t("pipe:Chat ID placeholder")}
-                value={this.state.testChatId}
-                onChange={e => this.setState({testChatId: e.target.value})}
+                value={pipe.chatId}
+                onChange={e => this.updatePipeField("chatId", e.target.value)}
               />
             </Col>
             <Col span={Setting.isMobile() ? 22 : 12}>
               <div style={{marginBottom: "4px"}}>{i18next.t("pipe:Test message")}</div>
               <Input
                 placeholder={i18next.t("pipe:Test message placeholder")}
-                value={this.state.testMessage}
-                onChange={e => this.setState({testMessage: e.target.value})}
+                value={pipe.chatTestMessage}
+                onChange={e => this.updatePipeField("chatTestMessage", e.target.value)}
                 onPressEnter={() => this.chatTest()}
               />
             </Col>

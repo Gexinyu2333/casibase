@@ -37,6 +37,9 @@ type Pipe struct {
 
 	IsDefault bool   `json:"isDefault"`
 	State     string `xorm:"varchar(100)" json:"state"`
+
+	ChatId          string `xorm:"varchar(200)" json:"chatId"`
+	ChatTestMessage string `xorm:"varchar(1000)" json:"chatTestMessage"`
 }
 
 func GetMaskedPipe(pipe *Pipe, isMaskEnabled bool, user *auth.User) *Pipe {
