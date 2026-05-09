@@ -30,11 +30,11 @@ import (
 	"github.com/the-open-agent/openagent/txt"
 )
 
-func (c *ApiController) ResponseErrorStream(message *object.Message, errorText string) {
+func writeMessageErrorStream(responseWriter http.ResponseWriter, lang string, message *object.Message, errorText string) error {
 	var err error
 	if message != nil {
 		if !message.IsAlerted {
-			err = message.SendErrorEmail(errorText, c.GetAcceptLanguage())
+			err = message.SendErrorEmail(errorText, lang)
 			if err != nil {
 				errorText = fmt.Sprintf("%s\n%s", errorText, err.Error())
 			}
@@ -51,10 +51,17 @@ func (c *ApiController) ResponseErrorStream(message *object.Message, errorText s
 	}
 
 	event := fmt.Sprintf("event: myerror\ndata: %s\n\n", errorText)
-	_, err = c.Ctx.ResponseWriter.Write([]byte(event))
+	_, err = responseWriter.Write([]byte(event))
 	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c *ApiController) ResponseErrorStream(message *object.Message, errorText string) {
+	if err := writeMessageErrorStream(c.Ctx.ResponseWriter, c.GetAcceptLanguage(), message, errorText); err != nil {
 		c.ResponseError(err.Error())
-		return
 	}
 }
 
