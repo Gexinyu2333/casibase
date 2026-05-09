@@ -79,7 +79,7 @@ func initBuiltInStore(modelProviderName string, embeddingProviderName string, tt
 		PropertiesMap:        map[string]*Properties{},
 	}
 
-	if conf.GetConfigString("providerDbName") != "" {
+	if conf.GetConfigString("parentDbName") != "" {
 		store.ShowAutoRead = true
 		store.DisableFileUpload = true
 
@@ -101,8 +101,8 @@ func initBuiltInStore(modelProviderName string, embeddingProviderName string, tt
 }
 
 func getDefaultStoragePath() (string, error) {
-	providerDbName := conf.GetConfigString("providerDbName")
-	if providerDbName != "" {
+	parentDbName := conf.GetConfigString("parentDbName")
+	if parentDbName != "" {
 		dbName := conf.GetConfigString("dbName")
 		return fmt.Sprintf("C:/openagent_data/%s", dbName), nil
 	}
@@ -173,8 +173,8 @@ func initBuiltInProviders() (string, string, string, string, string) {
 	}
 
 	imageProviderName := ""
-	providerDbName := conf.GetConfigString("providerDbName")
-	if providerDbName != "" {
+	parentDbName := conf.GetConfigString("parentDbName")
+	if parentDbName != "" {
 		imageProviderName = "provider_storage_casibase_default"
 	} else {
 		imageProvider, err := getProvider("admin", "provider-image-built-in")
