@@ -378,7 +378,7 @@ func (c *ApiController) AddMessage() {
 			c.ResponseError(err.Error())
 			return
 		}
-		if chat != nil && chat.Type == "AI" {
+		if chat != nil {
 			modelProvider := chat.ModelProvider
 			if modelProvider == "" {
 				// Fallback to store's model provider if chat doesn't have one

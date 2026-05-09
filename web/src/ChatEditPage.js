@@ -188,21 +188,6 @@ class ChatEditPage extends React.Component {
               8
             )}
             {this.renderChatField(
-              Setting.getLabel(i18next.t("general:Type"), i18next.t("general:Type - Tooltip")),
-              <Select virtual={false} style={{width: "100%"}} value={chat.type} onChange={(value => {
-                this.updateChatField("type", value);
-              })}>
-                {
-                  [
-                    {id: "Single", name: i18next.t("chat:Single")},
-                    {id: "Group", name: i18next.t("chat:Group")},
-                    {id: "AI", name: i18next.t("chat:AI")},
-                  ].map((item, index) => <Option key={index} value={item.id}>{item.name}</Option>)
-                }
-              </Select>,
-              8
-            )}
-            {this.renderChatField(
               Setting.getLabel(i18next.t("general:Store"), i18next.t("general:Store - Tooltip")),
               <Input value={chat.store} onChange={e => {
                 this.updateChatField("store", e.target.value);
@@ -245,7 +230,7 @@ class ChatEditPage extends React.Component {
           </Row>
         </Card>
 
-        <Card size="small" title={renderCardTitle(i18next.t("general:Users"), i18next.t("general:Users desc"))} style={sectionCardStyle} headStyle={cardHeadStyle}>
+        <Card size="small" title={renderCardTitle(i18next.t("general:User"), i18next.t("chat:User desc"))} style={sectionCardStyle} headStyle={cardHeadStyle}>
           <Row gutter={rowGutter}>
             {this.renderChatField(
               Setting.getLabel(i18next.t("general:User"), i18next.t("general:User - Tooltip")),
@@ -253,26 +238,6 @@ class ChatEditPage extends React.Component {
                 this.updateChatField("user", e.target.value);
               }} />,
               8
-            )}
-            {this.renderChatField(
-              Setting.getLabel(i18next.t("chat:User1"), i18next.t("chat:User1 - Tooltip")),
-              <Select virtual={false} style={{width: "100%"}} value={chat.user1} onChange={(value => {this.updateChatField("user1", value);})}
-                options={chat.users.map((user) => Setting.getOption(`${user}`, `${user}`))} />,
-              8
-            )}
-            {this.renderChatField(
-              Setting.getLabel(i18next.t("chat:User2"), i18next.t("chat:User2 - Tooltip")),
-              <Select virtual={false} style={{width: "100%"}} value={chat.user2} onChange={(value => {this.updateChatField("user2", value);})}
-                options={[{label: "None", value: ""}, ...chat.users.map((user) => Setting.getOption(`${user}`, `${user}`))]} />,
-              8
-            )}
-            {this.renderChatField(
-              Setting.getLabel(i18next.t("general:Users"), i18next.t("general:Users - Tooltip")),
-              <Select virtual={false} mode="multiple" style={{width: "100%"}} value={chat.users}
-                onChange={(value => {this.updateChatField("users", value);})}
-                options={chat.users.map((user) => Setting.getOption(`${user}`, `${user}`))}
-              />,
-              12
             )}
             {this.renderChatSwitch(
               Setting.getLabel(i18next.t("general:Is deleted"), i18next.t("general:Is deleted - Tooltip")),

@@ -94,11 +94,6 @@ func (c *ApiController) generateMessageAnswer(id string, responseWriter http.Res
 	//	return
 	//}
 
-	if chat.Type != "AI" {
-		responseErrorStream(message, "The chat type must be \"AI\"")
-		return
-	}
-
 	store, err := object.ResolveStoreForChat(chat)
 	if err != nil {
 		responseErrorStream(message, err.Error())
@@ -202,7 +197,7 @@ func (c *ApiController) generateMessageAnswer(id string, responseWriter http.Res
 		return
 	}
 
-	embeddingProvider, embeddingProviderObj, err := object.GetEmbeddingProviderFromContext(store.Owner, chat.User2, lang)
+	embeddingProvider, embeddingProviderObj, err := object.GetEmbeddingProviderFromContext(store.Owner, "", lang)
 	if err != nil {
 		responseErrorStream(message, err.Error())
 		return
@@ -493,11 +488,7 @@ func (c *ApiController) GetAnswer() {
 			Store:         "",
 			ModelProvider: provider,
 			Category:      category,
-			Type:          "AI",
 			User:          userName,
-			User1:         "",
-			User2:         "",
-			Users:         []string{},
 			ClientIp:      c.getClientIp(),
 			UserAgent:     c.getUserAgent(),
 			MessageCount:  0,

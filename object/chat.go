@@ -33,11 +33,7 @@ type Chat struct {
 	ModelProvider string   `xorm:"varchar(100)" json:"modelProvider"`
 	Tool          string   `xorm:"varchar(100)" json:"tool"`
 	Category      string   `xorm:"varchar(100)" json:"category"`
-	Type          string   `xorm:"varchar(100)" json:"type"`
 	User          string   `xorm:"varchar(100) index" json:"user"`
-	User1         string   `xorm:"varchar(100)" json:"user1"`
-	User2         string   `xorm:"varchar(100)" json:"user2"`
-	Users         []string `xorm:"varchar(100)" json:"users"`
 	ClientIp      string   `xorm:"varchar(100)" json:"clientIp"`
 	UserAgent     string   `xorm:"varchar(200)" json:"userAgent"`
 	ClientIpDesc  string   `xorm:"varchar(100)" json:"clientIpDesc"`
@@ -116,17 +112,6 @@ func UpdateChat(id string, chat *Chat) (bool, error) {
 }
 
 func AddChat(chat *Chat) (bool, error) {
-	//if chat.Type == "AI" && chat.User2 == "" {
-	//	provider, err := GetDefaultModelProvider()
-	//	if err != nil {
-	//		return false, err
-	//	}
-	//
-	//	if provider != nil {
-	//		chat.User2 = provider.Name
-	//	}
-	//}
-
 	affected, err := adapter.engine.Insert(chat)
 	if err != nil {
 		return false, err

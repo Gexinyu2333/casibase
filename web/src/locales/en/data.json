@@ -63,7 +63,6 @@
     "User key - Tooltip": "User's private key for authentication"
   },
   "chat": {
-    "AI": "AI",
     "Add attachment": "Add attachment",
     "An error occurred during responding": "An error occurred during responding",
     "Arguments": "Arguments",
@@ -87,7 +86,6 @@
     "Read it out": "Read it out",
     "Reasoning process": "Reasoning process",
     "Relevance": "Relevance",
-    "Single": "Single",
     "Speech recognition not supported in this browser": "Speech recognition not supported in this browser",
     "Text token count": "Text token count",
     "The chat is not found": "The chat is not found",
@@ -96,11 +94,8 @@
     "Token count": "Token count",
     "Tool calls": "Tool calls",
     "Type message here": "Type message here",
+    "User desc": "The user who owns this chat",
     "Unable to load knowledge base sources. Please try again.": "Unable to load knowledge base sources. Please try again.",
-    "User1": "User1",
-    "User1 - Tooltip": "The user who initiated this chat session.",
-    "User2": "User2",
-    "User2 - Tooltip": "The other participant in a two-party chat.",
     "Web search": "Web search",
     "Web sources": "Web sources",
     "Your chat text involves sensitive content. This chat has been forcibly terminated.": "Your chat text involves sensitive content. This chat has been forcibly terminated."

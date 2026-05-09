@@ -104,11 +104,7 @@ class ChatListPage extends BaseListPage {
       organization: this.props.account.owner,
       displayName: `${i18next.t("chat:New Chat")} - ${randomName}`,
       category: i18next.t("chat:Default Category"),
-      type: "AI",
       user: this.props.account.name,
-      user1: "",
-      user2: "",
-      users: [],
       clientIp: "",
       userAgent: "",
       messageCount: 0,
@@ -362,22 +358,6 @@ class ChatListPage extends BaseListPage {
       //   // ...this.getColumnSearchProps("displayName"),
       // },
       // {
-      //   title: i18next.t("general:Type"),
-      //   dataIndex: "type",
-      //   key: "type",
-      //   width: "110px",
-      //   sorter: (a, b) => a.type.localeCompare(b.type),
-      //   filterMultiple: false,
-      //   filters: [
-      //     {text: "Single", value: "Single"},
-      //     {text: "Group", value: "Group"},
-      //     {text: "AI", value: "AI"},
-      //   ],
-      //   render: (text, record, index) => {
-      //     return i18next.t(`chat:${text}`);
-      //   },
-      // },
-      // {
       //   title: i18next.t("general:Category"),
       //   dataIndex: "category",
       //   key: "category",
@@ -435,51 +415,6 @@ class ChatListPage extends BaseListPage {
           );
         },
       },
-      // {
-      //   title: i18next.t("chat:User1"),
-      //   dataIndex: "user1",
-      //   key: "user1",
-      //   width: "120px",
-      //   sorter: (a, b) => a.user1.localeCompare(b.user1),
-      //   // ...this.getColumnSearchProps("user1"),
-      //   render: (text, record, index) => {
-      //     if (text.includes("/u-")) {
-      //       return text;
-      //     }
-      //
-      //     return (
-      //       <a target="_blank" rel="noreferrer" href={Setting.getMyProfileUrl(this.props.account).replace("/account", `/users/${text}`)}>
-      //         {text}
-      //       </a>
-      //     );
-      //   },
-      // },
-      // {
-      //   title: i18next.t("chat:User2"),
-      //   dataIndex: "user2",
-      //   key: "user2",
-      //   width: "120px",
-      //   sorter: (a, b) => a.user2.localeCompare(b.user2),
-      //   // ...this.getColumnSearchProps("user2"),
-      //   render: (text, record, index) => {
-      //     return (
-      //       <Link to={`/users/${text}`}>
-      //         {text}
-      //       </Link>
-      //     );
-      //   },
-      // },
-      // {
-      //   title: i18next.t("general:Users"),
-      //   dataIndex: "users",
-      //   key: "users",
-      //   width: "100px",
-      //   sorter: (a, b) => a.users.localeCompare(b.users),
-      //   // ...this.getColumnSearchProps("users"),
-      //   render: (text, record, index) => {
-      //     return Setting.getTags(text, "users");
-      //   },
-      // },
       {
         title: i18next.t("general:Client IP"),
         dataIndex: "clientIp",

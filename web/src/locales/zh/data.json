@@ -63,7 +63,6 @@
     "User key - Tooltip": "用于认证的用户私钥"
   },
   "chat": {
-    "AI": "AI",
     "Add attachment": "添加附件",
     "An error occurred during responding": "回答时出现错误",
     "Arguments": "参数",
@@ -73,7 +72,6 @@
     "Edit Chat": "编辑会话",
     "Executing...": "执行中...",
     "Failed to recognize speech": "语音识别失败",
-    "Group": "群聊",
     "Hello, I'm OpenAgent AI Assistant": "您好，我是OpenAgent AI助理",
     "I'm here to help answer your questions": "我可以帮助回答您的问题",
     "Knowledge Fragment": "知识片段",
@@ -87,7 +85,6 @@
     "Read it out": "朗读出来",
     "Reasoning process": "思维链",
     "Relevance": "相关性",
-    "Single": "单聊",
     "Speech recognition not supported in this browser": "此浏览器不支持语音识别",
     "Text token count": "文本Token数量",
     "The chat is not found": "会话不存在",
@@ -96,11 +93,8 @@
     "Token count": "Token数量",
     "Tool calls": "工具调用",
     "Type message here": "请输入您的问题",
+    "User desc": "该对话的所有者",
     "Unable to load knowledge base sources. Please try again.": "无法加载知识库来源。请重试。",
-    "User1": "用户1",
-    "User1 - Tooltip": "发起本会话的用户",
-    "User2": "用户2",
-    "User2 - Tooltip": "双人聊天中的另一方参与者",
     "Web search": "网络搜索",
     "Web sources": "网络来源",
     "Your chat text involves sensitive content. This chat has been forcibly terminated.": "您的聊天信息涉及敏感内容。此会话已被强制终止。"
