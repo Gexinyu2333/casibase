@@ -188,7 +188,6 @@ class ProviderListPage extends BaseListPage {
           {text: "Video", value: "Video"},
           {text: "Text-to-Speech", value: "Text-to-Speech"},
           {text: "Speech-to-Text", value: "Speech-to-Text"},
-          {text: "Chat", value: "Chat"},
         ],
         sorter: (a, b) => a.category.localeCompare(b.category),
       },
@@ -208,7 +207,6 @@ class ProviderListPage extends BaseListPage {
           {text: "Video", value: "Video", children: Setting.getProviderTypeOptions("Video").map((o) => {return {text: o.id, value: o.name};})},
           {text: "Text-to-Speech", value: "Text-to-Speech", children: Setting.getProviderTypeOptions("Text-to-Speech").map((o) => {return {text: o.id, value: o.name};})},
           {text: "Speech-to-Text", value: "Speech-to-Text", children: Setting.getProviderTypeOptions("Speech-to-Text").map((o) => {return {text: o.id, value: o.name};})},
-          {text: "Chat", value: "Chat", children: Setting.getProviderTypeOptions("Chat").map((o) => {return {text: o.id, value: o.name};})},
         ],
         sorter: (a, b) => a.type.localeCompare(b.type),
         render: (text, record, index) => {

@@ -76,6 +76,8 @@ import VideoPage from "./VideoPage";
 import PublicVideoListPage from "./basic/PublicVideoListPage";
 import ProviderListPage from "./ProviderListPage";
 import ProviderEditPage from "./ProviderEditPage";
+import PipeListPage from "./PipeListPage";
+import PipeEditPage from "./PipeEditPage";
 import SkillListPage from "./SkillListPage";
 import SkillEditPage from "./SkillEditPage";
 import ToolListPage from "./ToolListPage";
@@ -120,7 +122,7 @@ const {Header, Footer, Content, Sider} = Layout;
 function getMenuParentKey(uri) {
   if (!uri) {return null;}
   if (uri.includes("/chats") || uri.includes("/messages") || uri.includes("/stores")) {return "/basic";}
-  if (uri.includes("/providers") || uri.includes("/tools") || uri.includes("/servers")) {return "/connectors";}
+  if (uri.includes("/providers") || uri.includes("/pipes") || uri.includes("/tools") || uri.includes("/servers")) {return "/connectors";}
   if (uri.includes("/files") || uri.includes("/vectors") || uri.includes("/resources")) {return "/knowledge-base";}
   if (uri.includes("/videos") || uri.includes("/public-videos") || uri.includes("/tasks") || uri.includes("/scales") || uri.includes("/forms") || uri.includes("/workflows") || uri.includes("/audit") || uri.includes("/articles") || uri.includes("/graphs")) {return "/multimedia";}
   if (uri.includes("/sessions") || uri.includes("/records")) {return "/logs";}
@@ -492,9 +494,10 @@ function ManagementPage(props) {
         Setting.getItem(<Link to="/vectors">{i18next.t("general:Vectors")}</Link>, "/vectors", <ApartmentOutlined />),
       ]));
 
-      res.push(Setting.getItem(<Link style={{color: textColor}} to="/skills">{i18next.t("general:Connectors")}</Link>, "/connectors", <ApiOutlined />, [
-        Setting.getItem(<Link to="/skills">{i18next.t("general:Skills")}</Link>, "/skills", <RocketOutlined />),
+      res.push(Setting.getItem(<Link style={{color: textColor}} to="/providers">{i18next.t("general:Connectors")}</Link>, "/connectors", <ApiOutlined />, [
         Setting.getItem(<Link to="/providers">{i18next.t("general:Providers")}</Link>, "/providers", <ThunderboltOutlined />),
+        Setting.getItem(<Link to="/pipes">{i18next.t("general:Pipes")}</Link>, "/pipes", <MessageOutlined />),
+        Setting.getItem(<Link to="/skills">{i18next.t("general:Skills")}</Link>, "/skills", <RocketOutlined />),
         Setting.getItem(<Link to="/tools">{i18next.t("general:Tools")}</Link>, "/tools", <ToolOutlined />),
         Setting.getItem(<Link to="/servers">{i18next.t("general:MCP Servers")}</Link>, "/servers", <ApiOutlined />),
       ]));
@@ -609,6 +612,8 @@ function ManagementPage(props) {
         <Route exact path="/public-videos/:owner/:videoName" render={(props) => <VideoPage account={account} {...props} />} />
         <Route exact path="/providers" render={(props) => renderSigninIfNotSignedIn(<ProviderListPage account={account} {...props} />)} />
         <Route exact path="/providers/:providerName" render={(props) => renderSigninIfNotSignedIn(<ProviderEditPage account={account} {...props} />)} />
+        <Route exact path="/pipes" render={(props) => renderSigninIfNotSignedIn(<PipeListPage account={account} {...props} />)} />
+        <Route exact path="/pipes/:pipeName" render={(props) => renderSigninIfNotSignedIn(<PipeEditPage account={account} {...props} />)} />
         <Route exact path="/skills" render={(props) => renderSigninIfNotSignedIn(<SkillListPage account={account} {...props} />)} />
         <Route exact path="/skills/:skillName" render={(props) => renderSigninIfNotSignedIn(<SkillEditPage account={account} {...props} />)} />
         <Route exact path="/tools" render={(props) => renderSigninIfNotSignedIn(<ToolListPage account={account} {...props} />)} />

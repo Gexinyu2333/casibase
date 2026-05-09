@@ -50,14 +50,14 @@ func NormalizeChatProviderType(typ string) string {
 	return strings.ToLower(strings.ReplaceAll(typ, " ", "-"))
 }
 
-func GetChatProvider(typ string, clientSecret string, providerKey string, lang string) (ChatProvider, error) {
+func GetChatProvider(typ string, token string, providerKey string, lang string) (ChatProvider, error) {
 	var p ChatProvider
 	var err error
 
 	if typ == "Telegram" {
-		p, err = NewTelegramChatProvider(clientSecret, proxy.ProxyHttpClient)
+		p, err = NewTelegramChatProvider(token, proxy.ProxyHttpClient)
 	} else if typ == "Discord" {
-		p, err = NewDiscordChatProvider(clientSecret, providerKey, proxy.ProxyHttpClient)
+		p, err = NewDiscordChatProvider(token, providerKey, proxy.ProxyHttpClient)
 	} else {
 		return nil, fmt.Errorf(i18n.Translate(lang, "object:the chat provider type: %s is not supported"), typ)
 	}

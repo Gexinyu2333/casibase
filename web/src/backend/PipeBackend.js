@@ -1,4 +1,4 @@
-// Copyright 2023 The OpenAgent Authors. All Rights Reserved.
+// Copyright 2026 The OpenAgent Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
 
 import * as Setting from "../Setting";
 
-export function getGlobalProviders() {
-  return fetch(`${Setting.ServerUrl}/api/get-global-providers`, {
+export function getGlobalPipes() {
+  return fetch(`${Setting.ServerUrl}/api/get-global-pipes`, {
     method: "GET",
     credentials: "include",
     headers: {
@@ -24,8 +24,8 @@ export function getGlobalProviders() {
   }).then(res => Setting.handleFetchResponse(res));
 }
 
-export function getProviders(owner, storeName = "", page = "", pageSize = "", field = "", value = "", sortField = "", sortOrder = "") {
-  return fetch(`${Setting.ServerUrl}/api/get-providers?owner=${owner}&store=${storeName}&p=${page}&pageSize=${pageSize}&field=${field}&value=${value}&sortField=${sortField}&sortOrder=${sortOrder}`, {
+export function getPipes(owner) {
+  return fetch(`${Setting.ServerUrl}/api/get-pipes?owner=${owner}`, {
     method: "GET",
     credentials: "include",
     headers: {
@@ -34,8 +34,8 @@ export function getProviders(owner, storeName = "", page = "", pageSize = "", fi
   }).then(res => Setting.handleFetchResponse(res));
 }
 
-export function getProvider(owner, name) {
-  return fetch(`${Setting.ServerUrl}/api/get-provider?id=${owner}/${encodeURIComponent(name)}`, {
+export function getPipe(owner, name) {
+  return fetch(`${Setting.ServerUrl}/api/get-pipe?id=${owner}/${encodeURIComponent(name)}`, {
     method: "GET",
     credentials: "include",
     headers: {
@@ -44,50 +44,58 @@ export function getProvider(owner, name) {
   }).then(res => Setting.handleFetchResponse(res));
 }
 
-export function updateProvider(owner, name, provider) {
-  const newProvider = Setting.deepCopy(provider);
-  return fetch(`${Setting.ServerUrl}/api/update-provider?id=${owner}/${encodeURIComponent(name)}`, {
+export function updatePipe(owner, name, pipe) {
+  const newPipe = Setting.deepCopy(pipe);
+  return fetch(`${Setting.ServerUrl}/api/update-pipe?id=${owner}/${encodeURIComponent(name)}`, {
     method: "POST",
     credentials: "include",
     headers: {
       "Accept-Language": Setting.getAcceptLanguage(),
     },
-    body: JSON.stringify(newProvider),
+    body: JSON.stringify(newPipe),
   }).then(res => Setting.handleFetchResponse(res));
 }
 
-export function addProvider(provider) {
-  const newProvider = Setting.deepCopy(provider);
-  return fetch(`${Setting.ServerUrl}/api/add-provider`, {
+export function addPipe(pipe) {
+  const newPipe = Setting.deepCopy(pipe);
+  return fetch(`${Setting.ServerUrl}/api/add-pipe`, {
     method: "POST",
     credentials: "include",
     headers: {
       "Accept-Language": Setting.getAcceptLanguage(),
     },
-    body: JSON.stringify(newProvider),
+    body: JSON.stringify(newPipe),
   }).then(res => Setting.handleFetchResponse(res));
 }
 
-export function deleteProvider(provider) {
-  const newProvider = Setting.deepCopy(provider);
-  return fetch(`${Setting.ServerUrl}/api/delete-provider`, {
+export function deletePipe(pipe) {
+  const newPipe = Setting.deepCopy(pipe);
+  return fetch(`${Setting.ServerUrl}/api/delete-pipe`, {
     method: "POST",
     credentials: "include",
     headers: {
       "Accept-Language": Setting.getAcceptLanguage(),
     },
-    body: JSON.stringify(newProvider),
+    body: JSON.stringify(newPipe),
   }).then(res => Setting.handleFetchResponse(res));
 }
 
-export function testTool(provider) {
-  const newProvider = Setting.deepCopy(provider);
-  return fetch(`${Setting.ServerUrl}/api/test-tool`, {
+export function setPipeWebhook(id) {
+  return fetch(`${Setting.ServerUrl}/api/set-pipe-webhook?id=${encodeURIComponent(id)}`, {
     method: "POST",
     credentials: "include",
     headers: {
       "Accept-Language": Setting.getAcceptLanguage(),
     },
-    body: JSON.stringify(newProvider),
+  }).then(res => Setting.handleFetchResponse(res));
+}
+
+export function chatTest(id, chatId, message) {
+  return fetch(`${Setting.ServerUrl}/api/chat-test?id=${encodeURIComponent(id)}&chatId=${encodeURIComponent(chatId)}&message=${encodeURIComponent(message)}`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Accept-Language": Setting.getAcceptLanguage(),
+    },
   }).then(res => Setting.handleFetchResponse(res));
 }

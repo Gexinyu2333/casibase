@@ -82,8 +82,16 @@ func initAPI() {
 	beego.Router("/api/update-provider", &controllers.ApiController{}, "POST:UpdateProvider")
 	beego.Router("/api/add-provider", &controllers.ApiController{}, "POST:AddProvider")
 	beego.Router("/api/delete-provider", &controllers.ApiController{}, "POST:DeleteProvider")
-	beego.Router("/api/set-chat-webhook", &controllers.ApiController{}, "POST:SetChatWebhook")
-	beego.Router("/api/chat-webhook/:providerType/:providerName", &controllers.ApiController{}, "POST:ChatWebhook")
+
+	beego.Router("/api/get-global-pipes", &controllers.ApiController{}, "GET:GetGlobalPipes")
+	beego.Router("/api/get-pipes", &controllers.ApiController{}, "GET:GetPipes")
+	beego.Router("/api/get-pipe", &controllers.ApiController{}, "GET:GetPipe")
+	beego.Router("/api/update-pipe", &controllers.ApiController{}, "POST:UpdatePipe")
+	beego.Router("/api/add-pipe", &controllers.ApiController{}, "POST:AddPipe")
+	beego.Router("/api/delete-pipe", &controllers.ApiController{}, "POST:DeletePipe")
+	beego.Router("/api/set-pipe-webhook", &controllers.ApiController{}, "POST:SetPipeWebhook")
+	beego.Router("/api/chat-test", &controllers.ApiController{}, "POST:ChatTest")
+	beego.Router("/api/chat-webhook/:pipeType/:pipeName", &controllers.ApiController{}, "POST:ChatWebhook")
 
 	beego.Router("/api/get-servers", &controllers.ApiController{}, "GET:GetServers")
 	beego.Router("/api/get-server", &controllers.ApiController{}, "GET:GetServer")

@@ -37,38 +37,12 @@ class ProviderEditPage extends React.Component {
       providerName: props.match.params.providerName,
       provider: null,
       originalProvider: null,
-      modelProviders: [],
       isNewProvider: props.location?.state?.isNewProvider || false,
     };
   }
 
   UNSAFE_componentWillMount() {
     this.getProvider();
-  }
-
-  getModelProviders() {
-    if (this.state.modelProviders.length > 0) {
-      return;
-    }
-    ProviderBackend.getProviders("admin")
-      .then((res) => {
-        if (res.status === "ok") {
-          this.setState({
-            modelProviders: res.data.filter(provider => provider.category === "Model"),
-          });
-        }
-      });
-  }
-
-  renderModelProviderOption(provider, index) {
-    return (
-      <Option key={index} value={provider.name}>
-        <img width={20} height={20} style={{marginBottom: "3px", marginRight: "10px"}}
-          src={Setting.getProviderLogoURL({category: provider.category, type: provider.type})}
-          alt={provider.name} />
-        {provider.displayName || provider.name}
-      </Option>
-    );
   }
 
   getProvider() {
@@ -100,9 +74,6 @@ class ProviderEditPage extends React.Component {
     if (provider.category === "Storage") {
       return Setting.getLabel(i18next.t("store:Storage subpath"), i18next.t("store:Storage subpath - Tooltip"));
     }
-    if (provider.category === "Chat") {
-      return Setting.getLabel(i18next.t("provider:Model provider"), i18next.t("provider:Model provider - Tooltip"));
-    }
     return Setting.getLabel(i18next.t("provider:Client ID"), i18next.t("provider:Client ID - Tooltip"));
   }
 
@@ -129,9 +100,6 @@ class ProviderEditPage extends React.Component {
   }
 
   getProviderKeyLabel(provider) {
-    if (provider.category === "Chat" && provider.type === "Discord") {
-      return Setting.getLabel(i18next.t("provider:Public key"), i18next.t("provider:Public key - Tooltip"));
-    }
     return Setting.getLabel(i18next.t("provider:Provider key"), i18next.t("provider:Provider key - Tooltip"));
   }
 
@@ -160,10 +128,6 @@ class ProviderEditPage extends React.Component {
       if (provider.type === "Ethereum") {
         return Setting.getLabel(i18next.t("provider:Private key"), i18next.t("provider:Private key - Tooltip"));
       }
-    } else if (provider.category === "Chat") {
-      if (["Telegram", "Discord"].includes(provider.type)) {
-        return Setting.getLabel(i18next.t("provider:Bot token"), i18next.t("provider:Bot token - Tooltip"));
-      }
     }
     return Setting.getLabel(i18next.t("provider:Client secret"), i18next.t("provider:Client secret - Tooltip"));
   }
@@ -175,7 +139,7 @@ class ProviderEditPage extends React.Component {
         provider.category === "Storage") ||
       (provider.category === "Blockchain" && !["ChainMaker", "Ethereum"].includes(provider.type)) ||
       ((provider.category === "Model" || provider.category === "Embedding") && provider.type === "Azure") ||
-      (!(["Storage", "Model", "Embedding", "Text-to-Speech", "Speech-to-Text", "Blockchain", "Chat"].includes(provider.category)))
+      (!(["Storage", "Model", "Embedding", "Text-to-Speech", "Speech-to-Text", "Blockchain"].includes(provider.category)))
     );
   }
 
@@ -382,8 +346,6 @@ class ProviderEditPage extends React.Component {
                 } else if (value === "Speech-to-Text") {
                   this.updateProviderField("type", "Alibaba Cloud");
                   this.updateProviderField("subType", "paraformer-realtime-v1");
-                } else if (value === "Chat") {
-                  this.updateProviderField("type", "Telegram");
                 }
               })}>
                 {
@@ -395,7 +357,6 @@ class ProviderEditPage extends React.Component {
                     {id: "Video", name: "Video"},
                     {id: "Text-to-Speech", name: "Text-to-Speech"},
                     {id: "Speech-to-Text", name: "Speech-to-Text"},
-                    {id: "Chat", name: "Chat"},
                   ].map((item, index) => <Option key={index} value={item.id}>{item.name}</Option>)
                 }
               </Select>
@@ -583,27 +544,6 @@ class ProviderEditPage extends React.Component {
                   <Input disabled={isRemote} value={this.state.provider.clientId} onChange={e => {
                     this.updateProviderField("clientId", e.target.value);
                   }} />
-                </Col>
-              </Row>
-            ) : null
-          }
-          {
-            this.state.provider.category === "Chat" ? (
-              <Row style={{marginTop: "20px"}} >
-                <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-                  {this.getClientIdLabel(this.state.provider)}
-                </Col>
-                <Col span={22} >
-                  <Select virtual={false} disabled={isRemote} style={{width: "100%"}} value={this.state.provider.clientId}
-                    onChange={(value) => this.updateProviderField("clientId", value)}
-                    onDropdownVisibleChange={(open) => {if (open) {this.getModelProviders();}}}
-                    showSearch
-                    filterOption={(input, option) =>
-                      option.children[1].toLowerCase().includes(input.toLowerCase())
-                    }
-                  >
-                    {this.state.modelProviders.map((provider, index) => this.renderModelProviderOption(provider, index))}
-                  </Select>
                 </Col>
               </Row>
             ) : null
@@ -999,7 +939,7 @@ class ProviderEditPage extends React.Component {
             </Col>
           </Row>
           {
-            (this.state.provider.category === "Model" || (this.state.provider.category === "Chat" && this.state.provider.type === "Discord")) ? (
+            this.state.provider.category === "Model" ? (
               <Row style={{marginTop: "20px"}} >
                 <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
                   {this.getProviderKeyLabel(this.state.provider)}
@@ -1203,34 +1143,6 @@ class ProviderEditPage extends React.Component {
           />
         </Card>
         {
-          this.state.provider.category === "Chat" ? (
-            <Row style={{marginTop: "20px"}} >
-              <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-                {Setting.getLabel(i18next.t("provider:Domain"), i18next.t("provider:Domain - Tooltip"))}
-              </Col>
-              <Col span={22} >
-                <Input prefix={<LinkOutlined />} disabled={isRemote} value={this.state.provider.domain} onChange={e => {
-                  this.updateProviderField("domain", e.target.value);
-                }} />
-              </Col>
-            </Row>
-          ) : null
-        }
-        {
-          this.state.provider.category === "Chat" ? (
-            <Row style={{marginTop: "20px"}} >
-              <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-                {Setting.getLabel(i18next.t("provider:Webhook"), i18next.t("provider:Webhook - Tooltip"))}
-              </Col>
-              <Col span={22} >
-                <Button disabled={isRemote} type="primary" onClick={() => this.setChatWebhook()}>
-                  {i18next.t("provider:Set Webhook")}
-                </Button>
-              </Col>
-            </Row>
-          ) : null
-        }
-        {
           (this.state.provider.category !== "Model" || this.modelCategoryShowsProviderUrlInput(this.state.provider.type)) ? (
             <Row style={{marginTop: "20px"}} >
               <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
@@ -1246,21 +1158,6 @@ class ProviderEditPage extends React.Component {
         }
       </div>
     );
-  }
-
-  setChatWebhook() {
-    const id = `${this.state.provider.owner}/${this.state.provider.name}`;
-    ProviderBackend.setChatWebhook(id)
-      .then((res) => {
-        if (res.status === "ok") {
-          Setting.showMessage("success", `${i18next.t("provider:Webhook set successfully")}: ${res.data}`);
-        } else {
-          Setting.showMessage("error", `${i18next.t("general:Failed to save")}: ${res.msg}`);
-        }
-      })
-      .catch((error) => {
-        Setting.showMessage("error", `${i18next.t("general:Failed to save")}: ${error}`);
-      });
   }
 
   submitProviderEdit(exitAfterSave) {

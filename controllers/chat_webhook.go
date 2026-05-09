@@ -21,28 +21,27 @@ import (
 
 	"github.com/the-open-agent/openagent/chat"
 	"github.com/the-open-agent/openagent/object"
-	"github.com/the-open-agent/openagent/util"
 )
 
-// ChatWebhook receives incoming updates from a Chat provider.
-// The URL format is: /api/chat-webhook/:providerType/:providerName
-// This endpoint does not require authentication because it is called by chat provider servers.
-// @router /api/chat-webhook/:providerType/:providerName [post]
+// ChatWebhook receives incoming updates from a chat pipe.
+// The URL format is: /api/chat-webhook/:pipeType/:pipeName
+// This endpoint does not require authentication because it is called by chat platform servers.
+// @router /api/chat-webhook/:pipeType/:pipeName [post]
 func (c *ApiController) ChatWebhook() {
-	providerType := c.Ctx.Input.Param(":providerType")
-	providerName := c.Ctx.Input.Param(":providerName")
+	pipeType := c.Ctx.Input.Param(":pipeType")
+	pipeName := c.Ctx.Input.Param(":pipeName")
 
-	provider, err := object.GetProvider(util.GetIdFromOwnerAndName("admin", providerName))
+	pipe, err := object.GetPipeByName("admin", pipeName)
 	if err != nil {
 		c.Ctx.ResponseWriter.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	if provider == nil || provider.Category != "Chat" || chat.NormalizeChatProviderType(provider.Type) != providerType {
+	if pipe == nil || chat.NormalizeChatProviderType(pipe.Type) != pipeType {
 		c.Ctx.ResponseWriter.WriteHeader(http.StatusNotFound)
 		return
 	}
 
-	chatProviderObj, err := provider.GetChatProvider(c.GetAcceptLanguage())
+	chatProviderObj, err := pipe.GetChatProvider(c.GetAcceptLanguage())
 	if err != nil {
 		c.Ctx.ResponseWriter.WriteHeader(http.StatusInternalServerError)
 		return
@@ -62,7 +61,7 @@ func (c *ApiController) ChatWebhook() {
 
 	incoming, err := chatProviderObj.ParseWebhookRequest(body)
 	if err != nil {
-		// Acknowledge malformed updates so chat providers do not keep retrying them.
+		// Acknowledge malformed updates so chat platforms do not keep retrying them.
 		c.Ctx.ResponseWriter.WriteHeader(http.StatusOK)
 		return
 	}
@@ -73,11 +72,11 @@ func (c *ApiController) ChatWebhook() {
 
 	if immediateResponse != nil {
 		writeChatWebhookResponse(c, immediateResponse)
-		go sendChatProviderAnswer(chatProviderObj, provider.ClientId, incoming, c.GetAcceptLanguage())
+		go sendChatPipeAnswer(chatProviderObj, incoming, c.GetAcceptLanguage())
 		return
 	}
 
-	sendChatProviderAnswer(chatProviderObj, provider.ClientId, incoming, c.GetAcceptLanguage())
+	sendChatPipeAnswer(chatProviderObj, incoming, c.GetAcceptLanguage())
 	c.Ctx.ResponseWriter.WriteHeader(http.StatusOK)
 }
 
@@ -109,57 +108,12 @@ func writeChatWebhookResponse(c *ApiController, response *chat.WebhookResponse) 
 	}
 }
 
-func sendChatProviderAnswer(chatProviderObj chat.ChatProvider, modelProvider string, incoming *chat.IncomingMessage, lang string) {
-	// Use clientId as the model provider name; empty string falls back to default store.
-	answer, _, err := object.GetAnswer(modelProvider, incoming.Text, lang)
+func sendChatPipeAnswer(chatProviderObj chat.ChatProvider, incoming *chat.IncomingMessage, lang string) {
+	answer, _, err := object.GetAnswer("", incoming.Text, lang)
 	if err != nil {
 		_ = chatProviderObj.SendMessage(incoming.ChatId, fmt.Sprintf("Error: %v", err))
 		return
 	}
 
 	_ = chatProviderObj.SendMessage(incoming.ChatId, answer)
-}
-
-// SetChatWebhook calls the provider API to register the webhook URL for the given provider.
-// @Title SetChatWebhook
-// @Tag Provider API
-// @Description set webhook for a Chat provider
-// @Param   id     query    string  true  "The id of the provider (owner/name)"
-// @Success 200 {object} controllers.Response The Response object
-// @router /api/set-chat-webhook [post]
-func (c *ApiController) SetChatWebhook() {
-	id := c.Input().Get("id")
-
-	provider, err := object.GetProvider(id)
-	if err != nil {
-		c.ResponseError(err.Error())
-		return
-	}
-	if provider == nil {
-		c.ResponseError("provider not found")
-		return
-	}
-	if provider.Category != "Chat" {
-		c.ResponseError("provider is not a Chat provider")
-		return
-	}
-
-	chatProviderObj, err := provider.GetChatProvider(c.GetAcceptLanguage())
-	if err != nil {
-		c.ResponseError(err.Error())
-		return
-	}
-
-	if provider.Domain == "" {
-		c.ResponseError("Domain is not set on this provider")
-		return
-	}
-
-	webhookUrl := fmt.Sprintf("%s/api/chat-webhook/%s/%s", provider.Domain, chat.NormalizeChatProviderType(provider.Type), provider.Name)
-	if err = chatProviderObj.SetWebhook(webhookUrl); err != nil {
-		c.ResponseError(err.Error())
-		return
-	}
-
-	c.ResponseOk(webhookUrl)
 }
