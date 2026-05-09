@@ -42,8 +42,9 @@ const MessageItem = ({
   onToggleRead,
   onEditMessage,
   disableInput,
+  hideInput,
   isReading,
-  isLoadingTTS, // Added new prop for TTS loading state
+  isLoadingTTS,
   readingMessage,
   sendMessage,
   hideThinking,
@@ -154,8 +155,10 @@ const MessageItem = ({
     message,
     isLastMessage,
     disableInput,
+    hideInput,
     index,
     onEditMessage,
+    isDark,
   });
 
   useEffect(() => {
@@ -168,12 +171,8 @@ const MessageItem = ({
   };
 
   const renderMessageContent = () => {
-    if (isEditing && message.author !== "AI") {
-      return renderEditForm();
-    }
-
     if (message.errorText !== "") {
-      const regenerateButton = (
+      const regenerateButton = !hideInput ? (
         <Button
           danger
           type="primary"
@@ -187,7 +186,7 @@ const MessageItem = ({
             ? i18next.t("general:Regenerating...")
             : i18next.t("general:Regenerate")}
         </Button>
-      );
+      ) : null;
       return Setting.isMobile() ? (
         <div>
           <Alert
@@ -197,9 +196,11 @@ const MessageItem = ({
             showIcon
             style={{whiteSpace: "normal", wordWrap: "break-word"}}
           />
-          <Row justify="center" style={{marginTop: 16}}>
-            <Col>{regenerateButton}</Col>
-          </Row>
+          {regenerateButton && (
+            <Row justify="center" style={{marginTop: 16}}>
+              <Col>{regenerateButton}</Col>
+            </Row>
+          )}
         </div>
       ) : (
         <Alert
@@ -207,7 +208,7 @@ const MessageItem = ({
           description={message.errorText}
           type="error"
           showIcon
-          action={<div style={{marginLeft: 16}}>{regenerateButton}</div>}
+          action={regenerateButton ? <div style={{marginLeft: 16}}>{regenerateButton}</div> : null}
         />
       );
     }
@@ -335,6 +336,10 @@ const MessageItem = ({
 
     const isUserMessage = message.author !== "AI";
 
+    if (isEditing && isUserMessage) {
+      return renderEditForm();
+    }
+
     return (
       <div style={{
         display: "flex",
@@ -345,7 +350,7 @@ const MessageItem = ({
         {isUserMessage && !isEditing && (
           <Space size="small" style={{opacity: isHovering ? 0.8 : 0, transition: "opacity 0.2s ease-in-out"}}>
             <CopyButton message={message} onCopy={onCopy} />
-            {renderEditButton()}
+            {!hideInput && renderEditButton()}
           </Space>
         )}
 
@@ -370,11 +375,12 @@ const MessageItem = ({
                     onToggleRead={onToggleRead}
                     onEdit={() => setIsHovering(true)}
                     isReading={isReading}
-                    isLoadingTTS={isLoadingTTS} // Pass loading state to MessageActions
+                    isLoadingTTS={isLoadingTTS}
                     readingMessage={readingMessage}
                     account={account}
                     setIsRegenerating={setIsRegenerating}
                     isRegenerating={isRegenerating}
+                    hideInput={hideInput}
                   />
                   {mergedSearchResults.length > 0 && (
                     <Button
@@ -427,13 +433,11 @@ const MessageItem = ({
               padding: "11px 16px",
               backgroundColor: themeColor,
               color: "#fff",
-              minWidth: isEditing ? "300px" : "auto",
             } : {
               borderRadius: "4px 18px 18px 18px",
               padding: "11px 16px",
               backgroundColor: aiBubbleBg,
               border: aiBubbleBorder,
-              minWidth: isEditing ? "300px" : "auto",
             },
           }}
         />

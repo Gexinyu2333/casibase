@@ -69,7 +69,6 @@ func createProviderChat(chatId string, provider *Provider) (*Chat, error) {
 	}
 	chat := &Chat{
 		Name:        chatName,
-		Type:        "Provider",
 		Owner:       provider.Owner,
 		CreatedTime: util.GetCurrentTime(),
 		UpdatedTime: util.GetCurrentTime(),

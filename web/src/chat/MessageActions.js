@@ -52,6 +52,7 @@ const MessageActions = ({
   account,
   setIsRegenerating,
   isRegenerating,
+  hideInput,
 }) => {
   const isCurrentMessageBeingRead = readingMessage === message.name;
   const isCurrentMessageBeingLoaded = isLoadingTTS && isCurrentMessageBeingRead;
@@ -89,23 +90,27 @@ const MessageActions = ({
     >
       <CopyButton message={message} onCopy={onCopy} />
 
-      <Tooltip title={i18next.t("general:Like")} arrow={false}>
-        <Button
-          icon={message.likeUsers?.includes(account.name) ? <LikeFilled /> : <LikeOutlined />}
-          color="primary"
-          variant="text"
-          onClick={() => onLike(message, "like")}
-        />
-      </Tooltip>
+      {!hideInput && (
+        <Tooltip title={i18next.t("general:Like")} arrow={false}>
+          <Button
+            icon={message.likeUsers?.includes(account.name) ? <LikeFilled /> : <LikeOutlined />}
+            color="primary"
+            variant="text"
+            onClick={() => onLike(message, "like")}
+          />
+        </Tooltip>
+      )}
 
-      <Tooltip title={i18next.t("general:Dislike")} arrow={false}>
-        <Button
-          icon={message.dislikeUsers?.includes(account.name) ? <DislikeFilled /> : <DislikeOutlined />}
-          color="primary"
-          variant="text"
-          onClick={() => onLike(message, "dislike")}
-        />
-      </Tooltip>
+      {!hideInput && (
+        <Tooltip title={i18next.t("general:Dislike")} arrow={false}>
+          <Button
+            icon={message.dislikeUsers?.includes(account.name) ? <DislikeFilled /> : <DislikeOutlined />}
+            color="primary"
+            variant="text"
+            onClick={() => onLike(message, "dislike")}
+          />
+        </Tooltip>
+      )}
 
       <Tooltip title={getTtsTooltip()} arrow={false}>
         <Button
@@ -117,7 +122,7 @@ const MessageActions = ({
         />
       </Tooltip>
 
-      {!isLastMessage ? null : (
+      {!hideInput && isLastMessage && (
         <Tooltip title={i18next.t("general:Regenerate")} arrow={false}>
           <Button
             icon={<ReloadOutlined />}

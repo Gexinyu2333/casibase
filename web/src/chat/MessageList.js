@@ -73,6 +73,7 @@ class MessageList extends React.Component {
             onToggleRead={onToggleRead}
             onEditMessage={onEditMessage}
             disableInput={disableInput}
+            hideInput={hideInput}
             isReading={isReading}
             isLoadingTTS={isLoadingTTS}
             readingMessage={readingMessage}
