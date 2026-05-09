@@ -15,6 +15,7 @@
 package object
 
 import (
+	"github.com/the-open-agent/openagent/conf"
 	"github.com/the-open-agent/openagent/util"
 	"xorm.io/core"
 )
@@ -35,6 +36,30 @@ type Site struct {
 	NavItems      []string `xorm:"text" json:"navItems"`
 
 	CheckUserBalance bool `xorm:"bool" json:"checkUserBalance"`
+
+	CasdoorEndpoint     string `xorm:"varchar(500)" json:"casdoorEndpoint"`
+	ClientId            string `xorm:"varchar(100)" json:"clientId"`
+	ClientSecret        string `xorm:"varchar(100)" json:"clientSecret"`
+	CasdoorOrganization string `xorm:"varchar(100)" json:"casdoorOrganization"`
+	CasdoorApplication  string `xorm:"varchar(100)" json:"casdoorApplication"`
+	IpParsingMode       string `xorm:"varchar(100)" json:"ipParsingMode"`
+	ParentDbName        string `xorm:"varchar(100)" json:"parentDbName"`
+	Socks5Proxy         string `xorm:"varchar(200)" json:"socks5Proxy"`
+	LogConfig           string `xorm:"varchar(1000)" json:"logConfig"`
+}
+
+func SyncSiteToConf(site *Site) {
+	conf.SetSiteOverrides(map[string]string{
+		"casdoorEndpoint":     site.CasdoorEndpoint,
+		"clientId":            site.ClientId,
+		"clientSecret":        site.ClientSecret,
+		"casdoorOrganization": site.CasdoorOrganization,
+		"casdoorApplication":  site.CasdoorApplication,
+		"ipParsingMode":       site.IpParsingMode,
+		"parentDbName":        site.ParentDbName,
+		"socks5Proxy":         site.Socks5Proxy,
+		"logConfig":           site.LogConfig,
+	})
 }
 
 func GetGlobalSites() ([]*Site, error) {
@@ -72,6 +97,14 @@ func GetSite(id string) (*Site, error) {
 }
 
 func GetBuiltInSite() (*Site, error) {
+	site, err := GetSite("admin/site-built-in")
+	if site != nil {
+		site.ClientSecret = ""
+	}
+	return site, err
+}
+
+func GetBuiltInSiteWithSecret() (*Site, error) {
 	return GetSite("admin/site-built-in")
 }
 

@@ -15,6 +15,7 @@
 import React from "react";
 import Loading from "./common/Loading";
 import {Button, Card, Col, Image, Input, Modal, Popover, Row, Space, Switch, Upload} from "antd";
+import {EyeInvisibleOutlined, EyeTwoTone} from "@ant-design/icons";
 import * as SiteBackend from "./backend/SiteBackend";
 import * as ResourceBackend from "./backend/ResourceBackend";
 import * as Setting from "./Setting";
@@ -319,8 +320,47 @@ class SiteEditPage extends React.Component {
           </Row>
         </Card>
 
-        <Card size="small" title={renderCardTitle(i18next.t("general:Options"), i18next.t("general:Options desc"))} style={sectionCardStyle} headStyle={cardHeadStyle}>
+        <Card size="small" title={renderCardTitle(i18next.t("site:Authentication"), i18next.t("site:Authentication desc"))} style={sectionCardStyle} headStyle={cardHeadStyle}>
           <Row gutter={rowGutter}>
+            {this.renderSiteField(
+              Setting.getLabel(i18next.t("site:Casdoor endpoint"), i18next.t("site:Casdoor endpoint - Tooltip")),
+              <Input prefix={<LinkOutlined />} value={site.casdoorEndpoint} onChange={e => {
+                this.updateSiteField("casdoorEndpoint", e.target.value);
+              }} />,
+              12
+            )}
+            {this.renderSiteField(
+              Setting.getLabel(i18next.t("site:Client ID"), i18next.t("site:Client ID - Tooltip")),
+              <Input value={site.clientId} onChange={e => {
+                this.updateSiteField("clientId", e.target.value);
+              }} />,
+              6
+            )}
+            {this.renderSiteField(
+              Setting.getLabel(i18next.t("site:Client secret"), i18next.t("site:Client secret - Tooltip")),
+              <Input.Password
+                value={site.clientSecret}
+                iconRender={visible => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
+                onChange={e => {
+                  this.updateSiteField("clientSecret", e.target.value);
+                }}
+              />,
+              6
+            )}
+            {this.renderSiteField(
+              Setting.getLabel(i18next.t("site:Casdoor organization"), i18next.t("site:Casdoor organization - Tooltip")),
+              <Input value={site.casdoorOrganization} onChange={e => {
+                this.updateSiteField("casdoorOrganization", e.target.value);
+              }} />,
+              8
+            )}
+            {this.renderSiteField(
+              Setting.getLabel(i18next.t("site:Casdoor application"), i18next.t("site:Casdoor application - Tooltip")),
+              <Input value={site.casdoorApplication} onChange={e => {
+                this.updateSiteField("casdoorApplication", e.target.value);
+              }} />,
+              8
+            )}
             {this.renderSiteSwitch(
               Setting.getLabel(i18next.t("site:Check user balance"), i18next.t("site:Check user balance - Tooltip")),
               site.checkUserBalance,
@@ -328,6 +368,39 @@ class SiteEditPage extends React.Component {
                 this.updateSiteField("checkUserBalance", checked);
               },
               8
+            )}
+          </Row>
+        </Card>
+
+        <Card size="small" title={renderCardTitle(i18next.t("site:Advanced"), i18next.t("site:Advanced desc"))} style={sectionCardStyle} headStyle={cardHeadStyle}>
+          <Row gutter={rowGutter}>
+            {this.renderSiteField(
+              Setting.getLabel(i18next.t("site:IP parsing mode"), i18next.t("site:IP parsing mode - Tooltip")),
+              <Input value={site.ipParsingMode} onChange={e => {
+                this.updateSiteField("ipParsingMode", e.target.value);
+              }} />,
+              8
+            )}
+            {this.renderSiteField(
+              Setting.getLabel(i18next.t("site:Parent DB name"), i18next.t("site:Parent DB name - Tooltip")),
+              <Input value={site.parentDbName} onChange={e => {
+                this.updateSiteField("parentDbName", e.target.value);
+              }} />,
+              8
+            )}
+            {this.renderSiteField(
+              Setting.getLabel(i18next.t("site:Socks5 proxy"), i18next.t("site:Socks5 proxy - Tooltip")),
+              <Input value={site.socks5Proxy} onChange={e => {
+                this.updateSiteField("socks5Proxy", e.target.value);
+              }} />,
+              8
+            )}
+            {this.renderSiteField(
+              Setting.getLabel(i18next.t("site:Log config"), i18next.t("site:Log config - Tooltip")),
+              <Input value={site.logConfig} onChange={e => {
+                this.updateSiteField("logConfig", e.target.value);
+              }} />,
+              24
             )}
           </Row>
         </Card>

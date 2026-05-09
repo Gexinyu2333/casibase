@@ -20,9 +20,23 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/beego/beego"
 )
+
+var (
+	siteConfigOverrides = map[string]string{}
+	siteConfigMu        sync.RWMutex
+)
+
+func SetSiteOverrides(overrides map[string]string) {
+	siteConfigMu.Lock()
+	defer siteConfigMu.Unlock()
+	for k, v := range overrides {
+		siteConfigOverrides[k] = v
+	}
+}
 
 const FrontendBaseDir = "../openagent"
 
@@ -33,14 +47,14 @@ type WebConfig struct {
 		AppName          string `json:"appName"`
 		OrganizationName string `json:"organizationName"`
 	} `json:"authConfig"`
-	StaticBaseUrl    string `json:"staticBaseUrl"`
-	HtmlTitle        string `json:"htmlTitle"`
-	FaviconUrl       string `json:"faviconUrl"`
-	LogoUrl          string `json:"logoUrl"`
-	NavbarHtml       string `json:"navbarHtml"`
-	FooterHtml       string `json:"footerHtml"`
-	IsDemoMode       bool   `json:"isDemoMode"`
-	ThemeDefault     struct {
+	StaticBaseUrl string `json:"staticBaseUrl"`
+	HtmlTitle     string `json:"htmlTitle"`
+	FaviconUrl    string `json:"faviconUrl"`
+	LogoUrl       string `json:"logoUrl"`
+	NavbarHtml    string `json:"navbarHtml"`
+	FooterHtml    string `json:"footerHtml"`
+	IsDemoMode    bool   `json:"isDemoMode"`
+	ThemeDefault  struct {
 		ColorPrimary string `json:"colorPrimary"`
 	} `json:"themeDefault"`
 }
@@ -64,6 +78,13 @@ func ReadGlobalConfigTokens() []string {
 func GetConfigString(key string) string {
 	if value, ok := os.LookupEnv(key); ok {
 		return value
+	}
+
+	siteConfigMu.RLock()
+	siteVal, hasSiteVal := siteConfigOverrides[key]
+	siteConfigMu.RUnlock()
+	if hasSiteVal && siteVal != "" {
+		return siteVal
 	}
 
 	tokens := ReadGlobalConfigTokens()

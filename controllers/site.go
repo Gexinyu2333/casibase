@@ -18,6 +18,7 @@ import (
 	"encoding/json"
 
 	"github.com/the-open-agent/openagent/object"
+	"github.com/the-open-agent/openagent/proxy"
 )
 
 // GetGlobalSites
@@ -121,6 +122,12 @@ func (c *ApiController) UpdateSite() {
 	if err != nil {
 		c.ResponseError(err.Error())
 		return
+	}
+
+	if success && site.Name == "site-built-in" {
+		object.SyncSiteToConf(&site)
+		InitAuthConfig()
+		proxy.InitHttpClient()
 	}
 
 	c.ResponseOk(success)

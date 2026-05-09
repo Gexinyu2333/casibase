@@ -31,6 +31,9 @@ func InitDb() {
 	initSkillsFromFolder()
 	initBuiltInTools()
 	initBuiltInSite()
+	if site, err := GetBuiltInSiteWithSecret(); err == nil && site != nil {
+		SyncSiteToConf(site)
+	}
 	InitUsers()
 }
 
@@ -644,6 +647,16 @@ func initBuiltInSite() {
 		FooterHtml:    `<a target="_blank" href="https://github.com/the-open-agent/openagent" rel="noreferrer"><img style="padding-bottom: 3px;" height="30" alt="OpenAgent" src="https://cdn.openagentai.org/img/openagent-logo_1900x450.png" /></a>`,
 		StaticBaseUrl: "https://cdn.openagentai.org",
 		NavItems:      builtInNavItems,
+
+		CasdoorEndpoint:     conf.GetConfigString("casdoorEndpoint"),
+		ClientId:            conf.GetConfigString("clientId"),
+		ClientSecret:        conf.GetConfigString("clientSecret"),
+		CasdoorOrganization: conf.GetConfigString("casdoorOrganization"),
+		CasdoorApplication:  conf.GetConfigString("casdoorApplication"),
+		IpParsingMode:       conf.GetConfigString("ipParsingMode"),
+		ParentDbName:        conf.GetConfigString("parentDbName"),
+		Socks5Proxy:         conf.GetConfigString("socks5Proxy"),
+		LogConfig:           conf.GetConfigString("logConfig"),
 	}
 
 	_, err = AddSite(site)
