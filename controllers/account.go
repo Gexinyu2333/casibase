@@ -32,13 +32,16 @@ func init() {
 }
 
 func tryInitAuthConfig() error {
-	casdoorEndpoint := conf.GetConfigString("casdoorEndpoint")
+	issuer := conf.GetConfigString("issuer")
+	if issuer == "" {
+		issuer = conf.GetConfigString("casdoorEndpoint") // backward compat
+	}
 	clientId := conf.GetConfigString("clientId")
 	clientSecret := conf.GetConfigString("clientSecret")
-	casdoorOrganization := conf.GetConfigString("casdoorOrganization")
-	casdoorApplication := conf.GetConfigString("casdoorApplication")
+	casdoorOrganization := conf.GetConfigString("casdoorOrganization") // casdoor backward compat
+	casdoorApplication := conf.GetConfigString("casdoorApplication")   // casdoor backward compat
 
-	auth.InitConfig(casdoorEndpoint, clientId, clientSecret, "", casdoorOrganization, casdoorApplication)
+	auth.InitConfig(issuer, clientId, clientSecret, "", casdoorOrganization, casdoorApplication)
 
 	application, err := auth.GetApplication(casdoorApplication)
 	if err != nil {
@@ -56,14 +59,17 @@ func tryInitAuthConfig() error {
 		return fmt.Errorf("the cert %q does not exist", application.Cert)
 	}
 
-	auth.InitConfig(casdoorEndpoint, clientId, clientSecret, cert.Certificate, casdoorOrganization, casdoorApplication)
+	auth.InitConfig(issuer, clientId, clientSecret, cert.Certificate, casdoorOrganization, casdoorApplication)
 	conf.SetCasdoorAvailable(true)
 	return nil
 }
 
 func InitAuthConfig() {
-	casdoorEndpoint := conf.GetConfigString("casdoorEndpoint")
-	if casdoorEndpoint == "" {
+	issuer := conf.GetConfigString("issuer")
+	if issuer == "" {
+		issuer = conf.GetConfigString("casdoorEndpoint") // backward compat
+	}
+	if issuer == "" {
 		conf.SetCasdoorAvailable(false)
 		return
 	}

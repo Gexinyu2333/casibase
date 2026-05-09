@@ -161,12 +161,15 @@ func serveFileWithReplace(w http.ResponseWriter, r *http.Request, path string) {
 	oldContent := util.ReadStringFromPath(path)
 	newContent := oldContent
 
-	serverUrl := conf.GetConfigString("casdoorEndpoint")
+	issuer := conf.GetConfigString("issuer")
+	if issuer == "" {
+		issuer = conf.GetConfigString("casdoorEndpoint") // backward compat
+	}
 	clientId := conf.GetConfigString("clientId")
-	appName := conf.GetConfigString("casdoorApplication")
-	organizationName := conf.GetConfigString("casdoorOrganization")
+	appName := conf.GetConfigString("casdoorApplication")           // casdoor backward compat
+	organizationName := conf.GetConfigString("casdoorOrganization") // casdoor backward compat
 
-	newContent = regexp.MustCompile(`serverUrl:"[^"]*"`).ReplaceAllString(newContent, fmt.Sprintf(`serverUrl:"%s"`, serverUrl))
+	newContent = regexp.MustCompile(`issuer:"[^"]*"`).ReplaceAllString(newContent, fmt.Sprintf(`issuer:"%s"`, issuer))
 	newContent = regexp.MustCompile(`clientId:"[^"]*"`).ReplaceAllString(newContent, fmt.Sprintf(`clientId:"%s"`, clientId))
 	newContent = regexp.MustCompile(`appName:"[^"]*"`).ReplaceAllString(newContent, fmt.Sprintf(`appName:"%s"`, appName))
 	newContent = regexp.MustCompile(`organizationName:"[^"]*"`).ReplaceAllString(newContent, fmt.Sprintf(`organizationName:"%s"`, organizationName))

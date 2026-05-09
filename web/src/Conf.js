@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const AuthConfig = {serverUrl: "", clientId: "", appName: "", organizationName: "", redirectPath: "/callback"};
+export const AuthConfig = {issuer: "", clientId: "", appName: "", organizationName: "", redirectPath: "/callback"};
 export let StaticBaseUrl = "";
 export let HtmlTitle = "";
 export let FaviconUrl = "";

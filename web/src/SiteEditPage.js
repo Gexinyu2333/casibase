@@ -323,9 +323,9 @@ class SiteEditPage extends React.Component {
         <Card size="small" title={renderCardTitle(i18next.t("site:Authentication"), i18next.t("site:Authentication desc"))} style={sectionCardStyle} headStyle={cardHeadStyle}>
           <Row gutter={rowGutter}>
             {this.renderSiteField(
-              Setting.getLabel(i18next.t("site:Casdoor endpoint"), i18next.t("site:Casdoor endpoint - Tooltip")),
-              <Input prefix={<LinkOutlined />} value={site.casdoorEndpoint} onChange={e => {
-                this.updateSiteField("casdoorEndpoint", e.target.value);
+              Setting.getLabel(i18next.t("site:OIDC issuer"), i18next.t("site:OIDC issuer - Tooltip")),
+              <Input prefix={<LinkOutlined />} value={site.issuer} onChange={e => {
+                this.updateSiteField("issuer", e.target.value);
               }} />,
               12
             )}
@@ -347,27 +347,13 @@ class SiteEditPage extends React.Component {
               />,
               6
             )}
-            {this.renderSiteField(
-              Setting.getLabel(i18next.t("site:Casdoor organization"), i18next.t("site:Casdoor organization - Tooltip")),
-              <Input value={site.casdoorOrganization} onChange={e => {
-                this.updateSiteField("casdoorOrganization", e.target.value);
-              }} />,
-              8
-            )}
-            {this.renderSiteField(
-              Setting.getLabel(i18next.t("site:Casdoor application"), i18next.t("site:Casdoor application - Tooltip")),
-              <Input value={site.casdoorApplication} onChange={e => {
-                this.updateSiteField("casdoorApplication", e.target.value);
-              }} />,
-              8
-            )}
             {this.renderSiteSwitch(
               Setting.getLabel(i18next.t("site:Check user balance"), i18next.t("site:Check user balance - Tooltip")),
               site.checkUserBalance,
               checked => {
                 this.updateSiteField("checkUserBalance", checked);
               },
-              8
+              6
             )}
           </Row>
         </Card>

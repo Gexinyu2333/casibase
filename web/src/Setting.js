@@ -45,7 +45,13 @@ export function isLocalhost() {
 }
 
 export function initCasdoorSdk(config) {
-  CasdoorSdk = new Sdk(config);
+  CasdoorSdk = new Sdk({
+    serverUrl: config.issuer,
+    clientId: config.clientId,
+    appName: config.appName || "",
+    organizationName: config.organizationName || "",
+    redirectPath: config.redirectPath || "/callback",
+  });
 }
 
 export function initWebConfig() {
@@ -67,14 +73,14 @@ function getUrlWithLanguage(url) {
 }
 
 export function getSignupUrl() {
-  if (!Conf.AuthConfig || !Conf.AuthConfig.serverUrl) {
+  if (!Conf.AuthConfig || !Conf.AuthConfig.issuer) {
     return "";
   }
   return getUrlWithLanguage(CasdoorSdk.getSignupUrl());
 }
 
 export function isCasdoorAvailable() {
-  return !!(Conf.AuthConfig && Conf.AuthConfig.serverUrl);
+  return !!(Conf.AuthConfig && Conf.AuthConfig.issuer);
 }
 
 export function getSigninUrl() {

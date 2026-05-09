@@ -42,10 +42,10 @@ const FrontendBaseDir = "../openagent"
 
 type WebConfig struct {
 	AuthConfig struct {
-		ServerUrl        string `json:"serverUrl"`
+		Issuer           string `json:"issuer"`
 		ClientId         string `json:"clientId"`
-		AppName          string `json:"appName"`
-		OrganizationName string `json:"organizationName"`
+		AppName          string `json:"appName"`          // populated only when casdoorApplication is set (backward compat)
+		OrganizationName string `json:"organizationName"` // populated only when casdoorOrganization is set (backward compat)
 	} `json:"authConfig"`
 	StaticBaseUrl string `json:"staticBaseUrl"`
 	HtmlTitle     string `json:"htmlTitle"`
@@ -198,10 +198,14 @@ func GetStringArray(key string) []string {
 func GetWebConfig() *WebConfig {
 	config := &WebConfig{}
 
-	config.AuthConfig.ServerUrl = GetConfigString("casdoorEndpoint")
+	issuer := GetConfigString("issuer")
+	if issuer == "" {
+		issuer = GetConfigString("casdoorEndpoint") // backward compat
+	}
+	config.AuthConfig.Issuer = issuer
 	config.AuthConfig.ClientId = GetConfigString("clientId")
-	config.AuthConfig.AppName = GetConfigString("casdoorApplication")
-	config.AuthConfig.OrganizationName = GetConfigString("casdoorOrganization")
+	config.AuthConfig.AppName = GetConfigString("casdoorApplication")           // casdoor backward compat
+	config.AuthConfig.OrganizationName = GetConfigString("casdoorOrganization") // casdoor backward compat
 
 	config.StaticBaseUrl = GetConfigString("staticBaseUrl")
 	config.HtmlTitle = GetConfigString("htmlTitle")

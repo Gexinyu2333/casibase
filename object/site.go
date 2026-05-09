@@ -37,11 +37,12 @@ type Site struct {
 
 	CheckUserBalance bool `xorm:"bool" json:"checkUserBalance"`
 
-	CasdoorEndpoint     string `xorm:"varchar(500)" json:"casdoorEndpoint"`
+	Issuer              string `xorm:"varchar(500)" json:"issuer"`
 	ClientId            string `xorm:"varchar(100)" json:"clientId"`
 	ClientSecret        string `xorm:"varchar(100)" json:"clientSecret"`
-	CasdoorOrganization string `xorm:"varchar(100)" json:"casdoorOrganization"`
-	CasdoorApplication  string `xorm:"varchar(100)" json:"casdoorApplication"`
+	CasdoorEndpoint     string `xorm:"varchar(500)" json:"casdoorEndpoint"`     // backward compat, prefer Issuer
+	CasdoorOrganization string `xorm:"varchar(100)" json:"casdoorOrganization"` // casdoor backward compat
+	CasdoorApplication  string `xorm:"varchar(100)" json:"casdoorApplication"`  // casdoor backward compat
 	IpParsingMode       string `xorm:"varchar(100)" json:"ipParsingMode"`
 	ParentDbName        string `xorm:"varchar(100)" json:"parentDbName"`
 	Socks5Proxy         string `xorm:"varchar(200)" json:"socks5Proxy"`
@@ -50,11 +51,12 @@ type Site struct {
 
 func SyncSiteToConf(site *Site) {
 	conf.SetSiteOverrides(map[string]string{
-		"casdoorEndpoint":     site.CasdoorEndpoint,
+		"issuer":              site.Issuer,
 		"clientId":            site.ClientId,
 		"clientSecret":        site.ClientSecret,
-		"casdoorOrganization": site.CasdoorOrganization,
-		"casdoorApplication":  site.CasdoorApplication,
+		"casdoorEndpoint":     site.CasdoorEndpoint,     // backward compat
+		"casdoorOrganization": site.CasdoorOrganization, // casdoor backward compat
+		"casdoorApplication":  site.CasdoorApplication,  // casdoor backward compat
 		"ipParsingMode":       site.IpParsingMode,
 		"parentDbName":        site.ParentDbName,
 		"socks5Proxy":         site.Socks5Proxy,
