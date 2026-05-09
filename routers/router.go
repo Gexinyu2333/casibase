@@ -213,11 +213,8 @@ func initAPI() {
 	beego.Router("/api/add-article", &controllers.ApiController{}, "POST:AddArticle")
 	beego.Router("/api/delete-article", &controllers.ApiController{}, "POST:DeleteArticle")
 
-	beego.Router("/api/update-tree-file", &controllers.ApiController{}, "POST:UpdateTreeFile")
 	beego.Router("/api/add-tree-file", &controllers.ApiController{}, "POST:AddTreeFile")
 	beego.Router("/api/delete-tree-file", &controllers.ApiController{}, "POST:DeleteTreeFile")
-
-	beego.Router("/api/upload-file", &controllers.ApiController{}, "POST:UploadFile")
 
 	beego.Router("/api/get-global-resources", &controllers.ApiController{}, "GET:GetGlobalResources")
 	beego.Router("/api/get-resource", &controllers.ApiController{}, "GET:GetResource")

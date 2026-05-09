@@ -15,7 +15,6 @@
 package controllers
 
 import (
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"mime"
@@ -242,78 +241,4 @@ func (c *ApiController) UploadResourceFile() {
 	}
 
 	c.ResponseOk(fileUrl, fullFilePath)
-}
-
-// UploadFile
-// @Title UploadFile
-// @Tag File API
-// @Description upload a base64-encoded file and record it as a resource
-// @Param file formData string true "The base64 encoded file data"
-// @Param type formData string true "The file type/extension"
-// @Param name formData string true "The file name"
-// @Param category formData string false "Resource category: avatar (default), chat, document"
-// @Param objectType formData string false "Associated object type"
-// @Param objectId formData string false "Associated object id"
-// @Success 200 {object} controllers.Response The Response object
-// @router /upload-file [post]
-func (c *ApiController) UploadFile() {
-	userName, ok := c.RequireSignedIn()
-	if !ok {
-		return
-	}
-
-	fileBase64 := c.Input().Get("file")
-	fileType := c.Input().Get("type")
-	fileName := c.Input().Get("name")
-	category := c.Input().Get("category")
-	objectType := c.Input().Get("objectType")
-	objectId := c.Input().Get("objectId")
-
-	if fileBase64 == "" || fileType == "" || fileName == "" {
-		c.ResponseError(c.T("application:Missing required parameters"))
-		return
-	}
-
-	if category == "" {
-		category = "avatar"
-	}
-
-	index := strings.Index(fileBase64, ",")
-	if index == -1 {
-		c.ResponseError(c.T("resource:Invalid file data format"))
-		return
-	}
-
-	fileBytes, err := base64.StdEncoding.DecodeString(fileBase64[index+1:])
-	if err != nil {
-		c.ResponseError(err.Error())
-		return
-	}
-
-	filePath := fmt.Sprintf("openagent/resources/%s/%s/%s", category, userName, fileName)
-
-	host := c.Ctx.Request.Host
-	origin := getOriginFromHost(host)
-	fileUrl, err := object.UploadFileToStorageSafe(filePath, fileBytes, origin, c.GetAcceptLanguage())
-	if err != nil {
-		c.ResponseError(err.Error())
-		return
-	}
-
-	ext := strings.ToLower(filepath.Ext(fileName))
-	mimeType := mime.TypeByExtension(ext)
-	fileTypeParts := strings.SplitN(mimeType, "/", 2)
-	detectedFileType := "unknown"
-	if len(fileTypeParts) > 0 {
-		detectedFileType = fileTypeParts[0]
-	}
-
-	resource := object.NewResourceFromUpload("admin", userName, category, fileName, detectedFileType, ext, fileUrl, filePath, len(fileBytes), objectType, objectId)
-	_, err = object.AddResource(resource)
-	if err != nil {
-		c.ResponseError(err.Error())
-		return
-	}
-
-	c.ResponseOk(fileUrl)
 }

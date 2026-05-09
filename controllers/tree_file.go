@@ -15,48 +15,10 @@
 package controllers
 
 import (
-	"encoding/json"
 	"mime/multipart"
 
 	"github.com/the-open-agent/openagent/object"
 )
-
-// UpdateTreeFile
-// @Title UpdateTreeFile
-// @Tag Tree File API
-// @Description update tree file
-// @Param storeId query string true "The store id of the file"
-// @Param key query string true "The key of the file"
-// @Param body body object.TreeFile true "The details of the Tree File"
-// @Success 200 {object} controllers.Response The Response object
-// @router /update-tree-file [post]
-func (c *ApiController) UpdateTreeFile() {
-	userName, ok := c.RequireSignedIn()
-	if !ok {
-		return
-	}
-
-	storeId := c.Input().Get("store")
-	key := c.Input().Get("key")
-
-	var file object.TreeFile
-	err := json.Unmarshal(c.Ctx.Input.RequestBody, &file)
-	if err != nil {
-		c.ResponseError(err.Error())
-		return
-	}
-
-	res := object.UpdateTreeFile(storeId, key, &file)
-	if res {
-		err = addRecordForFile(c, userName, "Update", storeId, key, "", true, c.GetAcceptLanguage())
-		if err != nil {
-			c.ResponseError(err.Error())
-			return
-		}
-	}
-
-	c.ResponseOk(res)
-}
 
 // AddTreeFile
 // @Title AddTreeFile
