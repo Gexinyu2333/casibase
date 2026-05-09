@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package chat
+package pipe
 
 import (
 	"crypto/ed25519"
@@ -34,7 +34,7 @@ const (
 	discordApplicationCommandOptionTypeString            int = 3
 )
 
-type DiscordChatProvider struct {
+type DiscordPipe struct {
 	botToken     string
 	publicKeyHex string
 	httpClient   *http.Client
@@ -89,21 +89,21 @@ type discordWebhookResponse struct {
 	Type int `json:"type"`
 }
 
-func NewDiscordChatProvider(botToken string, publicKeyHex string, httpClient *http.Client) (*DiscordChatProvider, error) {
-	return &DiscordChatProvider{
+func NewDiscordPipe(botToken string, publicKeyHex string, httpClient *http.Client) (*DiscordPipe, error) {
+	return &DiscordPipe{
 		botToken:     botToken,
 		publicKeyHex: strings.TrimSpace(publicKeyHex),
 		httpClient:   httpClient,
 	}, nil
 }
 
-func (p *DiscordChatProvider) authorizationHeaders() map[string]string {
+func (p *DiscordPipe) authorizationHeaders() map[string]string {
 	return map[string]string{
 		"Authorization": fmt.Sprintf("Bot %s", p.botToken),
 	}
 }
 
-func (p *DiscordChatProvider) SendMessage(chatId string, text string) error {
+func (p *DiscordPipe) SendMessage(chatId string, text string) error {
 	payload := map[string]interface{}{
 		"content": text,
 	}
@@ -120,7 +120,7 @@ func (p *DiscordChatProvider) SendMessage(chatId string, text string) error {
 	return err
 }
 
-func (p *DiscordChatProvider) ParseWebhookRequest(body []byte) (*IncomingMessage, error) {
+func (p *DiscordPipe) ParseWebhookRequest(body []byte) (*IncomingMessage, error) {
 	var interaction discordInteraction
 	if err := json.Unmarshal(body, &interaction); err != nil {
 		return nil, err
@@ -137,7 +137,7 @@ func (p *DiscordChatProvider) ParseWebhookRequest(body []byte) (*IncomingMessage
 	return nil, nil
 }
 
-func (p *DiscordChatProvider) parseInteraction(interaction discordInteraction) *IncomingMessage {
+func (p *DiscordPipe) parseInteraction(interaction discordInteraction) *IncomingMessage {
 	if interaction.Type == discordInteractionTypePing {
 		return nil
 	}
@@ -172,7 +172,7 @@ func (p *DiscordChatProvider) parseInteraction(interaction discordInteraction) *
 	}
 }
 
-func (p *DiscordChatProvider) parseGatewayMessageCreate(body []byte) (*IncomingMessage, error) {
+func (p *DiscordPipe) parseGatewayMessageCreate(body []byte) (*IncomingMessage, error) {
 	var message discordMessageCreate
 	if err := json.Unmarshal(body, &message); err != nil {
 		return nil, err
@@ -225,7 +225,7 @@ func flattenDiscordCommandOption(option discordApplicationCommandOption) []strin
 	return values
 }
 
-func (p *DiscordChatProvider) GetWebhookResponse(body []byte, header http.Header) (*WebhookResponse, error) {
+func (p *DiscordPipe) GetWebhookResponse(body []byte, header http.Header) (*WebhookResponse, error) {
 	if err := p.verifyWebhookSignature(body, header); err != nil {
 		return nil, err
 	}
@@ -256,7 +256,7 @@ func (p *DiscordChatProvider) GetWebhookResponse(body []byte, header http.Header
 	}, nil
 }
 
-func (p *DiscordChatProvider) verifyWebhookSignature(body []byte, header http.Header) error {
+func (p *DiscordPipe) verifyWebhookSignature(body []byte, header http.Header) error {
 	if p.publicKeyHex == "" {
 		return nil
 	}
@@ -291,7 +291,7 @@ func (p *DiscordChatProvider) verifyWebhookSignature(body []byte, header http.He
 	return nil
 }
 
-func (p *DiscordChatProvider) SetWebhook(webhookUrl string) error {
+func (p *DiscordPipe) SetWebhook(webhookUrl string) error {
 	payload := map[string]interface{}{
 		"interactions_endpoint_url": webhookUrl,
 	}

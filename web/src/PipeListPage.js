@@ -36,7 +36,7 @@ class PipeListPage extends BaseListPage {
       displayName: `New Pipe - ${randomName}`,
       type: "Telegram",
       token: "",
-      providerKey: "",
+      secretKey: "",
       domain: "",
       isDefault: false,
       state: "Active",

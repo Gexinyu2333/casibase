@@ -18,8 +18,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/the-open-agent/openagent/chat"
 	"github.com/the-open-agent/openagent/object"
+	pipepkg "github.com/the-open-agent/openagent/pipe"
 )
 
 // GetGlobalPipes
@@ -174,7 +174,7 @@ func (c *ApiController) SetPipeWebhook() {
 		return
 	}
 
-	chatProviderObj, err := pipe.GetChatProvider(c.GetAcceptLanguage())
+	pipeObj, err := pipe.GetProvider(c.GetAcceptLanguage())
 	if err != nil {
 		c.ResponseError(err.Error())
 		return
@@ -185,8 +185,8 @@ func (c *ApiController) SetPipeWebhook() {
 		return
 	}
 
-	webhookUrl := fmt.Sprintf("%s/api/chat-webhook/%s/%s", pipe.Domain, chat.NormalizeChatProviderType(pipe.Type), pipe.Name)
-	if err = chatProviderObj.SetWebhook(webhookUrl); err != nil {
+	webhookUrl := fmt.Sprintf("%s/api/chat-webhook/%s/%s", pipe.Domain, pipepkg.NormalizeType(pipe.Type), pipe.Name)
+	if err = pipeObj.SetWebhook(webhookUrl); err != nil {
 		c.ResponseError(err.Error())
 		return
 	}
@@ -218,13 +218,13 @@ func (c *ApiController) ChatTest() {
 		return
 	}
 
-	chatProviderObj, err := pipe.GetChatProvider(c.GetAcceptLanguage())
+	pipeObj, err := pipe.GetProvider(c.GetAcceptLanguage())
 	if err != nil {
 		c.ResponseError(err.Error())
 		return
 	}
 
-	if err = chatProviderObj.SendMessage(chatId, message); err != nil {
+	if err = pipeObj.SendMessage(chatId, message); err != nil {
 		c.ResponseError(err.Error())
 		return
 	}

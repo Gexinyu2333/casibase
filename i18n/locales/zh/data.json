@@ -160,7 +160,7 @@
     "the STT provider type: %s is not supported": "不支持的 STT 提供商类型：%s",
     "the TTS provider type: %s is not supported": "不支持的 TTS 提供商类型：%s",
     "the blockchain provider: %s is not found": "区块链提供商：%s 未找到",
-    "the chat provider type: %s is not supported": "the chat provider type: %s is not supported",
+    "the pipe type: %s is not supported": "不支持的管道类型：%s",
     "the embedding provider type: %s is not supported": "不支持的嵌入提供商类型：%s",
     "the form: %s is not found": "表单：%s 未找到",
     "the model provider type: %s is not supported": "不支持的模型提供商类型：%s",

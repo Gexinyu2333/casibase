@@ -18,8 +18,8 @@ import (
 	"fmt"
 
 	"github.com/the-open-agent/openagent/auth"
-	"github.com/the-open-agent/openagent/chat"
 	"github.com/the-open-agent/openagent/i18n"
+	"github.com/the-open-agent/openagent/pipe"
 	"github.com/the-open-agent/openagent/util"
 	"xorm.io/core"
 )
@@ -32,7 +32,7 @@ type Pipe struct {
 	DisplayName string `xorm:"varchar(100)" json:"displayName"`
 	Type        string `xorm:"varchar(100)" json:"type"`
 	Token       string `xorm:"varchar(2000)" json:"token"`
-	ProviderKey string `xorm:"varchar(100)" json:"providerKey"`
+	SecretKey string `xorm:"varchar(100) 'provider_key'" json:"secretKey"`
 	Domain      string `xorm:"varchar(200)" json:"domain"`
 
 	IsDefault bool   `json:"isDefault"`
@@ -49,8 +49,8 @@ func GetMaskedPipe(pipe *Pipe, isMaskEnabled bool, user *auth.User) *Pipe {
 	}
 
 	if !util.IsAdmin(user) {
-		if pipe.ProviderKey != "" {
-			pipe.ProviderKey = "***"
+		if pipe.SecretKey != "" {
+			pipe.SecretKey = "***"
 		}
 	}
 
@@ -154,24 +154,24 @@ func (p *Pipe) GetId() string {
 	return fmt.Sprintf("%s/%s", p.Owner, p.Name)
 }
 
-func (p *Pipe) GetChatProvider(lang string) (chat.ChatProvider, error) {
-	pProvider, err := chat.GetChatProvider(p.Type, p.Token, p.ProviderKey, p.Name, lang)
+func (p *Pipe) GetProvider(lang string) (pipe.Pipe, error) {
+	pipeObj, err := pipe.Get(p.Type, p.Token, p.SecretKey, p.Name, lang)
 	if err != nil {
 		return nil, err
 	}
 
-	if pProvider == nil {
-		return nil, fmt.Errorf(i18n.Translate(lang, "object:the chat provider type: %s is not supported"), p.Type)
+	if pipeObj == nil {
+		return nil, fmt.Errorf(i18n.Translate(lang, "object:the pipe type: %s is not supported"), p.Type)
 	}
 
-	return pProvider, nil
+	return pipeObj, nil
 }
 
 func (p *Pipe) processPipeParams(pipeDb *Pipe) {
 	if p.Token == "***" {
 		p.Token = pipeDb.Token
 	}
-	if p.ProviderKey == "***" {
-		p.ProviderKey = pipeDb.ProviderKey
+	if p.SecretKey == "***" {
+		p.SecretKey = pipeDb.SecretKey
 	}
 }

@@ -245,9 +245,9 @@ class PipeEditPage extends React.Component {
               </Col>
               <Col span={22}>
                 <Input.Password
-                  value={pipe.providerKey}
+                  value={pipe.secretKey}
                   disabled={!Setting.isAdminUser(this.props.account)}
-                  onChange={e => this.updatePipeField("providerKey", e.target.value)}
+                  onChange={e => this.updatePipeField("secretKey", e.target.value)}
                 />
               </Col>
             </Row>

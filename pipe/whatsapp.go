@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package chat
+package pipe
 
 import (
 	"encoding/json"
@@ -23,7 +23,7 @@ import (
 
 const whatsAppApiBaseUrl = "https://graph.facebook.com/v19.0"
 
-type WhatsAppChatProvider struct {
+type WhatsAppPipe struct {
 	accessToken   string
 	phoneNumberId string
 	verifyToken   string
@@ -89,8 +89,8 @@ type whatsAppTextPayload struct {
 	Body string `json:"body"`
 }
 
-func NewWhatsAppChatProvider(accessToken string, phoneNumberId string, verifyToken string, httpClient *http.Client) (*WhatsAppChatProvider, error) {
-	return &WhatsAppChatProvider{
+func NewWhatsAppPipe(accessToken string, phoneNumberId string, verifyToken string, httpClient *http.Client) (*WhatsAppPipe, error) {
+	return &WhatsAppPipe{
 		accessToken:   accessToken,
 		phoneNumberId: strings.TrimSpace(phoneNumberId),
 		verifyToken:   verifyToken,
@@ -98,13 +98,13 @@ func NewWhatsAppChatProvider(accessToken string, phoneNumberId string, verifyTok
 	}, nil
 }
 
-func (p *WhatsAppChatProvider) authorizationHeaders() map[string]string {
+func (p *WhatsAppPipe) authorizationHeaders() map[string]string {
 	return map[string]string{
 		"Authorization": fmt.Sprintf("Bearer %s", p.accessToken),
 	}
 }
 
-func (p *WhatsAppChatProvider) SendMessage(chatId string, text string) error {
+func (p *WhatsAppPipe) SendMessage(chatId string, text string) error {
 	payload := whatsAppSendPayload{
 		MessagingProduct: "whatsapp",
 		To:               chatId,
@@ -124,7 +124,7 @@ func (p *WhatsAppChatProvider) SendMessage(chatId string, text string) error {
 	return err
 }
 
-func (p *WhatsAppChatProvider) ParseWebhookRequest(body []byte) (*IncomingMessage, error) {
+func (p *WhatsAppPipe) ParseWebhookRequest(body []byte) (*IncomingMessage, error) {
 	var payload whatsAppWebhookPayload
 	if err := json.Unmarshal(body, &payload); err != nil {
 		return nil, err
@@ -163,7 +163,7 @@ func (p *WhatsAppChatProvider) ParseWebhookRequest(body []byte) (*IncomingMessag
 // VerifyWebhook handles the Meta webhook verification challenge (GET request).
 // The verify token is the pipe name, which must match what is configured in
 // the Meta Developer Console as the webhook verify token.
-func (p *WhatsAppChatProvider) VerifyWebhook(params map[string]string) (*WebhookResponse, error) {
+func (p *WhatsAppPipe) VerifyWebhook(params map[string]string) (*WebhookResponse, error) {
 	mode := params["hub.mode"]
 	verifyToken := params["hub.verify_token"]
 	challenge := params["hub.challenge"]
@@ -181,6 +181,6 @@ func (p *WhatsAppChatProvider) VerifyWebhook(params map[string]string) (*Webhook
 
 // SetWebhook returns nil because WhatsApp webhooks are configured manually in
 // the Meta Developer Console. The caller displays the webhook URL to the user.
-func (p *WhatsAppChatProvider) SetWebhook(webhookUrl string) error {
+func (p *WhatsAppPipe) SetWebhook(webhookUrl string) error {
 	return nil
 }

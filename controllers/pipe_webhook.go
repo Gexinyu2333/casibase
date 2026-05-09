@@ -19,8 +19,8 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/the-open-agent/openagent/chat"
 	"github.com/the-open-agent/openagent/object"
+	pipepkg "github.com/the-open-agent/openagent/pipe"
 )
 
 // ChatWebhookVerify handles the HTTP GET challenge that some platforms (e.g. WhatsApp
@@ -32,23 +32,23 @@ func (c *ApiController) ChatWebhookVerify() {
 	pipeType := c.Ctx.Input.Param(":pipeType")
 	pipeName := c.Ctx.Input.Param(":pipeName")
 
-	pipe, err := object.GetPipeByName("admin", pipeName)
+	pipeObj, err := object.GetPipeByName("admin", pipeName)
 	if err != nil {
 		c.Ctx.ResponseWriter.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	if pipe == nil || chat.NormalizeChatProviderType(pipe.Type) != pipeType {
+	if pipeObj == nil || pipepkg.NormalizeType(pipeObj.Type) != pipeType {
 		c.Ctx.ResponseWriter.WriteHeader(http.StatusNotFound)
 		return
 	}
 
-	chatProviderObj, err := pipe.GetChatProvider(c.GetAcceptLanguage())
+	provider, err := pipeObj.GetProvider(c.GetAcceptLanguage())
 	if err != nil {
 		c.Ctx.ResponseWriter.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	verifier, ok := chatProviderObj.(chat.WebhookVerifier)
+	verifier, ok := provider.(pipepkg.WebhookVerifier)
 	if !ok {
 		c.Ctx.ResponseWriter.WriteHeader(http.StatusMethodNotAllowed)
 		return
@@ -67,7 +67,7 @@ func (c *ApiController) ChatWebhookVerify() {
 		return
 	}
 
-	writeChatWebhookResponse(c, response)
+	writePipeWebhookResponse(c, response)
 }
 
 // ChatWebhook receives incoming updates from a chat pipe.
@@ -78,17 +78,17 @@ func (c *ApiController) ChatWebhook() {
 	pipeType := c.Ctx.Input.Param(":pipeType")
 	pipeName := c.Ctx.Input.Param(":pipeName")
 
-	pipe, err := object.GetPipeByName("admin", pipeName)
+	pipeObj, err := object.GetPipeByName("admin", pipeName)
 	if err != nil {
 		c.Ctx.ResponseWriter.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	if pipe == nil || chat.NormalizeChatProviderType(pipe.Type) != pipeType {
+	if pipeObj == nil || pipepkg.NormalizeType(pipeObj.Type) != pipeType {
 		c.Ctx.ResponseWriter.WriteHeader(http.StatusNotFound)
 		return
 	}
 
-	chatProviderObj, err := pipe.GetChatProvider(c.GetAcceptLanguage())
+	provider, err := pipeObj.GetProvider(c.GetAcceptLanguage())
 	if err != nil {
 		c.Ctx.ResponseWriter.WriteHeader(http.StatusInternalServerError)
 		return
@@ -100,42 +100,42 @@ func (c *ApiController) ChatWebhook() {
 		return
 	}
 
-	immediateResponse, err := getImmediateWebhookResponse(chatProviderObj, body, c.Ctx.Request.Header)
+	immediateResponse, err := getImmediatePipeResponse(provider, body, c.Ctx.Request.Header)
 	if err != nil {
 		c.Ctx.ResponseWriter.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	incoming, err := chatProviderObj.ParseWebhookRequest(body)
+	incoming, err := provider.ParseWebhookRequest(body)
 	if err != nil {
 		// Acknowledge malformed updates so chat platforms do not keep retrying them.
 		c.Ctx.ResponseWriter.WriteHeader(http.StatusOK)
 		return
 	}
 	if incoming == nil {
-		writeChatWebhookResponse(c, immediateResponse)
+		writePipeWebhookResponse(c, immediateResponse)
 		return
 	}
 
 	if immediateResponse != nil {
-		writeChatWebhookResponse(c, immediateResponse)
-		go sendChatPipeAnswer(chatProviderObj, incoming, c.GetAcceptLanguage())
+		writePipeWebhookResponse(c, immediateResponse)
+		go sendPipeAnswer(provider, incoming, c.GetAcceptLanguage())
 		return
 	}
 
-	sendChatPipeAnswer(chatProviderObj, incoming, c.GetAcceptLanguage())
+	sendPipeAnswer(provider, incoming, c.GetAcceptLanguage())
 	c.Ctx.ResponseWriter.WriteHeader(http.StatusOK)
 }
 
-func getImmediateWebhookResponse(chatProviderObj chat.ChatProvider, body []byte, header http.Header) (*chat.WebhookResponse, error) {
-	responder, ok := chatProviderObj.(chat.ImmediateWebhookResponder)
+func getImmediatePipeResponse(provider pipepkg.Pipe, body []byte, header http.Header) (*pipepkg.WebhookResponse, error) {
+	responder, ok := provider.(pipepkg.ImmediateWebhookResponder)
 	if !ok {
 		return nil, nil
 	}
 	return responder.GetWebhookResponse(body, header)
 }
 
-func writeChatWebhookResponse(c *ApiController, response *chat.WebhookResponse) {
+func writePipeWebhookResponse(c *ApiController, response *pipepkg.WebhookResponse) {
 	if response == nil {
 		c.Ctx.ResponseWriter.WriteHeader(http.StatusOK)
 		return
@@ -155,12 +155,12 @@ func writeChatWebhookResponse(c *ApiController, response *chat.WebhookResponse) 
 	}
 }
 
-func sendChatPipeAnswer(chatProviderObj chat.ChatProvider, incoming *chat.IncomingMessage, lang string) {
+func sendPipeAnswer(provider pipepkg.Pipe, incoming *pipepkg.IncomingMessage, lang string) {
 	answer, _, err := object.GetAnswer("", incoming.Text, lang)
 	if err != nil {
-		_ = chatProviderObj.SendMessage(incoming.ChatId, fmt.Sprintf("Error: %v", err))
+		_ = provider.SendMessage(incoming.ChatId, fmt.Sprintf("Error: %v", err))
 		return
 	}
 
-	_ = chatProviderObj.SendMessage(incoming.ChatId, answer)
+	_ = provider.SendMessage(incoming.ChatId, answer)
 }

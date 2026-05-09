@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package chat
+package pipe
 
 import (
 	"encoding/json"
@@ -22,7 +22,7 @@ import (
 
 const telegramApiBaseUrl = "https://api.telegram.org"
 
-type TelegramChatProvider struct {
+type TelegramPipe struct {
 	botToken   string
 	httpClient *http.Client
 }
@@ -49,22 +49,22 @@ type telegramUpdate struct {
 	Message  *telegramMessage `json:"message"`
 }
 
-func NewTelegramChatProvider(botToken string, httpClient *http.Client) (*TelegramChatProvider, error) {
-	return &TelegramChatProvider{
+func NewTelegramPipe(botToken string, httpClient *http.Client) (*TelegramPipe, error) {
+	return &TelegramPipe{
 		botToken:   botToken,
 		httpClient: httpClient,
 	}, nil
 }
 
-func (p *TelegramChatProvider) buildUrl(method string) string {
+func (p *TelegramPipe) buildUrl(method string) string {
 	return fmt.Sprintf("%s/bot%s/%s", telegramApiBaseUrl, p.botToken, method)
 }
 
-func (p *TelegramChatProvider) doPost(method string, payload interface{}) ([]byte, error) {
+func (p *TelegramPipe) doPost(method string, payload interface{}) ([]byte, error) {
 	return doJSONRequest(p.httpClient, "Telegram", http.MethodPost, p.buildUrl(method), nil, payload, http.StatusOK)
 }
 
-func (p *TelegramChatProvider) SendMessage(chatId string, text string) error {
+func (p *TelegramPipe) SendMessage(chatId string, text string) error {
 	payload := map[string]interface{}{
 		"chat_id": chatId,
 		"text":    text,
@@ -73,7 +73,7 @@ func (p *TelegramChatProvider) SendMessage(chatId string, text string) error {
 	return err
 }
 
-func (p *TelegramChatProvider) ParseWebhookRequest(body []byte) (*IncomingMessage, error) {
+func (p *TelegramPipe) ParseWebhookRequest(body []byte) (*IncomingMessage, error) {
 	var update telegramUpdate
 	if err := json.Unmarshal(body, &update); err != nil {
 		return nil, err
@@ -102,7 +102,7 @@ func (p *TelegramChatProvider) ParseWebhookRequest(body []byte) (*IncomingMessag
 	}, nil
 }
 
-func (p *TelegramChatProvider) SetWebhook(webhookUrl string) error {
+func (p *TelegramPipe) SetWebhook(webhookUrl string) error {
 	payload := map[string]interface{}{
 		"url": webhookUrl,
 	}

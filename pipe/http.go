@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package chat
+package pipe
 
 import (
 	"bytes"
@@ -22,7 +22,7 @@ import (
 	"net/http"
 )
 
-func doJSONRequest(httpClient *http.Client, providerName string, method string, url string, headers map[string]string, payload interface{}, expectedStatusCodes ...int) ([]byte, error) {
+func doJSONRequest(httpClient *http.Client, platformName string, method string, url string, headers map[string]string, payload interface{}, expectedStatusCodes ...int) ([]byte, error) {
 	var bodyReader io.Reader
 	if payload != nil {
 		body, err := json.Marshal(payload)
@@ -60,5 +60,5 @@ func doJSONRequest(httpClient *http.Client, providerName string, method string, 
 		}
 	}
 
-	return nil, fmt.Errorf("%s API error (status %d): %s", providerName, resp.StatusCode, string(respBody))
+	return nil, fmt.Errorf("%s API error (status %d): %s", platformName, resp.StatusCode, string(respBody))
 }

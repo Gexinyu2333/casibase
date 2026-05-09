@@ -19,7 +19,6 @@ import (
 	"strings"
 
 	"github.com/the-open-agent/openagent/auth"
-	"github.com/the-open-agent/openagent/chat"
 	"github.com/the-open-agent/openagent/embedding"
 	"github.com/the-open-agent/openagent/i18n"
 	"github.com/the-open-agent/openagent/model"
@@ -370,19 +369,6 @@ func (p *Provider) GetSpeechToTextProvider(lang string) (stt.SpeechToTextProvide
 
 	if pProvider == nil {
 		return nil, fmt.Errorf(i18n.Translate(lang, "object:the STT provider type: %s is not supported"), p.Type)
-	}
-
-	return pProvider, nil
-}
-
-func (p *Provider) GetChatProvider(lang string) (chat.ChatProvider, error) {
-	pProvider, err := chat.GetChatProvider(p.Type, p.ClientSecret, p.ProviderKey, p.Name, lang)
-	if err != nil {
-		return nil, err
-	}
-
-	if pProvider == nil {
-		return nil, fmt.Errorf(i18n.Translate(lang, "object:the chat provider type: %s is not supported"), p.Type)
 	}
 
 	return pProvider, nil

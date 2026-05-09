@@ -488,7 +488,7 @@ func (c *ApiController) GetAnswer() {
 			ClientIp:      c.getClientIp(),
 			UserAgent:     c.getUserAgent(),
 			MessageCount:  0,
-			IsHidden:      strings.HasPrefix(chatName, "chat_provider_"),
+			IsHidden:      strings.HasPrefix(chatName, "pipe_"),
 		}
 
 		chat.ClientIpDesc = util.GetDescFromIP(chat.ClientIp)
