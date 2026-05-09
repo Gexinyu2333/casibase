@@ -86,7 +86,7 @@ export const NavItemTree = ({disabled, checkedKeys, defaultExpandedKeys, onCheck
           title: i18next.t("general:Admin"),
           key: "/admin",
           children: [
-            {title: i18next.t("general:Sites"), key: "/sites"},
+            {title: i18next.t("general:Sites"), key: "/sites", disableCheckbox: true},
             {title: i18next.t("general:Resources"), key: "/resources"},
             {title: i18next.t("general:Usages"), key: "/usages"},
             {title: i18next.t("general:Visitors"), key: "/visitors"},

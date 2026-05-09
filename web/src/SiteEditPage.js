@@ -296,7 +296,11 @@ class SiteEditPage extends React.Component {
                 checkedKeys={site.navItems ?? ["all"]}
                 defaultExpandedKeys={["all"]}
                 onCheck={(checked) => {
-                  this.updateSiteField("navItems", checked);
+                  const checkedArr = Array.isArray(checked) ? [...checked] : [...checked.checked];
+                  if (!checkedArr.includes("/sites")) {
+                    checkedArr.push("/sites");
+                  }
+                  this.updateSiteField("navItems", checkedArr);
                 }}
               />,
               24
