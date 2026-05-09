@@ -173,7 +173,7 @@ class UsagePage extends BaseListPage {
       });
   }
 
-  renderProviderChart() {
+  renderProviderChart(isDark) {
     const {providerData} = this.state;
     if (!providerData || providerData.length === 0) {
       return null;
@@ -194,7 +194,7 @@ class UsagePage extends BaseListPage {
         radius: ["42%", "68%"],
         center: ["26%", "50%"],
         avoidLabelOverlap: true,
-        itemStyle: {borderRadius: 5, borderColor: "#fff", borderWidth: 2},
+        itemStyle: {borderRadius: 5, borderColor: isDark ? "#1f1f1f" : "#fff", borderWidth: 2},
         label: {show: false},
         emphasis: {
           label: {show: true, fontSize: 13, fontWeight: "bold"},
@@ -209,12 +209,13 @@ class UsagePage extends BaseListPage {
     return (
       <ReactEcharts
         option={option}
+        theme={isDark ? "dark" : undefined}
         style={{height: "260px", width: "100%"}}
       />
     );
   }
 
-  renderHeatmapChart() {
+  renderHeatmapChart(isDark) {
     const {heatmapData} = this.state;
     if (!heatmapData || !heatmapData.data) {
       return null;
@@ -227,6 +228,11 @@ class UsagePage extends BaseListPage {
         start.setFullYear(end.getFullYear() - 1);
         return [start.toISOString().slice(0, 10), end.toISOString().slice(0, 10)];
       })();
+    const cellBg = isDark ? "#2a2a2a" : "#f3f0ff";
+    const cellBorder = isDark ? "#141414" : "#fff";
+    const heatColors = isDark
+      ? ["#2a2a2a", "#3a2a5a", "#5a3a8a", "#7c5ce0", "#5734d3"]
+      : ["#f3f0ff", "#d9d1f7", "#b5a8ef", "#7c5ce0", "#5734d3"];
     const option = {
       tooltip: {
         position: "top",
@@ -239,7 +245,7 @@ class UsagePage extends BaseListPage {
         min: 0,
         max: Math.max(heatmapData.maxCount, 1),
         show: false,
-        inRange: {color: ["#f3f0ff", "#d9d1f7", "#b5a8ef", "#7c5ce0", "#5734d3"]},
+        inRange: {color: heatColors},
       },
       calendar: {
         top: 28,
@@ -249,9 +255,9 @@ class UsagePage extends BaseListPage {
         range,
         cellSize: [13, 13],
         itemStyle: {
-          color: "#f3f0ff",
+          color: cellBg,
           borderWidth: 2,
-          borderColor: "#fff",
+          borderColor: cellBorder,
           borderRadius: 2,
         },
         dayLabel: {
@@ -266,7 +272,7 @@ class UsagePage extends BaseListPage {
             i18next.t("usage:Sat"),
           ],
           fontSize: 10,
-          color: "#888",
+          color: isDark ? "#aaa" : "#888",
         },
         monthLabel: {
           nameMap: [
@@ -284,7 +290,7 @@ class UsagePage extends BaseListPage {
             i18next.t("usage:Dec"),
           ],
           fontSize: 11,
-          color: "#555",
+          color: isDark ? "#bbb" : "#555",
         },
         yearLabel: {show: false},
         splitLine: {show: false},
@@ -299,6 +305,7 @@ class UsagePage extends BaseListPage {
     return (
       <ReactEcharts
         option={option}
+        theme={isDark ? "dark" : undefined}
         style={{height: "200px", width: "100%"}}
       />
     );
@@ -780,6 +787,7 @@ class UsagePage extends BaseListPage {
   }
 
   renderChart() {
+    const isDark = this.props.themeAlgorithm && this.props.themeAlgorithm.includes("dark");
     if (this.state.rangeType === "All") {
       return (
         <React.Fragment>
@@ -788,6 +796,7 @@ class UsagePage extends BaseListPage {
             <Col span={11} >
               <ReactEcharts
                 option={this.renderLeftChart(this.state.usages || [])}
+                theme={isDark ? "dark" : undefined}
                 style={{
                   height: "400px",
                   width: "100%",
@@ -807,6 +816,7 @@ class UsagePage extends BaseListPage {
             <Col span={11} >
               <ReactEcharts
                 option={this.renderRightChart(this.state.usages || [])}
+                theme={isDark ? "dark" : undefined}
                 style={{
                   height: "400px",
                   width: "100%",
@@ -835,6 +845,7 @@ class UsagePage extends BaseListPage {
         <React.Fragment>
           <ReactEcharts
             option={this.renderLeftRangeChart(rangeUsages || [])}
+            theme={isDark ? "dark" : undefined}
             style={{
               height: "400px",
               width: "48%",
@@ -852,6 +863,7 @@ class UsagePage extends BaseListPage {
           />
           <ReactEcharts
             option={this.renderRightRangeChart(rangeUsages || [])}
+            theme={isDark ? "dark" : undefined}
             style={{
               height: "400px",
               width: "48%",
@@ -873,8 +885,10 @@ class UsagePage extends BaseListPage {
   }
 
   render() {
+    const isDark = this.props.themeAlgorithm && this.props.themeAlgorithm.includes("dark");
+    const cardBorder = isDark ? "1px solid #303030" : "1px solid #e8e8e8";
     return (
-      <div style={{backgroundColor: this.props.themeAlgorithm && this.props.themeAlgorithm.includes("dark") ? "black" : "white"}}>
+      <div style={{backgroundColor: isDark ? "#141414" : "white"}}>
         <Row style={{marginTop: "20px"}} >
           <Col span={1} />
           <Col span={17} >
@@ -894,17 +908,17 @@ class UsagePage extends BaseListPage {
           <Row gutter={16} style={{marginTop: "20px"}}>
             {this.state.providerData && this.state.providerData.length > 0 && (
               <Col xs={24} xl={8}>
-                <div style={{border: "1px solid #e8e8e8", borderRadius: 8, padding: "16px 16px 8px"}}>
+                <div style={{border: cardBorder, borderRadius: 8, padding: "16px 16px 8px"}}>
                   <div style={{marginBottom: 8, fontWeight: 500}}>{i18next.t("general:Providers")}</div>
-                  {this.renderProviderChart()}
+                  {this.renderProviderChart(isDark)}
                 </div>
               </Col>
             )}
             {this.state.heatmapData && (
               <Col xs={24} xl={this.state.providerData && this.state.providerData.length > 0 ? 16 : 24}>
-                <div style={{border: "1px solid #e8e8e8", borderRadius: 8, padding: "16px 16px 8px"}}>
+                <div style={{border: cardBorder, borderRadius: 8, padding: "16px 16px 8px"}}>
                   <div style={{marginBottom: 8, fontWeight: 500}}>{i18next.t("general:Messages")}</div>
-                  {this.renderHeatmapChart()}
+                  {this.renderHeatmapChart(isDark)}
                 </div>
               </Col>
             )}
