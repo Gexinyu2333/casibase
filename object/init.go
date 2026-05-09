@@ -638,7 +638,7 @@ func initBuiltInSite() {
 		FaviconUrl:    "https://cdn.openagentai.org/img/openagent.png",
 		LogoUrl:       "https://cdn.openagentai.org/img/openagent-logo_1900x450.png",
 		NavbarHtml:    "",
-		FooterHtml:    `<a target="_blank" href="https://github.com/the-open-agent/openagent" rel="noreferrer"><img style="padding-bottom: 3px;" height="20" alt="OpenAgent" src="https://cdn.openagentai.org/img/openagent-logo_1900x450.png" /></a>`,
+		FooterHtml:    `<a target="_blank" href="https://github.com/the-open-agent/openagent" rel="noreferrer"><img style="padding-bottom: 3px;" height="30" alt="OpenAgent" src="https://cdn.openagentai.org/img/openagent-logo_1900x450.png" /></a>`,
 		StaticBaseUrl: "https://cdn.openagentai.org",
 		NavItems:      builtInNavItems,
 	}

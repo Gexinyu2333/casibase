@@ -2607,11 +2607,13 @@ export function getStoreIconUrl(store) {
 
 export function getLogo(themes, storeLogoUrl) {
   const defaultLogoUrl = "https://cdn.openagentai.org/img/openagent-logo_1900x450.png";
-  let logoUrl = Conf.LogoUrl;
+  let logoUrl = Conf.LogoUrl || defaultLogoUrl;
   if (storeLogoUrl && storeLogoUrl !== defaultLogoUrl) {
     logoUrl = storeLogoUrl;
   }
-  logoUrl = logoUrl.replace("https://cdn.openagentai.org", Conf.StaticBaseUrl);
+  if (Conf.StaticBaseUrl) {
+    logoUrl = logoUrl.replace("https://cdn.openagentai.org", Conf.StaticBaseUrl);
+  }
   if (themes.includes("dark")) {
     return logoUrl.replace(/\.png$/, "_white.png");
   } else {
@@ -2620,7 +2622,7 @@ export function getLogo(themes, storeLogoUrl) {
 }
 
 export function getFooterHtml(themes, storeFooterHtml) {
-  const defaultFooterHtml = "<a target=\"_blank\" href=\"https://github.com/the-open-agent/openagent\" rel=\"noreferrer\"><img style=\"padding-bottom: 3px;\" height=\"20\" alt=\"OpenAgent\" src=\"https://cdn.openagentai.org/img/openagent-logo_1600x276.png\" /></a>";
+  const defaultFooterHtml = "<a target=\"_blank\" href=\"https://github.com/the-open-agent/openagent\" rel=\"noreferrer\"><img style=\"padding-bottom: 3px;\" height=\"30\" alt=\"OpenAgent\" src=\"https://cdn.openagentai.org/img/openagent-logo_1600x276.png\" /></a>";
   let footerHtml = Conf.FooterHtml;
   if (storeFooterHtml && storeFooterHtml !== defaultFooterHtml) {
     footerHtml = storeFooterHtml;
