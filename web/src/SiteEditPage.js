@@ -84,6 +84,9 @@ class SiteEditPage extends React.Component {
             Setting.showMessage("success", i18next.t("general:Successfully saved"));
             Setting.setThemeColor(this.state.site.themeColor || Setting.getThemeColor());
             this.setState({siteName: this.state.site.name});
+            if (this.props.onUpdateSite) {
+              this.props.onUpdateSite();
+            }
             this.props.history.push(`/sites/${this.state.site.name}`);
           } else {
             Setting.showMessage("error", i18next.t("general:Failed to connect to server"));

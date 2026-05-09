@@ -228,6 +228,10 @@ class App extends Component {
     }
   }
 
+  onUpdateSite = () => {
+    this.setTheme();
+  };
+
   setLogoAndThemeAlgorithm = (nextThemeAlgorithm) => {
     this.setState({
       themeAlgorithm: nextThemeAlgorithm,
@@ -254,6 +258,7 @@ class App extends Component {
           logo={this.state.logo}
           uri={this.state.uri}
           selectedMenuKey={this.state.selectedMenuKey}
+          onUpdateSite={this.onUpdateSite}
           setLogoAndThemeAlgorithm={this.setLogoAndThemeAlgorithm}
           signout={this.signout.bind(this)}
           onMenuClick={({key}) => {

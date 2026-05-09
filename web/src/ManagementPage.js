@@ -210,6 +210,7 @@ function ManagementPage(props) {
     themeAlgorithm,
     logo,
     uri,
+    onUpdateSite,
     setLogoAndThemeAlgorithm,
     signout,
     onMenuClick,
@@ -631,7 +632,7 @@ function ManagementPage(props) {
         <Route exact path="/messages/:messageName" render={(props) => renderSigninIfNotSignedIn(<MessageEditPage account={account} {...props} />)} />
         <Route exact path="/usages" render={(props) => renderSigninIfNotSignedIn(<UsagePage account={account} themeAlgorithm={themeAlgorithm} {...props} />)} />
         <Route exact path="/sites" render={(props) => renderSigninIfNotSignedIn(<SiteListPage account={account} {...props} />)} />
-        <Route exact path="/sites/:siteName" render={(props) => renderSigninIfNotSignedIn(<SiteEditPage account={account} {...props} />)} />
+        <Route exact path="/sites/:siteName" render={(props) => renderSigninIfNotSignedIn(<SiteEditPage account={account} onUpdateSite={onUpdateSite} {...props} />)} />
         <Route exact path="/visitors" render={(props) => renderSigninIfNotSignedIn(<VisitorPage account={account} themeAlgorithm={themeAlgorithm} {...props} />)} />
         <Route exact path="/sessions" render={(props) => renderSigninIfNotSignedIn(<SessionListPage account={account} {...props} />)} />
         <Route exact path="/records" render={(props) => renderSigninIfNotSignedIn(<RecordListPage account={account} {...props} />)} />
