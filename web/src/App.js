@@ -127,8 +127,6 @@ class App extends Component {
       this.setState({selectedMenuKey: "/chats"});
     } else if (uri.includes("/messages")) {
       this.setState({selectedMenuKey: "/messages"});
-    } else if (uri.includes("/graphs")) {
-      this.setState({selectedMenuKey: "/graphs"});
     } else if (uri.includes("/usages")) {
       this.setState({selectedMenuKey: "/usages"});
     } else if (uri.includes("/sites")) {
@@ -139,22 +137,12 @@ class App extends Component {
       this.setState({selectedMenuKey: "/sessions"});
     } else if (uri.includes("/records")) {
       this.setState({selectedMenuKey: "/records"});
-    } else if (uri.includes("/workflows")) {
-      this.setState({selectedMenuKey: "/workflows"});
-    } else if (uri.includes("/audit")) {
-      this.setState({selectedMenuKey: "/audit"});
     } else if (uri.includes("/tasks")) {
       this.setState({selectedMenuKey: "/tasks"});
     } else if (uri.includes("/scales")) {
       this.setState({selectedMenuKey: "/scales"});
     } else if (uri.includes("/forms")) {
       this.setState({selectedMenuKey: "/forms"});
-    } else if (uri.includes("/articles")) {
-      this.setState({selectedMenuKey: "/articles"});
-    } else if (uri.includes("/public-videos")) {
-      this.setState({selectedMenuKey: "/public-videos"});
-    } else if (uri.includes("/videos")) {
-      this.setState({selectedMenuKey: "/videos"});
     } else if (uri.includes("/resources")) {
       this.setState({selectedMenuKey: "/resources"});
     } else if (uri.includes("/chat")) {

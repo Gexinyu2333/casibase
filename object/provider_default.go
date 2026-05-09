@@ -101,20 +101,6 @@ func GetDefaultStorageProvider() (*Provider, error) {
 	return &provider, nil
 }
 
-func GetDefaultVideoProvider() (*Provider, error) {
-	provider := Provider{Owner: "admin", Category: "Video"}
-	existed, err := adapter.engine.Get(&provider)
-	if err != nil {
-		return &provider, err
-	}
-
-	if !existed {
-		return nil, nil
-	}
-
-	return &provider, nil
-}
-
 func GetDefaultModelProvider() (*Provider, error) {
 	provider := Provider{Owner: "admin", Category: "Model", IsDefault: true}
 	existed, err := adapter.engine.UseBool("is_default").Get(&provider)

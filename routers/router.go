@@ -55,14 +55,6 @@ func initAPI() {
 	beego.Router("/api/add-site", &controllers.ApiController{}, "POST:AddSite")
 	beego.Router("/api/delete-site", &controllers.ApiController{}, "POST:DeleteSite")
 
-	beego.Router("/api/get-global-videos", &controllers.ApiController{}, "GET:GetGlobalVideos")
-	beego.Router("/api/get-videos", &controllers.ApiController{}, "GET:GetVideos")
-	beego.Router("/api/get-video", &controllers.ApiController{}, "GET:GetVideo")
-	beego.Router("/api/update-video", &controllers.ApiController{}, "POST:UpdateVideo")
-	beego.Router("/api/add-video", &controllers.ApiController{}, "POST:AddVideo")
-	beego.Router("/api/delete-video", &controllers.ApiController{}, "POST:DeleteVideo")
-	beego.Router("/api/upload-video", &controllers.ApiController{}, "POST:UploadVideo")
-
 	beego.Router("/api/get-global-stores", &controllers.ApiController{}, "GET:GetGlobalStores")
 	beego.Router("/api/get-stores", &controllers.ApiController{}, "GET:GetStores")
 	beego.Router("/api/get-store", &controllers.ApiController{}, "GET:GetStore")
@@ -156,13 +148,6 @@ func initAPI() {
 	beego.Router("/api/delete-message", &controllers.ApiController{}, "POST:DeleteMessage")
 	beego.Router("/api/delete-welcome-message", &controllers.ApiController{}, "POST:DeleteWelcomeMessage")
 
-	beego.Router("/api/get-global-graphs", &controllers.ApiController{}, "GET:GetGlobalGraphs")
-	beego.Router("/api/get-graphs", &controllers.ApiController{}, "GET:GetGraphs")
-	beego.Router("/api/get-graph", &controllers.ApiController{}, "GET:GetGraph")
-	beego.Router("/api/update-graph", &controllers.ApiController{}, "POST:UpdateGraph")
-	beego.Router("/api/add-graph", &controllers.ApiController{}, "POST:AddGraph")
-	beego.Router("/api/delete-graph", &controllers.ApiController{}, "POST:DeleteGraph")
-
 	beego.Router("/api/get-usages", &controllers.ApiController{}, "GET:GetUsages")
 	beego.Router("/api/get-range-usages", &controllers.ApiController{}, "GET:GetRangeUsages")
 	beego.Router("/api/get-users", &controllers.ApiController{}, "GET:GetUsers")
@@ -172,13 +157,6 @@ func initAPI() {
 
 	beego.Router("/api/get-visitors", &controllers.ApiController{}, "GET:GetVisitors")
 	// beego.Router("/api/get-range-visitors", &controllers.ApiController{}, "GET:GetRangeVisitors")
-
-	beego.Router("/api/get-global-workflows", &controllers.ApiController{}, "GET:GetGlobalWorkflows")
-	beego.Router("/api/get-workflows", &controllers.ApiController{}, "GET:GetWorkflows")
-	beego.Router("/api/get-workflow", &controllers.ApiController{}, "GET:GetWorkflow")
-	beego.Router("/api/update-workflow", &controllers.ApiController{}, "POST:UpdateWorkflow")
-	beego.Router("/api/add-workflow", &controllers.ApiController{}, "POST:AddWorkflow")
-	beego.Router("/api/delete-workflow", &controllers.ApiController{}, "POST:DeleteWorkflow")
 
 	beego.Router("/api/get-global-tasks", &controllers.ApiController{}, "GET:GetGlobalTasks")
 	beego.Router("/api/get-tasks", &controllers.ApiController{}, "GET:GetTasks")
@@ -205,13 +183,6 @@ func initAPI() {
 	beego.Router("/api/delete-form", &controllers.ApiController{}, "POST:DeleteForm")
 
 	beego.Router("/api/get-form-data", &controllers.ApiController{}, "GET:GetFormData")
-
-	beego.Router("/api/get-global-articles", &controllers.ApiController{}, "GET:GetGlobalArticles")
-	beego.Router("/api/get-articles", &controllers.ApiController{}, "GET:GetArticles")
-	beego.Router("/api/get-article", &controllers.ApiController{}, "GET:GetArticle")
-	beego.Router("/api/update-article", &controllers.ApiController{}, "POST:UpdateArticle")
-	beego.Router("/api/add-article", &controllers.ApiController{}, "POST:AddArticle")
-	beego.Router("/api/delete-article", &controllers.ApiController{}, "POST:DeleteArticle")
 
 	beego.Router("/api/add-tree-file", &controllers.ApiController{}, "POST:AddTreeFile")
 	beego.Router("/api/delete-tree-file", &controllers.ApiController{}, "POST:DeleteTreeFile")

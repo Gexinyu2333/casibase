@@ -19,9 +19,7 @@ import {
   ApartmentOutlined,
   ApiOutlined,
   AppstoreOutlined,
-  AuditOutlined,
   BarsOutlined,
-  BranchesOutlined,
   BulbOutlined,
   CommentOutlined,
   DashboardOutlined,
@@ -41,18 +39,14 @@ import {
   MenuUnfoldOutlined,
   MessageOutlined,
   OrderedListOutlined,
-  PlaySquareOutlined,
-  ReadOutlined,
   RocketOutlined,
   SafetyOutlined,
   SettingOutlined,
-  ShareAltOutlined,
   TeamOutlined,
   ThunderboltOutlined,
   ToolOutlined,
   UnorderedListOutlined,
   UserOutlined,
-  VideoCameraOutlined,
   WalletOutlined
 } from "@ant-design/icons";
 import "./App.less";
@@ -70,10 +64,6 @@ import StoreEditPage from "./StoreEditPage";
 import FileListPage from "./FileListPage";
 import FileViewPage from "./FileViewPage";
 import FileTreePage from "./FileTreePage";
-import VideoListPage from "./VideoListPage";
-import VideoEditPage from "./VideoEditPage";
-import VideoPage from "./VideoPage";
-import PublicVideoListPage from "./basic/PublicVideoListPage";
 import ProviderListPage from "./ProviderListPage";
 import ProviderEditPage from "./ProviderEditPage";
 import PipeListPage from "./PipeListPage";
@@ -93,13 +83,9 @@ import ChatEditPage from "./ChatEditPage";
 import ChatListPage from "./ChatListPage";
 import MessageListPage from "./MessageListPage";
 import MessageEditPage from "./MessageEditPage";
-import GraphListPage from "./GraphListPage";
-import GraphEditPage from "./GraphEditPage";
 import SessionListPage from "./SessionListPage";
 import RecordListPage from "./RecordListPage";
 import RecordEditPage from "./RecordEditPage";
-import WorkflowListPage from "./WorkflowListPage";
-import WorkflowEditPage from "./WorkflowEditPage";
 import TaskListPage from "./TaskListPage";
 import TaskEditPage from "./TaskEditPage";
 import ScaleListPage from "./ScaleListPage";
@@ -107,12 +93,9 @@ import ScaleEditPage from "./ScaleEditPage";
 import FormListPage from "./FormListPage";
 import FormEditPage from "./FormEditPage";
 import FormDataPage from "./FormDataPage";
-import ArticleListPage from "./ArticleListPage";
-import ArticleEditPage from "./ArticleEditPage";
 import ChatPage from "./ChatPage";
 import UsagePage from "./UsagePage";
 import VisitorPage from "./VisitorPage";
-import AuditPage from "./frame/AuditPage";
 import SystemInfo from "./SystemInfo";
 import ResourceListPage from "./ResourceListPage";
 import SiteListPage from "./SiteListPage";
@@ -124,7 +107,7 @@ function getMenuParentKey(uri) {
   if (uri.includes("/chats") || uri.includes("/messages") || uri.includes("/stores")) {return "/basic";}
   if (uri.includes("/providers") || uri.includes("/pipes") || uri.includes("/tools") || uri.includes("/servers")) {return "/connectors";}
   if (uri.includes("/files") || uri.includes("/vectors") || uri.includes("/resources")) {return "/knowledge-base";}
-  if (uri.includes("/videos") || uri.includes("/public-videos") || uri.includes("/tasks") || uri.includes("/scales") || uri.includes("/forms") || uri.includes("/workflows") || uri.includes("/audit") || uri.includes("/articles") || uri.includes("/graphs")) {return "/multimedia";}
+  if (uri.includes("/tasks") || uri.includes("/scales") || uri.includes("/forms")) {return "/multimedia";}
   if (uri.includes("/sessions") || uri.includes("/records")) {return "/logs";}
   if (uri.includes("/users") || uri.includes("/casdoor-resources") || uri.includes("/permissions")) {return "/identity";}
   if (uri.includes("/sysinfo") || uri.includes("/swagger") || uri.includes("/visitors") || uri.includes("/sites") || uri.includes("/usages")) {return "/admin";}
@@ -408,22 +391,6 @@ function ManagementPage(props) {
 
     const navItems = site?.navItems;
 
-    if (account.type.startsWith("video-")) {
-      res.push(Setting.getItem(<Link to="/videos">{i18next.t("general:Videos")}</Link>, "/videos", <VideoCameraOutlined />));
-
-      if (account.type === "video-admin-user") {
-        res.push(Setting.getItem(
-          <a target="_blank" rel="noreferrer" href={Setting.getMyProfileUrl(account).replace("/account", "/users")}>
-            {i18next.t("general:Users")}
-            {Setting.renderExternalLink()}
-          </a>,
-          "#",
-          <UserOutlined />));
-      }
-
-      return res;
-    }
-
     if (Setting.isChatAdminUser(account)) {
       res.push(Setting.getItem(<Link to="/chat">{i18next.t("general:Chat")}</Link>, "/chat", <CommentOutlined />));
       res.push(Setting.getItem(<Link to="/stores">{i18next.t("general:Stores")}</Link>, "/stores", <AppstoreOutlined />));
@@ -503,16 +470,10 @@ function ManagementPage(props) {
         Setting.getItem(<Link to="/servers">{i18next.t("general:MCP Servers")}</Link>, "/servers", <ApiOutlined />),
       ]));
 
-      res.push(Setting.getItem(<Link style={{color: textColor}} to="/videos">{i18next.t("general:Multimedia")}</Link>, "/multimedia", <VideoCameraOutlined />, [
-        Setting.getItem(<Link to="/videos">{i18next.t("general:Videos")}</Link>, "/videos", <VideoCameraOutlined />),
-        Setting.getItem(<Link to="/public-videos">{i18next.t("general:Public Videos")}</Link>, "/public-videos", <PlaySquareOutlined />),
+      res.push(Setting.getItem(<Link style={{color: textColor}} to="/tasks">{i18next.t("general:Multimedia")}</Link>, "/multimedia", <UnorderedListOutlined />, [
         Setting.getItem(<Link to="/tasks">{i18next.t("general:Tasks")}</Link>, "/tasks", <UnorderedListOutlined />),
         Setting.getItem(<Link to="/scales">{i18next.t("general:Scales")}</Link>, "/scales", <FundOutlined />),
         Setting.getItem(<Link to="/forms">{i18next.t("general:Forms")}</Link>, "/forms", <FormOutlined />),
-        Setting.getItem(<Link to="/workflows">{i18next.t("general:Workflows")}</Link>, "/workflows", <BranchesOutlined />),
-        Setting.getItem(<Link to="/audit">{i18next.t("general:Audit")}</Link>, "/audit", <AuditOutlined />),
-        Setting.getItem(<Link to="/articles">{i18next.t("general:Articles")}</Link>, "/articles", <ReadOutlined />),
-        Setting.getItem(<Link to="/graphs">{i18next.t("general:Graphs")}</Link>, "/graphs", <ShareAltOutlined />),
       ]));
 
       res.push(Setting.getItem(<Link style={{color: textColor}} to="/records">{i18next.t("general:Auditing Logs")}</Link>, "/logs", <WalletOutlined />, [
@@ -588,12 +549,6 @@ function ManagementPage(props) {
   }
 
   function renderRouter() {
-    if (account?.type.startsWith("video-")) {
-      if (window.location.pathname === "/") {
-        return <PublicVideoListPage account={account} />;
-      }
-    }
-
     return (
       <Switch>
         <Route exact path="/callback" component={AuthCallback} />
@@ -607,10 +562,6 @@ function ManagementPage(props) {
         <Route exact path="/stores/:owner/:storeName/chats" render={(props) => renderSigninIfNotSignedIn(<ChatListPage account={account} {...props} />)} />
         <Route exact path="/stores/:owner/:storeName/messages" render={(props) => renderSigninIfNotSignedIn(<MessageListPage account={account} {...props} />)} />
         <Route exact path="/stores/:owner/:storeName/vectors" render={(props) => renderSigninIfNotSignedIn(<VectorListPage account={account} {...props} />)} />
-        <Route exact path="/videos" render={(props) => renderSigninIfNotSignedIn(<VideoListPage account={account} {...props} />)} />
-        <Route exact path="/videos/:owner/:videoName" render={(props) => renderSigninIfNotSignedIn(<VideoEditPage account={account} {...props} />)} />
-        <Route exact path="/public-videos" render={(props) => <PublicVideoListPage {...props} />} />
-        <Route exact path="/public-videos/:owner/:videoName" render={(props) => <VideoPage account={account} {...props} />} />
         <Route exact path="/providers" render={(props) => renderSigninIfNotSignedIn(<ProviderListPage account={account} {...props} />)} />
         <Route exact path="/providers/:providerName" render={(props) => renderSigninIfNotSignedIn(<ProviderEditPage account={account} {...props} />)} />
         <Route exact path="/pipes" render={(props) => renderSigninIfNotSignedIn(<PipeListPage account={account} {...props} />)} />
@@ -637,9 +588,6 @@ function ManagementPage(props) {
         <Route exact path="/sessions" render={(props) => renderSigninIfNotSignedIn(<SessionListPage account={account} {...props} />)} />
         <Route exact path="/records" render={(props) => renderSigninIfNotSignedIn(<RecordListPage account={account} {...props} />)} />
         <Route exact path="/records/:organizationName/:recordName" render={(props) => renderSigninIfNotSignedIn(<RecordEditPage account={account} {...props} />)} />
-        <Route exact path="/workflows" render={(props) => renderSigninIfNotSignedIn(<WorkflowListPage account={account} {...props} />)} />
-        <Route exact path="/workflows/:workflowName" render={(props) => renderSigninIfNotSignedIn(<WorkflowEditPage account={account} {...props} />)} />
-        <Route exact path="/audit" render={(props) => renderSigninIfNotSignedIn(<AuditPage account={account} {...props} />)} />
         <Route exact path="/tasks" render={(props) => renderSigninIfNotSignedIn(<TaskListPage account={account} {...props} />)} />
         <Route exact path="/tasks/:owner/:taskName" render={(props) => renderSigninIfNotSignedIn(<TaskEditPage account={account} {...props} />)} />
         <Route exact path="/scales" render={(props) => renderSigninIfNotSignedIn(<ScaleListPage account={account} {...props} />)} />
@@ -647,16 +595,12 @@ function ManagementPage(props) {
         <Route exact path="/forms" render={(props) => renderSigninIfNotSignedIn(<FormListPage account={account} {...props} />)} />
         <Route exact path="/forms/:formName" render={(props) => renderSigninIfNotSignedIn(<FormEditPage account={account} {...props} />)} />
         <Route exact path="/forms/:formName/data" render={(props) => renderSigninIfNotSignedIn(<FormDataPage key={props.match.params.formName} account={account} {...props} />)} />
-        <Route exact path="/articles" render={(props) => renderSigninIfNotSignedIn(<ArticleListPage account={account} {...props} />)} />
-        <Route exact path="/articles/:articleName" render={(props) => renderSigninIfNotSignedIn(<ArticleEditPage account={account} {...props} />)} />
         <Route exact path="/resources" render={(props) => renderSigninIfNotSignedIn(<ResourceListPage account={account} {...props} />)} />
         <Route exact path="/chat" render={(props) => renderSigninIfNotSignedIn(<ChatPage account={account} {...props} />)} />
         <Route exact path="/chat/:chatName" render={(props) => renderSigninIfNotSignedIn(<ChatPage account={account} {...props} />)} />
         <Route exact path="/stores/:owner/:storeName/chat" render={(props) => renderSigninIfNotSignedIn(<ChatPage account={account} {...props} />)} />
         <Route exact path="/:owner/:storeName/chat" render={(props) => renderSigninIfNotSignedIn(<ChatPage account={account} {...props} />)} />
         <Route exact path="/:owner/:storeName/chat/:chatName" render={(props) => renderSigninIfNotSignedIn(<ChatPage account={account} {...props} />)} />
-        <Route exact path="/graphs" render={(props) => renderSigninIfNotSignedIn(<GraphListPage account={account} {...props} />)} />
-        <Route exact path="/graphs/:graphName" render={(props) => renderSigninIfNotSignedIn(<GraphEditPage account={account} {...props} />)} />
         <Route exact path="/sysinfo" render={(props) => renderSigninIfNotSignedIn(<SystemInfo account={account} {...props} />)} />
         <Route path="" render={() => <Result status="404" title="404 NOT FOUND" subTitle={i18next.t("general:Sorry, the page you visited does not exist.")} extra={<a href="/"><Button type="primary">{i18next.t("general:Back Home")}</Button></a>} />} />
       </Switch>

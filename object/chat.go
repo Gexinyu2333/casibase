@@ -259,6 +259,20 @@ func getPaginationChatsByMessages(owner string, offset, limit int, value, sortFi
 	return chats, nil
 }
 
+func FilterChatsByTimeRange(chats []*Chat, startTime, endTime string) []*Chat {
+	result := []*Chat{}
+	for _, chat := range chats {
+		if startTime != "" && chat.CreatedTime < startTime {
+			continue
+		}
+		if endTime != "" && chat.CreatedTime > endTime {
+			continue
+		}
+		result = append(result, chat)
+	}
+	return result
+}
+
 func GetPaginationChats(owner string, offset, limit int, field, value, sortField, sortOrder string, store string) ([]*Chat, error) {
 	// Handle the special "messages" field by joining with the message table
 	if field == "messages" && value != "" {

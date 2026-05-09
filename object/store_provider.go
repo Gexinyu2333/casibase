@@ -15,7 +15,6 @@
 package object
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/the-open-agent/openagent/storage"
@@ -132,30 +131,6 @@ func (store *Store) Populate(origin string, lang string) error {
 	}
 
 	return nil
-}
-
-func (store *Store) GetVideoData(lang string) ([]string, error) {
-	storageProviderObj, err := store.GetStorageProviderObj(lang)
-	if err != nil {
-		return nil, err
-	}
-
-	objects, err := storageProviderObj.ListObjects("2023/视频附件")
-	if err != nil {
-		return nil, err
-	}
-
-	res := []string{}
-	for _, object := range objects {
-		if strings.HasSuffix(object.Key, "/_hidden.ini") {
-			continue
-		}
-
-		url := fmt.Sprintf("%s/%s", store.StorageProvider, object.Key)
-		res = append(res, url)
-	}
-
-	return res, nil
 }
 
 func SyncDefaultProvidersToStore(store *Store) error {

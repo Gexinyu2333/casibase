@@ -21,7 +21,6 @@ import (
 	"github.com/the-open-agent/openagent/i18n"
 	"github.com/the-open-agent/openagent/model"
 	"github.com/the-open-agent/openagent/util"
-	"github.com/the-open-agent/openagent/video"
 )
 
 func getModelProviderFromName(owner string, providerName string, lang string) (*Provider, model.ModelProvider, error) {
@@ -90,23 +89,6 @@ func getEmbeddingProviderFromName(owner string, providerName string, lang string
 	}
 
 	return provider, providerObj, err
-}
-
-func SetDefaultVodClient(lang string) error {
-	if video.VodClient != nil {
-		return nil
-	}
-
-	provider, err := GetDefaultVideoProvider()
-	if err != nil {
-		return err
-	}
-	if provider == nil {
-		return fmt.Errorf(i18n.Translate(lang, "object:The default video provider should not be empty"))
-	}
-
-	err = video.SetVodClient(provider.Region, provider.ClientId, provider.ClientSecret)
-	return err
 }
 
 func GetActiveBlockchainProvider(owner string) (*Provider, error) {

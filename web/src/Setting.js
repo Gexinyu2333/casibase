@@ -2650,11 +2650,7 @@ export function getFormTypeOptions() {
     {id: "records", name: "general:Records"},
     {id: "stores", name: "general:Stores"},
     {id: "vectors", name: "general:Vectors"},
-    {id: "videos", name: "general:Videos"},
     {id: "tasks", name: "general:Tasks"},
-    {id: "workflows", name: "general:Workflows"},
-    {id: "articles", name: "general:Articles"},
-    {id: "graphs", name: "general:Graphs"},
   ];
 }
 
@@ -2718,27 +2714,6 @@ export function getFormTypeItems(formType) {
       {name: "data", label: "general:Data", visible: true, width: "200"},
       {name: "dimension", label: "vector:Dimension", visible: true, width: "80"},
     ];
-  } else if (formType === "videos") {
-    return [
-      {name: "owner", label: "general:User", visible: true, width: "90"},
-      {name: "name", label: "general:Name", visible: true, width: "180"},
-      {name: "displayName", label: "general:Display name", visible: true, width: "180"},
-      {name: "description", label: "general:Description", visible: true, width: "120"},
-      {name: "grade", label: "video:Grade", visible: true, width: "90"},
-      {name: "unit", label: "general:Unit", visible: true, width: "90"},
-      {name: "lesson", label: "video:Lesson", visible: true, width: "90"},
-      // { name: "videoId", label: "video:Video ID", visible: false, width: "250" },
-      {name: "coverUrl", label: "video:Cover", visible: true, width: "170"},
-      {name: "remarks", label: "video:Remarks", visible: true},
-      // { name: "labels", label: "task:Labels", visible: false, width: "120" },
-      {name: "state", label: "general:State", visible: true, width: "90"},
-      {name: "reviewState", label: "video:Review state", visible: true, width: "110"},
-      {name: "isPublic", label: "video:Is public", visible: true, width: "110"},
-      {name: "downloadUrl", label: "general:Download", visible: true, width: "110"},
-      // { name: "labelCount", label: "video:Label count", visible: false, width: "90" },
-      // { name: "segmentCount", label: "video:Segment count", visible: false, width: "110" },
-      {name: "excellentCount", label: "video:Excellent count", visible: true, width: "110"},
-    ];
   } else if (formType === "tasks") {
     return [
       {name: "name", label: "general:Name", visible: true, width: "160"},
@@ -2756,31 +2731,6 @@ export function getFormTypeItems(formType) {
       {name: "text", label: "general:Text", visible: true},
       {name: "labels", label: "task:Labels", visible: true, width: "250"},
       {name: "example", label: "task:Example", visible: true},
-    ];
-  } else if (formType === "workflows") {
-    return [
-      {name: "name", label: "general:Name", visible: true, width: "160"},
-      {name: "displayName", label: "general:Display name", visible: true, width: "200"},
-      {name: "text", label: "general:Text", visible: true},
-      {name: "text2", label: "general:Text2", visible: true},
-      {name: "message", label: "general:Message", visible: true},
-      {name: "questionTemplate", label: "task:Question", visible: true},
-    ];
-  } else if (formType === "articles") {
-    return [
-      {name: "name", label: "general:Name", visible: true, width: "160"},
-      {name: "displayName", label: "general:Display name", visible: true, width: "200"},
-      {name: "workflow", label: "store:Workflow", visible: true, width: "250"},
-      // { name: "type", label: "general:Type", visible: false, width: "90" },
-      {name: "content", label: "general:Content", visible: true},
-    ];
-  } else if (formType === "graphs") {
-    return [
-      {name: "name", label: "general:Name", visible: true, width: "160"},
-      {name: "displayName", label: "general:Display name", visible: true, width: "200"},
-      {name: "createdTime", label: "general:Created time", visible: true, width: "200"},
-      {name: "text", label: "general:Text", visible: true, width: "200"},
-      {name: "graph", label: "general:Graphs", visible: true, width: "240"},
     ];
   } else {
     return [];

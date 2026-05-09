@@ -58,15 +58,9 @@ export const NavItemTree = ({disabled, casdoorAvailable, checkedKeys, defaultExp
           title: i18next.t("general:Multimedia"),
           key: "/multimedia",
           children: [
-            {title: i18next.t("general:Videos"), key: "/videos"},
-            {title: i18next.t("general:Public Videos"), key: "/public-videos"},
             {title: i18next.t("general:Tasks"), key: "/tasks"},
             {title: i18next.t("general:Scales"), key: "/scales"},
             {title: i18next.t("general:Forms"), key: "/forms"},
-            {title: i18next.t("general:Workflows"), key: "/workflows"},
-            {title: i18next.t("general:Audit"), key: "/audit"},
-            {title: i18next.t("general:Articles"), key: "/articles"},
-            {title: i18next.t("general:Graphs"), key: "/graphs"},
           ],
         },
         {

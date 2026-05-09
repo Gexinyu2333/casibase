@@ -616,7 +616,7 @@ func initBuiltInSite() {
 		return
 	}
 
-	// Navbar leaves enabled by default: all groups except Cloud (/cloud/*) and Multimedia (/multimedia/*).
+	// Navbar leaves enabled by default: all groups except Multimedia (/multimedia/*).
 	// Keys must match ManagementPage.getMenuItems admin-branch child keys (filterMenuItems).
 	builtInNavItems := []string{
 		"/chat",

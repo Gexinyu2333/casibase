@@ -270,12 +270,7 @@ func (a *Adapter) close() {
 }
 
 func (a *Adapter) createTable() {
-	err := a.engine.Sync2(new(Video))
-	if err != nil {
-		panic(err)
-	}
-
-	err = a.engine.Sync2(new(Store))
+	err := a.engine.Sync2(new(Store))
 	if err != nil {
 		panic(err)
 	}
@@ -320,16 +315,6 @@ func (a *Adapter) createTable() {
 		panic(err)
 	}
 
-	err = a.engine.Sync2(new(Workflow))
-	if err != nil {
-		panic(err)
-	}
-
-	err = a.engine.Sync2(new(Article))
-	if err != nil {
-		panic(err)
-	}
-
 	err = a.engine.Sync2(new(Session))
 	if err != nil {
 		panic(err)
@@ -341,11 +326,6 @@ func (a *Adapter) createTable() {
 	}
 
 	err = a.engine.Sync2(new(Record))
-	if err != nil {
-		panic(err)
-	}
-
-	err = a.engine.Sync2(new(Graph))
 	if err != nil {
 		panic(err)
 	}
