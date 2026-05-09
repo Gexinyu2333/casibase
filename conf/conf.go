@@ -39,7 +39,6 @@ type WebConfig struct {
 	LogoUrl          string `json:"logoUrl"`
 	NavbarHtml       string `json:"navbarHtml"`
 	FooterHtml       string `json:"footerHtml"`
-	ShowGithubCorner bool   `json:"showGithubCorner"`
 	IsDemoMode       bool   `json:"isDemoMode"`
 	ThemeDefault     struct {
 		ColorPrimary string `json:"colorPrimary"`
@@ -189,7 +188,6 @@ func GetWebConfig() *WebConfig {
 	config.LogoUrl = GetConfigString("logoUrl")
 	config.NavbarHtml = GetConfigString("navbarHtml")
 	config.FooterHtml = GetConfigString("footerHtml")
-	config.ShowGithubCorner = GetConfigBool("showGithubCorner")
 	config.IsDemoMode = GetConfigBool("isDemoMode")
 
 	config.ThemeDefault.ColorPrimary = GetDefaultColorPrimary()

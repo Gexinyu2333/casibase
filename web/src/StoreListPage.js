@@ -178,7 +178,7 @@ class StoreListPage extends BaseListPage {
       suggestionCount: 3,
       isDefault: false,
       state: "Active",
-      enableExtraOptions: Conf.ShowGithubCorner,
+      enableExtraOptions: false,
     };
   }
 

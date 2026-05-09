@@ -29,7 +29,6 @@ import * as SiteBackend from "./backend/SiteBackend";
 import * as FetchFilter from "./backend/FetchFilter";
 import {withTranslation} from "react-i18next";
 import i18next from "i18next";
-import CustomGithubCorner from "./CustomGithubCorner";
 import ManagementPage from "./ManagementPage";
 
 class App extends Component {
@@ -266,7 +265,6 @@ class App extends Component {
     return (
       <React.Fragment>
         <FloatButton.BackTop />
-        <CustomGithubCorner />
         {this.renderContent()}
       </React.Fragment>
     );

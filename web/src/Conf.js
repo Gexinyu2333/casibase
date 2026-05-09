@@ -19,7 +19,6 @@ export let FaviconUrl = "";
 export let LogoUrl = "";
 export let NavbarHtml = "";
 export let FooterHtml = "";
-export let ShowGithubCorner = false;
 export let IsDemoMode = false;
 // eslint-disable-next-line
 export let ThemeDefault = {
@@ -42,8 +41,6 @@ export function setConfig(config) {
   if (config.logoUrl !== undefined) {LogoUrl = config.logoUrl;}
   if (config.navbarHtml !== undefined) {NavbarHtml = config.navbarHtml;}
   if (config.footerHtml !== undefined) {FooterHtml = config.footerHtml;}
-  if (config.showGithubCorner !== undefined) {ShowGithubCorner = config.showGithubCorner;}
-
   if (config.isDemoMode !== undefined) {
     IsDemoMode = config.isDemoMode;
   }
