@@ -106,12 +106,21 @@ func GetDescFromIP(ip string) string {
 		return ""
 	}
 
-	res := info.Country + ", " + info.Region + ", " + info.City
-	if info.Isp != Null {
-		res += ", " + info.Isp
+	parts := []string{}
+	if info.Country != "" {
+		parts = append(parts, info.Country)
+	}
+	if info.Region != "" {
+		parts = append(parts, info.Region)
+	}
+	if info.City != "" {
+		parts = append(parts, info.City)
+	}
+	if info.Isp != Null && info.Isp != "" {
+		parts = append(parts, info.Isp)
 	}
 
-	return res
+	return strings.Join(parts, ", ")
 }
 
 func GetIPInfo(clientIP string) string {

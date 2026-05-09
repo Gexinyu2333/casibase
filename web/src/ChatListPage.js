@@ -492,15 +492,22 @@ class ChatListPage extends BaseListPage {
             return null;
           }
 
+          const ipDesc = record.clientIpDesc
+            ? record.clientIpDesc.split(",").map(s => s.trim()).filter(s => s !== "").join(", ")
+            : "";
+
           return (
             <a target="_blank" rel="noreferrer" href={`https://db-ip.com/${text}`}>
               {
-                record.clientIpDesc === "" ? text : (
+                ipDesc === "" && record.userAgentDesc === "" && record.userAgent === "" ? text : (
                   <div>
                     {text}
-                    <br />
-                    {record.clientIpDesc}
-                    <br />
+                    {ipDesc !== "" && (
+                      <>
+                        <br />
+                        {ipDesc}
+                      </>
+                    )}
                     <br />
                     {
                       this.renderUserAgent(record)
