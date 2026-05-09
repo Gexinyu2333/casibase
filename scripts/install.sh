@@ -106,4 +106,5 @@ info ""
 info "For more information visit https://github.com/${REPO}"
 info ""
 info "Starting openagent..."
+export PATH="${BIN_DIR}:${PATH}"
 openagent serve
