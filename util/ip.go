@@ -24,8 +24,8 @@ import (
 	"github.com/beego/beego"
 )
 
-// isLocalIpDb holds the resolved config string: "" = disabled, "true" = 17monipdb, "false" = MaxMind.
-var isLocalIpDb string
+// ipParsingMode holds the resolved config string: "" = disabled, "17monipdb" = 17monipdb, "MaxMind GeoIP2" = MaxMind.
+var ipParsingMode string
 
 // tryInitLocalDb tries to initialize the local IP database from different paths.
 // Returns (found, error): found=false means the data file doesn't exist (caller should skip silently).
@@ -48,36 +48,36 @@ func tryInitLocalDb() (bool, error) {
 }
 
 // InitIpDb initializes the IP database based on configuration.
-// isLocalIpDb = "" : IP parsing disabled entirely (no DB loaded, no download).
-// isLocalIpDb = "true" : use local 17monipdb.
-// isLocalIpDb = "false": use MaxMind GeoIP2 (same behaviour as the old bool=false).
+// ipParsingMode = ""              : IP parsing disabled entirely (no DB loaded, no download).
+// ipParsingMode = "17monipdb"     : use local 17monipdb.
+// ipParsingMode = "MaxMind GeoIP2": use MaxMind GeoIP2.
 func InitIpDb() {
-	isLocalIpDb = beego.AppConfig.DefaultString("isLocalIpDb", "")
-	if isLocalIpDb == "" {
+	ipParsingMode = beego.AppConfig.DefaultString("ipParsingMode", "")
+	if ipParsingMode == "" {
 		return
 	}
 
-	if isLocalIpDb == "true" {
+	if ipParsingMode == "17monipdb" {
 		found, err := tryInitLocalDb()
 		if err != nil {
 			panic(err)
 		}
 		if !found {
 			// Data file absent — disable silently.
-			isLocalIpDb = ""
+			ipParsingMode = ""
 		}
 	} else {
-		// "false" — MaxMind; InitMaxmindFiles() is called from main before InitIpDb,
+		// "MaxMind GeoIP2" — InitMaxmindFiles() is called from main before InitIpDb,
 		// so the DB is already loaded or a background download is in progress.
 		if err := InitMaxmindDb(); err != nil && !MaxmindDownloadInProgress {
 			// MaxMind not available either — disable silently.
-			isLocalIpDb = ""
+			ipParsingMode = ""
 		}
 	}
 }
 
 func GetInfoFromIP(ip string) (*LocationInfo, error) {
-	if isLocalIpDb == "" {
+	if ipParsingMode == "" {
 		return &LocationInfo{}, nil
 	}
 
@@ -87,7 +87,7 @@ func GetInfoFromIP(ip string) (*LocationInfo, error) {
 
 	var info *LocationInfo
 	var err error
-	if isLocalIpDb == "true" {
+	if ipParsingMode == "17monipdb" {
 		info, err = Find(ip)
 	} else {
 		info, err = FindMaxmind(ip)

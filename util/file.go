@@ -214,9 +214,9 @@ func downloadMaxmindFiles() {
 }
 
 // InitMaxmindFiles checks if MaxMind database files are valid and downloads them if needed.
-// It is a no-op when isLocalIpDb is not "false" (i.e. disabled or using 17monipdb).
+// It is a no-op when ipParsingMode is not "MaxMind GeoIP2" (i.e. disabled or using 17monipdb).
 func InitMaxmindFiles() {
-	if conf.GetConfigString("isLocalIpDb") != "false" {
+	if conf.GetConfigString("ipParsingMode") != "MaxMind GeoIP2" {
 		return
 	}
 
