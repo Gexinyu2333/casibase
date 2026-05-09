@@ -34,8 +34,6 @@ func GetStorageProvider(typ string, clientId string, clientSecret string, provid
 	var err error
 	if typ == "Local File System" {
 		p, err = NewLocalFileSystemStorageProvider(clientId)
-	} else if typ == "OpenAI File System" {
-		p, err = NewOpenAIFileSystemStorageProvider(vectorStoreId, clientSecret)
 	} else {
 		p, err = NewCasdoorProvider(providerName, lang)
 	}

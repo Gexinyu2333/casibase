@@ -273,14 +273,6 @@ class StoreEditPage extends React.Component {
     });
   }
 
-  isAIStorageProvider(storageProvider) {
-    const providerSelected = this.state.storageProviders.concat(this.state.casdoorStorageProviders).find(v => v.name === storageProvider);
-    if (providerSelected && providerSelected.type === "OpenAI File System") {
-      return true;
-    }
-    return false;
-  }
-
   renderStoreActions(size, useGlobalAdminCheck = false) {
     if (this.state.store === null) {
       return null;
@@ -493,15 +485,8 @@ class StoreEditPage extends React.Component {
                   <Input value={store.storageSubpath} onChange={e => {
                     this.updateStoreField("storageSubpath", e.target.value);
                   }} />,
-                  this.isAIStorageProvider(store.storageProvider) ? 12 : 8
+                  8
                 )}
-                {this.isAIStorageProvider(store.storageProvider) ? this.renderStoreField(
-                  Setting.getLabel(i18next.t("store:Vector store id"), i18next.t("store:Vector store id - Tooltip")),
-                  <Input value={store.vectorStoreId} onChange={e => {
-                    this.updateStoreField("vectorStoreId", e.target.value);
-                  }} />,
-                  12
-                ) : null}
                 {this.renderStoreField(
                   Setting.getLabel(i18next.t("store:Split provider"), i18next.t("store:Split provider - Tooltip")),
                   <Select virtual={false} style={{width: "100%"}} value={store.splitProvider} onChange={(value => {this.updateStoreField("splitProvider", value);})}

@@ -118,7 +118,7 @@ class StoreListPage extends BaseListPage {
       <img width={20} height={20} src={Setting.getProviderLogoURL(provider)} alt={provider.name} />
     );
 
-    const isLocalStorage = ["Local File System", "OpenAI File System"].includes(provider.type);
+    const isLocalStorage = provider.type === "Local File System";
     const providerType = provider.category;
 
     const openInCasdoorAdmin =

@@ -731,8 +731,6 @@
     "Upload file": "上传文件",
     "Upload folder": "上传文件夹",
     "Vector count": "向量数量",
-    "Vector store id": "向量存储ID",
-    "Vector store id - Tooltip": "文件所属的向量存储ID",
     "Vector stores": "向量存储",
     "Vector stores - Tooltip": "向量数据库存储配置",
     "Welcome": "欢迎提示词",

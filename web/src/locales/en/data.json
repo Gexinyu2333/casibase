@@ -731,8 +731,6 @@
     "Upload file": "Upload file",
     "Upload folder": "Upload folder",
     "Vector count": "Vector count",
-    "Vector store id": "Vector store id",
-    "Vector store id - Tooltip": "The ID of the vector store that the files belong to",
     "Vector stores": "Vector stores",
     "Vector stores - Tooltip": "Vector database storage configurations",
     "Welcome": "Welcome",

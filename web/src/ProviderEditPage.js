@@ -172,7 +172,7 @@ class ProviderEditPage extends React.Component {
     return (
       ((provider.category === "Embedding" && provider.type === "Baidu Cloud") ||
         (provider.category === "Embedding" && provider.type === "Tencent Cloud") ||
-        (provider.category === "Storage" && provider.type !== "OpenAI File System")) ||
+        provider.category === "Storage") ||
       (provider.category === "Blockchain" && !["ChainMaker", "Ethereum"].includes(provider.type)) ||
       ((provider.category === "Model" || provider.category === "Embedding") && provider.type === "Azure") ||
       (!(["Storage", "Model", "Embedding", "Text-to-Speech", "Speech-to-Text", "Blockchain", "Chat"].includes(provider.category)))
@@ -181,7 +181,7 @@ class ProviderEditPage extends React.Component {
 
   shouldShowClientSecretInput(provider) {
     return !(
-      (provider.category === "Storage" && provider.type !== "OpenAI File System") ||
+      provider.category === "Storage" ||
       (provider.category === "Blockchain" && provider.type === "ChainMaker") ||
       provider.type === "Dummy" ||
       provider.type === "Ollama"
