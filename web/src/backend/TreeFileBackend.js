@@ -17,7 +17,7 @@ import * as Setting from "../Setting";
 export function addFile(storeId, key, isLeaf, filename, file) {
   const formData = new FormData();
   formData.append("file", file);
-  return fetch(`${Setting.ServerUrl}/api/add-tree-file?store=${storeId}&key=${key}&isLeaf=${isLeaf ? 1 : 0}&filename=${filename}`, {
+  return fetch(`${Setting.ServerUrl}/api/add-tree-file?store=${storeId}&key=${key}&isLeaf=${isLeaf ? 1 : 0}&filename=${encodeURIComponent(filename)}`, {
     method: "POST",
     credentials: "include",
     headers: {
