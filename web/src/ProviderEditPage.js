@@ -1,4 +1,4 @@
-// Copyright 2023 The OpenAgent Authors. All Rights Reserved.
+﻿// Copyright 2023 The OpenAgent Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -330,9 +330,9 @@ class ProviderEditPage extends React.Component {
     const cardHeadStyle = {background: "transparent", borderBottom: "none", fontWeight: 600, fontSize: "15px"};
 
     const btnStyle = {
-      backgroundColor: "#F8F9FA",
-      borderColor: "rgb(229, 229, 234)",
-      border: "1px solid #E5E5EA",
+      backgroundColor: "var(--ant-color-bg-container)",
+      borderColor: "var(--ant-color-border)",
+      border: "1px solid var(--ant-color-border)",
       borderRadius: "10px",
       padding: "6px 10px",
     };
@@ -1373,7 +1373,7 @@ class ProviderEditPage extends React.Component {
 
   render() {
     return (
-      <div style={{background: "#F1F3F5", padding: "16px 20px 32px", minHeight: "100vh"}}>
+      <div style={{background: "var(--ant-color-bg-layout)", padding: "16px 20px 32px", minHeight: "100vh"}}>
         {
           this.state.provider !== null ? this.renderProvider() : <Loading type="page" tip={i18next.t("general:Loading")} />
         }

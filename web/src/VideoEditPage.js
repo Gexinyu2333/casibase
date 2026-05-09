@@ -1,4 +1,4 @@
-// Copyright 2023 The OpenAgent Authors. All Rights Reserved.
+﻿// Copyright 2023 The OpenAgent Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -527,9 +527,9 @@ class VideoEditPage extends React.Component {
 
   renderVideoActions() {
     const btnStyle = {
-      backgroundColor: "#F8F9FA",
-      borderColor: "rgb(229, 229, 234)",
-      border: "1px solid #E5E5EA",
+      backgroundColor: "var(--ant-color-bg-container)",
+      borderColor: "var(--ant-color-border)",
+      border: "1px solid var(--ant-color-border)",
       borderRadius: "10px",
       padding: "6px 10px",
     };
@@ -918,7 +918,7 @@ class VideoEditPage extends React.Component {
 
   render() {
     return (
-      <div style={{background: "#F1F3F5", padding: "16px 20px 32px", minHeight: "100vh"}}>
+      <div style={{background: "var(--ant-color-bg-layout)", padding: "16px 20px 32px", minHeight: "100vh"}}>
         <div style={{marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center"}}>
           <span style={{fontSize: "22px", fontWeight: 600}}>{i18next.t("video:Edit Video")}</span>
           <div style={{display: "flex", gap: "8px", marginRight: "4px"}}>

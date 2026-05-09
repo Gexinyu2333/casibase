@@ -1,4 +1,4 @@
-// Copyright 2023 The OpenAgent Authors.. All Rights Reserved.
+﻿// Copyright 2023 The OpenAgent Authors.. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -87,7 +87,7 @@ class RecordEditPage extends React.Component {
   renderRecordField(label, control, span = 8) {
     return (
       <Col style={{marginTop: "12px"}} span={Setting.isMobile() ? 22 : span}>
-        <div style={{marginBottom: "6px", color: "#595959", fontWeight: 500, lineHeight: "22px", fontSize: "13px"}}>{label}</div>
+        <div style={{marginBottom: "6px", color: "var(--ant-color-text-secondary)", fontWeight: 500, lineHeight: "22px", fontSize: "13px"}}>{label}</div>
         {control}
       </Col>
     );
@@ -99,9 +99,9 @@ class RecordEditPage extends React.Component {
 
   renderRecordActions() {
     const btnStyle = {
-      backgroundColor: "#F8F9FA",
-      borderColor: "rgb(229, 229, 234)",
-      border: "1px solid #E5E5EA",
+      backgroundColor: "var(--ant-color-bg-container)",
+      borderColor: "var(--ant-color-border)",
+      border: "1px solid var(--ant-color-border)",
       borderRadius: "10px",
       padding: "6px 10px",
     };
@@ -134,7 +134,7 @@ class RecordEditPage extends React.Component {
     const renderCardTitle = (title, desc) => (
       <div>
         <div style={{fontWeight: 600, fontSize: "15px"}}>{title}</div>
-        {desc && <div style={{fontSize: "13px", color: "#6E6E73", fontWeight: 400, marginTop: "2px"}}>{desc}</div>}
+        {desc && <div style={{fontSize: "13px", color: "var(--ant-color-text-tertiary)", fontWeight: 400, marginTop: "2px"}}>{desc}</div>}
       </div>
     );
 
@@ -350,7 +350,7 @@ class RecordEditPage extends React.Component {
 
   render() {
     return (
-      <div style={{background: "#F1F3F5", padding: "16px 20px 32px", minHeight: "100vh"}}>
+      <div style={{background: "var(--ant-color-bg-layout)", padding: "16px 20px 32px", minHeight: "100vh"}}>
         {this.state.record !== null ? this.renderRecord() : <Loading type="page" tip={i18next.t("general:Loading")} />}
       </div>
     );
