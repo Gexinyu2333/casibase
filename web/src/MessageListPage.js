@@ -39,6 +39,19 @@ class MessageListPage extends BaseListPage {
     };
   }
 
+  UNSAFE_componentWillMount() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const chatFilter = urlParams.get("chat");
+    const {pagination} = this.state;
+    if (chatFilter) {
+      this.setState({searchText: chatFilter, searchedColumn: "chat"});
+      this.fetch({pagination, searchedColumn: "chat", searchText: chatFilter});
+    } else {
+      this.fetch({pagination});
+    }
+    this.getForm();
+  }
+
   componentDidMount() {
     super.componentDidMount();
     this.getProviders();

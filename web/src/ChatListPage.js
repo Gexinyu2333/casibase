@@ -530,12 +530,14 @@ class ChatListPage extends BaseListPage {
       //   },
       // },
       {
-        title: i18next.t("general:Count"),
+        title: i18next.t("chat:Message count"),
         dataIndex: "messageCount",
         key: "messageCount",
-        width: "80px",
+        width: "140px",
         sorter: (a, b) => a.messageCount - b.messageCount,
-        // ...this.getColumnSearchProps("messageCount"),
+        render: (text, record) => (
+          <Link to={`/messages?chat=${record.name}`}>{text}</Link>
+        ),
       },
       {
         title: i18next.t("chat:Token count"),
@@ -572,17 +574,16 @@ class ChatListPage extends BaseListPage {
 
           return (
             <div style={{
-              padding: "5px",
+              padding: "2px",
               margin: "5px",
               background: "rgb(191,191,191)",
-              borderRadius: "10px",
+              borderRadius: "6px",
               width: messagesWidth,
               // boxSizing: "border-box",
               // boxShadow: "0 0 0 1px inset",
             }}>
               <div style={{
-                maxHeight: "500px",
-                overflowY: "auto",
+                height: "300px",
                 width: "100%",
               }}>
                 <ChatBox disableInput={true} hideInput={true} messages={messages} sendMessage={null} account={this.props.account} />
