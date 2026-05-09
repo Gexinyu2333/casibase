@@ -164,6 +164,7 @@ func initBuiltInProviders() (string, string, string, string, string) {
 			Type:        "Local File System",
 			ClientId:    path,
 			IsDefault:   true,
+			State:       "Active",
 		}
 		_, err = AddProvider(storageProvider)
 		if err != nil && !isUniqueConstraintError(err) {
@@ -197,6 +198,7 @@ func initBuiltInProviders() (string, string, string, string, string) {
 				Category:    "Storage",
 				Type:        "Local File System",
 				ClientId:    imagePath,
+				State:       "Inactive",
 			}
 			_, err = AddProvider(imageProvider)
 			if err != nil && !isUniqueConstraintError(err) {
@@ -216,6 +218,7 @@ func initBuiltInProviders() (string, string, string, string, string) {
 			Type:        "Dummy",
 			SubType:     "Dummy",
 			IsDefault:   true,
+			State:       "Active",
 		}
 		_, err = AddProvider(modelProvider)
 		if err != nil && !isUniqueConstraintError(err) {
@@ -233,6 +236,7 @@ func initBuiltInProviders() (string, string, string, string, string) {
 			Type:        "Dummy",
 			SubType:     "Dummy",
 			IsDefault:   true,
+			State:       "Active",
 		}
 		_, err = AddProvider(embeddingProvider)
 		if err != nil && !isUniqueConstraintError(err) {
