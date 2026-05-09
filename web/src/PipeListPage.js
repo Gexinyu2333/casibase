@@ -37,6 +37,7 @@ class PipeListPage extends BaseListPage {
       type: "Telegram",
       token: "",
       secretKey: "",
+      store: "store-built-in",
       domain: "",
       isDefault: false,
       state: "Active",

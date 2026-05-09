@@ -17,6 +17,7 @@ import Loading from "./common/Loading";
 import {Button, Card, Col, Input, Row, Select, Switch} from "antd";
 import {LinkOutlined, SendOutlined} from "@ant-design/icons";
 import * as PipeBackend from "./backend/PipeBackend";
+import * as StoreBackend from "./backend/StoreBackend";
 import * as Setting from "./Setting";
 import i18next from "i18next";
 
@@ -30,6 +31,7 @@ class PipeEditPage extends React.Component {
       pipeName: props.match.params.pipeName,
       pipe: null,
       originalPipe: null,
+      storeNames: [],
       isNewPipe: props.location?.state?.isNewPipe || false,
       testChatId: "",
       testMessage: "",
@@ -40,7 +42,29 @@ class PipeEditPage extends React.Component {
   }
 
   UNSAFE_componentWillMount() {
+    this.getStoreNames();
     this.getPipe();
+  }
+
+  getStoreNames() {
+    StoreBackend.getStoreNames("admin")
+      .then((res) => {
+        if (res.status === "ok") {
+          this.setState({storeNames: res.data || []});
+        } else {
+          Setting.showMessage("error", `${i18next.t("general:Failed to get")}: ${res.msg}`);
+        }
+      })
+      .catch((error) => {
+        Setting.showMessage("error", `${i18next.t("general:Failed to get")}: ${error}`);
+      });
+  }
+
+  getStoreOptions() {
+    return this.state.storeNames.map((store) => {
+      const label = store.displayName ? `${store.displayName} (${store.name})` : store.name;
+      return Setting.getOption(label, store.name);
+    });
   }
 
   getPipe() {
@@ -223,6 +247,16 @@ class PipeEditPage extends React.Component {
                   </Option>
                 ))}
               </Select>
+            </Col>
+            <Col style={{marginTop: "5px"}} span={Setting.isMobile() ? 22 : 11}>
+              <div style={{marginBottom: "4px"}}>{Setting.getLabel(i18next.t("general:Store"), i18next.t("general:Store - Tooltip"))}</div>
+              <Select
+                virtual={false}
+                style={{width: "100%"}}
+                value={pipe.store || "store-built-in"}
+                onChange={(value) => this.updatePipeField("store", value)}
+                options={this.getStoreOptions()}
+              />
             </Col>
           </Row>
 

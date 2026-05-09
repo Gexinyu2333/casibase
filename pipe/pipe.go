@@ -37,6 +37,17 @@ type Pipe interface {
 	SetWebhook(webhookUrl string) error
 }
 
+type PipeMessageWriter interface {
+	WriteMessage(text string) error
+	CloseMessage(text string) error
+}
+
+// StreamPipe is implemented by pipes that can progressively update an
+// in-flight response (for example via send + edit message APIs).
+type StreamPipe interface {
+	SendStreamMessage(chatId string, text string) (PipeMessageWriter, error)
+}
+
 type WebhookResponse struct {
 	StatusCode  int
 	ContentType string

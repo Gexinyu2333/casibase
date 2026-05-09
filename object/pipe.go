@@ -33,6 +33,7 @@ type Pipe struct {
 	Type        string `xorm:"varchar(100)" json:"type"`
 	Token       string `xorm:"varchar(2000)" json:"token"`
 	SecretKey   string `xorm:"varchar(100) 'provider_key'" json:"secretKey"`
+	Store       string `xorm:"varchar(100)" json:"store"`
 	Domain      string `xorm:"varchar(200)" json:"domain"`
 
 	IsDefault bool   `json:"isDefault"`

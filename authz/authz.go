@@ -94,6 +94,7 @@ p, anonymous, *, /api/analyze-task
 p, anonymous, *, /api/claim-store
 p, anonymous, *, /api/is-session-duplicated
 p, anonymous, *, /api/add-node-tunnel
+p, anonymous, *, /api/chat-webhook/*
 
 g, admin, user
 g, user, anonymous

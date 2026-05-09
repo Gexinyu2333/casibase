@@ -15,13 +15,37 @@
 package controllers
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 
+	"github.com/the-open-agent/openagent/conf"
 	"github.com/the-open-agent/openagent/object"
 	pipepkg "github.com/the-open-agent/openagent/pipe"
+	"github.com/the-open-agent/openagent/util"
 )
+
+type pipeAnswerSender interface {
+	WriteMessage(text string) error
+	WriteError(text string) error
+	CloseMessage(text string) error
+}
+
+type defaultPipeAnswerSender struct {
+	provider  pipepkg.Pipe
+	chatId    string
+	text      string
+	errorText string
+}
+
+type streamPipeAnswerSender struct {
+	writer    pipepkg.PipeMessageWriter
+	text      string
+	errorText string
+}
 
 // ChatWebhookVerify handles the HTTP GET challenge that some platforms (e.g. WhatsApp
 // Cloud API) send to verify webhook ownership before they start delivering events.
@@ -77,6 +101,8 @@ func (c *ApiController) ChatWebhookVerify() {
 func (c *ApiController) ChatWebhook() {
 	pipeType := c.Ctx.Input.Param(":pipeType")
 	pipeName := c.Ctx.Input.Param(":pipeName")
+	host := c.Ctx.Request.Host
+	lang := c.GetAcceptLanguage()
 
 	pipeObj, err := object.GetPipeByName("admin", pipeName)
 	if err != nil {
@@ -88,7 +114,7 @@ func (c *ApiController) ChatWebhook() {
 		return
 	}
 
-	provider, err := pipeObj.GetProvider(c.GetAcceptLanguage())
+	provider, err := pipeObj.GetProvider(lang)
 	if err != nil {
 		c.Ctx.ResponseWriter.WriteHeader(http.StatusInternalServerError)
 		return
@@ -119,11 +145,11 @@ func (c *ApiController) ChatWebhook() {
 
 	if immediateResponse != nil {
 		writePipeWebhookResponse(c, immediateResponse)
-		go sendPipeAnswer(provider, incoming, c.GetAcceptLanguage())
+		go sendPipeAnswer(provider, pipeObj, incoming, host, lang)
 		return
 	}
 
-	sendPipeAnswer(provider, incoming, c.GetAcceptLanguage())
+	sendPipeAnswer(provider, pipeObj, incoming, host, lang)
 	c.Ctx.ResponseWriter.WriteHeader(http.StatusOK)
 }
 
@@ -155,12 +181,283 @@ func writePipeWebhookResponse(c *ApiController, response *pipepkg.WebhookRespons
 	}
 }
 
-func sendPipeAnswer(provider pipepkg.Pipe, incoming *pipepkg.IncomingMessage, lang string) {
-	answer, _, err := object.GetAnswer("", incoming.Text, lang)
+type pipeSSERecorder struct {
+	header http.Header
+	body   bytes.Buffer
+	status int
+	sender pipeAnswerSender
+}
+
+func newPipeSSERecorder(sender pipeAnswerSender) *pipeSSERecorder {
+	return &pipeSSERecorder{header: http.Header{}, status: http.StatusOK, sender: sender}
+}
+
+func (r *pipeSSERecorder) Header() http.Header {
+	return r.header
+}
+
+func (r *pipeSSERecorder) WriteHeader(statusCode int) {
+	r.status = statusCode
+}
+
+func (r *pipeSSERecorder) Write(p []byte) (int, error) {
+	n, err := r.body.Write(p)
+	if err != nil {
+		return n, err
+	}
+
+	if r.sender != nil {
+		r.consumeBody()
+	}
+
+	return n, nil
+}
+
+func (r *pipeSSERecorder) Flush() {}
+
+func (r *pipeSSERecorder) consumeBody() {
+	for {
+		body := r.body.String()
+		idx := strings.Index(body, "\n\n")
+		if idx == -1 {
+			return
+		}
+
+		chunk := body[:idx]
+		rest := body[idx+2:]
+		r.body.Reset()
+		_, _ = r.body.WriteString(rest)
+
+		r.consumeChunk(chunk)
+	}
+}
+
+func (r *pipeSSERecorder) consumeChunk(chunk string) {
+	lines := strings.Split(chunk, "\n")
+	if len(lines) == 0 {
+		return
+	}
+
+	eventType := ""
+	if strings.HasPrefix(lines[0], "event: ") {
+		eventType = strings.TrimPrefix(lines[0], "event: ")
+	}
+
+	switch eventType {
+	case "message":
+		for _, line := range lines {
+			if !strings.HasPrefix(line, "data: ") {
+				continue
+			}
+			payload := strings.TrimPrefix(line, "data: ")
+			var data map[string]string
+			if err := json.Unmarshal([]byte(payload), &data); err == nil && r.sender != nil {
+				_ = r.sender.WriteMessage(data["text"])
+			}
+		}
+	case "myerror":
+		for _, line := range lines {
+			if !strings.HasPrefix(line, "data: ") {
+				continue
+			}
+			payload := strings.TrimPrefix(line, "data: ")
+			if r.sender != nil {
+				_ = r.sender.WriteError(payload)
+			}
+		}
+	}
+}
+
+func ensurePipeChat(pipeObj *object.Pipe, incoming *pipepkg.IncomingMessage) (*object.Chat, error) {
+	chatName := fmt.Sprintf("pipe_%s_%s", pipeObj.Name, incoming.ChatId)
+	chatId := util.GetIdFromOwnerAndName("admin", chatName)
+	chat, err := object.GetChat(chatId)
+	if err != nil {
+		return nil, err
+	}
+	if chat != nil {
+		return chat, nil
+	}
+
+	casdoorOrganization := conf.GetConfigString("casdoorOrganization")
+	storeName := ""
+	if pipeObj.Store != "" {
+		storeName = pipeObj.Store
+	} else {
+		defaultStore, err := object.GetDefaultStore("admin")
+		if err != nil {
+			return nil, err
+		}
+		if defaultStore != nil {
+			storeName = defaultStore.Name
+		}
+	}
+
+	currentTime := util.GetCurrentTime()
+	chat = &object.Chat{
+		Owner:         "admin",
+		Name:          chatName,
+		CreatedTime:   currentTime,
+		UpdatedTime:   currentTime,
+		Organization:  casdoorOrganization,
+		DisplayName:   incoming.Username,
+		Store:         storeName,
+		ModelProvider: "",
+		Category:      "Pipe",
+		Type:          "AI",
+		User:          chatName,
+		User1:         "",
+		User2:         "",
+		Users:         []string{},
+		ClientIp:      "",
+		UserAgent:     fmt.Sprintf("pipe/%s", pipeObj.Type),
+		MessageCount:  0,
+		IsHidden:      true,
+	}
+	_, err = object.AddChat(chat)
+	if err != nil {
+		return nil, err
+	}
+	return chat, nil
+}
+
+func addPipeQuestionAndAnswerMessages(chat *object.Chat, incoming *pipepkg.IncomingMessage) (*object.Message, *object.Message, error) {
+	questionMessage := &object.Message{
+		Owner:        "admin",
+		Name:         fmt.Sprintf("message_%s", util.GetRandomName()),
+		CreatedTime:  util.GetCurrentTimeWithMilli(),
+		Organization: chat.Organization,
+		Store:        chat.Store,
+		User:         chat.User,
+		Chat:         chat.Name,
+		ReplyTo:      "",
+		Author:       incoming.Username,
+		Text:         incoming.Text,
+	}
+	if questionMessage.Author == "" {
+		questionMessage.Author = incoming.UserId
+	}
+	if questionMessage.Author == "" {
+		questionMessage.Author = "User"
+	}
+
+	_, err := object.AddMessage(questionMessage)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	answerMessage := &object.Message{
+		Owner:         "admin",
+		Name:          fmt.Sprintf("message_%s", util.GetRandomName()),
+		CreatedTime:   util.GetCurrentTimeEx(questionMessage.CreatedTime),
+		Organization:  chat.Organization,
+		Store:         chat.Store,
+		User:          chat.User,
+		Chat:          chat.Name,
+		ReplyTo:       questionMessage.Name,
+		Author:        "AI",
+		Text:          "",
+		ModelProvider: chat.ModelProvider,
+	}
+
+	_, err = object.AddMessage(answerMessage)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return questionMessage, answerMessage, nil
+}
+
+func sendPipeAnswer(provider pipepkg.Pipe, pipeObj *object.Pipe, incoming *pipepkg.IncomingMessage, host string, lang string) {
+	chat, err := ensurePipeChat(pipeObj, incoming)
 	if err != nil {
 		_ = provider.SendMessage(incoming.ChatId, fmt.Sprintf("Error: %v", err))
 		return
 	}
 
-	_ = provider.SendMessage(incoming.ChatId, answer)
+	_, answerMessage, err := addPipeQuestionAndAnswerMessages(chat, incoming)
+	if err != nil {
+		_ = provider.SendMessage(incoming.ChatId, fmt.Sprintf("Error: %v", err))
+		return
+	}
+
+	var sender pipeAnswerSender = newDefaultPipeAnswerSender(provider, incoming.ChatId)
+	if streamProvider, ok := provider.(pipepkg.StreamPipe); ok {
+		if writer, streamErr := streamProvider.SendStreamMessage(incoming.ChatId, ""); streamErr == nil && writer != nil {
+			sender = newStreamPipeAnswerSender(writer)
+		}
+	}
+
+	recorder := newPipeSSERecorder(sender)
+	generateMessageAnswer(answerMessage.GetId(), recorder, host, lang, false, nil)
+
+	answer, err := object.GetMessage(answerMessage.GetId())
+	if err == nil && answer != nil && answer.Text != "" {
+		_ = sender.CloseMessage(answer.Text)
+		return
+	}
+	if answer != nil && answer.ErrorText != "" {
+		_ = sender.CloseMessage(answer.ErrorText)
+		return
+	}
+	_ = sender.CloseMessage("")
+}
+
+func newDefaultPipeAnswerSender(provider pipepkg.Pipe, chatId string) *defaultPipeAnswerSender {
+	return &defaultPipeAnswerSender{provider: provider, chatId: chatId}
+}
+
+func (s *defaultPipeAnswerSender) WriteMessage(text string) error {
+	if text != "" {
+		s.text = text
+	}
+	return nil
+}
+
+func (s *defaultPipeAnswerSender) WriteError(text string) error {
+	if text != "" {
+		s.errorText = text
+	}
+	return nil
+}
+
+func (s *defaultPipeAnswerSender) CloseMessage(text string) error {
+	if text == "" {
+		return nil
+	}
+	return s.provider.SendMessage(s.chatId, text)
+}
+
+func newStreamPipeAnswerSender(writer pipepkg.PipeMessageWriter) *streamPipeAnswerSender {
+	return &streamPipeAnswerSender{writer: writer}
+}
+
+func (s *streamPipeAnswerSender) WriteMessage(text string) error {
+	if text == "" || text == s.text {
+		return nil
+	}
+	s.text = text
+	return s.writer.WriteMessage(text)
+}
+
+func (s *streamPipeAnswerSender) WriteError(text string) error {
+	if text != "" {
+		s.errorText = text
+	}
+	return nil
+}
+
+func (s *streamPipeAnswerSender) CloseMessage(text string) error {
+	finalText := text
+	if finalText == "" {
+		switch {
+		case s.text != "":
+			finalText = s.text
+		case s.errorText != "":
+			finalText = s.errorText
+		default:
+			finalText = "No response generated"
+		}
+	}
+	return s.writer.CloseMessage(finalText)
 }

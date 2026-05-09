@@ -23,6 +23,7 @@ import (
 	"github.com/beego/beego/context"
 	"github.com/the-open-agent/openagent/conf"
 	"github.com/the-open-agent/openagent/embedding"
+	"github.com/the-open-agent/openagent/i18n"
 	"github.com/the-open-agent/openagent/model"
 	"github.com/the-open-agent/openagent/object"
 	"github.com/the-open-agent/openagent/util"
@@ -46,10 +47,16 @@ func (c *ApiController) GetMessageAnswer() {
 }
 
 func (c *ApiController) generateMessageAnswer(id string, responseWriter http.ResponseWriter, host string) {
-	lang := c.GetAcceptLanguage()
+	_, signedIn := c.CheckSignedIn()
+	generateMessageAnswer(id, responseWriter, host, c.GetAcceptLanguage(), signedIn, c.ResponseError)
+}
+
+func generateMessageAnswer(id string, responseWriter http.ResponseWriter, host string, lang string, signedIn bool, responseError func(string, ...interface{})) {
 	responseErrorStream := func(message *object.Message, errorText string) {
 		if err := writeMessageErrorStream(responseWriter, lang, message, errorText); err != nil {
-			c.ResponseError(err.Error())
+			if responseError != nil {
+				responseError(err.Error())
+			}
 		}
 	}
 
@@ -107,7 +114,7 @@ func (c *ApiController) generateMessageAnswer(id string, responseWriter http.Res
 				KnowledgeCount: 10,
 			}
 		} else {
-			responseErrorStream(message, fmt.Sprintf(c.T("account:The store: %s is not found"), chat.Store))
+			responseErrorStream(message, fmt.Sprintf(i18n.Translate(lang, "account:The store: %s is not found"), chat.Store))
 			return
 		}
 	}
@@ -166,8 +173,7 @@ func (c *ApiController) generateMessageAnswer(id string, responseWriter http.Res
 		return
 	}
 
-	_, ok := c.CheckSignedIn()
-	if !ok {
+	if !signedIn {
 		var count int
 		count, err = object.GetNearMessageCount(message.User, store.LimitMinutes)
 		if err != nil {
@@ -222,7 +228,7 @@ func (c *ApiController) generateMessageAnswer(id string, responseWriter http.Res
 	if chat.Tool == "" && store.KnowledgeCount != 0 {
 		knowledge, vectorScores, embeddingResult, err = object.GetNearestKnowledge(store.Name, store.VectorStores, store.SearchProvider, embeddingProvider, embeddingProviderObj, modelProvider, store.Owner, question, store.KnowledgeCount, lang)
 		if err != nil && err.Error() != "no knowledge vectors found" {
-			err = fmt.Errorf(c.T("message_answer:object.GetNearestKnowledge() error, %s"), err.Error())
+			err = fmt.Errorf(i18n.Translate(lang, "message_answer:object.GetNearestKnowledge() error, %s"), err.Error())
 			responseErrorStream(message, err.Error())
 			return
 		}
@@ -293,7 +299,9 @@ func (c *ApiController) generateMessageAnswer(id string, responseWriter http.Res
 	}
 	if err != nil {
 		if strings.Contains(err.Error(), "write tcp") {
-			c.ResponseError(err.Error())
+			if responseError != nil {
+				responseError(err.Error())
+			}
 			return
 		}
 		responseErrorStream(message, err.Error())
