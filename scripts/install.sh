@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 # OpenAgent one-step install: download the release binary for your platform.
 # Usage:
-#   curl -fsSL --proto '=https' --tlsv1.2 \
-#     https://raw.githubusercontent.com/the-open-agent/openagent/master/scripts/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/the-open-agent/openagent/master/scripts/install.sh | bash
 #
 # Optional environment variables:
 #   OPENAGENT_VERSION   e.g. v1.777.3  (default: latest release)
@@ -59,7 +58,7 @@ TMPDIR="$(mktemp -d)"
 trap 'rm -rf "${TMPDIR}"' EXIT
 
 info "Downloading ${URL} ..."
-curl -fsSL --proto '=https' --tlsv1.2 -o "${TMPDIR}/openagent" "${URL}"
+curl -fsSL -o "${TMPDIR}/openagent" "${URL}"
 chmod 755 "${TMPDIR}/openagent"
 
 # ── install ──────────────────────────────────────────────────────────────────

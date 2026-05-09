@@ -68,8 +68,7 @@ Pre-built binaries are available for **Linux**, **macOS**, and **Windows** (`amd
 **macOS / Linux / WSL**
 
 ```bash
-curl -fsSL --proto '=https' --tlsv1.2 \
-  https://raw.githubusercontent.com/the-open-agent/openagent/master/scripts/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/the-open-agent/openagent/master/scripts/install.sh | bash
 ```
 
 **Windows (PowerShell)**
