@@ -14,7 +14,7 @@
 
 import React from "react";
 import Loading from "./common/Loading";
-import {Affix, Button, Card, Col, Input, Popover, Row, Select} from "antd";
+import {Affix, Button, Card, Col, Input, Popover, Row, Select, Space} from "antd";
 import * as ArticleBackend from "./backend/ArticleBackend";
 import * as Setting from "./Setting";
 import i18next from "i18next";
@@ -55,10 +55,9 @@ class ArticleEditPage extends React.Component {
   }
 
   handleKeyDown = (event) => {
-    // Check if Ctrl or Command (for macOS) is pressed along with S
     if ((event.ctrlKey || event.metaKey) && event.key === "s") {
-      event.preventDefault(); // Prevent the browser's save action
-      this.submitArticleEdit(false); // Call your method here
+      event.preventDefault();
+      this.submitArticleEdit(false);
     }
   };
 
@@ -130,8 +129,7 @@ class ArticleEditPage extends React.Component {
   }
 
   splitTextBlocks(blocks) {
-    // Maximum length of text in a block before splitting
-    const textMaxLength = 1000; // Adjust this value as needed
+    const textMaxLength = 1000;
 
     let blockIndex = 0;
     blocks.forEach((block, index) => {
@@ -143,28 +141,23 @@ class ArticleEditPage extends React.Component {
         paragraphs.forEach((paragraph) => {
           if ((currentText.length + paragraph.length) > textMaxLength) {
             if (currentText.trim() !== "") {
-              // Push the current text as a new block and reset currentText
               newBlocks.push({no: blockIndex++, type: "Text", text: "", textEn: currentText.trim(), state: ""});
               currentText = "";
             }
-            // If the paragraph itself is longer than textMaxLength, it becomes a new block
             if (paragraph.length > textMaxLength) {
               newBlocks.push({no: blockIndex++, type: "Text", text: "", textEn: paragraph, state: ""});
             } else {
               currentText = paragraph;
             }
           } else {
-            // Accumulate paragraph
             currentText += paragraph + "\n";
           }
         });
 
-        // Check if there is remaining text to be pushed as a new block
         if (currentText.trim() !== "") {
           newBlocks.push({no: blockIndex++, type: "Text", text: "", textEn: currentText.trim(), state: ""});
         }
 
-        // Replace the original block with the new blocks
         blocks.splice(index, 1, ...newBlocks);
       }
     });
@@ -192,7 +185,6 @@ class ArticleEditPage extends React.Component {
 
     patterns.forEach(({pattern, type}) => {
       const allMatches = [...text.matchAll(pattern)];
-
       allMatches.forEach(match => {
         matches.push({
           index: match.index,
@@ -203,25 +195,20 @@ class ArticleEditPage extends React.Component {
       });
     });
 
-    // Sort the matches by their position in the text
     matches.sort((a, b) => a.index - b.index);
 
-    // Process the matches to create blocks
     let lastIndex = 0;
     matches.forEach(match => {
-      // Check for any text before the current match that hasn't been matched; consider it as regular text
       if (match.index > lastIndex) {
         const textPart = text.substring(lastIndex, match.index).trim();
         if (textPart) {
           blocks.push({no: blockIndex++, type: "Text", text: "", textEn: textPart, state: ""});
         }
       }
-      // Add the current match as a block
       blocks.push({no: blockIndex++, type: match.type, text: "", textEn: match.text, state: ""});
       lastIndex = match.index + match.length;
     });
 
-    // Check for any unmatched text at the end of the document as regular text
     if (lastIndex < text.length) {
       const textPart = text.substring(lastIndex).trim();
       if (textPart) {
@@ -245,7 +232,7 @@ class ArticleEditPage extends React.Component {
     let lastHeader1Index = 0;
     let lastHeader2Index = 0;
 
-    return blocks.map((block, index) => {
+    return blocks.map((block) => {
       switch (block.type) {
       case "Title":
         block.prefix = "Tit: ";
@@ -258,14 +245,14 @@ class ArticleEditPage extends React.Component {
         break;
       case "Header 1":
         header1Counter++;
-        header2Counter = 0; // Reset header2Counter when a new Header 1 is encountered
-        header3Counter = 0; // Reset header3Counter for new Header 1 section
+        header2Counter = 0;
+        header3Counter = 0;
         lastHeader1Index = header1Counter;
         block.prefix = `${header1Counter}. `;
         break;
       case "Header 2":
         header2Counter++;
-        header3Counter = 0; // Reset header3Counter when a new Header 2 is encountered
+        header3Counter = 0;
         lastHeader2Index = header2Counter;
         block.prefix = `${lastHeader1Index}.${header2Counter} `;
         break;
@@ -330,101 +317,116 @@ class ArticleEditPage extends React.Component {
     this.updateArticleField("text", text);
   }
 
+  renderArticleField(label, control, span = 8) {
+    return (
+      <Col style={{marginTop: "12px"}} span={Setting.isMobile() ? 22 : span}>
+        {label && <div style={{marginBottom: "6px", color: "#595959", fontWeight: 500, lineHeight: "22px", fontSize: "13px"}}>{label}</div>}
+        {control}
+      </Col>
+    );
+  }
+
+  renderArticleActions() {
+    const btnStyle = {
+      backgroundColor: "#F8F9FA",
+      borderColor: "rgb(229, 229, 234)",
+      border: "1px solid #E5E5EA",
+      borderRadius: "10px",
+      padding: "6px 10px",
+    };
+    return (
+      <Space wrap>
+        <Button style={btnStyle} onClick={() => this.submitArticleEdit(false)}>{i18next.t("general:Save")}</Button>
+        <Button style={btnStyle} onClick={() => this.submitArticleEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
+        {this.state.isNewArticle && <Button style={btnStyle} onClick={() => this.cancelArticleEdit()}>{i18next.t("general:Cancel")}</Button>}
+      </Space>
+    );
+  }
+
   renderArticle() {
-    const blocks = this.getBlocksWithPrefix(this.state.article.content);
+    const article = this.state.article;
+    const blocks = this.getBlocksWithPrefix(article.content);
+    const rowGutter = [16, 8];
+    const cardHeadStyle = {background: "transparent", borderBottom: "none", fontWeight: 600, fontSize: "15px", fontFamily: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"};
+    const sectionCardStyle = {
+      marginBottom: "16px",
+      borderRadius: "14px",
+      boxShadow: "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
+      padding: "18px",
+    };
+    const renderCardTitle = (title, desc) => (
+      <div>
+        <div style={{fontWeight: 600, fontSize: "15px"}}>{title}</div>
+        {desc && <div style={{fontSize: "13px", color: "#6E6E73", fontWeight: 400, marginTop: "2px"}}>{desc}</div>}
+      </div>
+    );
 
     return (
-      <Card size="small" title={
-        <div>
-          {i18next.t("article:Edit Article")}&nbsp;&nbsp;&nbsp;&nbsp;
-          <Button onClick={() => this.submitArticleEdit(false)}>{i18next.t("general:Save")}</Button>
-          <Button style={{marginLeft: "20px"}} type="primary" onClick={() => this.submitArticleEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
-          {this.state.isNewArticle && <Button style={{marginLeft: "20px"}} onClick={() => this.cancelArticleEdit()}>{i18next.t("general:Cancel")}</Button>}
+      <div>
+        <div style={{marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+          <span style={{fontSize: "22px", fontWeight: 600}}>{i18next.t("article:Edit Article")}</span>
+          <div style={{display: "flex", gap: "8px", marginRight: "4px"}}>
+            {this.renderArticleActions()}
+          </div>
         </div>
-      } style={{marginLeft: "5px"}} type="inner">
-        <Row style={{marginTop: "10px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Name"), i18next.t("general:Name - Tooltip"))} :
-          </Col>
-          <Col span={2} >
-            <Input value={this.state.article.name} onChange={e => {
-              this.updateArticleField("name", e.target.value);
-            }} />
-          </Col>
-          <Col span={1} />
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Display name"), i18next.t("general:Display name - Tooltip"))} :
-          </Col>
-          <Col span={2} >
-            <Input value={this.state.article.displayName} onChange={e => {
-              this.updateArticleField("displayName", e.target.value);
-            }} />
-          </Col>
-          {
-            this.props.account.name !== "admin" ? null : (
-              <React.Fragment>
-                <Col span={1} />
-                <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-                  {Setting.getLabel(i18next.t("store:Workflow"), i18next.t("store:Workflow - Tooltip"))} :
-                </Col>
-                <Col span={5} >
-                  <Select virtual={false} style={{width: "100%"}} value={this.state.article.workflow} onChange={(value => {this.updateArticleField("workflow", value);})}
-                    options={this.state.workflows.map((item) => Setting.getOption(`${item.displayName} (${item.name})`, `${item.name}`))
-                    } />
-                </Col>
-              </React.Fragment>
-            )
-          }
-          <Col span={1} />
-          <Col style={{marginTop: "5px"}} span={2}>
-            {Setting.getLabel(i18next.t("general:Text"), i18next.t("general:Text - Tooltip"))} :
-          </Col>
-          <Col span={4}>
-            <Popover placement="left" content={
-              <div style={{width: "1000px"}}>
-                <Select virtual={false} mode="tags" style={{width: "100%"}} value={this.state.article.glossary} onChange={(value => {this.updateArticleField("glossary", value);})}>
-                  {
-                    this.state.article.glossary?.map((item, index) => <Option key={index} value={item}>{item}</Option>)
-                  }
-                </Select>
-                <Button style={{marginTop: "20px", marginBottom: "20px", marginRight: "20px"}}
-                  onClick={() => this.parseText()}>{i18next.t("article:Parse")}</Button>
-                <Button style={{marginTop: "20px", marginBottom: "20px", marginRight: "20px"}} type="primary"
-                  onClick={() => this.exportText(true)}>{i18next.t("article:Export")}</Button>
-                <Button style={{marginTop: "20px", marginBottom: "20px"}}
-                  onClick={() => this.exportText(false)}>{i18next.t("article:Export ZH")}</Button>
-                <TextArea autoSize={{minRows: 1, maxRows: 30}} showCount value={this.state.article.text} onChange={(e) => {
-                  this.updateArticleField("text", e.target.value);
-                }} />
-              </div>
-            } title="" trigger="hover">
-              <Input value={this.state.article.text} onChange={e => {
-                this.updateArticleField("text", e.target.value);
-              }} />
-            </Popover>
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          {/* <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>*/}
-          {/*  {i18next.t("article:Content")}:*/}
-          {/* </Col>*/}
-          <Col span={5} >
-            <Affix offsetTop={0} style={{marginRight: "10px"}}>
-              <div style={{height: "100vh", overflowY: "auto", borderRight: 0}}>
-                <ArticleMenu table={blocks} onGoToRow={(table, i) => {
-                  if (this.articleTableRef.current) {
-                    this.articleTableRef.current.goToRow(table, i);
-                  }
-                }} />
-              </div>
-            </Affix>
-          </Col>
-          {/* <Col span={1} />*/}
-          <Col span={19} >
-            <ArticleTable ref={this.articleTableRef} article={this.state.article} table={blocks} onUpdateTable={(value) => {this.updateArticleField("content", value);}} onSubmitArticleEdit={() => {this.submitArticleEdit(false);}} />
-          </Col>
-        </Row>
-      </Card>
+
+        <Card size="small" title={renderCardTitle(i18next.t("general:General Settings"), i18next.t("general:General Settings desc"))} style={sectionCardStyle} headStyle={cardHeadStyle}>
+          <Row gutter={rowGutter}>
+            {this.renderArticleField(
+              Setting.getLabel(i18next.t("general:Name"), i18next.t("general:Name - Tooltip")),
+              <Input value={article.name} onChange={(e) => this.updateArticleField("name", e.target.value)} />,
+              6
+            )}
+            {this.renderArticleField(
+              Setting.getLabel(i18next.t("general:Display name"), i18next.t("general:Display name - Tooltip")),
+              <Input value={article.displayName} onChange={(e) => this.updateArticleField("displayName", e.target.value)} />,
+              6
+            )}
+            {this.props.account.name !== "admin" ? null : this.renderArticleField(
+              Setting.getLabel(i18next.t("store:Workflow"), i18next.t("store:Workflow - Tooltip")),
+              <Select virtual={false} style={{width: "100%"}} value={article.workflow} onChange={(value) => this.updateArticleField("workflow", value)}
+                options={this.state.workflows.map((item) => Setting.getOption(`${item.displayName} (${item.name})`, `${item.name}`))} />,
+              8
+            )}
+            {this.renderArticleField(
+              Setting.getLabel(i18next.t("general:Text"), i18next.t("general:Text - Tooltip")),
+              <Popover placement="left" content={
+                <div style={{width: "1000px"}}>
+                  <Select virtual={false} mode="tags" style={{width: "100%"}} value={article.glossary} onChange={(value) => this.updateArticleField("glossary", value)}>
+                    {article.glossary?.map((item, index) => <Option key={index} value={item}>{item}</Option>)}
+                  </Select>
+                  <Button style={{marginTop: "20px", marginBottom: "20px", marginRight: "20px"}} onClick={() => this.parseText()}>{i18next.t("article:Parse")}</Button>
+                  <Button style={{marginTop: "20px", marginBottom: "20px", marginRight: "20px"}} type="primary" onClick={() => this.exportText(true)}>{i18next.t("article:Export")}</Button>
+                  <Button style={{marginTop: "20px", marginBottom: "20px"}} onClick={() => this.exportText(false)}>{i18next.t("article:Export ZH")}</Button>
+                  <TextArea autoSize={{minRows: 1, maxRows: 30}} showCount value={article.text} onChange={(e) => this.updateArticleField("text", e.target.value)} />
+                </div>
+              } title="" trigger="hover">
+                <Input value={article.text} onChange={(e) => this.updateArticleField("text", e.target.value)} />
+              </Popover>,
+              8
+            )}
+          </Row>
+        </Card>
+
+        <Card size="small" title={renderCardTitle(i18next.t("general:Content"), "")} style={sectionCardStyle} headStyle={cardHeadStyle}>
+          <Row gutter={rowGutter}>
+            <Col span={5}>
+              <Affix offsetTop={0} style={{marginRight: "10px"}}>
+                <div style={{height: "100vh", overflowY: "auto", borderRight: 0}}>
+                  <ArticleMenu table={blocks} onGoToRow={(table, i) => {
+                    if (this.articleTableRef.current) {
+                      this.articleTableRef.current.goToRow(table, i);
+                    }
+                  }} />
+                </div>
+              </Affix>
+            </Col>
+            <Col span={19}>
+              <ArticleTable ref={this.articleTableRef} article={article} table={blocks} onUpdateTable={(value) => this.updateArticleField("content", value)} onSubmitArticleEdit={() => this.submitArticleEdit(false)} />
+            </Col>
+          </Row>
+        </Card>
+      </div>
     );
   }
 
@@ -478,15 +480,8 @@ class ArticleEditPage extends React.Component {
 
   render() {
     return (
-      <div>
-        {
-          this.state.article !== null ? this.renderArticle() : <Loading type="page" tip={i18next.t("general:Loading")} />
-        }
-        <div style={{marginTop: "20px", marginLeft: "40px"}}>
-          <Button size="large" onClick={() => this.submitArticleEdit(false)}>{i18next.t("general:Save")}</Button>
-          <Button style={{marginLeft: "20px"}} type="primary" size="large" onClick={() => this.submitArticleEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
-          {this.state.isNewArticle && <Button style={{marginLeft: "20px"}} size="large" onClick={() => this.cancelArticleEdit()}>{i18next.t("general:Cancel")}</Button>}
-        </div>
+      <div style={{background: "#F1F3F5", padding: "16px 20px 32px", minHeight: "100vh"}}>
+        {this.state.article !== null ? this.renderArticle() : <Loading type="page" tip={i18next.t("general:Loading")} />}
       </div>
     );
   }

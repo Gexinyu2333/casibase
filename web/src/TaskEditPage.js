@@ -14,7 +14,7 @@
 
 import React from "react";
 import Loading from "./common/Loading";
-import {Button, Card, Col, Input, Progress, Row, Select, Spin, Typography, Upload} from "antd";
+import {Button, Card, Col, Input, Progress, Row, Select, Space, Spin, Typography, Upload} from "antd";
 
 const ANALYZE_PROGRESS_DURATION_SEC = 300;
 const ANALYZE_PROGRESS_TICK_MS = 500;
@@ -230,7 +230,6 @@ class TaskEditPage extends React.Component {
       .then((res) => {
         if (res.status === "ok") {
           const result = res.data;
-          // Update both fields in a single setState to avoid race conditions
           const task = this.state.task;
           task.documentUrl = result.url;
           task.documentText = result.text;
@@ -271,193 +270,178 @@ class TaskEditPage extends React.Component {
     }
   }
 
-  renderTask() {
+  renderTaskField(label, control, span = 8) {
     return (
-      <Card size="small" title={
-        <div>
-          {i18next.t("task:Edit Task")}&nbsp;&nbsp;&nbsp;&nbsp;
-          <Button onClick={() => this.submitTaskEdit(false)}>{i18next.t("general:Save")}</Button>
-          <Button style={{marginLeft: "20px"}} type="primary" onClick={() => this.submitTaskEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
-          {this.state.isNewTask && <Button style={{marginLeft: "20px"}} onClick={() => this.cancelTaskEdit()}>{i18next.t("general:Cancel")}</Button>}
+      <Col style={{marginTop: "12px"}} span={Setting.isMobile() ? 22 : span}>
+        {label && <div style={{marginBottom: "6px", color: "#595959", fontWeight: 500, lineHeight: "22px", fontSize: "13px"}}>{label}</div>}
+        {control}
+      </Col>
+    );
+  }
+
+  renderTaskActions() {
+    const btnStyle = {
+      backgroundColor: "#F8F9FA",
+      borderColor: "rgb(229, 229, 234)",
+      border: "1px solid #E5E5EA",
+      borderRadius: "10px",
+      padding: "6px 10px",
+    };
+    return (
+      <Space wrap>
+        <Button style={btnStyle} onClick={() => this.submitTaskEdit(false)}>{i18next.t("general:Save")}</Button>
+        <Button style={btnStyle} onClick={() => this.submitTaskEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
+        {this.state.isNewTask && <Button style={btnStyle} onClick={() => this.cancelTaskEdit()}>{i18next.t("general:Cancel")}</Button>}
+      </Space>
+    );
+  }
+
+  renderTask() {
+    const task = this.state.task;
+    const rowGutter = [16, 8];
+    const cardHeadStyle = {background: "transparent", borderBottom: "none", fontWeight: 600, fontSize: "15px", fontFamily: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"};
+    const sectionCardStyle = {
+      marginBottom: "16px",
+      borderRadius: "14px",
+      boxShadow: "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
+      padding: "18px",
+    };
+    const renderCardTitle = (title, desc) => (
+      <div>
+        <div style={{fontWeight: 600, fontSize: "15px"}}>{title}</div>
+        {desc && <div style={{fontSize: "13px", color: "#6E6E73", fontWeight: 400, marginTop: "2px"}}>{desc}</div>}
+      </div>
+    );
+
+    return (
+      <div>
+        <div style={{marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+          <span style={{fontSize: "22px", fontWeight: 600}}>{i18next.t("task:Edit Task")}</span>
+          <div style={{display: "flex", gap: "8px", marginRight: "4px"}}>
+            {this.renderTaskActions()}
+          </div>
         </div>
-      } style={{marginLeft: "5px"}} type="inner">
-        <Row style={{marginTop: "10px"}} gutter={16}>
-          <Col style={{marginTop: "5px"}} span={Setting.isAdminUser(this.props.account) ? 8 : 24}>
-            <div>{Setting.getLabel(i18next.t("general:Name"), i18next.t("general:Name - Tooltip"))} :</div>
-            <Input value={this.state.task.name} onChange={e => {
-              this.updateTaskField("name", e.target.value);
-            }} />
-          </Col>
-          {Setting.isAdminUser(this.props.account) ? (
-            <>
-              <Col style={{marginTop: "5px"}} span={8}>
-                <div>{Setting.getLabel(i18next.t("provider:Model provider"), i18next.t("provider:Model provider - Tooltip"))} :</div>
-                <Select
-                  virtual={false}
-                  style={{width: "100%"}}
-                  value={this.state.task.provider}
-                  onChange={(value) => this.updateTaskField("provider", value)}
-                  options={this.state.modelProviders.map((p) => ({
-                    value: p.name,
-                    label: (
-                      <span style={{display: "inline-flex", alignItems: "center", gap: 8}}>
-                        <Provider.ProviderLogo provider={p} width={20} height={20} />
-                        <span>{Setting.getProviderDisplayName(p)} ({p.name})</span>
-                      </span>
-                    ),
-                  }))}
-                />
-              </Col>
-              <Col style={{marginTop: "5px"}} span={8}>
-                <div>{Setting.getLabel(i18next.t("general:Type"), i18next.t("general:Type - Tooltip"))} :</div>
-                <Select virtual={false} style={{width: "100%"}} value={this.state.task.type} onChange={(value => {this.updateTaskField("type", value);})}>
-                  {
-                    [
-                      {id: "Labeling", name: "Labeling"},
-                      {id: "PBL", name: "PBL"},
-                    ].map((item, index) => <Option key={index} value={item.id}>{item.name}</Option>)
-                  }
-                </Select>
-              </Col>
-            </>
-          ) : null}
-        </Row>
-        {
-          (this.state.task.type === "Labeling" || Setting.isAdminUser(this.props.account)) ? (
-            <Row style={{marginTop: "20px"}} >
-              <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-                {Setting.getLabel(i18next.t("general:Display name"), i18next.t("general:Display name - Tooltip"))} :
-              </Col>
-              <Col span={22} >
-                <Input value={this.state.task.displayName} onChange={e => {
-                  this.updateTaskField("displayName", e.target.value);
-                }} />
-              </Col>
-            </Row>
-          ) : null
-        }
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("task:Scale"), i18next.t("task:Scale - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Select
-              virtual={false}
-              style={{width: "100%"}}
-              placeholder={i18next.t("general:None")}
-              allowClear
-              value={this.state.task.scale ?? ""}
-              onChange={(value) => {
-                this.setState({task: {...this.state.task, scale: value || ""}});
-              }}
-              options={[
-                {value: "", label: i18next.t("general:None")},
-                ...this.state.publicScales.map((s) => ({value: `${s.owner}/${s.name}`, label: s.displayName ? `${s.displayName} (${s.owner}/${s.name})` : `${s.owner}/${s.name}`})),
-              ]}
-            />
-          </Col>
-        </Row>
-        {
-          this.getEffectiveScale() ? (
-            <Row style={{marginTop: "20px"}} >
-              <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-                {Setting.getLabel(i18next.t("general:Text"), i18next.t("task:Scale - Tooltip"))} :
-              </Col>
-              <Col span={22} >
-                <TextArea
-                  rows={5}
-                  style={{maxHeight: "120px", overflow: "auto"}}
-                  readOnly
-                  value={this.getEffectiveScale()}
-                />
-              </Col>
-            </Row>
-          ) : null
-        }
-        {
-          <Row style={{marginTop: "20px"}} >
-            <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-              {Setting.getLabel(i18next.t("store:File"), i18next.t("store:File - Tooltip"))} :
-            </Col>
-            <Col span={22}>
-              {this.state.task.documentUrl ? (
+
+        <Card size="small" title={renderCardTitle(i18next.t("general:General Settings"), i18next.t("general:General Settings desc"))} style={sectionCardStyle} headStyle={cardHeadStyle}>
+          <Row gutter={rowGutter}>
+            {this.renderTaskField(
+              Setting.getLabel(i18next.t("general:Name"), i18next.t("general:Name - Tooltip")),
+              <Input value={task.name} onChange={(e) => this.updateTaskField("name", e.target.value)} />,
+              Setting.isAdminUser(this.props.account) ? 8 : 24
+            )}
+            {Setting.isAdminUser(this.props.account) && this.renderTaskField(
+              Setting.getLabel(i18next.t("provider:Model provider"), i18next.t("provider:Model provider - Tooltip")),
+              <Select
+                virtual={false}
+                style={{width: "100%"}}
+                value={task.provider}
+                onChange={(value) => this.updateTaskField("provider", value)}
+                options={this.state.modelProviders.map((p) => ({
+                  value: p.name,
+                  label: (
+                    <span style={{display: "inline-flex", alignItems: "center", gap: 8}}>
+                      <Provider.ProviderLogo provider={p} width={20} height={20} />
+                      <span>{Setting.getProviderDisplayName(p)} ({p.name})</span>
+                    </span>
+                  ),
+                }))}
+              />,
+              8
+            )}
+            {Setting.isAdminUser(this.props.account) && this.renderTaskField(
+              Setting.getLabel(i18next.t("general:Type"), i18next.t("general:Type - Tooltip")),
+              <Select virtual={false} style={{width: "100%"}} value={task.type} onChange={(value) => this.updateTaskField("type", value)}>
+                {[
+                  {id: "Labeling", name: "Labeling"},
+                  {id: "PBL", name: "PBL"},
+                ].map((item, index) => <Option key={index} value={item.id}>{item.name}</Option>)}
+              </Select>,
+              8
+            )}
+            {(task.type === "Labeling" || Setting.isAdminUser(this.props.account)) && this.renderTaskField(
+              Setting.getLabel(i18next.t("general:Display name"), i18next.t("general:Display name - Tooltip")),
+              <Input value={task.displayName} onChange={(e) => this.updateTaskField("displayName", e.target.value)} />,
+              8
+            )}
+          </Row>
+        </Card>
+
+        <Card size="small" title={renderCardTitle(i18next.t("general:Options"), "")} style={sectionCardStyle} headStyle={cardHeadStyle}>
+          <Row gutter={rowGutter}>
+            {this.renderTaskField(
+              Setting.getLabel(i18next.t("task:Scale"), i18next.t("task:Scale - Tooltip")),
+              <Select
+                virtual={false}
+                style={{width: "100%"}}
+                placeholder={i18next.t("general:None")}
+                allowClear
+                value={task.scale ?? ""}
+                onChange={(value) => this.setState({task: {...task, scale: value || ""}})}
+                options={[
+                  {value: "", label: i18next.t("general:None")},
+                  ...this.state.publicScales.map((s) => ({value: `${s.owner}/${s.name}`, label: s.displayName ? `${s.displayName} (${s.owner}/${s.name})` : `${s.owner}/${s.name}`})),
+                ]}
+              />,
+              16
+            )}
+            {this.getEffectiveScale() ? this.renderTaskField(
+              Setting.getLabel(i18next.t("general:Text"), i18next.t("task:Scale - Tooltip")),
+              <TextArea rows={5} style={{maxHeight: "120px", overflow: "auto"}} readOnly value={this.getEffectiveScale()} />,
+              24
+            ) : null}
+            {this.renderTaskField(
+              Setting.getLabel(i18next.t("store:File"), i18next.t("store:File - Tooltip")),
+              task.documentUrl ? (
                 <Card
                   size="small"
-                  style={{
-                    display: "inline-block",
-                    width: "auto",
-                    maxWidth: "100%",
-                    verticalAlign: "top",
-                  }}
+                  style={{display: "inline-block", width: "auto", maxWidth: "100%", verticalAlign: "top"}}
                 >
                   <div style={{display: "flex", alignItems: "center", gap: 12, flexWrap: "nowrap", minWidth: 0}}>
-                    <span style={{fontSize: 28, flexShrink: 0, color: this.state.task.documentUrl.endsWith(".pdf") ? "#cf1322" : "#1890ff"}}>
-                      {this.state.task.documentUrl.endsWith(".pdf") ? <FilePdfOutlined /> : <FileWordOutlined />}
+                    <span style={{fontSize: 28, flexShrink: 0, color: task.documentUrl.endsWith(".pdf") ? "#cf1322" : "#1890ff"}}>
+                      {task.documentUrl.endsWith(".pdf") ? <FilePdfOutlined /> : <FileWordOutlined />}
                     </span>
                     <div style={{minWidth: 0, maxWidth: "min(960px, calc(100vw - 220px))", flex: "0 1 auto"}}>
                       <Typography.Text ellipsis={{tooltip: true}} style={{width: "100%"}}>
                         {this.getDocumentFileName()}
                       </Typography.Text>
                     </div>
-                    <Button type="link" size="small" icon={<DownloadOutlined />} href={this.state.task.documentUrl} target="_blank" rel="noopener noreferrer" style={{flexShrink: 0}}>
+                    <Button type="link" size="small" icon={<DownloadOutlined />} href={task.documentUrl} target="_blank" rel="noopener noreferrer" style={{flexShrink: 0}}>
                       {i18next.t("general:Download")}
                     </Button>
                     <Button type="text" size="small" danger icon={<CloseOutlined />} onClick={this.clearDocument} aria-label={i18next.t("general:Delete")} style={{flexShrink: 0}} />
                   </div>
                 </Card>
               ) : (
-                <Upload
-                  name="file"
-                  accept=".docx,.pdf"
-                  showUploadList={false}
-                  customRequest={this.handleDocumentUpload}
-                >
+                <Upload name="file" accept=".docx,.pdf" showUploadList={false} customRequest={this.handleDocumentUpload}>
                   <Button type="primary" icon={<UploadOutlined />} loading={this.state.uploadingDocument}>
                     {i18next.t("store:Upload file")} (.docx, .pdf)
                   </Button>
                 </Upload>
-              )}
-            </Col>
-          </Row>
-        }
-        {
-          (this.state.task.type !== "Labeling") ? null : (
-            <React.Fragment>
-              <Row style={{marginTop: "20px"}} >
-                <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-                  {Setting.getLabel(i18next.t("task:Example"), i18next.t("task:Example - Tooltip"))} :
-                </Col>
-                <Col span={22} >
-                  <Input value={this.state.task.example} onChange={e => {
-                    this.updateTaskField("example", e.target.value);
-                  }} />
-                </Col>
-              </Row>
-              <Row style={{marginTop: "20px"}} >
-                <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-                  {Setting.getLabel(i18next.t("task:Labels"), i18next.t("task:Labels - Tooltip"))} :
-                </Col>
-                <Col span={22} >
-                  <Select virtual={false} mode="tags" style={{width: "100%"}} value={this.state.task.labels} onChange={(value => {this.updateTaskField("labels", value);})}>
-                    {
-                      this.state.task.labels?.map((item, index) => <Option key={index} value={item}>{item}</Option>)
-                    }
-                  </Select>
-                </Col>
-              </Row>
-            </React.Fragment>
-          )
-        }
-        {
-          (this.state.task.type !== "Labeling") && this.state.task.documentUrl ? (
-            <Row style={{marginTop: "20px"}} >
-              <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-                {Setting.getLabel(i18next.t("task:Report"), i18next.t("task:Report - Tooltip"))} :
-              </Col>
-              <Col span={22} >
+              ),
+              24
+            )}
+            {task.type === "Labeling" && (
+              <>
+                {this.renderTaskField(
+                  Setting.getLabel(i18next.t("task:Example"), i18next.t("task:Example - Tooltip")),
+                  <Input value={task.example} onChange={(e) => this.updateTaskField("example", e.target.value)} />,
+                  12
+                )}
+                {this.renderTaskField(
+                  Setting.getLabel(i18next.t("task:Labels"), i18next.t("task:Labels - Tooltip")),
+                  <Select virtual={false} mode="tags" style={{width: "100%"}} value={task.labels} onChange={(value) => this.updateTaskField("labels", value)}>
+                    {task.labels?.map((item, index) => <Option key={index} value={item}>{item}</Option>)}
+                  </Select>,
+                  12
+                )}
+              </>
+            )}
+            {task.type !== "Labeling" && task.documentUrl ? this.renderTaskField(
+              Setting.getLabel(i18next.t("task:Report"), i18next.t("task:Report - Tooltip")),
+              <div>
                 <Button
                   loading={this.state.analyzing}
-                  disabled={!this.state.task.documentText || !!this.state.task.result || !String(this.state.task.scale || "").trim()}
+                  disabled={!task.documentText || !!task.result || !String(task.scale || "").trim()}
                   style={{marginBottom: "20px", width: "200px"}}
                   type="primary"
                   icon={<BarChartOutlined />}
@@ -465,12 +449,8 @@ class TaskEditPage extends React.Component {
                 >
                   {i18next.t("task:Analyze")}
                 </Button>
-                {this.state.task.result ? (
-                  <Button
-                    style={{marginBottom: "20px", marginLeft: "8px", width: "200px"}}
-                    icon={<ClearOutlined />}
-                    onClick={this.clearReport}
-                  >
+                {task.result ? (
+                  <Button style={{marginBottom: "20px", marginLeft: "8px", width: "200px"}} icon={<ClearOutlined />} onClick={this.clearReport}>
                     {i18next.t("general:Clear")}
                   </Button>
                 ) : null}
@@ -482,37 +462,33 @@ class TaskEditPage extends React.Component {
                     <Spin style={{marginLeft: "16px"}} tip={i18next.t("task:Analyzing")} />
                   </>
                 )}
-                {this.state.task.result && (
+                {task.result && (
                   <TaskAnalysisReport
-                    result={this.state.task.result}
-                    downloadFileName={`${this.state.task.owner}_${this.state.task.name}_report.docx`}
+                    result={task.result}
+                    downloadFileName={`${task.owner}_${task.name}_report.docx`}
                   />
                 )}
-              </Col>
-            </Row>
-          ) : this.state.task.type === "Labeling" ? (
-            <Row style={{marginTop: "20px"}} >
-              <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-                {Setting.getLabel(i18next.t("task:Log"), i18next.t("task:Log - Tooltip"))} :
-              </Col>
-              <Col span={22} >
+              </div>,
+              24
+            ) : task.type === "Labeling" ? this.renderTaskField(
+              Setting.getLabel(i18next.t("task:Log"), i18next.t("task:Log - Tooltip")),
+              <div>
                 <Button loading={this.state.loading} style={{marginBottom: "20px", width: "100px"}} type="primary" onClick={this.runTask.bind(this)}>{i18next.t("general:Run")}</Button>
                 <div style={{height: "200px"}}>
                   <Editor
-                    value={this.state.task.log}
+                    value={task.log}
                     lang="js"
                     fillHeight
                     dark
-                    onChange={value => {
-                      this.updateTaskField("log", value);
-                    }}
+                    onChange={(value) => this.updateTaskField("log", value)}
                   />
                 </div>
-              </Col>
-            </Row>
-          ) : null
-        }
-      </Card>
+              </div>,
+              24
+            ) : null}
+          </Row>
+        </Card>
+      </div>
     );
   }
 
@@ -556,20 +532,6 @@ class TaskEditPage extends React.Component {
       });
   }
 
-  render() {
-    return (
-      <div>
-        {
-          this.state.task !== null ? this.renderTask() : <Loading type="page" tip={i18next.t("general:Loading")} />
-        }
-        <div style={{marginTop: "20px", marginLeft: "40px"}}>
-          <Button size="large" onClick={() => this.submitTaskEdit(false)}>{i18next.t("general:Save")}</Button>
-          <Button style={{marginLeft: "20px"}} type="primary" size="large" onClick={() => this.submitTaskEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
-          {this.state.isNewTask && <Button style={{marginLeft: "20px"}} size="large" onClick={() => this.cancelTaskEdit()}>{i18next.t("general:Cancel")}</Button>}
-        </div>
-      </div>
-    );
-  }
   cancelTaskEdit() {
     if (this.state.isNewTask) {
       TaskBackend.deleteTask(this.state.task)
@@ -589,6 +551,13 @@ class TaskEditPage extends React.Component {
     }
   }
 
+  render() {
+    return (
+      <div style={{background: "#F1F3F5", padding: "16px 20px 32px", minHeight: "100vh"}}>
+        {this.state.task !== null ? this.renderTask() : <Loading type="page" tip={i18next.t("general:Loading")} />}
+      </div>
+    );
+  }
 }
 
 export default TaskEditPage;

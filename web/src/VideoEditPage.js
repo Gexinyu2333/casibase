@@ -14,7 +14,7 @@
 
 import React from "react";
 import Loading from "./common/Loading";
-import {Affix, Avatar, Button, Card, Col, Input, Row, Segmented, Select, Switch, Tag, Timeline, Tooltip} from "antd";
+import {Affix, Avatar, Button, Card, Col, Input, Row, Segmented, Select, Space, Switch, Tag, Timeline, Tooltip} from "antd";
 import * as VideoBackend from "./backend/VideoBackend";
 import * as Setting from "./Setting";
 import i18next from "i18next";
@@ -525,25 +525,38 @@ class VideoEditPage extends React.Component {
     return !(this.props.account.type === "video-admin-user");
   }
 
-  renderVideo() {
+  renderVideoActions() {
+    const btnStyle = {
+      backgroundColor: "#F8F9FA",
+      borderColor: "rgb(229, 229, 234)",
+      border: "1px solid #E5E5EA",
+      borderRadius: "10px",
+      padding: "6px 10px",
+    };
+    if (this.requireUserOrReviewerOrAdmin(this.state.video)) {
+      return (
+        <Space wrap>
+          <Button style={btnStyle} onClick={() => this.exit()}>{i18next.t("general:Exit")}</Button>
+        </Space>
+      );
+    }
     return (
-      <Card size="small" title={
-        <div>
-          {i18next.t("video:Edit Video")}&nbsp;&nbsp;&nbsp;&nbsp;
-          {
-            this.requireUserOrReviewerOrAdmin(this.state.video) ? (
-              <>
-                <Button onClick={() => this.exit()}>{i18next.t("general:Exit")}</Button>
-              </>
-            ) : (
-              <>
-                <Button onClick={() => this.submitVideoEdit(false)}>{i18next.t("general:Save")}</Button>
-                <Button style={{marginLeft: "20px"}} type="primary" onClick={() => this.submitVideoEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
-              </>
-            )
-          }
-        </div>
-      } style={{marginLeft: "5px"}} type="inner">
+      <Space wrap>
+        <Button style={btnStyle} onClick={() => this.submitVideoEdit(false)}>{i18next.t("general:Save")}</Button>
+        <Button style={btnStyle} onClick={() => this.submitVideoEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
+      </Space>
+    );
+  }
+
+  renderVideo() {
+    const sectionCardStyle = {
+      marginBottom: "16px",
+      borderRadius: "14px",
+      boxShadow: "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
+      padding: "18px",
+    };
+    return (
+      <Card size="small" style={sectionCardStyle}>
         <Row style={{marginTop: "10px"}} >
           <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
             {Setting.getLabel(i18next.t("general:Name"), i18next.t("general:Name - Tooltip"))} :
@@ -905,24 +918,14 @@ class VideoEditPage extends React.Component {
 
   render() {
     return (
-      <div>
-        {
-          this.state.video !== null ? this.renderVideo() : <Loading type="page" tip={i18next.t("general:Loading")} />
-        }
-        <div style={{marginTop: "20px", marginLeft: "40px"}}>
-          {
-            this.requireUserOrReviewerOrAdmin(this.state.video) ? (
-              <>
-                <Button size="large" onClick={() => this.exit()}>{i18next.t("general:Exit")}</Button>
-              </>
-            ) : (
-              <>
-                <Button size="large" onClick={() => this.submitVideoEdit(false)}>{i18next.t("general:Save")}</Button>
-                <Button style={{marginLeft: "20px"}} type="primary" size="large" onClick={() => this.submitVideoEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
-              </>
-            )
-          }
+      <div style={{background: "#F1F3F5", padding: "16px 20px 32px", minHeight: "100vh"}}>
+        <div style={{marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+          <span style={{fontSize: "22px", fontWeight: 600}}>{i18next.t("video:Edit Video")}</span>
+          <div style={{display: "flex", gap: "8px", marginRight: "4px"}}>
+            {this.state.video !== null && this.renderVideoActions()}
+          </div>
         </div>
+        {this.state.video !== null ? this.renderVideo() : <Loading type="page" tip={i18next.t("general:Loading")} />}
       </div>
     );
   }

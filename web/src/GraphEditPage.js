@@ -14,7 +14,7 @@
 
 import React from "react";
 import Loading from "./common/Loading";
-import {Button, Card, Col, DatePicker, Input, Row, Select} from "antd";
+import {Button, Card, Col, DatePicker, Input, Row, Select, Space} from "antd";
 import * as GraphBackend from "./backend/GraphBackend";
 import * as ChatBackend from "./backend/ChatBackend";
 import * as StoreBackend from "./backend/StoreBackend";
@@ -100,17 +100,14 @@ class GraphEditPage extends React.Component {
   }
 
   generateGraphData() {
-    // First, clear the text field
     this.updateGraphField("text", "");
 
-    // Then save the graph to DB with empty text
     const graph = Setting.deepCopy(this.state.graph);
     graph.text = "";
 
     GraphBackend.updateGraph(this.state.graph.owner, this.state.graphName, graph)
       .then((res) => {
         if (res.status === "ok") {
-          // After saving, reload the graph (which will auto-generate data on backend)
           this.getGraph();
           this.loadFilteredChats();
           Setting.showMessage("success", i18next.t("general:Successfully generated"));
@@ -144,214 +141,202 @@ class GraphEditPage extends React.Component {
 
   toRFC3339 = (d) => (d ? d.format("YYYY-MM-DDTHH:mm:ssZ") : "");
 
-  renderGraph() {
+  renderGraphField(label, control, span = 8) {
     return (
-      <Card size="small" title={
-        <div>
-          {i18next.t("graph:Edit Graph")}&nbsp;&nbsp;&nbsp;&nbsp;
-          <Button onClick={() => this.submitGraphEdit(false)}>{i18next.t("general:Save")}</Button>
-          <Button style={{marginLeft: "20px"}} type="primary" onClick={() => this.submitGraphEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
-          {this.state.isNewGraph && <Button style={{marginLeft: "20px"}} onClick={() => this.cancelGraphEdit()}>{i18next.t("general:Cancel")}</Button>}
+      <Col style={{marginTop: "12px"}} span={Setting.isMobile() ? 22 : span}>
+        <div style={{marginBottom: "6px", color: "#595959", fontWeight: 500, lineHeight: "22px", fontSize: "13px"}}>{label}</div>
+        {control}
+      </Col>
+    );
+  }
+
+  renderGraphActions() {
+    const btnStyle = {
+      backgroundColor: "#F8F9FA",
+      borderColor: "rgb(229, 229, 234)",
+      border: "1px solid #E5E5EA",
+      borderRadius: "10px",
+      padding: "6px 10px",
+    };
+    return (
+      <Space wrap>
+        <Button style={btnStyle} onClick={() => this.submitGraphEdit(false)}>{i18next.t("general:Save")}</Button>
+        <Button style={btnStyle} onClick={() => this.submitGraphEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
+        {this.state.isNewGraph && <Button style={btnStyle} onClick={() => this.cancelGraphEdit()}>{i18next.t("general:Cancel")}</Button>}
+      </Space>
+    );
+  }
+
+  renderGraph() {
+    const graph = this.state.graph;
+    const rowGutter = [16, 8];
+    const cardHeadStyle = {background: "transparent", borderBottom: "none", fontWeight: 600, fontSize: "15px", fontFamily: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"};
+    const sectionCardStyle = {
+      marginBottom: "16px",
+      borderRadius: "14px",
+      boxShadow: "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
+      padding: "18px",
+    };
+    const renderCardTitle = (title, desc) => (
+      <div>
+        <div style={{fontWeight: 600, fontSize: "15px"}}>{title}</div>
+        {desc && <div style={{fontSize: "13px", color: "#6E6E73", fontWeight: 400, marginTop: "2px"}}>{desc}</div>}
+      </div>
+    );
+
+    return (
+      <div>
+        <div style={{marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+          <span style={{fontSize: "22px", fontWeight: 600}}>{i18next.t("graph:Edit Graph")}</span>
+          <div style={{display: "flex", gap: "8px", marginRight: "4px"}}>
+            {this.renderGraphActions()}
+          </div>
         </div>
-      } style={{marginLeft: "5px"}} type="inner">
-        <Row style={{marginTop: "10px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Name"), i18next.t("general:Name - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Input value={this.state.graph.name} onChange={e => {
-              this.updateGraphField("name", e.target.value);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Display name"), i18next.t("general:Display name - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Input value={this.state.graph.displayName} onChange={e => {
-              this.updateGraphField("displayName", e.target.value);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Category"), i18next.t("provider:Category - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Select
-              style={{width: "100%"}}
-              value={this.state.graph.category || "Default"}
-              onChange={value => {
-                this.updateGraphField("category", value);
-              }}
-            >
-              <Select.Option value="Default">{i18next.t("general:Default")}</Select.Option>
-              <Select.Option value={"Assets"}>{i18next.t("general:Assets")}</Select.Option>
-              <Select.Option value={"Chats"}>{i18next.t("general:Chats")}</Select.Option>
-            </Select>
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("graph:Layout"), i18next.t("graph:Layout - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Select
-              style={{width: "100%"}}
-              value={this.state.graph.layout || (this.state.graph.category === "Chats" ? "wordcloud" : "force")}
-              onChange={value => {
-                this.updateGraphField("layout", value);
-              }}
-            >
-              {this.state.graph.category === "Chats" ? (
-                <Select.Option value="wordcloud">{i18next.t("graph:Word Cloud")}</Select.Option>
-              ) : (
-                <>
-                  <Select.Option value="force">{i18next.t("graph:Force")}</Select.Option>
-                  <Select.Option value="circular">{i18next.t("graph:Circular")}</Select.Option>
-                  <Select.Option value="radial">{i18next.t("graph:Radial")}</Select.Option>
-                  <Select.Option value="grid">{i18next.t("graph:Grid")}</Select.Option>
-                  <Select.Option value="tree">{i18next.t("graph:Tree")}</Select.Option>
-                  <Select.Option value="none">{i18next.t("general:None")}</Select.Option>
-                </>
-              )}
-            </Select>
-          </Col>
-        </Row>
-        {this.state.graph.category === "Chats" && (
-          <>
-            <Row style={{marginTop: "20px"}} >
-              <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-                {Setting.getLabel(i18next.t("general:Store"), i18next.t("general:Store - Tooltip"))} :
-              </Col>
-              <Col span={22} >
-                <Select
-                  style={{width: "100%"}}
-                  value={this.state.graph.store}
-                  onChange={value => {
-                    this.updateGraphField("store", value);
-                  }}
-                  allowClear
-                >
-                  {this.state.stores.map((store) => (
-                    <Select.Option key={store.name} value={store.name}>{store.displayName || store.name}</Select.Option>
-                  ))}
-                </Select>
-              </Col>
-            </Row>
-            <Row style={{marginTop: "20px"}} >
-              <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-                {Setting.getLabel(i18next.t("video:Start time (s)"), i18next.t("video:Start time (s) - Tooltip"))} :
-              </Col>
-              <Col span={22} >
-                <DatePicker
-                  showTime
-                  style={{width: "300px"}}
-                  value={this.toDayjs(this.state.graph.startTime)}
-                  onChange={(date) => {
-                    const rfc3339 = this.toRFC3339(date);
-                    this.updateGraphField("startTime", rfc3339);
-                  }}
-                />
-              </Col>
-            </Row>
-            <Row style={{marginTop: "20px"}} >
-              <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-                {Setting.getLabel(i18next.t("video:End time (s)"), i18next.t("video:End time (s) - Tooltip"))} :
-              </Col>
-              <Col span={22} >
-                <DatePicker
-                  showTime
-                  style={{width: "300px"}}
-                  value={this.toDayjs(this.state.graph.endTime)}
-                  onChange={(date) => {
-                    const rfc3339 = this.toRFC3339(date);
-                    this.updateGraphField("endTime", rfc3339);
-                  }}
-                />
-              </Col>
-            </Row>
-            <Row style={{marginTop: "20px"}} >
-              <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-                {Setting.getLabel(i18next.t("graph:Threshold"), i18next.t("graph:Threshold - Tooltip"))} :
-              </Col>
-              <Col span={22} >
-                <Input
-                  style={{width: "200px"}}
-                  type="number"
-                  min={1}
-                  step={1}
-                  value={this.state.graph.density || 1}
-                  onChange={e => {
-                    this.updateGraphField("density", e.target.value);
-                  }}
-                />
-              </Col>
-            </Row>
-            <Row style={{marginTop: "20px"}} >
-              <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-              </Col>
-              <Col span={22} >
-                <Button type="primary" onClick={() => this.generateGraphData()}>
-                  {i18next.t("general:Generate")}
-                </Button>
-              </Col>
-            </Row>
-          </>
-        )}
-        {this.state.graph.category !== "Chats" && (
-          <Row style={{marginTop: "20px"}} >
-            <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-              {Setting.getLabel(i18next.t("graph:Node density"), i18next.t("graph:Node density - Tooltip"))} :
-            </Col>
-            <Col span={22} >
+
+        <Card size="small" title={renderCardTitle(i18next.t("general:General Settings"), i18next.t("general:General Settings desc"))} style={sectionCardStyle} headStyle={cardHeadStyle}>
+          <Row gutter={rowGutter}>
+            {this.renderGraphField(
+              Setting.getLabel(i18next.t("general:Name"), i18next.t("general:Name - Tooltip")),
+              <Input value={graph.name} onChange={(e) => this.updateGraphField("name", e.target.value)} />,
+              8
+            )}
+            {this.renderGraphField(
+              Setting.getLabel(i18next.t("general:Display name"), i18next.t("general:Display name - Tooltip")),
+              <Input value={graph.displayName} onChange={(e) => this.updateGraphField("displayName", e.target.value)} />,
+              8
+            )}
+            {this.renderGraphField(
+              Setting.getLabel(i18next.t("general:Category"), i18next.t("provider:Category - Tooltip")),
+              <Select
+                style={{width: "100%"}}
+                value={graph.category || "Default"}
+                onChange={(value) => this.updateGraphField("category", value)}
+              >
+                <Select.Option value="Default">{i18next.t("general:Default")}</Select.Option>
+                <Select.Option value={"Assets"}>{i18next.t("general:Assets")}</Select.Option>
+                <Select.Option value={"Chats"}>{i18next.t("general:Chats")}</Select.Option>
+              </Select>,
+              8
+            )}
+            {this.renderGraphField(
+              Setting.getLabel(i18next.t("graph:Layout"), i18next.t("graph:Layout - Tooltip")),
+              <Select
+                style={{width: "100%"}}
+                value={graph.layout || (graph.category === "Chats" ? "wordcloud" : "force")}
+                onChange={(value) => this.updateGraphField("layout", value)}
+              >
+                {graph.category === "Chats" ? (
+                  <Select.Option value="wordcloud">{i18next.t("graph:Word Cloud")}</Select.Option>
+                ) : (
+                  <>
+                    <Select.Option value="force">{i18next.t("graph:Force")}</Select.Option>
+                    <Select.Option value="circular">{i18next.t("graph:Circular")}</Select.Option>
+                    <Select.Option value="radial">{i18next.t("graph:Radial")}</Select.Option>
+                    <Select.Option value="grid">{i18next.t("graph:Grid")}</Select.Option>
+                    <Select.Option value="tree">{i18next.t("graph:Tree")}</Select.Option>
+                    <Select.Option value="none">{i18next.t("general:None")}</Select.Option>
+                  </>
+                )}
+              </Select>,
+              8
+            )}
+            {graph.category === "Chats" && (
+              <>
+                {this.renderGraphField(
+                  Setting.getLabel(i18next.t("general:Store"), i18next.t("general:Store - Tooltip")),
+                  <Select
+                    style={{width: "100%"}}
+                    value={graph.store}
+                    onChange={(value) => this.updateGraphField("store", value)}
+                    allowClear
+                  >
+                    {this.state.stores.map((store) => (
+                      <Select.Option key={store.name} value={store.name}>{store.displayName || store.name}</Select.Option>
+                    ))}
+                  </Select>,
+                  8
+                )}
+                {this.renderGraphField(
+                  Setting.getLabel(i18next.t("video:Start time (s)"), i18next.t("video:Start time (s) - Tooltip")),
+                  <DatePicker
+                    showTime
+                    style={{width: "100%"}}
+                    value={this.toDayjs(graph.startTime)}
+                    onChange={(date) => this.updateGraphField("startTime", this.toRFC3339(date))}
+                  />,
+                  8
+                )}
+                {this.renderGraphField(
+                  Setting.getLabel(i18next.t("video:End time (s)"), i18next.t("video:End time (s) - Tooltip")),
+                  <DatePicker
+                    showTime
+                    style={{width: "100%"}}
+                    value={this.toDayjs(graph.endTime)}
+                    onChange={(date) => this.updateGraphField("endTime", this.toRFC3339(date))}
+                  />,
+                  8
+                )}
+                {this.renderGraphField(
+                  Setting.getLabel(i18next.t("graph:Threshold"), i18next.t("graph:Threshold - Tooltip")),
+                  <Input
+                    type="number"
+                    min={1}
+                    step={1}
+                    value={graph.density || 1}
+                    onChange={(e) => this.updateGraphField("density", e.target.value)}
+                  />,
+                  8
+                )}
+                <Col style={{marginTop: "12px"}} span={24}>
+                  <Button type="primary" onClick={() => this.generateGraphData()}>
+                    {i18next.t("general:Generate")}
+                  </Button>
+                </Col>
+              </>
+            )}
+            {graph.category !== "Chats" && this.renderGraphField(
+              Setting.getLabel(i18next.t("graph:Node density"), i18next.t("graph:Node density - Tooltip")),
               <Input
                 type="number"
                 min={0.1}
                 max={10}
                 step={0.1}
-                value={this.state.graph.density || 5}
-                onChange={e => {
-                  this.updateGraphField("density", e.target.value);
-                }}
-              />
-            </Col>
+                value={graph.density || 5}
+                onChange={(e) => this.updateGraphField("density", e.target.value)}
+              />,
+              8
+            )}
           </Row>
-        )}
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Text"), i18next.t("general:Text - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <div style={{height: "500px"}}>
-              <Editor
-                value={this.state.graph.text}
-                lang="json"
-                fillHeight
-                dark
-                onChange={value => {
-                  this.updateGraphField("text", value);
-                }}
-              />
-            </div>
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {i18next.t("general:Preview")}:
-          </Col>
-          <Col span={22} >
-            <div key={this.state.graphCount} style={{height: "1000px", width: "100%"}}>
-              {this.state.graph?.category === "Chats" ? (
-                <GraphChatDataPage graphText={this.state.graph?.text} showBorder={true} onErrorChange={(errorText) => this.handleErrorChange(errorText)} />
-              ) : (
-                <GraphDataPage account={this.props.account} owner={this.state.graph?.owner} graphName={this.state.graph?.name} graphText={this.state.graph?.text} category={this.state.graph?.category} layout={this.state.graph?.layout} density={this.state.graph?.density} showBorder={true} onErrorChange={(errorText) => this.handleErrorChange(errorText)} />
-              )}
-            </div>
-          </Col>
-        </Row>
-      </Card>
+        </Card>
+
+        <Card size="small" title={renderCardTitle(i18next.t("general:Content"), "")} style={sectionCardStyle} headStyle={cardHeadStyle}>
+          <Row gutter={rowGutter}>
+            {this.renderGraphField(
+              Setting.getLabel(i18next.t("general:Text"), i18next.t("general:Text - Tooltip")),
+              <div style={{height: "500px"}}>
+                <Editor
+                  value={graph.text}
+                  lang="json"
+                  fillHeight
+                  dark
+                  onChange={(value) => this.updateGraphField("text", value)}
+                />
+              </div>,
+              24
+            )}
+          </Row>
+        </Card>
+
+        <Card size="small" title={renderCardTitle(i18next.t("general:Preview"), "")} style={sectionCardStyle} headStyle={cardHeadStyle}>
+          <div key={this.state.graphCount} style={{height: "1000px", width: "100%"}}>
+            {graph.category === "Chats" ? (
+              <GraphChatDataPage graphText={graph.text} showBorder={true} onErrorChange={(errorText) => this.handleErrorChange(errorText)} />
+            ) : (
+              <GraphDataPage account={this.props.account} owner={graph.owner} graphName={graph.name} graphText={graph.text} category={graph.category} layout={graph.layout} density={graph.density} showBorder={true} onErrorChange={(errorText) => this.handleErrorChange(errorText)} />
+            )}
+          </div>
+        </Card>
+      </div>
     );
   }
 
@@ -397,23 +382,6 @@ class GraphEditPage extends React.Component {
       });
   }
 
-  render() {
-    return (
-      <div>
-        {
-          this.state.graph !== null ? this.renderGraph() : <Loading type="page" tip={i18next.t("general:Loading")} />
-        }
-        {
-          this.renderFilteredChatsSection()
-        }
-        <div style={{marginTop: "20px", marginLeft: "40px"}}>
-          <Button size="large" onClick={() => this.submitGraphEdit(false)}>{i18next.t("general:Save")}</Button>
-          <Button style={{marginLeft: "20px"}} type="primary" size="large" onClick={() => this.submitGraphEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
-          {this.state.isNewGraph && <Button style={{marginLeft: "20px"}} size="large" onClick={() => this.cancelGraphEdit()}>{i18next.t("general:Cancel")}</Button>}
-        </div>
-      </div>
-    );
-  }
   cancelGraphEdit() {
     if (this.state.isNewGraph) {
       GraphBackend.deleteGraph(this.state.graph)
@@ -433,6 +401,14 @@ class GraphEditPage extends React.Component {
     }
   }
 
+  render() {
+    return (
+      <div style={{background: "#F1F3F5", padding: "16px 20px 32px", minHeight: "100vh"}}>
+        {this.state.graph !== null ? this.renderGraph() : <Loading type="page" tip={i18next.t("general:Loading")} />}
+        {this.renderFilteredChatsSection()}
+      </div>
+    );
+  }
 }
 
 export default GraphEditPage;

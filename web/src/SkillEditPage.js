@@ -183,7 +183,7 @@ class SkillEditPage extends React.Component {
               12
             )}
             {this.renderSkillField(
-              Setting.getLabel(i18next.t("article:Content"), i18next.t("skill:Content - Tooltip")),
+              Setting.getLabel(i18next.t("general:Content"), i18next.t("skill:Content - Tooltip")),
               <TextArea
                 rows={14}
                 value={skill.content}

@@ -5,7 +5,7 @@
 
 import React from "react";
 import Loading from "./common/Loading";
-import {Button, Card, Col, Input, Row, Select} from "antd";
+import {Button, Card, Col, Input, Row, Select, Space} from "antd";
 import * as ScaleBackend from "./backend/ScaleBackend";
 import * as Setting from "./Setting";
 import i18next from "i18next";
@@ -44,6 +44,99 @@ class ScaleEditPage extends React.Component {
     this.setState({scale});
   }
 
+  renderScaleField(label, control, span = 8) {
+    return (
+      <Col style={{marginTop: "12px"}} span={Setting.isMobile() ? 22 : span}>
+        <div style={{marginBottom: "6px", color: "#595959", fontWeight: 500, lineHeight: "22px", fontSize: "13px"}}>{label}</div>
+        {control}
+      </Col>
+    );
+  }
+
+  renderScaleActions() {
+    const btnStyle = {
+      backgroundColor: "#F8F9FA",
+      borderColor: "rgb(229, 229, 234)",
+      border: "1px solid #E5E5EA",
+      borderRadius: "10px",
+      padding: "6px 10px",
+    };
+    return (
+      <Space wrap>
+        <Button style={btnStyle} onClick={() => this.submitScaleEdit(false)}>{i18next.t("general:Save")}</Button>
+        <Button style={btnStyle} onClick={() => this.submitScaleEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
+      </Space>
+    );
+  }
+
+  renderScale() {
+    const s = this.state.scale;
+    const rowGutter = [16, 8];
+    const cardHeadStyle = {background: "transparent", borderBottom: "none", fontWeight: 600, fontSize: "15px", fontFamily: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"};
+    const sectionCardStyle = {
+      marginBottom: "16px",
+      borderRadius: "14px",
+      boxShadow: "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
+      padding: "18px",
+    };
+    const renderCardTitle = (title, desc) => (
+      <div>
+        <div style={{fontWeight: 600, fontSize: "15px"}}>{title}</div>
+        {desc && <div style={{fontSize: "13px", color: "#6E6E73", fontWeight: 400, marginTop: "2px"}}>{desc}</div>}
+      </div>
+    );
+
+    return (
+      <div>
+        <div style={{marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+          <span style={{fontSize: "22px", fontWeight: 600}}>{i18next.t("task:Edit Scale")}</span>
+          <div style={{display: "flex", gap: "8px", marginRight: "4px"}}>
+            {this.renderScaleActions()}
+          </div>
+        </div>
+
+        <Card size="small" title={renderCardTitle(i18next.t("general:General Settings"), i18next.t("general:General Settings desc"))} style={sectionCardStyle} headStyle={cardHeadStyle}>
+          <Row gutter={rowGutter}>
+            {this.renderScaleField(
+              Setting.getLabel(i18next.t("general:Name"), i18next.t("general:Name - Tooltip")),
+              <Input value={s.name} onChange={(e) => this.updateScaleField("name", e.target.value)} />,
+              8
+            )}
+            {this.renderScaleField(
+              Setting.getLabel(i18next.t("general:Display name"), i18next.t("general:Display name - Tooltip")),
+              <Input value={s.displayName} onChange={(e) => this.updateScaleField("displayName", e.target.value)} />,
+              8
+            )}
+            {Setting.isAdminUser(this.props.account) ? this.renderScaleField(
+              Setting.getLabel(i18next.t("general:State"), i18next.t("general:State - Tooltip")),
+              <Select
+                virtual={false}
+                style={{width: "100%"}}
+                value={s.state || "Public"}
+                onChange={(value) => this.updateScaleField("state", value)}
+                options={[
+                  {value: "Public", label: i18next.t("video:Public")},
+                  {value: "Hidden", label: i18next.t("video:Hidden")},
+                ]}
+              />,
+              8
+            ) : null}
+          </Row>
+        </Card>
+
+        <Card size="small" title={renderCardTitle(i18next.t("general:Content"), "")} style={sectionCardStyle} headStyle={cardHeadStyle}>
+          <Row gutter={rowGutter}>
+            {this.renderScaleField(
+              Setting.getLabel(i18next.t("general:Text"), i18next.t("task:Scale - Tooltip")),
+              <TextArea rows={12} value={s.text} onChange={(e) => this.updateScaleField("text", e.target.value)} />,
+              24
+            )}
+          </Row>
+        </Card>
+      </div>
+    );
+  }
+
   submitScaleEdit(exitAfterSave) {
     const scale = Setting.deepCopy(this.state.scale);
     ScaleBackend.updateScale(this.state.owner, this.state.scaleName, scale)
@@ -65,68 +158,10 @@ class ScaleEditPage extends React.Component {
       });
   }
 
-  renderScale() {
-    const s = this.state.scale;
-    if (!s) {
-      return null;
-    }
-    return (
-      <Card size="small" title={
-        <div>
-          {i18next.t("task:Edit Scale")}&nbsp;&nbsp;&nbsp;&nbsp;
-          <Button onClick={() => this.submitScaleEdit(false)}>{i18next.t("general:Save")}</Button>
-          <Button style={{marginLeft: "20px"}} type="primary" onClick={() => this.submitScaleEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
-        </div>
-      } style={{marginLeft: "5px"}} type="inner">
-        <Row style={{marginTop: "10px"}} gutter={16}>
-          <Col span={12}>
-            <div>{Setting.getLabel(i18next.t("general:Name"), i18next.t("general:Name - Tooltip"))} :</div>
-            <Input value={s.name} onChange={(e) => this.updateScaleField("name", e.target.value)} />
-          </Col>
-          <Col span={12}>
-            <div>{Setting.getLabel(i18next.t("general:Display name"), i18next.t("general:Display name - Tooltip"))} :</div>
-            <Input value={s.displayName} onChange={(e) => this.updateScaleField("displayName", e.target.value)} />
-          </Col>
-        </Row>
-        {Setting.isAdminUser(this.props.account) ? (
-          <Row style={{marginTop: "20px"}} >
-            <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-              {Setting.getLabel(i18next.t("general:State"), i18next.t("general:State - Tooltip"))} :
-            </Col>
-            <Col span={22} >
-              <Select
-                virtual={false}
-                style={{width: "100%"}}
-                value={s.state || "Public"}
-                onChange={(value) => this.updateScaleField("state", value)}
-                options={[
-                  {value: "Public", label: i18next.t("video:Public")},
-                  {value: "Hidden", label: i18next.t("video:Hidden")},
-                ]}
-              />
-            </Col>
-          </Row>
-        ) : null}
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Text"), i18next.t("task:Scale - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <TextArea rows={12} value={s.text} onChange={(e) => this.updateScaleField("text", e.target.value)} />
-          </Col>
-        </Row>
-      </Card>
-    );
-  }
-
   render() {
     return (
-      <div>
+      <div style={{background: "#F1F3F5", padding: "16px 20px 32px", minHeight: "100vh"}}>
         {this.state.scale !== null ? this.renderScale() : <Loading type="page" tip={i18next.t("general:Loading")} />}
-        <div style={{marginTop: "20px", marginLeft: "40px"}}>
-          <Button size="large" onClick={() => this.submitScaleEdit(false)}>{i18next.t("general:Save")}</Button>
-          <Button style={{marginLeft: "20px"}} type="primary" size="large" onClick={() => this.submitScaleEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
-        </div>
       </div>
     );
   }

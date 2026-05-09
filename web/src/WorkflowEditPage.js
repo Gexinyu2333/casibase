@@ -14,7 +14,7 @@
 
 import React from "react";
 import Loading from "./common/Loading";
-import {Button, Card, Col, Input, Mentions, Popover, Row} from "antd";
+import {Button, Card, Col, Input, Mentions, Popover, Row, Space} from "antd";
 import * as WorkflowBackend from "./backend/WorkflowBackend";
 import * as Setting from "./Setting";
 import i18next from "i18next";
@@ -85,7 +85,6 @@ class WorkflowEditPage extends React.Component {
       return "";
     }
 
-    // Render the question template with variables replaced
     const renderedTemplate = questionTemplate.replace(/#\{\{(\w+)\}\}/g, (match, variableName) => {
       if (variableName === "language") {
         const lang = Setting.getLanguage();
@@ -97,185 +96,192 @@ class WorkflowEditPage extends React.Component {
     return renderedTemplate;
   }
 
-  renderWorkflow() {
+  renderWorkflowField(label, control, span = 8) {
     return (
-      <Card size="small" title={
-        <div>
-          {i18next.t("workflow:Edit Workflow")}&nbsp;&nbsp;&nbsp;&nbsp;
-          <Button onClick={() => this.submitWorkflowEdit(false)}>{i18next.t("general:Save")}</Button>
-          <Button style={{marginLeft: "20px"}} type="primary" onClick={() => this.submitWorkflowEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
-          {this.state.isNewWorkflow && <Button style={{marginLeft: "20px"}} onClick={() => this.cancelWorkflowEdit()}>{i18next.t("general:Cancel")}</Button>}
+      <Col style={{marginTop: "12px"}} span={Setting.isMobile() ? 22 : span}>
+        <div style={{marginBottom: "6px", color: "#595959", fontWeight: 500, lineHeight: "22px", fontSize: "13px"}}>{label}</div>
+        {control}
+      </Col>
+    );
+  }
+
+  renderWorkflowActions() {
+    const btnStyle = {
+      backgroundColor: "#F8F9FA",
+      borderColor: "rgb(229, 229, 234)",
+      border: "1px solid #E5E5EA",
+      borderRadius: "10px",
+      padding: "6px 10px",
+    };
+    return (
+      <Space wrap>
+        <Button style={btnStyle} onClick={() => this.submitWorkflowEdit(false)}>{i18next.t("general:Save")}</Button>
+        <Button style={btnStyle} onClick={() => this.submitWorkflowEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
+        {this.state.isNewWorkflow && <Button style={btnStyle} onClick={() => this.cancelWorkflowEdit()}>{i18next.t("general:Cancel")}</Button>}
+      </Space>
+    );
+  }
+
+  renderWorkflow() {
+    const workflow = this.state.workflow;
+    const rowGutter = [16, 8];
+    const cardHeadStyle = {background: "transparent", borderBottom: "none", fontWeight: 600, fontSize: "15px", fontFamily: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"};
+    const sectionCardStyle = {
+      marginBottom: "16px",
+      borderRadius: "14px",
+      boxShadow: "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
+      padding: "18px",
+    };
+    const renderCardTitle = (title, desc) => (
+      <div>
+        <div style={{fontWeight: 600, fontSize: "15px"}}>{title}</div>
+        {desc && <div style={{fontSize: "13px", color: "#6E6E73", fontWeight: 400, marginTop: "2px"}}>{desc}</div>}
+      </div>
+    );
+
+    return (
+      <div>
+        <div style={{marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+          <span style={{fontSize: "22px", fontWeight: 600}}>{i18next.t("workflow:Edit Workflow")}</span>
+          <div style={{display: "flex", gap: "8px", marginRight: "4px"}}>
+            {this.renderWorkflowActions()}
+          </div>
         </div>
-      } style={{marginLeft: "5px"}} type="inner">
-        <Row style={{marginTop: "10px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Name"), i18next.t("general:Name - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Input value={this.state.workflow.name} onChange={e => {
-              this.updateWorkflowField("name", e.target.value);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Display name"), i18next.t("general:Display name - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <Input value={this.state.workflow.displayName} onChange={e => {
-              this.updateWorkflowField("displayName", e.target.value);
-            }} />
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Text"), i18next.t("general:Text - Tooltip"))} :
-          </Col>
-          <Col span={10} >
-            <div style={{height: "500px"}}>
-              <Editor
-                value={this.state.workflow.text}
-                lang="xml"
-                fillHeight
-                fillWidth
-                dark
-                onChange={value => {
-                  this.updateWorkflowField("text", value);
-                }}
-              />
-            </div>
-          </Col>
-          <Col span={1} />
-          <Col span={11} >
-            <div>
-              <BpmnComponent
-                diagramXML={this.state.workflow.text}
-                onLoading={(info) => {
-                  Setting.showMessage("success", info);
-                }}
-                onError={(err) => {
-                  Setting.showMessage("error", err);
-                }}
-                onXMLChange={(xml) => {
-                  this.updateWorkflowField("text", xml);
-                }}
-              />
-            </div>
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Text2"), i18next.t("general:Text2 - Tooltip"))} :
-          </Col>
-          <Col span={10} >
-            <div style={{height: "500px"}}>
-              <Editor
-                value={this.state.workflow.text2}
-                lang="xml"
-                fillHeight
-                fillWidth
-                dark
-                onChange={value => {
-                  this.updateWorkflowField("text2", value);
-                }}
-              />
-            </div>
-          </Col>
-          <Col span={1} />
-          <Col span={11} >
-            <div>
-              <BpmnComponent
-                diagramXML={this.state.workflow.text2}
-                onLoading={(info) => {
-                  Setting.showMessage("success", info);
-                }}
-                onError={(err) => {
-                  Setting.showMessage("error", err);
-                }}
-                onXMLChange={(xml) => {
-                  this.updateWorkflowField("text2", xml);
-                }}
-              />
-            </div>
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Message"), i18next.t("general:Message - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <div style={{height: "500px"}}>
-              <Editor
-                value={this.state.workflow.message}
-                lang="html"
-                fillHeight
-                fillWidth
-                dark
-                onChange={value => {
-                  this.updateWorkflowField("message", value);
-                }}
-              />
-            </div>
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Template"), i18next.t("general:Template - Tooltip"))} :
-          </Col>
-          <Col span={22}>
-            <Popover placement="top" trigger="click"
-              content={
-                <Row gutter={[16, 8]} style={{width: "1000px"}}>
-                  <Col span={12}>
-                    <div style={{marginBottom: "8px"}}>
-                      {i18next.t("general:Template")}:
-                    </div>
-                    <Mentions rows={25} prefix={"#"} options={this.questionTemplatesOptions} value={this.state.workflow.questionTemplate} onChange={(value) => this.updateWorkflowField("questionTemplate", value)} />
-                  </Col>
-                  <Col span={12}>
-                    <div style={{marginBottom: "8px"}}>
-                      {i18next.t("general:Preview")}:
-                    </div>
-                    <div style={{height: "600px", borderRadius: "4px"}}>
-                      <Editor
-                        value={this.renderQuestionTemplate()}
-                        lang="markdown"
-                        fillHeight
-                        fillWidth
-                        dark
-                        readOnly
-                      />
-                    </div>
-                  </Col>
-                </Row>
-              }>
-              <Input readOnly value={Setting.getShortText(this.state.workflow.questionTemplate, 60)}
-              />
-            </Popover>
-          </Col>
-        </Row>
-        <Row style={{marginTop: "20px"}} >
-          <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-            {Setting.getLabel(i18next.t("general:Response"), i18next.t("general:Response - Tooltip"))} :
-          </Col>
-          <Col span={22} >
-            <ChatWidget
-              chatName={`workflow_chat_${this.state.workflowName}`}
-              displayName={`${i18next.t("general:Chat")} - ${this.state.workflowName}`}
-              category="Workflow"
-              account={this.props.account}
-              title={i18next.t("general:Chat")}
-              height="800px"
-              showNewChatButton={true}
-              prompts={[{
-                "title": i18next.t("task:Generate Project"),
-                "text": this.renderQuestionTemplate(),
-                "image": "",
-              }]}
-            />
-          </Col>
-        </Row>
-      </Card>
+
+        <Card size="small" title={renderCardTitle(i18next.t("general:General Settings"), i18next.t("general:General Settings desc"))} style={sectionCardStyle} headStyle={cardHeadStyle}>
+          <Row gutter={rowGutter}>
+            {this.renderWorkflowField(
+              Setting.getLabel(i18next.t("general:Name"), i18next.t("general:Name - Tooltip")),
+              <Input value={workflow.name} onChange={(e) => this.updateWorkflowField("name", e.target.value)} />,
+              8
+            )}
+            {this.renderWorkflowField(
+              Setting.getLabel(i18next.t("general:Display name"), i18next.t("general:Display name - Tooltip")),
+              <Input value={workflow.displayName} onChange={(e) => this.updateWorkflowField("displayName", e.target.value)} />,
+              8
+            )}
+          </Row>
+        </Card>
+
+        <Card size="small" title={renderCardTitle(i18next.t("general:Content"), "")} style={sectionCardStyle} headStyle={cardHeadStyle}>
+          <Row gutter={rowGutter}>
+            {this.renderWorkflowField(
+              Setting.getLabel(i18next.t("general:Text"), i18next.t("general:Text - Tooltip")),
+              <Row gutter={8}>
+                <Col span={10}>
+                  <div style={{height: "500px"}}>
+                    <Editor
+                      value={workflow.text}
+                      lang="xml"
+                      fillHeight
+                      fillWidth
+                      dark
+                      onChange={(value) => this.updateWorkflowField("text", value)}
+                    />
+                  </div>
+                </Col>
+                <Col span={1} />
+                <Col span={13}>
+                  <BpmnComponent
+                    diagramXML={workflow.text}
+                    onLoading={(info) => Setting.showMessage("success", info)}
+                    onError={(err) => Setting.showMessage("error", err)}
+                    onXMLChange={(xml) => this.updateWorkflowField("text", xml)}
+                  />
+                </Col>
+              </Row>,
+              24
+            )}
+            {this.renderWorkflowField(
+              Setting.getLabel(i18next.t("general:Text2"), i18next.t("general:Text2 - Tooltip")),
+              <Row gutter={8}>
+                <Col span={10}>
+                  <div style={{height: "500px"}}>
+                    <Editor
+                      value={workflow.text2}
+                      lang="xml"
+                      fillHeight
+                      fillWidth
+                      dark
+                      onChange={(value) => this.updateWorkflowField("text2", value)}
+                    />
+                  </div>
+                </Col>
+                <Col span={1} />
+                <Col span={13}>
+                  <BpmnComponent
+                    diagramXML={workflow.text2}
+                    onLoading={(info) => Setting.showMessage("success", info)}
+                    onError={(err) => Setting.showMessage("error", err)}
+                    onXMLChange={(xml) => this.updateWorkflowField("text2", xml)}
+                  />
+                </Col>
+              </Row>,
+              24
+            )}
+            {this.renderWorkflowField(
+              Setting.getLabel(i18next.t("general:Message"), i18next.t("general:Message - Tooltip")),
+              <div style={{height: "500px"}}>
+                <Editor
+                  value={workflow.message}
+                  lang="html"
+                  fillHeight
+                  fillWidth
+                  dark
+                  onChange={(value) => this.updateWorkflowField("message", value)}
+                />
+              </div>,
+              24
+            )}
+            {this.renderWorkflowField(
+              Setting.getLabel(i18next.t("general:Template"), i18next.t("general:Template - Tooltip")),
+              <Popover placement="top" trigger="click"
+                content={
+                  <Row gutter={[16, 8]} style={{width: "1000px"}}>
+                    <Col span={12}>
+                      <div style={{marginBottom: "8px"}}>{i18next.t("general:Template")}:</div>
+                      <Mentions rows={25} prefix={"#"} options={this.questionTemplatesOptions} value={workflow.questionTemplate} onChange={(value) => this.updateWorkflowField("questionTemplate", value)} />
+                    </Col>
+                    <Col span={12}>
+                      <div style={{marginBottom: "8px"}}>{i18next.t("general:Preview")}:</div>
+                      <div style={{height: "600px", borderRadius: "4px"}}>
+                        <Editor
+                          value={this.renderQuestionTemplate()}
+                          lang="markdown"
+                          fillHeight
+                          fillWidth
+                          dark
+                          readOnly
+                        />
+                      </div>
+                    </Col>
+                  </Row>
+                }>
+                <Input readOnly value={Setting.getShortText(workflow.questionTemplate, 60)} />
+              </Popover>,
+              24
+            )}
+            {this.renderWorkflowField(
+              Setting.getLabel(i18next.t("general:Response"), i18next.t("general:Response - Tooltip")),
+              <ChatWidget
+                chatName={`workflow_chat_${this.state.workflowName}`}
+                displayName={`${i18next.t("general:Chat")} - ${this.state.workflowName}`}
+                category="Workflow"
+                account={this.props.account}
+                title={i18next.t("general:Chat")}
+                height="800px"
+                showNewChatButton={true}
+                prompts={[{
+                  "title": i18next.t("task:Generate Project"),
+                  "text": this.renderQuestionTemplate(),
+                  "image": "",
+                }]}
+              />,
+              24
+            )}
+          </Row>
+        </Card>
+      </div>
     );
   }
 
@@ -309,20 +315,6 @@ class WorkflowEditPage extends React.Component {
       });
   }
 
-  render() {
-    return (
-      <div>
-        {
-          this.state.workflow !== null ? this.renderWorkflow() : <Loading type="page" tip={i18next.t("general:Loading")} />
-        }
-        <div style={{marginTop: "20px", marginLeft: "40px"}}>
-          <Button size="large" onClick={() => this.submitWorkflowEdit(false)}>{i18next.t("general:Save")}</Button>
-          <Button style={{marginLeft: "20px"}} type="primary" size="large" onClick={() => this.submitWorkflowEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
-          {this.state.isNewWorkflow && <Button style={{marginLeft: "20px"}} size="large" onClick={() => this.cancelWorkflowEdit()}>{i18next.t("general:Cancel")}</Button>}
-        </div>
-      </div>
-    );
-  }
   cancelWorkflowEdit() {
     if (this.state.isNewWorkflow) {
       WorkflowBackend.deleteWorkflow(this.state.workflow)
@@ -342,6 +334,13 @@ class WorkflowEditPage extends React.Component {
     }
   }
 
+  render() {
+    return (
+      <div style={{background: "#F1F3F5", padding: "16px 20px 32px", minHeight: "100vh"}}>
+        {this.state.workflow !== null ? this.renderWorkflow() : <Loading type="page" tip={i18next.t("general:Loading")} />}
+      </div>
+    );
+  }
 }
 
 export default WorkflowEditPage;

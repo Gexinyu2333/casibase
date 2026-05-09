@@ -2824,7 +2824,7 @@ export function getFormTypeItems(formType) {
       {name: "displayName", label: "general:Display name", visible: true, width: "200"},
       {name: "workflow", label: "store:Workflow", visible: true, width: "250"},
       // { name: "type", label: "general:Type", visible: false, width: "90" },
-      {name: "content", label: "article:Content", visible: true},
+      {name: "content", label: "general:Content", visible: true},
     ];
   } else if (formType === "graphs") {
     return [

@@ -133,7 +133,7 @@ class ArticleListPage extends BaseListPage {
       //   sorter: (a, b) => a.type.localeCompare(b.type),
       // },
       {
-        title: i18next.t("article:Content"),
+        title: i18next.t("general:Content"),
         dataIndex: "content",
         key: "content",
         // width: "160px",
