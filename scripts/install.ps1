@@ -1,4 +1,4 @@
-# OpenAgent one-step install (Windows PowerShell): download the release archive for your platform.
+# OpenAgent one-step install (Windows PowerShell): download the release binary for your platform.
 # Usage (run only if you trust this script source):
 #   irm https://raw.githubusercontent.com/the-open-agent/openagent/master/scripts/install.ps1 | iex
 #
@@ -33,38 +33,25 @@ $ArchName = switch ($Arch) {
     default { throw "Unsupported architecture ($Arch). Download manually from https://github.com/$Repo/releases" }
 }
 
-$Filename = "openagent_Windows_${ArchName}.zip"
+$Filename = "openagent_Windows_${ArchName}.exe"
 $Url      = "https://github.com/$Repo/releases/download/$Version/$Filename"
 
-# ── download & extract ─────────────────────────────────────────────────────────
+# ── download binary ─────────────────────────────────────────────────────────────
 $TmpDir = Join-Path $env:TEMP "openagent_install_$(Get-Random)"
 New-Item -ItemType Directory -Path $TmpDir | Out-Null
 
 try {
-    $ZipPath = Join-Path $TmpDir $Filename
+    $ExePath = Join-Path $TmpDir 'openagent.exe'
     Write-Info "Downloading $Url ..."
-    Invoke-WebRequest -Uri $Url -OutFile $ZipPath -UseBasicParsing
-
-    Write-Info 'Extracting...'
-    Expand-Archive -Path $ZipPath -DestinationPath $TmpDir -Force
-
-    # Remove the zip so it is never copied into InstallDir
-    Remove-Item -Force $ZipPath
-
-    # Locate openagent.exe anywhere inside the extraction tree, then use its
-    # parent as the source root (handles both flat and subdirectory archives).
-    $Binary = Get-ChildItem -Path $TmpDir -Filter 'openagent.exe' -Recurse | Select-Object -First 1
-    if (-not $Binary) { throw 'openagent.exe not found in archive.' }
-    $SourceDir = $Binary.DirectoryName
+    Invoke-WebRequest -Uri $Url -OutFile $ExePath -UseBasicParsing
 
     # ── install ────────────────────────────────────────────────────────────────
     if (-not (Test-Path $InstallDir)) {
         New-Item -ItemType Directory -Path $InstallDir | Out-Null
     }
 
-    # Copy everything (binary + conf/, data/, web/, etc.)
-    Write-Info "Installing all files to $InstallDir ..."
-    Copy-Item -Path "$SourceDir\*" -Destination $InstallDir -Recurse -Force
+    Write-Info "Installing to $InstallDir ..."
+    Copy-Item -Path $ExePath -Destination (Join-Path $InstallDir 'openagent.exe') -Force
 }
 finally {
     Remove-Item -Recurse -Force $TmpDir -ErrorAction SilentlyContinue

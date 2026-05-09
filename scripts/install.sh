@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# OpenAgent one-step install: download the release archive for your platform.
+# OpenAgent one-step install: download the release binary for your platform.
 # Usage:
 #   curl -fsSL --proto '=https' --tlsv1.2 \
 #     https://raw.githubusercontent.com/the-open-agent/openagent/master/scripts/install.sh | bash
@@ -25,7 +25,6 @@ need_cmd() {
 }
 
 need_cmd curl
-need_cmd tar
 
 # ── resolve version ────────────────────────────────────────────────────────────
 if [[ "${OPENAGENT_VERSION}" == "latest" ]]; then
@@ -52,30 +51,19 @@ case "${ARCH}" in
 	*) die "Unsupported architecture: ${ARCH}. Download manually from https://github.com/${REPO}/releases" ;;
 esac
 
-FILENAME="openagent_${OS_NAME}_${ARCH_NAME}.tar.gz"
+FILENAME="openagent_${OS_NAME}_${ARCH_NAME}"
 URL="https://github.com/${REPO}/releases/download/${OPENAGENT_VERSION}/${FILENAME}"
 
-# ── download & extract ─────────────────────────────────────────────────────────
+# ── download binary ─────────────────────────────────────────────────────────────
 TMPDIR="$(mktemp -d)"
 trap 'rm -rf "${TMPDIR}"' EXIT
 
 info "Downloading ${URL} ..."
-curl -fsSL --proto '=https' --tlsv1.2 -o "${TMPDIR}/${FILENAME}" "${URL}"
+curl -fsSL --proto '=https' --tlsv1.2 -o "${TMPDIR}/openagent" "${URL}"
+chmod 755 "${TMPDIR}/openagent"
 
-info "Extracting..."
-tar -xzf "${TMPDIR}/${FILENAME}" -C "${TMPDIR}"
-
-# Remove the tarball so it is never copied into INSTALL_DIR
-rm -f "${TMPDIR}/${FILENAME}"
-
-# Locate the binary anywhere in the extraction tree, then use its parent as
-# the source root (handles both flat and subdirectory archives).
-BINARY="$(find "${TMPDIR}" -type f -name "openagent" | head -1)"
-[[ -n "${BINARY}" ]] || die "openagent binary not found in archive."
-SOURCE_DIR="$(dirname "${BINARY}")"
-
-# ── install all files ────────────────────────────────────────────────────────
-info "Installing all files to ${INSTALL_DIR} ..."
+# ── install ──────────────────────────────────────────────────────────────────
+info "Installing to ${INSTALL_DIR} ..."
 
 if [[ ! -d "${INSTALL_DIR}" ]]; then
 	mkdir -p "${INSTALL_DIR}" 2>/dev/null || sudo mkdir -p "${INSTALL_DIR}"
@@ -83,11 +71,11 @@ fi
 
 # Use sudo when the target directory is not writable
 if [[ -w "${INSTALL_DIR}" ]]; then
-	cp -r "${SOURCE_DIR}/." "${INSTALL_DIR}/"
+	cp "${TMPDIR}/openagent" "${INSTALL_DIR}/openagent"
 	chmod 755 "${INSTALL_DIR}/openagent"
 else
 	info "Writing to ${INSTALL_DIR} requires sudo..."
-	sudo cp -r "${SOURCE_DIR}/." "${INSTALL_DIR}/"
+	sudo cp "${TMPDIR}/openagent" "${INSTALL_DIR}/openagent"
 	sudo chmod 755 "${INSTALL_DIR}/openagent"
 fi
 
