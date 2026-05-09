@@ -14,8 +14,7 @@
 
 import React from "react";
 
-// Palette: indigo → violet → cyan, evoking a modern AI aesthetic
-const AI_COLORS = ["#6366F1", "#A855F7", "#06B6D4"];
+const AI_COLORS = ["#404040", "#404040", "#404040"];
 
 /**
  * AiDots – the core animated indicator.
