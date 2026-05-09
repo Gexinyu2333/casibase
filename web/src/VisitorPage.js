@@ -73,7 +73,7 @@ class VisitorPage extends BaseListPage {
             if (fieldName === "action") {
               const allOps = this.extractAllOperations(res);
               state["allOps"] = allOps;
-              state["selectedOps"] = allOps.slice(0, 3);
+              state["selectedOps"] = allOps;
             }
             this.setState(state);
           });
@@ -162,8 +162,15 @@ class VisitorPage extends BaseListPage {
     };
   }
 
+  isPieChartEmpty(visitor) {
+    if (!visitor || visitor.length === 0) {return true;}
+    const FieldCount = visitor[visitor.length - 1]?.FieldCount || {};
+    return Object.keys(FieldCount).length === 0;
+  }
+
   renderLineChart(data, selectedOps) {
     const dates = data.map(item => item.date);
+    const isDark = this.props.themeAlgorithm && this.props.themeAlgorithm.includes("dark");
 
     const series = selectedOps.map(op => ({
       name: op,
@@ -173,9 +180,19 @@ class VisitorPage extends BaseListPage {
 
     return {
       tooltip: {trigger: "axis"},
-      legend: {data: selectedOps},
-      xAxis: {type: "category", data: dates},
-      yAxis: {type: "value"},
+      legend: {
+        data: selectedOps,
+        textStyle: {color: isDark ? "#ccc" : "#333"},
+      },
+      xAxis: {
+        type: "category",
+        data: dates,
+        axisLabel: {color: isDark ? "#ccc" : "#333"},
+      },
+      yAxis: {
+        type: "value",
+        axisLabel: {color: isDark ? "#ccc" : "#333"},
+      },
       series,
     };
   }
@@ -328,11 +345,20 @@ class VisitorPage extends BaseListPage {
   }
 
   renderSubPieCharts() {
-    const count = this.subPieCharts?.length || 0;
+    const isDark = this.props.themeAlgorithm && this.props.themeAlgorithm.includes("dark");
+    const visibleCharts = this.subPieCharts.filter(dataName => {
+      const visitors = this.state["visitors" + dataName];
+      return visitors === undefined || !this.isPieChartEmpty(visitors);
+    });
+
+    if (visibleCharts.length === 0) {
+      return null;
+    }
+
     const numChartsPerRow = 2;
     const grouped = [];
-    for (let i = 0; i < count; i += numChartsPerRow) {
-      grouped.push(this.subPieCharts.slice(i, i + 2));
+    for (let i = 0; i < visibleCharts.length; i += numChartsPerRow) {
+      grouped.push(visibleCharts.slice(i, i + 2));
     }
     return (
       <Col span={22} key="subPieChars">
@@ -343,6 +369,7 @@ class VisitorPage extends BaseListPage {
                 <Col span={12} key={`col-${rowIndex}-${colIndex}`}>
                   <ReactEcharts
                     option={this.renderPieChart(this.state["visitors" + dataName] || [])}
+                    theme={isDark ? "dark" : undefined}
                     style={{
                       height: "400px",
                       width: "100%",
@@ -370,6 +397,7 @@ class VisitorPage extends BaseListPage {
   renderChart() {
     const fieldName = "visitorsaction";
     const visitorsAction = this.state[fieldName];
+    const isDark = this.props.themeAlgorithm && this.props.themeAlgorithm.includes("dark");
     return (
       <React.Fragment>
         <Row style={{marginTop: "20px"}} >
@@ -377,6 +405,7 @@ class VisitorPage extends BaseListPage {
           <Col span={11} >
             <ReactEcharts
               option={this.renderPieChart(visitorsAction || [])}
+              theme={isDark ? "dark" : undefined}
               style={{
                 height: "400px",
                 width: "100%",
@@ -396,6 +425,7 @@ class VisitorPage extends BaseListPage {
           <Col span={11} >
             <ReactEcharts
               option={this.renderLineChart(visitorsAction || [], this.state.selectedOps || [])}
+              theme={isDark ? "dark" : undefined}
               style={{
                 height: "400px",
                 width: "100%",
