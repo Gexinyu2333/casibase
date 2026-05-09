@@ -171,8 +171,8 @@ func (c *ApiController) DeleteResource() {
 	c.ResponseOk(success)
 }
 
-// UploadResourceFile
-// @Title UploadResourceFile
+// UploadResource
+// @Title UploadResource
 // @Tag Resource API
 // @Description upload a file (multipart/form-data) and record it as a resource
 // @Param file formData file true "The file to upload"
@@ -181,7 +181,7 @@ func (c *ApiController) DeleteResource() {
 // @Param objectId formData string false "Associated object id (owner/name)"
 // @Success 200 {object} controllers.Response The Response object (returns fileUrl)
 // @router /upload-resource [post]
-func (c *ApiController) UploadResourceFile() {
+func (c *ApiController) UploadResource() {
 	userName, ok := c.RequireSignedIn()
 	if !ok {
 		return
