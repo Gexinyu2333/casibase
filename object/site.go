@@ -37,7 +37,6 @@ type Site struct {
 	CheckUserBalance bool `xorm:"bool" json:"checkUserBalance"`
 }
 
-
 func GetGlobalSites() ([]*Site, error) {
 	sites := []*Site{}
 	err := adapter.engine.Asc("owner").Desc("created_time").Find(&sites)
