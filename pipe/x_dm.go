@@ -42,8 +42,8 @@ type xDMWebhookPayload struct {
 }
 
 type xDMEvent struct {
-	Type          string          `json:"type"`
-	Id            string          `json:"id"`
+	Type          string           `json:"type"`
+	Id            string           `json:"id"`
 	MessageCreate xDMMessageCreate `json:"message_create"`
 }
 

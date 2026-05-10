@@ -63,9 +63,9 @@ type wechatAPIResponse struct {
 }
 
 type wechatCustomMessagePayload struct {
-	ToUser  string           `json:"touser"`
-	MsgType string           `json:"msgtype"`
-	Text    wechatTextBody   `json:"text"`
+	ToUser  string         `json:"touser"`
+	MsgType string         `json:"msgtype"`
+	Text    wechatTextBody `json:"text"`
 }
 
 type wechatTextBody struct {

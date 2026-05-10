@@ -35,8 +35,8 @@ type SlackPipe struct {
 }
 
 type slackEventPayload struct {
-	Type      string     `json:"type"`
-	Challenge string     `json:"challenge"`
+	Type      string         `json:"type"`
+	Challenge string         `json:"challenge"`
 	Event     *slackMsgEvent `json:"event"`
 }
 

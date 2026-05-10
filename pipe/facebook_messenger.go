@@ -34,13 +34,13 @@ type FacebookMessengerPipe struct {
 }
 
 type facebookMessengerWebhookPayload struct {
-	Object string                    `json:"object"`
-	Entry  []facebookMessengerEntry  `json:"entry"`
+	Object string                   `json:"object"`
+	Entry  []facebookMessengerEntry `json:"entry"`
 }
 
 type facebookMessengerEntry struct {
-	Id        string                         `json:"id"`
-	Time      int64                          `json:"time"`
+	Id        string                            `json:"id"`
+	Time      int64                             `json:"time"`
 	Messaging []facebookMessengerMessagingEvent `json:"messaging"`
 }
 
@@ -56,14 +56,14 @@ type facebookMessengerParticipant struct {
 }
 
 type facebookMessengerMessage struct {
-	Mid  string `json:"mid"`
-	Text string `json:"text"`
-	IsEcho bool `json:"is_echo,omitempty"`
+	Mid    string `json:"mid"`
+	Text   string `json:"text"`
+	IsEcho bool   `json:"is_echo,omitempty"`
 }
 
 type facebookMessengerSendPayload struct {
-	Recipient facebookMessengerRecipient    `json:"recipient"`
-	Message   facebookMessengerTextMessage  `json:"message"`
+	Recipient facebookMessengerRecipient   `json:"recipient"`
+	Message   facebookMessengerTextMessage `json:"message"`
 }
 
 type facebookMessengerRecipient struct {
