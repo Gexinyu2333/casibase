@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React from "react";
-import {Avatar, Button, Card, Col, Form, Input, Modal, Row, message} from "antd";
+import {Avatar, Button, Card, Col, Form, Input, Modal, Row, Space, message} from "antd";
 import i18next from "i18next";
 import * as AccountBackend from "./backend/AccountBackend";
 import * as Setting from "./Setting";
@@ -27,7 +27,6 @@ class AccountPage extends React.Component {
       passwordModalVisible: false,
       currentPassword: "",
       newPassword: "",
-      confirmPassword: "",
     };
   }
 
@@ -49,16 +48,10 @@ class AccountPage extends React.Component {
       passwordModalVisible: false,
       currentPassword: "",
       newPassword: "",
-      confirmPassword: "",
     });
   }
 
   setPassword() {
-    if (this.state.newPassword !== this.state.confirmPassword) {
-      message.error(i18next.t("account:The two passwords that you entered do not match"));
-      return;
-    }
-
     const values = this.formRef.current.getFieldsValue();
     AccountBackend.updateAccount({...values, currentPassword: this.state.currentPassword, newPassword: this.state.newPassword})
       .then((res) => {
@@ -92,29 +85,68 @@ class AccountPage extends React.Component {
     );
   }
 
-  renderFormItem(label, tooltip, item) {
+  renderField(label, control, span = 12) {
     return (
-      <Row style={{marginTop: "20px"}}>
-        <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-          {Setting.getLabel(label, tooltip)} :
-        </Col>
-        <Col span={22}>
-          {item}
-        </Col>
-      </Row>
+      <Col style={{marginTop: "12px"}} span={Setting.isMobile() ? 22 : span}>
+        <div style={{marginBottom: "6px", color: "var(--ant-color-text-secondary)", fontWeight: 500, lineHeight: "22px", fontSize: "13px"}}>{label}</div>
+        {control}
+      </Col>
+    );
+  }
+
+  renderModalField(label, control) {
+    return (
+      <div style={{marginBottom: "20px"}}>
+        <div style={{marginBottom: "6px", color: "var(--ant-color-text-secondary)", fontWeight: 500, lineHeight: "22px", fontSize: "13px"}}>{label}</div>
+        {control}
+      </div>
     );
   }
 
   render() {
     const account = this.props.account;
 
+    const btnStyle = {
+      backgroundColor: "var(--ant-color-bg-container)",
+      borderColor: "var(--ant-color-border)",
+      border: "1px solid var(--ant-color-border)",
+      borderRadius: "10px",
+      padding: "6px 10px",
+    };
+
+    const cardHeadStyle = {
+      background: "transparent",
+      borderBottom: "none",
+      fontWeight: 600,
+      fontSize: "15px",
+      fontFamily: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+    };
+
+    const sectionCardStyle = {
+      marginBottom: "16px",
+      borderRadius: "14px",
+      boxShadow: "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
+      padding: "18px",
+    };
+
+    const renderCardTitle = (title, desc) => (
+      <div>
+        <div style={{fontWeight: 600, fontSize: "15px"}}>{title}</div>
+        <div style={{fontSize: "13px", color: "var(--ant-color-text-tertiary)", fontWeight: 400, marginTop: "2px"}}>{desc}</div>
+      </div>
+    );
+
     return (
-      <Card size="small" title={
-        <div>
-          {i18next.t("account:My Account")}&nbsp;&nbsp;&nbsp;&nbsp;
-          <Button onClick={() => this.formRef.current.submit()}>{i18next.t("general:Save")}</Button>
+      <div style={{background: "var(--ant-color-bg-layout)", padding: "16px 20px 32px", minHeight: "100vh"}}>
+        <div style={{marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+          <span style={{fontSize: "22px", fontWeight: 600}}>{i18next.t("account:My Account")}</span>
+          <div style={{display: "flex", gap: "8px", marginRight: "4px"}}>
+            <Space wrap>
+              <Button style={btnStyle} onClick={() => this.formRef.current.submit()}>{i18next.t("general:Save")}</Button>
+            </Space>
+          </div>
         </div>
-      } style={(Setting.isMobile()) ? {margin: "5px"} : {}} type="inner">
+
         <Form
           ref={this.formRef}
           initialValues={{
@@ -125,80 +157,92 @@ class AccountPage extends React.Component {
           onFinish={(values) => this.onFinish(values)}
           onValuesChange={(_, values) => this.setState({avatar: values.avatar ?? ""})}
         >
-          {this.renderFormItem(
-            i18next.t("general:Name"),
-            i18next.t("general:Name - Tooltip"),
-            <Form.Item name="username" style={{margin: 0}}>
-              <Input disabled placeholder={i18next.t("account:Account ID")} />
-            </Form.Item>
-          )}
-          {this.renderFormItem(
-            i18next.t("general:Display name"),
-            i18next.t("general:Display name - Tooltip"),
-            <Form.Item name="displayName" style={{margin: 0}}>
-              <Input placeholder={i18next.t("account:Name shown in OpenAgent")} />
-            </Form.Item>
-          )}
-          {this.renderFormItem(
-            i18next.t("general:Avatar"),
-            i18next.t("general:Avatar - Tooltip"),
-            <Row gutter={10}>
-              <Col flex="80px">
-                {this.renderAvatar()}
-              </Col>
-              <Col flex="auto">
-                <Form.Item name="avatar" style={{margin: 0}}>
-                  <Input placeholder={i18next.t("account:Avatar image URL, optional")} />
-                </Form.Item>
-              </Col>
+          <Card
+            size="small"
+            title={renderCardTitle(i18next.t("account:Profile"), i18next.t("account:Profile desc"))}
+            style={sectionCardStyle}
+            headStyle={cardHeadStyle}
+          >
+            <Row gutter={[16, 8]}>
+              {this.renderField(
+                Setting.getLabel(i18next.t("general:Name"), i18next.t("general:Name - Tooltip")),
+                <Form.Item name="username" style={{margin: 0}}>
+                  <Input disabled placeholder={i18next.t("account:Account ID")} />
+                </Form.Item>,
+                12
+              )}
+              {this.renderField(
+                Setting.getLabel(i18next.t("general:Display name"), i18next.t("general:Display name - Tooltip")),
+                <Form.Item name="displayName" style={{margin: 0}}>
+                  <Input placeholder={i18next.t("account:Name shown in OpenAgent")} />
+                </Form.Item>,
+                12
+              )}
+              {this.renderField(
+                Setting.getLabel(i18next.t("general:Avatar"), i18next.t("general:Avatar - Tooltip")),
+                <Row gutter={10} align="middle">
+                  <Col flex="80px">
+                    {this.renderAvatar()}
+                  </Col>
+                  <Col flex="auto">
+                    <Form.Item name="avatar" style={{margin: 0}}>
+                      <Input placeholder={i18next.t("account:Avatar image URL, optional")} />
+                    </Form.Item>
+                  </Col>
+                </Row>,
+                24
+              )}
             </Row>
-          )}
-          {this.renderFormItem(
-            i18next.t("general:Password"),
-            i18next.t("general:Password - Tooltip"),
-            <Button type="primary" onClick={() => this.setState({passwordModalVisible: true})}>
-              {i18next.t("account:Modify password...")}
-            </Button>
-          )}
+          </Card>
+
+          <Card
+            size="small"
+            title={renderCardTitle(i18next.t("general:Password"), i18next.t("account:Password desc"))}
+            style={sectionCardStyle}
+            headStyle={cardHeadStyle}
+          >
+            <Row gutter={[16, 8]}>
+              {this.renderField(
+                Setting.getLabel(i18next.t("general:Password"), i18next.t("general:Password - Tooltip")),
+                <Button style={btnStyle} onClick={() => this.setState({passwordModalVisible: true})}>
+                  {i18next.t("account:Modify password...")}
+                </Button>,
+                12
+              )}
+            </Row>
+          </Card>
         </Form>
+
         <Modal
           maskClosable={false}
-          title={i18next.t("general:Password")}
+          title={i18next.t("account:Modify password")}
           open={this.state.passwordModalVisible}
           okText={i18next.t("account:Set Password")}
           cancelText={i18next.t("general:Cancel")}
           onCancel={() => this.closePasswordModal()}
           onOk={() => this.setPassword()}
-          width={600}
+          width={520}
         >
-          <Col style={{margin: "0px auto 40px auto", width: "100%"}}>
-            <Row style={{width: "100%", marginBottom: "20px"}}>
+          <div style={{padding: "16px 0 8px"}}>
+            {this.renderModalField(
+              i18next.t("account:Old Password"),
               <Input.Password
-                addonBefore={i18next.t("account:Old Password")}
                 placeholder={i18next.t("account:Enter current password")}
                 value={this.state.currentPassword}
                 onChange={e => this.setState({currentPassword: e.target.value})}
               />
-            </Row>
-            <Row style={{width: "100%", marginBottom: "20px"}}>
+            )}
+            {this.renderModalField(
+              i18next.t("account:New password"),
               <Input.Password
-                addonBefore={i18next.t("account:New password")}
                 placeholder={i18next.t("account:Enter new password")}
                 value={this.state.newPassword}
                 onChange={e => this.setState({newPassword: e.target.value})}
               />
-            </Row>
-            <Row style={{width: "100%", marginBottom: "20px"}}>
-              <Input.Password
-                addonBefore={i18next.t("account:Re-enter New")}
-                placeholder={i18next.t("account:Confirm new password")}
-                value={this.state.confirmPassword}
-                onChange={e => this.setState({confirmPassword: e.target.value})}
-              />
-            </Row>
-          </Col>
+            )}
+          </div>
         </Modal>
-      </Card>
+      </div>
     );
   }
 }
