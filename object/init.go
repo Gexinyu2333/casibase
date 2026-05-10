@@ -19,6 +19,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/the-open-agent/openagent/conf"
 	"github.com/the-open-agent/openagent/embedsupport"
@@ -250,12 +251,13 @@ func initSkillsFromFolder() {
 	entries, err := os.ReadDir(skillsDir)
 	if err != nil {
 		if !os.IsNotExist(err) {
-			fmt.Printf("initSkillsFromFolder: cannot read %s: %v\n", skillsDir, err)
+			fmt.Printf("skills: cannot read %s: %v\n", skillsDir, err)
 		}
 		return
 	}
 
-	loaded := 0
+	var names []string
+	newCount := 0
 	for _, entry := range entries {
 		if !entry.IsDir() {
 			continue
@@ -263,7 +265,7 @@ func initSkillsFromFolder() {
 		dir := filepath.Join(skillsDir, entry.Name())
 		skill, err := LoadSkill(dir)
 		if err != nil {
-			fmt.Printf("initSkillsFromFolder: skipping %s: %v\n", dir, err)
+			fmt.Printf("skills: skipping %s: %v\n", dir, err)
 			continue
 		}
 
@@ -274,24 +276,24 @@ func initSkillsFromFolder() {
 
 		existing, err := getSkill(skill.Owner, skill.Name)
 		if err != nil {
-			fmt.Printf("initSkillsFromFolder: DB lookup failed for %s: %v\n", skill.Name, err)
+			fmt.Printf("skills: DB lookup failed for %s: %v\n", skill.Name, err)
 			continue
 		}
 		if existing != nil {
-			fmt.Printf("initSkillsFromFolder: skill %q already in DB, skipping\n", skill.Name)
+			names = append(names, skill.Name)
 			continue
 		}
 
 		skill.CreatedTime = util.GetCurrentTime()
 		if _, err = AddSkill(skill); err != nil {
-			fmt.Printf("initSkillsFromFolder: failed to add skill %s: %v\n", skill.Name, err)
+			fmt.Printf("skills: failed to add skill %s: %v\n", skill.Name, err)
 		} else {
-			fmt.Printf("initSkillsFromFolder: loaded skill %q from %s\n", skill.Name, dir)
-			loaded++
+			names = append(names, skill.Name)
+			newCount++
 		}
 	}
 
-	fmt.Printf("initSkillsFromFolder: %d skill(s) loaded from %s\n", loaded, skillsDir)
+	fmt.Printf("skills: %d total, %d new: %s from %s\n", len(names), newCount, strings.Join(names, ", "), skillsDir)
 }
 
 // findSkillsDir returns the first existing skills/ directory found next to the
@@ -322,11 +324,12 @@ func findSkillsDir() string {
 func loadSkillsFromFS(fsys fs.FS) {
 	entries, err := fs.ReadDir(fsys, ".")
 	if err != nil {
-		fmt.Printf("initSkillsFromFolder(embedded): cannot list skills: %v\n", err)
+		fmt.Printf("skills(embedded): cannot list skills: %v\n", err)
 		return
 	}
 
-	loaded := 0
+	var names []string
+	newCount := 0
 	for _, entry := range entries {
 		if !entry.IsDir() {
 			continue
@@ -334,13 +337,13 @@ func loadSkillsFromFS(fsys fs.FS) {
 
 		skillFS, err := fs.Sub(fsys, entry.Name())
 		if err != nil {
-			fmt.Printf("initSkillsFromFolder(embedded): cannot sub %s: %v\n", entry.Name(), err)
+			fmt.Printf("skills(embedded): cannot sub %s: %v\n", entry.Name(), err)
 			continue
 		}
 
 		skill, err := loadSkillFromFS(skillFS, entry.Name())
 		if err != nil {
-			fmt.Printf("initSkillsFromFolder(embedded): skipping %s: %v\n", entry.Name(), err)
+			fmt.Printf("skills(embedded): skipping %s: %v\n", entry.Name(), err)
 			continue
 		}
 
@@ -350,24 +353,24 @@ func loadSkillsFromFS(fsys fs.FS) {
 
 		existing, err := getSkill(skill.Owner, skill.Name)
 		if err != nil {
-			fmt.Printf("initSkillsFromFolder(embedded): DB lookup failed for %s: %v\n", skill.Name, err)
+			fmt.Printf("skills(embedded): DB lookup failed for %s: %v\n", skill.Name, err)
 			continue
 		}
 		if existing != nil {
-			fmt.Printf("initSkillsFromFolder(embedded): skill %q already in DB, skipping\n", skill.Name)
+			names = append(names, skill.Name)
 			continue
 		}
 
 		skill.CreatedTime = util.GetCurrentTime()
 		if _, err = AddSkill(skill); err != nil {
-			fmt.Printf("initSkillsFromFolder(embedded): failed to add skill %s: %v\n", skill.Name, err)
+			fmt.Printf("skills(embedded): failed to add skill %s: %v\n", skill.Name, err)
 		} else {
-			fmt.Printf("initSkillsFromFolder(embedded): loaded skill %q\n", skill.Name)
-			loaded++
+			names = append(names, skill.Name)
+			newCount++
 		}
 	}
 
-	fmt.Printf("initSkillsFromFolder(embedded): %d skill(s) loaded\n", loaded)
+	fmt.Printf("skills(embedded): %d total, %d new: %s\n", len(names), newCount, strings.Join(names, ", "))
 }
 
 // loadSkillFromFS reads a skill from an fs.FS rooted at the skill's directory.
