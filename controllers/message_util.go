@@ -50,12 +50,18 @@ func writeMessageErrorStream(responseWriter http.ResponseWriter, lang string, me
 		}
 	}
 
-	event := fmt.Sprintf("event: myerror\ndata: %s\n\n", errorText)
+	// SSE requires newlines in data to be escaped as "\ndata: " so the event
+	// is not prematurely terminated (a blank line ends an SSE event).
+	sseData := strings.ReplaceAll(errorText, "\n", "\ndata: ")
+	event := fmt.Sprintf("event: myerror\ndata: %s\n\n", sseData)
 	_, err = responseWriter.Write([]byte(event))
 	if err != nil {
 		return err
 	}
 
+	if flusher, ok := responseWriter.(http.Flusher); ok {
+		flusher.Flush()
+	}
 	return nil
 }
 

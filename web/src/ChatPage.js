@@ -463,8 +463,6 @@ class ChatPage extends BaseListPage {
                 messages: res.data,
               });
             }, (error) => {
-              Setting.showMessage("error", Setting.getRefinedErrorText(error));
-
               const lastMessage2 = Setting.deepCopy(lastMessage);
               lastMessage2.errorText = error;
               res.data[res.data.length - 1] = lastMessage2;
