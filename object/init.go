@@ -36,6 +36,49 @@ func InitDb() {
 		SyncSiteToConf(site)
 	}
 	InitUsers()
+	go printStartupStats()
+}
+
+func printStartupStats() {
+	providers, err := GetGlobalProviders()
+	if err == nil {
+		var modelNames, storageNames []string
+		for _, p := range providers {
+			switch p.Category {
+			case "Model":
+				modelNames = append(modelNames, p.Name)
+			case "Storage":
+				storageNames = append(storageNames, p.Name)
+			}
+		}
+		fmt.Printf("AI models: %d: %s\n", len(modelNames), joinNames(modelNames))
+		fmt.Printf("storage providers: %d: %s\n", len(storageNames), joinNames(storageNames))
+	}
+
+	tools, err := GetGlobalTools()
+	if err == nil {
+		var names []string
+		for _, t := range tools {
+			names = append(names, t.Name)
+		}
+		fmt.Printf("tools: %d: %s\n", len(names), joinNames(names))
+	}
+
+	servers, err := GetServers("")
+	if err == nil {
+		var names []string
+		for _, s := range servers {
+			names = append(names, s.Name)
+		}
+		fmt.Printf("MCP servers: %d: %s\n", len(names), joinNames(names))
+	}
+}
+
+func joinNames(names []string) string {
+	if len(names) == 0 {
+		return "(none)"
+	}
+	return strings.Join(names, ", ")
 }
 
 func initBuiltInStore(modelProviderName string, embeddingProviderName string, ttsProviderName string, sttProviderName string, imageProviderName string) {
