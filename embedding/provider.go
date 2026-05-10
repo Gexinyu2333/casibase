@@ -60,8 +60,6 @@ func GetEmbeddingProvider(typ string, subType string, clientId string, clientSec
 		p, err = NewJinaEmbeddingProvider(subType, clientSecret)
 	} else if typ == "Word2Vec" {
 		p, err = NewWord2VecEmbeddingProvider(typ, subType, lang)
-	} else if typ == "Dummy" {
-		p, err = NewDummyEmbeddingProvider(subType)
 	}
 
 	if err != nil {

@@ -150,7 +150,6 @@ class ProviderEditPage extends React.Component {
     return !(
       (provider.category === "Storage" && provider.type !== "Alibaba Cloud OSS") ||
       (provider.category === "Blockchain" && provider.type === "ChainMaker") ||
-      provider.type === "Dummy" ||
       provider.type === "Ollama"
     );
   }
@@ -397,8 +396,6 @@ class ProviderEditPage extends React.Component {
                     this.updateProviderField("subType", "gpt-4");
                   } else if (value === "Cohere") {
                     this.updateProviderField("subType", "command");
-                  } else if (value === "Dummy") {
-                    this.updateProviderField("subType", "Dummy");
                   } else if (value === "Alibaba Cloud") {
                     this.updateProviderField("subType", "qwen-long");
                   } else if (value === "Moonshot") {
@@ -439,8 +436,6 @@ class ProviderEditPage extends React.Component {
                     this.updateProviderField("subType", "custom-embedding");
                   } else if (value === "Azure") {
                     this.updateProviderField("subType", "AdaSimilarity");
-                  } else if (value === "Dummy") {
-                    this.updateProviderField("subType", "Dummy");
                   }
                 } else if (provider.category === "Text-to-Speech") {
                   if (value === "Alibaba Cloud") {

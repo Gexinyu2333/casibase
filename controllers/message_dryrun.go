@@ -33,11 +33,10 @@ func (w *dryRunWriter) Flush() {}
 
 // shouldPerformDryRun determines if a dry run estimation should be performed
 // before generating the actual AI answer. Dry run is skipped for:
-// - Dummy providers (no real AI calls)
 // - Reason models (they have different execution paths)
 // - Queries with agent clients (agent-based workflows)
 func shouldPerformDryRun(providerType string, modelSubType string, hasMcpTools bool) bool {
-	return providerType != "Dummy" && !isReasonModel(modelSubType) && !hasMcpTools
+	return !isReasonModel(modelSubType) && !hasMcpTools
 }
 
 // validateTransactionBeforeAIGeneration performs a dry run to estimate cost and validates

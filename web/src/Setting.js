@@ -913,10 +913,6 @@ export function getOtherProviderInfo() {
         logo: `${StaticBaseUrl}/img/social_aws.png`,
         url: "https://aws.amazon.com/bedrock/",
       },
-      "Dummy": {
-        logo: `${StaticBaseUrl}/img/social_default.png`,
-        url: "",
-      },
       "Alibaba Cloud": {
         logo: `${StaticBaseUrl}/img/social_aliyun.png`,
         url: "https://www.alibabacloud.com/",
@@ -1009,10 +1005,6 @@ export function getOtherProviderInfo() {
       },
       "Word2Vec": {
         logo: `${StaticBaseUrl}/img/social_local.jpg`,
-        url: "",
-      },
-      "Dummy": {
-        logo: `${StaticBaseUrl}/img/social_default.png`,
         url: "",
       },
     },
@@ -1354,7 +1346,6 @@ export function getProviderTypeOptions(category) {
         {id: "Cohere", name: "Cohere"},
         {id: "Moonshot", name: "Moonshot"},
         {id: "Amazon Bedrock", name: "Amazon Bedrock"},
-        {id: "Dummy", name: "Dummy"},
         {id: "Alibaba Cloud", name: "Alibaba Cloud"},
         {id: "Baichuan", name: "Baichuan"},
         {id: "Volcano Engine", name: "Volcano Engine"},
@@ -1383,7 +1374,6 @@ export function getProviderTypeOptions(category) {
         {id: "Tencent Cloud", name: "Tencent Cloud"},
         {id: "Jina", name: "Jina"},
         {id: "Word2Vec", name: "Word2Vec"},
-        {id: "Dummy", name: "Dummy"},
       ]
     );
   } else if (category === "Tool") {
@@ -2022,10 +2012,6 @@ export function getModelSubTypeOptions(type) {
       {id: "palmyra-med", name: "Palmyra Med"},
       {id: "palmyra-fin", name: "Palmyra Fin"},
       {id: "palmyra-creative", name: "Palmyra Creative"},
-    ];
-  } else if (type === "Dummy") {
-    return [
-      {id: "Dummy", name: "Dummy"},
     ];
   } else {
     return [];

@@ -211,42 +211,6 @@ func initBuiltInProviders() (string, string, string, string, string) {
 		imageProviderName = "provider-image-built-in"
 	}
 
-	if modelProvider == nil {
-		modelProvider = &Provider{
-			Owner:       "admin",
-			Name:        "dummy-model-provider",
-			CreatedTime: util.GetCurrentTime(),
-			DisplayName: "Dummy Model Provider",
-			Category:    "Model",
-			Type:        "Dummy",
-			SubType:     "Dummy",
-			IsDefault:   true,
-			State:       "Active",
-		}
-		_, err = AddProvider(modelProvider)
-		if err != nil && !isUniqueConstraintError(err) {
-			panic(err)
-		}
-	}
-
-	if embeddingProvider == nil {
-		embeddingProvider = &Provider{
-			Owner:       "admin",
-			Name:        "dummy-embedding-provider",
-			CreatedTime: util.GetCurrentTime(),
-			DisplayName: "Dummy Embedding Provider",
-			Category:    "Embedding",
-			Type:        "Dummy",
-			SubType:     "Dummy",
-			IsDefault:   true,
-			State:       "Active",
-		}
-		_, err = AddProvider(embeddingProvider)
-		if err != nil && !isUniqueConstraintError(err) {
-			panic(err)
-		}
-	}
-
 	ttsProviderName := "Browser Built-In"
 	if ttsProvider != nil {
 		ttsProviderName = ttsProvider.Name
@@ -254,7 +218,15 @@ func initBuiltInProviders() (string, string, string, string, string) {
 
 	sttProviderName := "Browser Built-In"
 
-	return modelProvider.Name, embeddingProvider.Name, ttsProviderName, sttProviderName, imageProviderName
+	modelProviderName := ""
+	if modelProvider != nil {
+		modelProviderName = modelProvider.Name
+	}
+	embeddingProviderName := ""
+	if embeddingProvider != nil {
+		embeddingProviderName = embeddingProvider.Name
+	}
+	return modelProviderName, embeddingProviderName, ttsProviderName, sttProviderName, imageProviderName
 }
 
 // initSkillsFromFolder scans the skills/ directory and auto-loads any skill

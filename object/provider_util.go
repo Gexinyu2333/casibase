@@ -45,7 +45,7 @@ func getModelProviderFromName(owner string, providerName string, lang string) (*
 	if provider.Category != "Model" {
 		return nil, nil, fmt.Errorf(i18n.Translate(lang, "object:The model provider: %s is expected to be \")Model\" category, got: \"%s\""), provider.GetId(), provider.Category)
 	}
-	if provider.ClientSecret == "" && provider.Type != "Dummy" && provider.Type != "Ollama" {
+	if provider.ClientSecret == "" && provider.Type != "Ollama" {
 		return nil, nil, fmt.Errorf(i18n.Translate(lang, "object:The model provider: %s's client secret should not be empty"), provider.GetId())
 	}
 
@@ -79,7 +79,7 @@ func getEmbeddingProviderFromName(owner string, providerName string, lang string
 	if provider.Category != "Embedding" {
 		return nil, nil, fmt.Errorf(i18n.Translate(lang, "object:The embedding provider: %s is expected to be \")Embedding\" category, got: \"%s\""), provider.GetId(), provider.Category)
 	}
-	if provider.ClientSecret == "" && provider.Type != "Dummy" {
+	if provider.ClientSecret == "" {
 		return nil, nil, fmt.Errorf(i18n.Translate(lang, "object:The embedding provider: %s's client secret should not be empty"), provider.GetId())
 	}
 

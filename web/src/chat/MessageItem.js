@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React, {useEffect, useMemo, useState} from "react";
-import {useHistory} from "react-router-dom";
 import {Bubble} from "@ant-design/x";
 import {Alert, Avatar, Button, Col, Collapse, Row, Space} from "antd";
 import {FileTextOutlined, GlobalOutlined} from "@ant-design/icons";
@@ -50,7 +49,6 @@ const MessageItem = ({
   sendMessage,
   hideThinking,
 }) => {
-  const history = useHistory();
   const [avatarSrc, setAvatarSrc] = useState(null);
   const [isRegenerating, setIsRegenerating] = useState(false);
   const [reasonExpanded, setReasonExpanded] = useState(["reason"]);
@@ -420,27 +418,6 @@ const MessageItem = ({
               )}
               {message.author === "AI" && isLastMessage && (
                 <MessageSuggestions message={message} sendMessage={sendMessage} />
-              )}
-              {message.author === "AI" && message.modelProvider?.includes("dummy") && (
-                <Alert
-                  type="warning"
-                  showIcon
-                  style={{borderRadius: 8, fontSize: 12, padding: "6px 12px"}}
-                  message={
-                    <span>
-                      {i18next.t("chat:Dummy model - notice")}
-                      {" "}
-                      <Button
-                        type="link"
-                        size="small"
-                        style={{padding: 0, fontWeight: 600, fontSize: 12, height: "auto"}}
-                        onClick={() => history.push("/quick-setup")}
-                      >
-                        {i18next.t("chat:Dummy model - action")} →
-                      </Button>
-                    </span>
-                  }
-                />
               )}
             </div>
           }

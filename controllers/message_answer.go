@@ -267,7 +267,7 @@ func generateMessageAnswer(id string, responseWriter http.ResponseWriter, host s
 	fmt.Printf("Answer: [")
 
 	prompt := store.Prompt
-	if modelProvider.Type != "Dummy" && !isReasonModel(modelProvider.SubType) {
+	if !isReasonModel(modelProvider.SubType) {
 		if modelProvider.Type == "Alibaba Cloud" && webSearchEnabled {
 			prompt, err = getPromptWithCarrier(prompt, store.SuggestionCount, chat.NeedTitle)
 		} else {
