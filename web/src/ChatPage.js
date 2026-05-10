@@ -854,8 +854,11 @@ class ChatPage extends BaseListPage {
             searchedColumn: params.searchedColumn,
           });
 
-          if (chatName !== undefined && chats.length > 0) {
-            let chat = chats.find(chat => chat.name === chatName);
+          if (chats.length > 0) {
+            let chat;
+            if (chatName !== undefined) {
+              chat = chats.find(c => c.name === chatName);
+            }
             if (!chat) {
               chat = chats[0];
               this.goToLinkSoft(this.generateChatUrl(chat.name, chat.store));
