@@ -187,14 +187,18 @@ const MessageItem = ({
             : i18next.t("general:Regenerate")}
         </Button>
       ) : null;
+      const errorDescription = (
+        <div style={{fontFamily: "monospace", fontSize: "12px", whiteSpace: "pre-wrap", wordBreak: "break-all", marginTop: 4, opacity: 0.85}}>
+          {message.errorText}
+        </div>
+      );
       return Setting.isMobile() ? (
         <div>
           <Alert
             message={Setting.getRefinedErrorText(message.errorText)}
-            description={message.errorText}
+            description={errorDescription}
             type="error"
             showIcon
-            style={{whiteSpace: "normal", wordWrap: "break-word"}}
           />
           {regenerateButton && (
             <Row justify="center" style={{marginTop: 16}}>
@@ -205,7 +209,7 @@ const MessageItem = ({
       ) : (
         <Alert
           message={Setting.getRefinedErrorText(message.errorText)}
-          description={message.errorText}
+          description={errorDescription}
           type="error"
           showIcon
           action={regenerateButton ? <div style={{marginLeft: 16}}>{regenerateButton}</div> : null}

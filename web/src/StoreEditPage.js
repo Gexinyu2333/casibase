@@ -466,6 +466,9 @@ class StoreEditPage extends React.Component {
                 {this.renderStoreField(
                   Setting.getLabel(i18next.t("store:Storage provider"), i18next.t("store:Storage provider - Tooltip")),
                   <Select virtual={false} style={{width: "100%"}} value={store.storageProvider} onChange={(value => {this.updateStoreField("storageProvider", value);})}>
+                    <Option key="none" value="">
+                      {i18next.t("general:empty")}
+                    </Option>
                     {providerOptions.map((provider, index) => this.renderProviderOption(provider, index))}
                   </Select>,
                   12
@@ -506,6 +509,9 @@ class StoreEditPage extends React.Component {
             {this.renderStoreField(
               Setting.getLabel(i18next.t("provider:Model provider"), i18next.t("provider:Model provider - Tooltip")),
               <Select virtual={false} style={{width: "100%"}} value={store.modelProvider} onChange={(value => {this.updateStoreField("modelProvider", value);})}>
+                <Option key="none" value="">
+                  {i18next.t("general:empty")}
+                </Option>
                 {this.state.modelProviders.map((provider, index) => this.renderProviderOption(provider, index))}
               </Select>,
               12
