@@ -199,8 +199,8 @@ class PipeEditPage extends React.Component {
       return Setting.getLabel(i18next.t("pipe:App Secret"), i18next.t("pipe:WeChat App Secret - Tooltip"));
     } else if (pipeType === "Snapchat") {
       return Setting.getLabel(i18next.t("pipe:App Secret"), i18next.t("pipe:Snapchat App Secret - Tooltip"));
-    } else if (pipeType === "X DM") {
-      return Setting.getLabel(i18next.t("pipe:Consumer Secret"), i18next.t("pipe:X DM Consumer Secret - Tooltip"));
+    } else if (pipeType === "X Direct Messages") {
+      return Setting.getLabel(i18next.t("pipe:Consumer Secret"), i18next.t("pipe:X Direct Messages Consumer Secret - Tooltip"));
     } else {
       return Setting.getLabel(i18next.t("provider:Public key"), i18next.t("provider:Public key - Tooltip"));
     }
@@ -267,7 +267,7 @@ class PipeEditPage extends React.Component {
                   {id: "Threads", name: "Threads"},
                   {id: "WeChat", name: "WeChat"},
                   {id: "Snapchat", name: "Snapchat"},
-                  {id: "X DM", name: "X Direct Messages"},
+                  {id: "X Direct Messages", name: "X Direct Messages"},
                 ].map((item, index) => (
                   <Option key={index} value={item.id}>
                     <img width={20} height={20} style={{marginBottom: "3px", marginRight: "10px"}}
@@ -299,7 +299,7 @@ class PipeEditPage extends React.Component {
             </Col>
           </Row>
 
-          {(pipe.type === "Discord" || pipe.type === "WhatsApp" || pipe.type === "Slack" || pipe.type === "Facebook Messenger" || pipe.type === "Threads" || pipe.type === "WeChat" || pipe.type === "Snapchat" || pipe.type === "X DM") && (
+          {(pipe.type === "Discord" || pipe.type === "WhatsApp" || pipe.type === "Slack" || pipe.type === "Facebook Messenger" || pipe.type === "Threads" || pipe.type === "WeChat" || pipe.type === "Snapchat" || pipe.type === "X Direct Messages") && (
             <Row style={{marginTop: "20px"}}>
               <Col style={{marginTop: "5px"}} span={Setting.isMobile() ? 22 : 2}>
                 {this.getSecretKeyLabel(pipe.type)}
@@ -391,13 +391,13 @@ class PipeEditPage extends React.Component {
             </Row>
           )}
 
-          {pipe.type === "X DM" && (
+          {pipe.type === "X Direct Messages" && (
             <Row style={{marginTop: "20px"}}>
               <Col span={22} offset={Setting.isMobile() ? 0 : 2}>
                 <span style={{color: "var(--ant-color-text-secondary)", fontSize: "13px"}}>
-                  {i18next.t("pipe:X DM token hint")}
+                  {i18next.t("pipe:X Direct Messages token hint")}
                   <br />
-                  {i18next.t("pipe:X DM webhook hint")}&nbsp;
+                  {i18next.t("pipe:X Direct Messages webhook hint")}&nbsp;
                   <strong>{pipe.domain ? `${pipe.domain}/api/chat-webhook/x-dm/${pipe.name}` : `https://<your-domain>/api/chat-webhook/x-dm/${pipe.name}`}</strong>
                 </span>
               </Col>

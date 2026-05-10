@@ -91,7 +91,7 @@ func Get(typ string, token string, secretKey string, pipeName string, lang strin
 		p, err = NewWeChatPipe(token, secretKey, pipeName, proxy.ProxyHttpClient)
 	} else if typ == "Snapchat" {
 		p, err = NewSnapchatPipe(token, secretKey, proxy.ProxyHttpClient)
-	} else if typ == "X DM" {
+	} else if typ == "X Direct Messages" {
 		p, err = NewXDMPipe(token, secretKey, proxy.ProxyHttpClient)
 	} else if typ == "Threads" {
 		p, err = NewThreadsPipe(token, secretKey, pipeName, proxy.ProxyHttpClient)

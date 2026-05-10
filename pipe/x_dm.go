@@ -85,7 +85,7 @@ func (p *XDMPipe) SendMessage(chatId string, text string) error {
 	}
 	_, err := doJSONRequest(
 		p.httpClient,
-		"X DM",
+		"X Direct Messages",
 		http.MethodPost,
 		url,
 		headers,

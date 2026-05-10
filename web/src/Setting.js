@@ -1189,10 +1189,6 @@ export function getOtherProviderInfo() {
         logo: `${StaticBaseUrl}/img/social_x.png`,
         url: "https://developer.twitter.com/",
       },
-      "X DM": {
-        logo: `${StaticBaseUrl}/img/social_x.png`,
-        url: "https://developer.twitter.com/",
-      },
     },
   };
 
@@ -1437,7 +1433,7 @@ export function getProviderTypeOptions(category) {
       {id: "Threads", name: "Threads"},
       {id: "WeChat", name: "WeChat"},
       {id: "Snapchat", name: "Snapchat"},
-      {id: "X DM", name: "X Direct Messages"},
+      {id: "X Direct Messages", name: "X Direct Messages"},
     ];
   } else {
     return [];
@@ -2230,7 +2226,7 @@ export function getPipeTypeOptions() {
     {id: "Threads", name: "Threads"},
     {id: "WeChat", name: "WeChat"},
     {id: "Snapchat", name: "Snapchat"},
-    {id: "X DM", name: "X Direct Messages"},
+    {id: "X Direct Messages", name: "X Direct Messages"},
   ];
 }
 
@@ -2244,7 +2240,7 @@ export function getPipePlatformMetadata(type) {
     "Threads": {desc: "Connect via Meta Threads", tokenLabel: "User Access Token", tokenPlaceholder: "THRDSxxxxxxxx...", helpUrl: "https://developers.facebook.com/docs/threads"},
     "WeChat": {desc: "Connect via WeChat Official Account", tokenLabel: "Access Token", tokenPlaceholder: "your-access-token", helpUrl: "https://developers.weixin.qq.com"},
     "Snapchat": {desc: "Connect via Snapchat Kit Bot", tokenLabel: "Access Token", tokenPlaceholder: "your-oauth-access-token", helpUrl: "https://kit.snapchat.com/"},
-    "X DM": {desc: "Connect via X Direct Messages", tokenLabel: "OAuth Token", tokenPlaceholder: "your-oauth-token", helpUrl: "https://developer.x.com"},
+    "X Direct Messages": {desc: "Connect via X Direct Messages", tokenLabel: "OAuth Token", tokenPlaceholder: "your-oauth-token", helpUrl: "https://developer.x.com"},
   };
   return metadata[type] || {desc: "", tokenLabel: "Token", tokenPlaceholder: "", helpUrl: ""};
 }
