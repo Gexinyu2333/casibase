@@ -18,6 +18,7 @@ import {Button, Card, Col, Collapse, Input, Row, Select, Space, Tag, Typography}
 import * as SkillBackend from "./backend/SkillBackend";
 import * as Setting from "./Setting";
 import i18next from "i18next";
+import Editor from "./common/Editor";
 
 const {Option} = Select;
 const {TextArea} = Input;
@@ -184,12 +185,14 @@ class SkillEditPage extends React.Component {
             )}
             {this.renderSkillField(
               Setting.getLabel(i18next.t("general:Content"), i18next.t("skill:Content - Tooltip")),
-              <TextArea
-                rows={14}
+              <Editor
+                lang="markdown"
                 value={skill.content}
-                onChange={e => this.updateSkillField("content", e.target.value)}
-                placeholder={i18next.t("skill:Content placeholder")}
-                style={{fontFamily: "monospace", fontSize: 13}}
+                onChange={value => this.updateSkillField("content", value)}
+                fillWidth
+                height="400px"
+                dark
+                lineWrapping
               />,
               24
             )}
