@@ -1181,6 +1181,10 @@ export function getOtherProviderInfo() {
         logo: `${StaticBaseUrl}/img/social_snapchat.png`,
         url: "https://kit.snapchat.com/",
       },
+      "X DM": {
+        logo: `${StaticBaseUrl}/img/social_x.png`,
+        url: "https://developer.twitter.com/",
+      },
     },
   };
 

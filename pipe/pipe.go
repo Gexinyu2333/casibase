@@ -91,6 +91,8 @@ func Get(typ string, token string, secretKey string, pipeName string, lang strin
 		p, err = NewWeChatPipe(token, secretKey, pipeName, proxy.ProxyHttpClient)
 	} else if typ == "Snapchat" {
 		p, err = NewSnapchatPipe(token, secretKey, proxy.ProxyHttpClient)
+	} else if typ == "X DM" {
+		p, err = NewXDMPipe(token, secretKey, proxy.ProxyHttpClient)
 	} else {
 		return nil, fmt.Errorf(i18n.Translate(lang, "object:the pipe type: %s is not supported"), typ)
 	}

@@ -439,7 +439,11 @@
     "WeChat webhook hint": "在微信公众平台服务器配置中，将服务器地址(URL)设置为：",
     "Snapchat App Secret - Tooltip": "Snap开发者平台中的App Secret，用于验证Webhook请求签名。",
     "Snapchat token hint": "Token字段填写在Snap开发者平台创建Bot后获取的OAuth访问令牌。",
-    "Snapchat webhook hint": "在Snap开发者平台Bot的Webhook设置中，将Webhook URL设置为："
+    "Snapchat webhook hint": "在Snap开发者平台Bot的Webhook设置中，将Webhook URL设置为：",
+    "Consumer Secret": "Consumer Secret",
+    "X DM Consumer Secret - Tooltip": "X开发者平台中的Consumer Secret（API密钥），用于响应CRC Webhook验证请求。",
+    "X DM token hint": "Token字段填写从X开发者平台获取的OAuth 2.0用户访问令牌（需包含dm.read、dm.write、tweet.read权限）。",
+    "X DM webhook hint": "在X开发者平台的Account Activity API订阅中，将Webhook URL设置为："
   },
   "provider": {
     "API key": "API密钥",

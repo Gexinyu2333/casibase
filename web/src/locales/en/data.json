@@ -439,7 +439,11 @@
     "WeChat webhook hint": "Set the Server URL in WeChat Official Account Platform server configuration to:",
     "Snapchat App Secret - Tooltip": "The App Secret from the Snap Developer Portal, used to verify webhook request signatures.",
     "Snapchat token hint": "Token field = OAuth Access Token obtained from the Snap Developer Portal after creating a bot.",
-    "Snapchat webhook hint": "Set the Webhook URL in your Snap Developer Portal bot settings to:"
+    "Snapchat webhook hint": "Set the Webhook URL in your Snap Developer Portal bot settings to:",
+    "Consumer Secret": "Consumer Secret",
+    "X DM Consumer Secret - Tooltip": "The Consumer Secret (API Secret Key) from the X Developer Portal, used to respond to CRC webhook challenges.",
+    "X DM token hint": "Token field = OAuth 2.0 User Access Token with dm.read, dm.write, and tweet.read scopes, obtained from the X Developer Portal.",
+    "X DM webhook hint": "Set the Webhook URL in your X Developer Portal Account Activity API subscription to:"
   },
   "provider": {
     "API key": "API key",
