@@ -425,7 +425,11 @@
     "Signing Secret": "Signing Secret",
     "Signing Secret - Tooltip": "The signing secret from the Slack App Basic Information page, used to verify webhook request signatures.",
     "Slack webhook hint": "Set the Request URL in your Slack App Event Subscriptions to:",
-    "WhatsApp verify token hint": "Set the webhook verify token in Meta Developer Console to your pipe name:"
+    "WhatsApp verify token hint": "Set the webhook verify token in Meta Developer Console to your pipe name:",
+    "App Secret": "App Secret",
+    "App Secret - Tooltip": "The Facebook App Secret from the Meta Developer Console, used to verify webhook request signatures.",
+    "Facebook Messenger verify token hint": "Set the webhook verify token in Meta Developer Console to your pipe name:",
+    "Facebook Messenger webhook hint": "Set the Callback URL in your Facebook App Messenger settings to:"
   },
   "provider": {
     "API key": "API key",

@@ -1169,6 +1169,10 @@ export function getOtherProviderInfo() {
         logo: `${StaticBaseUrl}/img/social_slack.png`,
         url: "https://slack.com/",
       },
+      "Facebook Messenger": {
+        logo: `${StaticBaseUrl}/img/social_messenger.png`,
+        url: "https://www.messenger.com/",
+      },
     },
   };
 
@@ -1407,6 +1411,9 @@ export function getProviderTypeOptions(category) {
     return [
       {id: "Telegram", name: "Telegram"},
       {id: "Discord", name: "Discord"},
+      {id: "WhatsApp", name: "WhatsApp"},
+      {id: "Slack", name: "Slack"},
+      {id: "Facebook Messenger", name: "Facebook Messenger"},
     ];
   } else {
     return [];

@@ -425,7 +425,11 @@
     "Signing Secret": "签名密钥",
     "Signing Secret - Tooltip": "Slack应用基本信息页面中的签名密钥，用于验证Webhook请求签名。",
     "Slack webhook hint": "在Slack应用的事件订阅中，将Request URL设置为：",
-    "WhatsApp verify token hint": "在Meta开发者控制台中，将Webhook验证令牌设置为管道名称："
+    "WhatsApp verify token hint": "在Meta开发者控制台中，将Webhook验证令牌设置为管道名称：",
+    "App Secret": "应用密钥",
+    "App Secret - Tooltip": "Meta开发者控制台中的Facebook应用密钥，用于验证Webhook请求签名。",
+    "Facebook Messenger verify token hint": "在Meta开发者控制台中，将Webhook验证令牌设置为管道名称：",
+    "Facebook Messenger webhook hint": "在Facebook应用Messenger设置中，将回调URL设置为："
   },
   "provider": {
     "API key": "API密钥",

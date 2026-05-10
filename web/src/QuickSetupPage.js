@@ -211,6 +211,14 @@ const PIPE_PLATFORMS = [
     tokenPlaceholder: "xoxb-...",
     helpUrl: "https://api.slack.com/apps",
   },
+  {
+    id: "Facebook Messenger",
+    label: "Messenger",
+    desc: "Connect via Facebook Messenger",
+    tokenLabel: "Page Access Token",
+    tokenPlaceholder: "EAAxxxxxxxx...",
+    helpUrl: "https://developers.facebook.com/docs/messenger-platform",
+  },
 ];
 
 function ProviderCard({provider, selected, onClick}) {
