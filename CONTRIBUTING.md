@@ -24,14 +24,14 @@ Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md) before contribu
 | Node.js | 20+ |
 | Yarn | 1.x |
 | MySQL | 8.0+ (or MariaDB) |
-| Casdoor | latest (for auth) |
+| Auth service | latest |
 
 ### 1. Clone and configure
 
 ```bash
 git clone https://github.com/the-open-agent/openagent.git
 cd openagent
-cp conf/app.conf.example conf/app.conf   # edit DB and Casdoor settings
+cp conf/app.conf.example conf/app.conf   # edit DB and auth settings
 ```
 
 Key fields in `conf/app.conf`:
@@ -45,14 +45,14 @@ casdoorOrganization = built-in
 casdoorApplication = app-openagent
 ```
 
-### 2. Start Casdoor (auth service)
+### 2. Start the auth service
 
 ```bash
 # Using Docker
 docker run -d -p 8000:8000 casbin/casdoor-all-in-one
 ```
 
-Create an application in Casdoor and copy the client ID/secret into `app.conf`.
+Create an application in the auth service and copy the client ID/secret into `app.conf`.
 
 ### 3. Backend
 

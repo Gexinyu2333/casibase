@@ -35,7 +35,7 @@ func (message *Message) SendEmail(lang string) error {
 		return err
 	}
 	if organization == nil {
-		return fmt.Errorf(i18n.Translate(lang, "object:Casdoor organization: [%s] doesn't exist"), casdoorOrganization)
+		return fmt.Errorf(i18n.Translate(lang, "object:Auth organization: [%s] doesn't exist"), casdoorOrganization)
 	}
 	sender := organization.DisplayName
 
@@ -45,7 +45,7 @@ func (message *Message) SendEmail(lang string) error {
 		return err
 	}
 	if application == nil {
-		return fmt.Errorf(i18n.Translate(lang, "object:Casdoor application: [%s] doesn't exist"), casdoorApplication)
+		return fmt.Errorf(i18n.Translate(lang, "object:Auth application: [%s] doesn't exist"), casdoorApplication)
 	}
 	title := application.DisplayName
 
@@ -56,7 +56,7 @@ func (message *Message) SendEmail(lang string) error {
 		return err
 	}
 	if user == nil {
-		return fmt.Errorf(i18n.Translate(lang, "object:Casdoor user: [%s] doesn't exist"), message.User)
+		return fmt.Errorf(i18n.Translate(lang, "object:Auth user: [%s] doesn't exist"), message.User)
 	}
 
 	username := user.Name
@@ -145,7 +145,7 @@ func (message *Message) SendErrorEmail(errorText string, lang string) error {
 		return err
 	}
 	if organization == nil {
-		return fmt.Errorf(i18n.Translate(lang, "object:Casdoor organization: [%s] doesn't exist"), casdoorOrganization)
+		return fmt.Errorf(i18n.Translate(lang, "object:Auth organization: [%s] doesn't exist"), casdoorOrganization)
 	}
 	sender := organization.DisplayName
 
@@ -154,7 +154,7 @@ func (message *Message) SendErrorEmail(errorText string, lang string) error {
 		return err
 	}
 	if user == nil {
-		return fmt.Errorf(i18n.Translate(lang, "object:Casdoor user: [%s] doesn't exist"), message.User)
+		return fmt.Errorf(i18n.Translate(lang, "object:Auth user: [%s] doesn't exist"), message.User)
 	}
 
 	username := user.Name

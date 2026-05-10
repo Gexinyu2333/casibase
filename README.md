@@ -127,11 +127,11 @@ Connect every major LLM provider and switch between them per conversation — no
 
 ---
 
-### 🏗️ Enterprise Platform
+### 🏗️ Platform Features
 
 | Capability | Description |
 |:---|:---|
-| **Single Sign-On** | OIDC / OAuth2 / LDAP / SAML via the integrated Casdoor auth layer |
+| **Single Sign-On** | OIDC / OAuth2 / LDAP / SAML via the built-in auth layer |
 | **Multi-tenancy** | Isolated workspaces per user or organisation |
 | **REST API + Swagger UI** | Every feature is accessible programmatically |
 | **Audit Logs** | Full activity history for every action |

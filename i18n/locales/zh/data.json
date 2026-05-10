@@ -112,9 +112,9 @@
     "writer does not implement http.Flusher": "写入器（writer）未实现 http.Flusher 接口"
   },
   "object": {
-    "Casdoor application: [%s] doesn't exist": "Casdoor 应用：[%s] 不存在",
-    "Casdoor organization: [%s] doesn't exist": "Casdoor 组织：[%s] 不存在",
-    "Casdoor user: [%s] doesn't exist": "Casdoor user: [%s] doesn't exist",
+    "Auth application: [%s] doesn't exist": "应用：[%s] 不存在",
+    "Auth organization: [%s] doesn't exist": "组织：[%s] 不存在",
+    "Auth user: [%s] doesn't exist": "用户：[%s] 不存在",
     "MCP test JSON must include non-empty \"tool\"": "MCP 测试 JSON 必须包含非空的 \"tool\" 字段",
     "Please add a model provider first": "请先添加模型提供商",
     "Please add an embedding provider first": "请先添加嵌入提供商",

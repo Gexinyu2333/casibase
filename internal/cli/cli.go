@@ -74,7 +74,7 @@ func printHelp() {
 	if len(os.Args) > 0 && os.Args[0] != "" {
 		exe = filepath.Base(os.Args[0])
 	}
-	fmt.Printf(`%[1]s — enterprise AI knowledge base and MCP / A2A management platform
+	fmt.Printf(`%[1]s — personal AI assistant with MCP / A2A support
 
 Without arguments, %[1]s starts the HTTP API server (same as %[1]s serve).
 

@@ -112,9 +112,9 @@
     "writer does not implement http.Flusher": "writer does not implement http.Flusher"
   },
   "object": {
-    "Casdoor application: [%s] doesn't exist": "Casdoor application: [%s] doesn't exist",
-    "Casdoor organization: [%s] doesn't exist": "Casdoor organization: [%s] doesn't exist",
-    "Casdoor user: [%s] doesn't exist": "Casdoor user: [%s] doesn't exist",
+    "Auth application: [%s] doesn't exist": "Auth application: [%s] doesn't exist",
+    "Auth organization: [%s] doesn't exist": "Auth organization: [%s] doesn't exist",
+    "Auth user: [%s] doesn't exist": "Auth user: [%s] doesn't exist",
     "MCP test JSON must include non-empty \"tool\"": "MCP test JSON must include a non-empty \"tool\" field",
     "Please add a model provider first": "Please add a model provider first",
     "Please add an embedding provider first": "Please add an embedding provider first",
