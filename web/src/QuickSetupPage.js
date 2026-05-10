@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import React, {useState} from "react";
+import {useHistory} from "react-router-dom";
 import {Alert, Button, Col, Input, Row, Select, Space, Tag, Typography} from "antd";
 import {CheckCircleFilled, LinkOutlined} from "@ant-design/icons";
 import * as ProviderBackend from "./backend/ProviderBackend";
@@ -358,6 +359,7 @@ function FieldRow({label, children, hint}) {
 }
 
 function QuickSetupPage({account}) {
+  const history = useHistory();
   const [selectedModelType, setSelectedModelType] = useState(null);
   const [providerName, setProviderName] = useState("");
   const [apiKey, setApiKey] = useState("");
@@ -536,12 +538,12 @@ function QuickSetupPage({account}) {
             <div style={{marginTop: 8}}>
               <Paragraph>{i18next.t("setup:Your configuration has been saved. You can now start chatting or further customize your setup.")}</Paragraph>
               <Space wrap>
-                <Button type="primary" href="/chat">{i18next.t("general:Chat")}</Button>
-                <Button href={`/providers/${savedProvider.name}`} icon={<LinkOutlined />}>
+                <Button type="primary" onClick={() => history.push("/chat")}>{i18next.t("general:Chat")}</Button>
+                <Button onClick={() => history.push(`/providers/${savedProvider.name}`)} icon={<LinkOutlined />}>
                   {i18next.t("setup:View Provider")}
                 </Button>
                 {savedPipe && (
-                  <Button href={`/pipes/${savedPipe.name}`} icon={<LinkOutlined />}>
+                  <Button onClick={() => history.push(`/pipes/${savedPipe.name}`)} icon={<LinkOutlined />}>
                     {i18next.t("setup:View Pipe")}
                   </Button>
                 )}

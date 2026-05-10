@@ -82,7 +82,9 @@
     "User desc": "The user who owns this chat",
     "Web search": "Web search",
     "Web sources": "Web sources",
-    "Your chat text involves sensitive content. This chat has been forcibly terminated.": "Your chat text involves sensitive content. This chat has been forcibly terminated."
+    "Your chat text involves sensitive content. This chat has been forcibly terminated.": "Your chat text involves sensitive content. This chat has been forcibly terminated.",
+    "Dummy model - notice": "This response is from a demo model — no real AI is connected.",
+    "Dummy model - action": "Set up a real model"
   },
   "file": {
     "Filename": "Filename"
