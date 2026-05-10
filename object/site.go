@@ -51,6 +51,12 @@ type Site struct {
 
 func SyncSiteToConf(site *Site) {
 	conf.SetSiteOverrides(map[string]string{
+		"staticBaseUrl":        site.StaticBaseUrl,
+		"htmlTitle":            site.HtmlTitle,
+		"faviconUrl":           site.FaviconUrl,
+		"logoUrl":              site.LogoUrl,
+		"navbarHtml":           site.NavbarHtml,
+		"footerHtml":           site.FooterHtml,
 		"issuer":              site.Issuer,
 		"clientId":            site.ClientId,
 		"clientSecret":        site.ClientSecret,

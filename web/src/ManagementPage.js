@@ -52,7 +52,6 @@ import {
 import "./App.less";
 import * as Setting from "./Setting";
 import AuthCallback from "./AuthCallback";
-import * as Conf from "./Conf";
 import i18next from "i18next";
 import LanguageSelect from "./LanguageSelect";
 import ThemeSelect from "./ThemeSelect";
@@ -208,6 +207,7 @@ function ManagementPage(props) {
   const isDark = themeAlgorithm.includes("dark");
   const textColor = isDark ? "white" : "black";
   const siderLogo = logo || Setting.getLogo(themeAlgorithm, site?.logoUrl);
+  const navbarHtml = Setting.getNavbarHtml(themeAlgorithm, site?.navbarHtml);
 
   const toggleSider = () => {
     const next = !siderCollapsed;
@@ -335,8 +335,8 @@ function ManagementPage(props) {
     } else {
       return (
         <div style={{display: "flex", alignItems: "center", gap: "2px", paddingRight: "8px"}}>
-          {Conf.NavbarHtml && (
-            <div style={{display: "flex", alignItems: "center"}} dangerouslySetInnerHTML={{__html: Conf.NavbarHtml}} />
+          {navbarHtml && (
+            <div style={{display: "flex", alignItems: "center"}} dangerouslySetInnerHTML={{__html: navbarHtml}} />
           )}
           {Setting.isLocalAdminUser(account) && (
             <StoreSelect

@@ -493,6 +493,19 @@ export function getLogo(themes, storeLogoUrl) {
   }
 }
 
+export function getNavbarHtml(themes, storeNavbarHtml) {
+  let navbarHtml = Conf.NavbarHtml;
+  if (storeNavbarHtml) {
+    navbarHtml = storeNavbarHtml;
+  }
+  navbarHtml = navbarHtml.replace("https://cdn.openagentai.org", Conf.StaticBaseUrl);
+  if (themes.includes("dark")) {
+    return navbarHtml.replace(/(\.png)/g, "_white$1");
+  } else {
+    return navbarHtml;
+  }
+}
+
 export function getFooterHtml(themes, storeFooterHtml) {
   const defaultFooterHtml = "<a target=\"_blank\" href=\"https://github.com/the-open-agent/openagent\" rel=\"noreferrer\"><img style=\"padding-bottom: 3px;\" height=\"30\" alt=\"OpenAgent\" src=\"https://cdn.openagentai.org/img/openagent-logo_1600x276.png\" /></a>";
   let footerHtml = Conf.FooterHtml;
