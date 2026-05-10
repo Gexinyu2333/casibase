@@ -167,7 +167,6 @@ func (c *ApiController) Signout() {
 	}
 
 	c.SetSessionClaims(nil)
-	c.Ctx.SetCookie("signed_out", "1", 3600, "/")
 
 	c.ResponseOk()
 }
@@ -364,7 +363,8 @@ func (c *ApiController) GetAccount() {
 
 	if object.IsSigninEnabled() {
 		if c.GetSessionUsername() == "" {
-			if c.Ctx.GetCookie("signed_out") != "1" && object.IsAdminUsingDefaultPassword() {
+			fromPath := c.GetString("fromPath")
+			if fromPath != "/signin" && object.IsAdminUsingDefaultPassword() {
 				if !c.autoLoginAdmin() {
 					return
 				}

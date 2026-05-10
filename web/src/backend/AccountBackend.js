@@ -15,7 +15,8 @@
 import * as Setting from "../Setting";
 
 export function getAccount() {
-  return fetch(`${Setting.ServerUrl}/api/get-account`, {
+  const fromPath = encodeURIComponent(window.location.pathname);
+  return fetch(`${Setting.ServerUrl}/api/get-account?fromPath=${fromPath}`, {
     method: "GET",
     credentials: "include",
     headers: {

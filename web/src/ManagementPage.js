@@ -542,6 +542,7 @@ function ManagementPage(props) {
         sessionStorage.setItem("from", window.location.pathname);
         window.location.replace(signinUrl);
       } else {
+        history.push("/signin");
         return null;
       }
     } else if (account === undefined) {
