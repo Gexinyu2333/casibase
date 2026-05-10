@@ -1173,6 +1173,10 @@ export function getOtherProviderInfo() {
         logo: `${StaticBaseUrl}/img/social_messenger.png`,
         url: "https://www.messenger.com/",
       },
+      "WeChat": {
+        logo: `${StaticBaseUrl}/img/social_wechat.png`,
+        url: "https://www.wechat.com/",
+      },
     },
   };
 
@@ -1414,6 +1418,7 @@ export function getProviderTypeOptions(category) {
       {id: "WhatsApp", name: "WhatsApp"},
       {id: "Slack", name: "Slack"},
       {id: "Facebook Messenger", name: "Facebook Messenger"},
+      {id: "WeChat", name: "WeChat"},
     ];
   } else {
     return [];

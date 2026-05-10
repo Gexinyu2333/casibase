@@ -244,6 +244,7 @@ class PipeEditPage extends React.Component {
                   {id: "WhatsApp", name: "WhatsApp"},
                   {id: "Slack", name: "Slack"},
                   {id: "Facebook Messenger", name: "Facebook Messenger"},
+                  {id: "WeChat", name: "WeChat"},
                 ].map((item, index) => (
                   <Option key={index} value={item.id}>
                     <img width={20} height={20} style={{marginBottom: "3px", marginRight: "10px"}}
@@ -275,7 +276,7 @@ class PipeEditPage extends React.Component {
             </Col>
           </Row>
 
-          {(pipe.type === "Discord" || pipe.type === "WhatsApp" || pipe.type === "Slack" || pipe.type === "Facebook Messenger") && (
+          {(pipe.type === "Discord" || pipe.type === "WhatsApp" || pipe.type === "Slack" || pipe.type === "Facebook Messenger" || pipe.type === "WeChat") && (
             <Row style={{marginTop: "20px"}}>
               <Col style={{marginTop: "5px"}} span={Setting.isMobile() ? 22 : 2}>
                 {pipe.type === "WhatsApp"
@@ -284,7 +285,9 @@ class PipeEditPage extends React.Component {
                     ? Setting.getLabel(i18next.t("pipe:Signing Secret"), i18next.t("pipe:Signing Secret - Tooltip"))
                     : pipe.type === "Facebook Messenger"
                       ? Setting.getLabel(i18next.t("pipe:App Secret"), i18next.t("pipe:App Secret - Tooltip"))
-                      : Setting.getLabel(i18next.t("provider:Public key"), i18next.t("provider:Public key - Tooltip"))
+                      : pipe.type === "WeChat"
+                        ? Setting.getLabel(i18next.t("pipe:App Secret"), i18next.t("pipe:WeChat App Secret - Tooltip"))
+                        : Setting.getLabel(i18next.t("provider:Public key"), i18next.t("provider:Public key - Tooltip"))
                 }
               </Col>
               <Col span={22}>
@@ -326,6 +329,21 @@ class PipeEditPage extends React.Component {
                   <br />
                   {i18next.t("pipe:Facebook Messenger webhook hint")}&nbsp;
                   <strong>{pipe.domain ? `${pipe.domain}/api/chat-webhook/facebook-messenger/${pipe.name}` : `https://<your-domain>/api/chat-webhook/facebook-messenger/${pipe.name}`}</strong>
+                </span>
+              </Col>
+            </Row>
+          )}
+
+          {pipe.type === "WeChat" && (
+            <Row style={{marginTop: "20px"}}>
+              <Col span={22} offset={Setting.isMobile() ? 0 : 2}>
+                <span style={{color: "var(--ant-color-text-secondary)", fontSize: "13px"}}>
+                  {i18next.t("pipe:WeChat token hint")}
+                  <br />
+                  {i18next.t("pipe:WeChat verify token hint")}&nbsp;<strong>{pipe.name}</strong>
+                  <br />
+                  {i18next.t("pipe:WeChat webhook hint")}&nbsp;
+                  <strong>{pipe.domain ? `${pipe.domain}/api/chat-webhook/wechat/${pipe.name}` : `https://<your-domain>/api/chat-webhook/wechat/${pipe.name}`}</strong>
                 </span>
               </Col>
             </Row>

@@ -87,6 +87,8 @@ func Get(typ string, token string, secretKey string, pipeName string, lang strin
 		p, err = NewSlackPipe(token, secretKey, proxy.ProxyHttpClient)
 	} else if typ == "Facebook Messenger" {
 		p, err = NewFacebookMessengerPipe(token, secretKey, pipeName, proxy.ProxyHttpClient)
+	} else if typ == "WeChat" {
+		p, err = NewWeChatPipe(token, secretKey, pipeName, proxy.ProxyHttpClient)
 	} else {
 		return nil, fmt.Errorf(i18n.Translate(lang, "object:the pipe type: %s is not supported"), typ)
 	}

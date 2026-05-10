@@ -429,7 +429,11 @@
     "App Secret": "App Secret",
     "App Secret - Tooltip": "The Facebook App Secret from the Meta Developer Console, used to verify webhook request signatures.",
     "Facebook Messenger verify token hint": "Set the webhook verify token in Meta Developer Console to your pipe name:",
-    "Facebook Messenger webhook hint": "Set the Callback URL in your Facebook App Messenger settings to:"
+    "Facebook Messenger webhook hint": "Set the Callback URL in your Facebook App Messenger settings to:",
+    "WeChat App Secret - Tooltip": "The WeChat AppSecret from the WeChat Official Account Platform, used together with AppID to obtain the access token.",
+    "WeChat token hint": "Token field = WeChat AppID; App Secret field = WeChat AppSecret.",
+    "WeChat verify token hint": "Set the Token in WeChat Official Account Platform server configuration to your pipe name:",
+    "WeChat webhook hint": "Set the Server URL in WeChat Official Account Platform server configuration to:"
   },
   "provider": {
     "API key": "API key",
