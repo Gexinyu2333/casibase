@@ -1629,26 +1629,20 @@ export function getModelSubTypeOptions(type) {
     ];
   } else if (type === "OpenRouter") {
     return [
-      {id: "google/palm-2-codechat-bison", name: "google/palm-2-codechat-bison"},
-      {id: "google/palm-2-chat-bison", name: "google/palm-2-chat-bison"},
-      {id: "openai/gpt-3.5-turbo", name: "openai/gpt-3.5-turbo"},
-      {id: "openai/gpt-3.5-turbo-16k", name: "openai/gpt-3.5-turbo-16k"},
-      {id: "openai/gpt-4", name: "openai/gpt-4"},
-      {id: "openai/gpt-4-32k", name: "openai/gpt-4-32k"},
-      {id: "anthropic/claude-2", name: "anthropic/claude-2"},
-      {id: "anthropic/claude-instant-v1", name: "anthropic/claude-instant-v1"},
-      {id: "meta-llama/llama-2-13b-chat", name: "meta-llama/llama-2-13b-chat"},
-      {id: "meta-llama/llama-2-70b-chat", name: "meta-llama/llama-2-70b-chat"},
-      {id: "palm-2-codechat-bison", name: "palm-2-codechat-bison"},
-      {id: "palm-2-chat-bison", name: "palm-2-chat-bison"},
-      {id: "gpt-3.5-turbo", name: "gpt-3.5-turbo"},
-      {id: "gpt-3.5-turbo-16k", name: "gpt-3.5-turbo-16k"},
-      {id: "gpt-4", name: "gpt-4"},
-      {id: "gpt-4-32k", name: "gpt-4-32k"},
-      {id: "claude-2", name: "claude-2"},
-      {id: "claude-instant-v1", name: "claude-instant-v1"},
-      {id: "llama-2-13b-chat", name: "llama-2-13b-chat"},
-      {id: "llama-2-70b-chat", name: "llama-2-70b-chat"},
+      {id: "anthropic/claude-opus-4-5", name: "anthropic/claude-opus-4-5"},
+      {id: "anthropic/claude-sonnet-4-0", name: "anthropic/claude-sonnet-4-0"},
+      {id: "openai/gpt-4.1", name: "openai/gpt-4.1"},
+      {id: "openai/gpt-4o", name: "openai/gpt-4o"},
+      {id: "openai/o3", name: "openai/o3"},
+      {id: "google/gemini-2.5-pro", name: "google/gemini-2.5-pro"},
+      {id: "google/gemini-2.5-flash", name: "google/gemini-2.5-flash"},
+      {id: "deepseek/deepseek-r1", name: "deepseek/deepseek-r1"},
+      {id: "deepseek/deepseek-chat-v3-0324", name: "deepseek/deepseek-chat-v3-0324"},
+      {id: "x-ai/grok-3", name: "x-ai/grok-3"},
+      {id: "meta-llama/llama-4-maverick", name: "meta-llama/llama-4-maverick"},
+      {id: "meta-llama/llama-3.3-70b-instruct", name: "meta-llama/llama-3.3-70b-instruct"},
+      {id: "mistralai/mistral-large", name: "mistralai/mistral-large"},
+      {id: "qwen/qwen3-235b-a22b", name: "qwen/qwen3-235b-a22b"},
     ];
   } else if (type === "Baidu Cloud") {
     return [
@@ -1811,15 +1805,15 @@ export function getModelSubTypeOptions(type) {
     ];
   } else if (type === "Moonshot") {
     return [
-      {id: "moonshot-v1-8k", name: "moonshot-v1-8k"},
-      {id: "moonshot-v1-32k", name: "moonshot-v1-32k"},
-      {id: "moonshot-v1-128k", name: "moonshot-v1-128k"},
       {id: "kimi-k2-0905-preview", name: "kimi-k2-0905-preview"},
       {id: "kimi-k2-0711-preview", name: "kimi-k2-0711-preview"},
       {id: "kimi-k2-turbo-preview", name: "kimi-k2-turbo-preview"},
       {id: "kimi-k2-thinking", name: "kimi-k2-thinking"},
       {id: "kimi-k2-thinking-turbo", name: "kimi-k2-thinking-turbo"},
       {id: "kimi-latest", name: "kimi-latest (Auto Tier)"},
+      {id: "moonshot-v1-128k", name: "moonshot-v1-128k"},
+      {id: "moonshot-v1-32k", name: "moonshot-v1-32k"},
+      {id: "moonshot-v1-8k", name: "moonshot-v1-8k"},
     ];
   } else if (type === "Amazon Bedrock") {
     return [
@@ -1840,13 +1834,13 @@ export function getModelSubTypeOptions(type) {
     ];
   } else if (type === "Alibaba Cloud") {
     return [
-      {id: "qwen-long", name: "qwen-long"},
-      {id: "qwen-turbo", name: "qwen-turbo"},
-      {id: "qwen-plus", name: "qwen-plus"},
-      {id: "qwen-max", name: "qwen-max"},
-      {id: "qwen-max-longcontext", name: "qwen-max-longcontext"},
       {id: "qwen3-235b-a22b", name: "qwen3-235b-a22b"},
       {id: "qwen3-32b", name: "qwen3-32b"},
+      {id: "qwen-max", name: "qwen-max"},
+      {id: "qwen-max-longcontext", name: "qwen-max-longcontext"},
+      {id: "qwen-plus", name: "qwen-plus"},
+      {id: "qwen-turbo", name: "qwen-turbo"},
+      {id: "qwen-long", name: "qwen-long"},
       {id: "deepseek-r1", name: "deepseek-r1"},
       {id: "deepseek-v3", name: "deepseek-v3"},
       {id: "deepseek-v3.1", name: "deepseek-v3.1"},
@@ -2182,21 +2176,21 @@ export function getQuickSetupModelTypes() {
 
 export function getModelProviderMetadata(type) {
   const metadata = {
-    "OpenAI": {desc: "GPT-4o, GPT-4, o3...", needsApiKey: true, needsUrl: false, needsClientId: false, needsRegion: false, defaultSubType: "gpt-4o"},
-    "Claude": {desc: "Claude Sonnet, Opus...", needsApiKey: true, needsUrl: false, needsClientId: false, needsRegion: false, defaultSubType: "claude-sonnet-4-0"},
-    "Gemini": {desc: "Gemini 2.5, 2.0 Flash...", needsApiKey: true, needsUrl: false, needsClientId: false, needsRegion: false, defaultSubType: "gemini-2.5-flash"},
-    "DeepSeek": {desc: "DeepSeek-V3, R1...", needsApiKey: true, needsUrl: false, needsClientId: false, needsRegion: false, defaultSubType: "deepseek-chat"},
+    "OpenAI": {desc: "GPT-5.4, GPT-4.1, o3...", needsApiKey: true, needsUrl: false, needsClientId: false, needsRegion: false, defaultSubType: "gpt-5.4"},
+    "Claude": {desc: "Claude Opus, Sonnet...", needsApiKey: true, needsUrl: false, needsClientId: false, needsRegion: false, defaultSubType: "claude-opus-4-5"},
+    "Gemini": {desc: "Gemini 2.5 Pro, Flash...", needsApiKey: true, needsUrl: false, needsClientId: false, needsRegion: false, defaultSubType: "gemini-2.5-pro"},
+    "DeepSeek": {desc: "DeepSeek-V4, R1...", needsApiKey: true, needsUrl: false, needsClientId: false, needsRegion: false, defaultSubType: "deepseek-v4-pro"},
     "Grok": {desc: "Grok-3, Grok-2...", needsApiKey: true, needsUrl: false, needsClientId: false, needsRegion: false, defaultSubType: "grok-3-latest"},
-    "Ollama": {desc: "Run models locally", needsApiKey: false, needsUrl: true, needsClientId: false, needsRegion: false, defaultSubType: "llama3.3:70b", urlPlaceholder: "http://localhost:11434", defaultUrl: "http://localhost:11434"},
-    "OpenRouter": {desc: "100+ models unified", needsApiKey: true, needsUrl: false, needsClientId: false, needsRegion: false, defaultSubType: "openai/gpt-4o"},
+    "Ollama": {desc: "Run models locally", needsApiKey: false, needsUrl: true, needsClientId: false, needsRegion: false, defaultSubType: "deepseek-r1:671b", urlPlaceholder: "http://localhost:11434", defaultUrl: "http://localhost:11434"},
+    "OpenRouter": {desc: "100+ models unified", needsApiKey: true, needsUrl: false, needsClientId: false, needsRegion: false, defaultSubType: "anthropic/claude-opus-4-5"},
     "Mistral": {desc: "Mistral Large, Medium...", needsApiKey: true, needsUrl: false, needsClientId: false, needsRegion: false, defaultSubType: "mistral-large-latest"},
-    "Azure": {desc: "Azure-hosted GPT models", needsApiKey: true, needsUrl: true, needsClientId: false, needsRegion: false, defaultSubType: "gpt-4o", urlPlaceholder: "https://your-resource.openai.azure.com"},
+    "Azure": {desc: "Azure-hosted GPT models", needsApiKey: true, needsUrl: true, needsClientId: false, needsRegion: false, defaultSubType: "gpt-5.4", urlPlaceholder: "https://your-resource.openai.azure.com"},
     "OpenAI Compatible": {desc: "Any compatible API", needsApiKey: true, needsUrl: true, needsClientId: false, needsRegion: false, defaultSubType: "", urlPlaceholder: "https://api.example.com/v1"},
-    "Alibaba Cloud": {desc: "Qwen-Max, Qwen-Plus...", needsApiKey: true, needsUrl: false, needsClientId: false, needsRegion: false, defaultSubType: "qwen-max"},
-    "Moonshot": {desc: "Kimi long-context models", needsApiKey: true, needsUrl: false, needsClientId: false, needsRegion: false, defaultSubType: "moonshot-v1-32k"},
-    "Silicon Flow": {desc: "DeepSeek, Qwen, and more", needsApiKey: true, needsUrl: false, needsClientId: false, needsRegion: false, defaultSubType: "deepseek-ai/DeepSeek-V3"},
+    "Alibaba Cloud": {desc: "Qwen3, Qwen-Max...", needsApiKey: true, needsUrl: false, needsClientId: false, needsRegion: false, defaultSubType: "qwen3-235b-a22b"},
+    "Moonshot": {desc: "Kimi K2, long-context models", needsApiKey: true, needsUrl: false, needsClientId: false, needsRegion: false, defaultSubType: "kimi-k2-0905-preview"},
+    "Silicon Flow": {desc: "DeepSeek, Qwen, and more", needsApiKey: true, needsUrl: false, needsClientId: false, needsRegion: false, defaultSubType: "deepseek-ai/DeepSeek-R1"},
     "Volcano Engine": {desc: "ByteDance AI platform", needsApiKey: true, needsUrl: false, needsClientId: false, needsRegion: false, defaultSubType: "doubao-seed-2-0-pro-260215"},
-    "Baidu Cloud": {desc: "ERNIE Bot models", needsApiKey: true, needsUrl: false, needsClientId: false, needsRegion: false, defaultSubType: "ernie-4.0-8k"},
+    "Baidu Cloud": {desc: "ERNIE Bot models", needsApiKey: true, needsUrl: false, needsClientId: false, needsRegion: false, defaultSubType: "ernie-5.0"},
     "Amazon Bedrock": {desc: "Claude, Llama on AWS", needsApiKey: true, needsUrl: false, needsClientId: true, needsRegion: true, defaultSubType: "claude"},
   };
   return metadata[type] || {desc: "", needsApiKey: true, needsUrl: false, needsClientId: false, needsRegion: false, defaultSubType: ""};
