@@ -35,11 +35,13 @@ func getModelProviderFromName(owner string, providerName string, lang string) (*
 		return nil, nil, err
 	}
 	if provider == nil {
-		if providerName != "" {
-			return nil, nil, fmt.Errorf(i18n.Translate(lang, "object:The model provider: %s is not found"), providerName)
-		} else {
-			return nil, nil, fmt.Errorf(i18n.Translate(lang, "object:Please add a model provider first"))
+		provider, err = GetDefaultModelProvider()
+		if err != nil {
+			return nil, nil, err
 		}
+	}
+	if provider == nil {
+		return nil, nil, fmt.Errorf(i18n.Translate(lang, "object:Please add a model provider first"))
 	}
 
 	if provider.Category != "Model" {
