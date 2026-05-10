@@ -59,6 +59,18 @@ func writeMessageErrorStream(responseWriter http.ResponseWriter, lang string, me
 	return nil
 }
 
+func writeInfoStream(responseWriter http.ResponseWriter, infoText string) error {
+	event := fmt.Sprintf("event: myinfo\ndata: %s\n\n", infoText)
+	_, err := responseWriter.Write([]byte(event))
+	if err != nil {
+		return err
+	}
+	if flusher, ok := responseWriter.(http.Flusher); ok {
+		flusher.Flush()
+	}
+	return nil
+}
+
 func (c *ApiController) ResponseErrorStream(message *object.Message, errorText string) {
 	if err := writeMessageErrorStream(c.Ctx.ResponseWriter, c.GetAcceptLanguage(), message, errorText); err != nil {
 		c.ResponseError(err.Error())

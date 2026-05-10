@@ -205,8 +205,12 @@ func generateMessageAnswer(id string, responseWriter http.ResponseWriter, host s
 
 	embeddingProvider, embeddingProviderObj, err := object.GetEmbeddingProviderFromContext(store.Owner, "", lang)
 	if err != nil {
-		responseErrorStream(message, err.Error())
-		return
+		if err2 := writeInfoStream(responseWriter, i18n.Translate(lang, "message_answer:No embedding model configured, answering without knowledge base")); err2 != nil {
+			responseErrorStream(message, err2.Error())
+			return
+		}
+		embeddingProvider = nil
+		embeddingProviderObj = nil
 	}
 
 	mcpToolSet, err := object.GetServerMcpToolSet(store.Owner, store.McpServer, lang)
@@ -225,7 +229,7 @@ func generateMessageAnswer(id string, responseWriter http.ResponseWriter, host s
 	var vectorScores []object.VectorScore
 	embeddingResult := &embedding.EmbeddingResult{}
 
-	if chat.Tool == "" && store.KnowledgeCount != 0 {
+	if chat.Tool == "" && store.KnowledgeCount != 0 && embeddingProviderObj != nil {
 		knowledge, vectorScores, embeddingResult, err = object.GetNearestKnowledge(store.Name, store.VectorStores, store.SearchProvider, embeddingProvider, embeddingProviderObj, modelProvider, store.Owner, question, store.KnowledgeCount, lang)
 		if err != nil && err.Error() != "no knowledge vectors found" {
 			err = fmt.Errorf(i18n.Translate(lang, "message_answer:object.GetNearestKnowledge() error, %s"), err.Error())

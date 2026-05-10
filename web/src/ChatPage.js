@@ -539,6 +539,15 @@ class ChatPage extends BaseListPage {
                   this.chatBox.current.toggleMessageReadState(lastMessage2);
                 }
               }
+            }, (infoText) => {
+              if (!chat || (this.state.chat.name !== chat.name)) {
+                return;
+              }
+              const currentMessage = res.data[res.data.length - 1];
+              const lastMessage2 = Setting.deepCopy(currentMessage);
+              lastMessage2.hintText = infoText;
+              res.data[res.data.length - 1] = lastMessage2;
+              this.setState({messages: res.data});
             });
           } else {
             this.setState({

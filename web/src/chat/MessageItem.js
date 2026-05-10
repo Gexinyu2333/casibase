@@ -16,7 +16,7 @@ import React, {useEffect, useMemo, useState} from "react";
 import {useHistory} from "react-router-dom";
 import {Bubble} from "@ant-design/x";
 import {Alert, Avatar, Button, Collapse, Space} from "antd";
-import {FileTextOutlined, GlobalOutlined} from "@ant-design/icons";
+import {FileTextOutlined, GlobalOutlined, InfoCircleOutlined} from "@ant-design/icons";
 import moment from "moment";
 import * as Setting from "../Setting";
 import i18next from "i18next";
@@ -371,6 +371,12 @@ const MessageItem = ({
           placement={isUserMessage ? "end" : "start"}
           content={
             <div style={{position: "relative", width: "100%"}} className={isUserMessage ? "user-message-content" : ""}>
+              {message.hintText && (
+                <div style={{display: "flex", alignItems: "flex-start", gap: 6, marginBottom: 8, color: "#8c8c8c", fontSize: 12}}>
+                  <InfoCircleOutlined style={{marginTop: 2, flexShrink: 0}} />
+                  <span>{message.hintText}</span>
+                </div>
+              )}
               {renderMessageContent()}
             </div>
           }
