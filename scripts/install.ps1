@@ -28,12 +28,12 @@ Write-Info "Installing openagent $Version"
 $Arch = (Get-CimInstance Win32_Processor).Architecture
 # 0=x86, 5=ARM, 9=x86-64, 12=ARM64
 $ArchName = switch ($Arch) {
-    9  { 'x86_64' }
+    9  { 'x86' }
     12 { 'arm64' }
     default { throw "Unsupported architecture ($Arch). Download manually from https://github.com/$Repo/releases" }
 }
 
-$Filename = "openagent_Windows_${ArchName}.exe"
+$Filename = "openagent_windows_${ArchName}.exe"
 $Url      = "https://github.com/$Repo/releases/download/$Version/$Filename"
 
 # ── download binary ─────────────────────────────────────────────────────────────

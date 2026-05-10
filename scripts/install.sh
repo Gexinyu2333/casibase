@@ -39,13 +39,13 @@ OS="$(uname -s)"
 ARCH="$(uname -m)"
 
 case "${OS}" in
-	Linux)  OS_NAME="Linux" ;;
-	Darwin) OS_NAME="Darwin" ;;
+	Linux)  OS_NAME="linux" ;;
+	Darwin) OS_NAME="darwin" ;;
 	*)      die "Unsupported OS: ${OS}. Download manually from https://github.com/${REPO}/releases" ;;
 esac
 
 case "${ARCH}" in
-	x86_64|amd64)  ARCH_NAME="x86_64" ;;
+	x86_64|amd64)  ARCH_NAME="x86" ;;
 	aarch64|arm64) ARCH_NAME="arm64" ;;
 	*) die "Unsupported architecture: ${ARCH}. Download manually from https://github.com/${REPO}/releases" ;;
 esac

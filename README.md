@@ -58,7 +58,7 @@ curl -fsSL https://raw.githubusercontent.com/the-open-agent/openagent/master/scr
 irm https://raw.githubusercontent.com/the-open-agent/openagent/master/scripts/install.ps1 | iex
 ```
 
-> **Windows runs natively** — no WSL, no Docker required. You can also download `openagent_windows_amd64.exe` directly from the [latest release](https://github.com/the-open-agent/openagent/releases/latest) and double-click to run.
+> **Windows runs natively** — no WSL, no Docker required.
 
 Open [http://localhost:14000](http://localhost:14000) and you're in.
 
