@@ -465,32 +465,23 @@ class ChatListPage extends BaseListPage {
       //   },
       // },
       {
-        title: i18next.t("chat:Message count"),
-        dataIndex: "messageCount",
-        key: "messageCount",
-        width: "140px",
+        title: i18next.t("general:Stats"),
+        key: "stats",
+        width: "150px",
         sorter: (a, b) => a.messageCount - b.messageCount,
-        render: (text, record) => (
-          <Link to={`/messages?chat=${record.name}`}>{text}</Link>
-        ),
-      },
-      {
-        title: i18next.t("chat:Token count"),
-        dataIndex: "tokenCount",
-        key: "tokenCount",
-        width: "120px",
-        sorter: (a, b) => a.tokenCount - b.tokenCount,
-        // ...this.getColumnSearchProps("tokenCount"),
-      },
-      {
-        title: i18next.t("chat:Price"),
-        dataIndex: "price",
-        key: "price",
-        width: "120px",
-        sorter: (a, b) => a.price - b.price,
-        // ...this.getColumnSearchProps("price"),
-        render: (text, record, index) => {
-          return Setting.getDisplayPrice(text, record.currency);
+        render: (text, record) => {
+          const isAdmin = this.props.account && this.props.account.name === "admin";
+          return (
+            <div style={{lineHeight: "1.6"}}>
+              <Link to={`/messages?chat=${record.name}`}>{record.messageCount}</Link>
+              {isAdmin && (
+                <>
+                  <br />{record.tokenCount}
+                  <br />{Setting.getDisplayPrice(record.price, record.currency)}
+                </>
+              )}
+            </div>
+          );
         },
       },
       {
@@ -529,19 +520,6 @@ class ChatListPage extends BaseListPage {
         },
       },
       {
-        title: i18next.t("general:Is deleted"),
-        dataIndex: "isDeleted",
-        key: "isDeleted",
-        width: "120px",
-        sorter: (a, b) => a.isDeleted - b.isDeleted,
-        ...this.getColumnFilterProps("isDeleted"),
-        render: (text, record, index) => {
-          return (
-            <Switch disabled checkedChildren={i18next.t("general:ON")} unCheckedChildren={i18next.t("general:OFF")} checked={text} />
-          );
-        },
-      },
-      {
         title: i18next.t("general:Action"),
         dataIndex: "action",
         key: "action",
@@ -573,16 +551,19 @@ class ChatListPage extends BaseListPage {
       chats = chats?.filter(chat => chat.messageCount > 1);
     }
 
+    if (Setting.isBasicLoginMode(this.props.account)) {
+      columns = columns.filter(column => column.key !== "user" && column.key !== "clientIp");
+    }
+
     if (!this.props.account || this.props.account.name !== "admin") {
-      columns = columns.filter(column => column.key !== "name" && column.key !== "tokenCount" && column.key !== "price" && column.key !== "clientIp");
+      columns = columns.filter(column => column.key !== "name" && column.key !== "clientIp");
 
-      const tokenCountIndex = columns.findIndex(column => column.key === "messageCount");
-      if (tokenCountIndex !== -1) {
-        const [tokenCountElement] = columns.splice(tokenCountIndex, 1);
-
+      const statsIndex = columns.findIndex(column => column.key === "stats");
+      if (statsIndex !== -1) {
+        const [statsElement] = columns.splice(statsIndex, 1);
         const actionIndex = columns.findIndex(column => column.key === "action");
         const insertIndex = actionIndex !== -1 ? actionIndex : columns.length;
-        columns.splice(insertIndex, 0, tokenCountElement);
+        columns.splice(insertIndex, 0, statsElement);
       }
     }
 

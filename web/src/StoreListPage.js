@@ -372,110 +372,15 @@ class StoreListPage extends BaseListPage {
         },
       },
       {
-        title: i18next.t("store:Storage provider"),
-        dataIndex: "storageProvider",
-        key: "storageProvider",
-        width: "250px",
-        sorter: (a, b) => a.storageProvider.localeCompare(b.storageProvider),
-        ...this.getColumnSearchProps("storageProvider"),
-        render: (text, record, index) => {
-          if (text === "") {
-            return null;
-          }
-          return this.renderProviderInfo(text);
-        },
-      },
-      // {
-      //   title: i18next.t("store:Split provider"),
-      //   dataIndex: "splitProvider",
-      //   key: "splitProvider",
-      //   width: "200px",
-      //   sorter: (a, b) => a.splitProvider.localeCompare(b.splitProvider),
-      // },
-      {
-        title: i18next.t("store:Image provider"),
-        dataIndex: "imageProvider",
-        key: "imageProvider",
-        width: "300px",
-        sorter: (a, b) => a.imageProvider.localeCompare(b.imageProvider),
-        ...this.getColumnSearchProps("imageProvider"),
-        render: (text, record, index) => {
-          return this.renderProviderInfo(text);
-        },
-      },
-      {
         title: i18next.t("provider:Model provider"),
         dataIndex: "modelProvider",
         key: "modelProvider",
-        width: "330px",
+        width: "250px",
         sorter: (a, b) => a.modelProvider.localeCompare(b.modelProvider),
         ...this.getColumnSearchProps("modelProvider"),
         render: (text, record, index) => {
           return this.renderProviderInfo(text);
         },
-      },
-      {
-        title: i18next.t("store:Embedding provider"),
-        dataIndex: "embeddingProvider",
-        key: "embeddingProvider",
-        width: "300px",
-        sorter: (a, b) => a.embeddingProvider.localeCompare(b.embeddingProvider),
-        ...this.getColumnSearchProps("embeddingProvider"),
-        render: (text, record, index) => {
-          return this.renderProviderInfo(text);
-        },
-      },
-      {
-        title: i18next.t("store:Text-to-Speech provider"),
-        dataIndex: "textToSpeechProvider",
-        key: "textToSpeechProvider",
-        width: "300px",
-        sorter: (a, b) => a.textToSpeechProvider.localeCompare(b.textToSpeechProvider),
-        ...this.getColumnSearchProps("textToSpeechProvider"),
-        render: (text, record, index) => {
-          return this.renderProviderInfo(text);
-        },
-      },
-      {
-        title: i18next.t("store:Speech-to-Text provider"),
-        dataIndex: "speechToTextProvider",
-        key: "speechToTextProvider",
-        width: "280px",
-        sorter: (a, b) => a.speechToTextProvider.localeCompare(b.speechToTextProvider),
-        ...this.getColumnSearchProps("speechToTextProvider"),
-        render: (text) => {
-          return this.renderProviderInfo(text);
-        },
-      },
-      {
-        title: i18next.t("store:MCP server"),
-        dataIndex: "mcpServer",
-        key: "mcpServer",
-        width: "250px",
-        sorter: (a, b) => (a.mcpServer || "").localeCompare(b.mcpServer || ""),
-        ...this.getColumnSearchProps("mcpServer"),
-        render: (text) => {
-          return text || "";
-        },
-      },
-      {
-        title: i18next.t("general:Tools"),
-        dataIndex: "tools",
-        key: "tools",
-        width: "280px",
-        render: (arr) => {
-          if (!arr || !arr.length) {
-            return "";
-          }
-          return arr.join(", ");
-        },
-      },
-      {
-        title: i18next.t("store:Memory limit"),
-        dataIndex: "memoryLimit",
-        key: "memoryLimit",
-        width: "130px",
-        sorter: (a, b) => a.memoryLimit - b.memoryLimit,
       },
       {
         title: i18next.t("general:State"),

@@ -2346,7 +2346,7 @@ export function getSpeakerTag(speaker) {
 }
 
 export function getDisplayPrice(price, currency) {
-  if (!price) {
+  if (price === null || price === undefined) {
     return "";
   }
 

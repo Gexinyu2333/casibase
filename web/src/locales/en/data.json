@@ -315,6 +315,7 @@
     "State - Tooltip": "Service operational state",
     "Static base URL": "Static base URL",
     "Static base URL - Tooltip": "Base URL for static assets such as images and icons",
+    "Stats": "Stats",
     "Status": "Status",
     "Store": "Agent",
     "Store - Tooltip": "Associated agent",

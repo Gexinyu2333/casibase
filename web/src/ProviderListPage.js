@@ -230,28 +230,6 @@ class ProviderListPage extends BaseListPage {
         ...this.getColumnSearchProps("clientId"),
       },
       {
-        title: i18next.t("general:Secret key"),
-        dataIndex: "clientSecret",
-        key: "clientSecret",
-        width: "120px",
-        sorter: (a, b) => a.clientSecret.localeCompare(b.clientSecret),
-      },
-      {
-        title: i18next.t("general:Region"),
-        dataIndex: "region",
-        key: "region",
-        width: "120px",
-        sorter: (a, b) => a.region.localeCompare(b.region),
-        ...this.getColumnSearchProps("region"),
-      },
-      {
-        title: i18next.t("provider:API key"),
-        dataIndex: "apiKey",
-        key: "apiKey",
-        width: "240px",
-        sorter: (a, b) => a.apiKey.localeCompare(b.apiKey),
-      },
-      {
         title: i18next.t("store:Is default"),
         dataIndex: "isDefault",
         key: "isDefault",

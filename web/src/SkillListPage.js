@@ -136,7 +136,8 @@ class SkillListPage extends BaseListPage {
         title: i18next.t("general:Description"),
         dataIndex: "description",
         key: "description",
-        ellipsis: true,
+        width: "200px",
+        render: (text) => (text ? Setting.getShortText(text, 20) : null),
         ...this.getColumnSearchProps("description"),
       },
       {
