@@ -1185,6 +1185,10 @@ export function getOtherProviderInfo() {
         logo: `${StaticBaseUrl}/img/social_snapchat.png`,
         url: "https://kit.snapchat.com/",
       },
+      "X Direct Messages": {
+        logo: `${StaticBaseUrl}/img/social_x.png`,
+        url: "https://developer.twitter.com/",
+      },
       "X DM": {
         logo: `${StaticBaseUrl}/img/social_x.png`,
         url: "https://developer.twitter.com/",
@@ -1432,6 +1436,8 @@ export function getProviderTypeOptions(category) {
       {id: "Facebook Messenger", name: "Facebook Messenger"},
       {id: "Threads", name: "Threads"},
       {id: "WeChat", name: "WeChat"},
+      {id: "Snapchat", name: "Snapchat"},
+      {id: "X DM", name: "X Direct Messages"},
     ];
   } else {
     return [];
@@ -2186,6 +2192,61 @@ export function getProviderAzureApiVersionOptions() {
     {id: "2023-07-01-preview", name: "2023-07-01-preview"},
     {id: "2023-08-01-preview", name: "2023-08-01-preview"},
   ]);
+}
+
+export function getQuickSetupModelTypes() {
+  return ["OpenAI", "Claude", "Gemini", "DeepSeek", "Grok", "Ollama", "OpenRouter", "Mistral", "Azure", "OpenAI Compatible", "Alibaba Cloud", "Moonshot", "Silicon Flow", "Volcano Engine", "Baidu Cloud", "Amazon Bedrock"];
+}
+
+export function getModelProviderMetadata(type) {
+  const metadata = {
+    "OpenAI": {desc: "GPT-4o, GPT-4, o3...", needsApiKey: true, needsUrl: false, needsClientId: false, needsRegion: false, defaultSubType: "gpt-4o"},
+    "Claude": {desc: "Claude Sonnet, Opus...", needsApiKey: true, needsUrl: false, needsClientId: false, needsRegion: false, defaultSubType: "claude-sonnet-4-0"},
+    "Gemini": {desc: "Gemini 2.5, 2.0 Flash...", needsApiKey: true, needsUrl: false, needsClientId: false, needsRegion: false, defaultSubType: "gemini-2.5-flash"},
+    "DeepSeek": {desc: "DeepSeek-V3, R1...", needsApiKey: true, needsUrl: false, needsClientId: false, needsRegion: false, defaultSubType: "deepseek-chat"},
+    "Grok": {desc: "Grok-3, Grok-2...", needsApiKey: true, needsUrl: false, needsClientId: false, needsRegion: false, defaultSubType: "grok-3-latest"},
+    "Ollama": {desc: "Run models locally", needsApiKey: false, needsUrl: true, needsClientId: false, needsRegion: false, defaultSubType: "llama3.3:70b", urlPlaceholder: "http://localhost:11434", defaultUrl: "http://localhost:11434"},
+    "OpenRouter": {desc: "100+ models unified", needsApiKey: true, needsUrl: false, needsClientId: false, needsRegion: false, defaultSubType: "openai/gpt-4o"},
+    "Mistral": {desc: "Mistral Large, Medium...", needsApiKey: true, needsUrl: false, needsClientId: false, needsRegion: false, defaultSubType: "mistral-large-latest"},
+    "Azure": {desc: "Azure-hosted GPT models", needsApiKey: true, needsUrl: true, needsClientId: false, needsRegion: false, defaultSubType: "gpt-4o", urlPlaceholder: "https://your-resource.openai.azure.com"},
+    "OpenAI Compatible": {desc: "Any compatible API", needsApiKey: true, needsUrl: true, needsClientId: false, needsRegion: false, defaultSubType: "", urlPlaceholder: "https://api.example.com/v1"},
+    "Alibaba Cloud": {desc: "Qwen-Max, Qwen-Plus...", needsApiKey: true, needsUrl: false, needsClientId: false, needsRegion: false, defaultSubType: "qwen-max"},
+    "Moonshot": {desc: "Kimi long-context models", needsApiKey: true, needsUrl: false, needsClientId: false, needsRegion: false, defaultSubType: "moonshot-v1-32k"},
+    "Silicon Flow": {desc: "DeepSeek, Qwen, and more", needsApiKey: true, needsUrl: false, needsClientId: false, needsRegion: false, defaultSubType: "deepseek-ai/DeepSeek-V3"},
+    "Volcano Engine": {desc: "ByteDance AI platform", needsApiKey: true, needsUrl: false, needsClientId: false, needsRegion: false, defaultSubType: "doubao-seed-2-0-pro-260215"},
+    "Baidu Cloud": {desc: "ERNIE Bot models", needsApiKey: true, needsUrl: false, needsClientId: false, needsRegion: false, defaultSubType: "ernie-4.0-8k"},
+    "Amazon Bedrock": {desc: "Claude, Llama on AWS", needsApiKey: true, needsUrl: false, needsClientId: true, needsRegion: true, defaultSubType: "claude"},
+  };
+  return metadata[type] || {desc: "", needsApiKey: true, needsUrl: false, needsClientId: false, needsRegion: false, defaultSubType: ""};
+}
+
+export function getPipeTypeOptions() {
+  return [
+    {id: "Telegram", name: "Telegram"},
+    {id: "Discord", name: "Discord"},
+    {id: "WhatsApp", name: "WhatsApp"},
+    {id: "Slack", name: "Slack"},
+    {id: "Facebook Messenger", name: "Facebook Messenger"},
+    {id: "Threads", name: "Threads"},
+    {id: "WeChat", name: "WeChat"},
+    {id: "Snapchat", name: "Snapchat"},
+    {id: "X DM", name: "X Direct Messages"},
+  ];
+}
+
+export function getPipePlatformMetadata(type) {
+  const metadata = {
+    "Telegram": {desc: "Connect via Telegram bot", tokenLabel: "Bot Token", tokenPlaceholder: "1234567890:ABCdefGHIjklMNOpqrsTUVwxyz", helpUrl: "https://core.telegram.org/bots#how-do-i-create-a-bot"},
+    "Discord": {desc: "Connect via Discord bot", tokenLabel: "Bot Token", tokenPlaceholder: "MTxxxxxx.Gyyyyy.zzzzzzzzzzz", helpUrl: "https://discord.com/developers/applications"},
+    "WhatsApp": {desc: "Connect via WhatsApp Business", tokenLabel: "Access Token", tokenPlaceholder: "EAAxxxxxxxx...", helpUrl: "https://developers.facebook.com/docs/whatsapp"},
+    "Slack": {desc: "Connect via Slack bot", tokenLabel: "Bot Token", tokenPlaceholder: "xoxb-...", helpUrl: "https://api.slack.com/apps"},
+    "Facebook Messenger": {desc: "Connect via Facebook Messenger", tokenLabel: "Page Access Token", tokenPlaceholder: "EAAxxxxxxxx...", helpUrl: "https://developers.facebook.com/docs/messenger-platform"},
+    "Threads": {desc: "Connect via Meta Threads", tokenLabel: "User Access Token", tokenPlaceholder: "THRDSxxxxxxxx...", helpUrl: "https://developers.facebook.com/docs/threads"},
+    "WeChat": {desc: "Connect via WeChat Official Account", tokenLabel: "Access Token", tokenPlaceholder: "your-access-token", helpUrl: "https://developers.weixin.qq.com"},
+    "Snapchat": {desc: "Connect via Snapchat Kit Bot", tokenLabel: "Access Token", tokenPlaceholder: "your-oauth-access-token", helpUrl: "https://kit.snapchat.com/"},
+    "X DM": {desc: "Connect via X Direct Messages", tokenLabel: "OAuth Token", tokenPlaceholder: "your-oauth-token", helpUrl: "https://developer.x.com"},
+  };
+  return metadata[type] || {desc: "", tokenLabel: "Token", tokenPlaceholder: "", helpUrl: ""};
 }
 
 // Whether a Model-category provider is configured for image generation (vs chat/text).
