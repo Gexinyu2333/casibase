@@ -242,6 +242,7 @@ class PipeEditPage extends React.Component {
                   {id: "Telegram", name: "Telegram"},
                   {id: "Discord", name: "Discord"},
                   {id: "WhatsApp", name: "WhatsApp"},
+                  {id: "Slack", name: "Slack"},
                 ].map((item, index) => (
                   <Option key={index} value={item.id}>
                     <img width={20} height={20} style={{marginBottom: "3px", marginRight: "10px"}}
@@ -273,12 +274,14 @@ class PipeEditPage extends React.Component {
             </Col>
           </Row>
 
-          {(pipe.type === "Discord" || pipe.type === "WhatsApp") && (
+          {(pipe.type === "Discord" || pipe.type === "WhatsApp" || pipe.type === "Slack") && (
             <Row style={{marginTop: "20px"}}>
               <Col style={{marginTop: "5px"}} span={Setting.isMobile() ? 22 : 2}>
                 {pipe.type === "WhatsApp"
                   ? Setting.getLabel(i18next.t("pipe:Phone Number ID"), i18next.t("pipe:Phone Number ID - Tooltip"))
-                  : Setting.getLabel(i18next.t("provider:Public key"), i18next.t("provider:Public key - Tooltip"))
+                  : pipe.type === "Slack"
+                    ? Setting.getLabel(i18next.t("pipe:Signing Secret"), i18next.t("pipe:Signing Secret - Tooltip"))
+                    : Setting.getLabel(i18next.t("provider:Public key"), i18next.t("provider:Public key - Tooltip"))
                 }
               </Col>
               <Col span={22}>
@@ -296,6 +299,17 @@ class PipeEditPage extends React.Component {
               <Col span={22} offset={Setting.isMobile() ? 0 : 2}>
                 <span style={{color: "var(--ant-color-text-secondary)", fontSize: "13px"}}>
                   {i18next.t("pipe:WhatsApp verify token hint")}&nbsp;<strong>{pipe.name}</strong>
+                </span>
+              </Col>
+            </Row>
+          )}
+
+          {pipe.type === "Slack" && (
+            <Row style={{marginTop: "20px"}}>
+              <Col span={22} offset={Setting.isMobile() ? 0 : 2}>
+                <span style={{color: "var(--ant-color-text-secondary)", fontSize: "13px"}}>
+                  {i18next.t("pipe:Slack webhook hint")}&nbsp;
+                  <strong>{pipe.domain ? `${pipe.domain}/api/chat-webhook/slack/${pipe.name}` : `https://<your-domain>/api/chat-webhook/slack/${pipe.name}`}</strong>
                 </span>
               </Col>
             </Row>

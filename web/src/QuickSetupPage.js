@@ -203,6 +203,14 @@ const PIPE_PLATFORMS = [
     tokenPlaceholder: "EAAxxxxxxxx...",
     helpUrl: "https://developers.facebook.com/docs/whatsapp",
   },
+  {
+    id: "Slack",
+    label: "Slack",
+    desc: "Connect via Slack bot",
+    tokenLabel: "Bot Token",
+    tokenPlaceholder: "xoxb-...",
+    helpUrl: "https://api.slack.com/apps",
+  },
 ];
 
 function ProviderCard({provider, selected, onClick}) {

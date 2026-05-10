@@ -383,13 +383,18 @@
   },
   "login": {
     "Additional Information": "附加信息",
+    "Build agents that actually do things.": "构建真正能做事的智能体。",
     "Details": "详情",
     "Error Details": "错误详情",
     "Error Message": "错误信息",
     "Help": "帮助",
+    "Loading OpenAgent sign in.": "正在加载 OpenAgent 登录页面。",
     "Login Error": "登录错误",
     "More Details": "更多详情",
-    "Signing in...": "正在登录..."
+    "Preparing the workspace entry screen.": "正在准备工作区入口界面。",
+    "Self-hosted. 30+ model providers. Full MCP support. Enterprise-grade from day one.": "私有部署。30+ 模型提供商。完整 MCP 支持。开箱即用的企业级能力。",
+    "Signing in...": "正在登录...",
+    "Welcome back": "欢迎回来"
   },
   "message": {
     "Author": "作者",
@@ -417,6 +422,9 @@
     "Send": "发送",
     "Test message": "测试消息",
     "Test message placeholder": "输入测试消息",
+    "Signing Secret": "签名密钥",
+    "Signing Secret - Tooltip": "Slack应用基本信息页面中的签名密钥，用于验证Webhook请求签名。",
+    "Slack webhook hint": "在Slack应用的事件订阅中，将Request URL设置为：",
     "WhatsApp verify token hint": "在Meta开发者控制台中，将Webhook验证令牌设置为管道名称："
   },
   "provider": {
@@ -564,7 +572,7 @@
     "Configuration saved successfully": "配置已保存！",
     "Configure": "配置",
     "Connect a Messaging Platform": "连接消息平台",
-    "Connect a messaging app so users can chat with your AI through Telegram, Discord, or WhatsApp. You can skip this step and set it up later.": "连接消息应用，让用户通过Telegram、Discord或WhatsApp与您的AI对话。此步骤可跳过，稍后再配置。",
+    "Connect a messaging app so users can chat with your AI through Telegram, Discord, or WhatsApp. You can skip this step and set it up later.": "连接消息应用，让用户通过Telegram、Discord、WhatsApp或Slack与您的AI对话。此步骤可跳过，稍后再配置。",
     "Created Resources": "已创建的资源",
     "Enter model name": "输入模型名称",
     "Get your AI up and running in minutes — no technical knowledge required.": "几分钟内启动您的AI——无需任何技术知识。",

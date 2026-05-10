@@ -383,13 +383,18 @@
   },
   "login": {
     "Additional Information": "Additional Information",
+    "Build agents that actually do things.": "Build agents that actually do things.",
     "Details": "Details",
     "Error Details": "Error Details",
     "Error Message": "Error Message",
     "Help": "Help",
+    "Loading OpenAgent sign in.": "Loading OpenAgent sign in.",
     "Login Error": "Login Error",
     "More Details": "More Details",
-    "Signing in...": "Signing in..."
+    "Preparing the workspace entry screen.": "Preparing the workspace entry screen.",
+    "Self-hosted. 30+ model providers. Full MCP support. Enterprise-grade from day one.": "Self-hosted. 30+ model providers. Full MCP support. Enterprise-grade from day one.",
+    "Signing in...": "Signing in...",
+    "Welcome back": "Welcome back"
   },
   "message": {
     "Author": "Author",
@@ -417,6 +422,9 @@
     "Send": "Send",
     "Test message": "Test message",
     "Test message placeholder": "Enter a test message",
+    "Signing Secret": "Signing Secret",
+    "Signing Secret - Tooltip": "The signing secret from the Slack App Basic Information page, used to verify webhook request signatures.",
+    "Slack webhook hint": "Set the Request URL in your Slack App Event Subscriptions to:",
     "WhatsApp verify token hint": "Set the webhook verify token in Meta Developer Console to your pipe name:"
   },
   "provider": {
@@ -564,7 +572,7 @@
     "Configuration saved successfully": "Configuration saved successfully!",
     "Configure": "Configure",
     "Connect a Messaging Platform": "Connect a Messaging Platform",
-    "Connect a messaging app so users can chat with your AI through Telegram, Discord, or WhatsApp. You can skip this step and set it up later.": "Connect a messaging app so users can chat with your AI through Telegram, Discord, or WhatsApp. You can skip this step and set it up later.",
+    "Connect a messaging app so users can chat with your AI through Telegram, Discord, or WhatsApp. You can skip this step and set it up later.": "Connect a messaging app so users can chat with your AI through Telegram, Discord, WhatsApp, or Slack. You can skip this step and set it up later.",
     "Created Resources": "Created Resources",
     "Enter model name": "Enter model name",
     "Get your AI up and running in minutes — no technical knowledge required.": "Get your AI up and running in minutes — no technical knowledge required.",

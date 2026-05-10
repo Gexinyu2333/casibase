@@ -1165,6 +1165,10 @@ export function getOtherProviderInfo() {
         logo: `${StaticBaseUrl}/img/social_whatsapp.png`,
         url: "https://www.whatsapp.com/",
       },
+      "Slack": {
+        logo: `${StaticBaseUrl}/img/social_slack.png`,
+        url: "https://slack.com/",
+      },
     },
   };
 

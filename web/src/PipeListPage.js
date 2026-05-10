@@ -120,6 +120,7 @@ class PipeListPage extends BaseListPage {
           {text: "Telegram", value: "Telegram"},
           {text: "Discord", value: "Discord"},
           {text: "WhatsApp", value: "WhatsApp"},
+          {text: "Slack", value: "Slack"},
         ],
         sorter: (a, b) => a.type.localeCompare(b.type),
         render: (text, record) => (
