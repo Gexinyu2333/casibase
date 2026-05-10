@@ -221,6 +221,14 @@ const PIPE_PLATFORMS = [
     helpUrl: "https://developers.facebook.com/docs/messenger-platform",
   },
   {
+    id: "Threads",
+    label: "Threads",
+    desc: "Connect via Meta Threads",
+    tokenLabel: "User Access Token",
+    tokenPlaceholder: "THRDSxxxxxxxx...",
+    helpUrl: "https://developers.facebook.com/docs/threads",
+  },
+  {
     id: "Snapchat",
     label: "Snapchat",
     desc: "Connect via Snapchat Kit Bot",

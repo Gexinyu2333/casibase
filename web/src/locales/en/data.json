@@ -443,7 +443,11 @@
     "Consumer Secret": "Consumer Secret",
     "X DM Consumer Secret - Tooltip": "The Consumer Secret (API Secret Key) from the X Developer Portal, used to respond to CRC webhook challenges.",
     "X DM token hint": "Token field = OAuth 2.0 User Access Token with dm.read, dm.write, and tweet.read scopes, obtained from the X Developer Portal.",
-    "X DM webhook hint": "Set the Webhook URL in your X Developer Portal Account Activity API subscription to:"
+    "X DM webhook hint": "Set the Webhook URL in your X Developer Portal Account Activity API subscription to:",
+    "Threads App Secret - Tooltip": "The App Secret from the Meta Developer Console, used to verify X-Hub-Signature-256 webhook signatures.",
+    "Threads token hint": "Token field = long-lived User Access Token with threads_basic and threads_manage_replies scopes, obtained from the Meta Developer Console.",
+    "Threads verify token hint": "Set the webhook verify token in the Meta Developer Console to your pipe name:",
+    "Threads webhook hint": "Set the Callback URL in your Threads webhook settings to:"
   },
   "provider": {
     "API key": "API key",

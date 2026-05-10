@@ -443,7 +443,11 @@
     "Consumer Secret": "Consumer Secret",
     "X DM Consumer Secret - Tooltip": "X开发者平台中的Consumer Secret（API密钥），用于响应CRC Webhook验证请求。",
     "X DM token hint": "Token字段填写从X开发者平台获取的OAuth 2.0用户访问令牌（需包含dm.read、dm.write、tweet.read权限）。",
-    "X DM webhook hint": "在X开发者平台的Account Activity API订阅中，将Webhook URL设置为："
+    "X DM webhook hint": "在X开发者平台的Account Activity API订阅中，将Webhook URL设置为：",
+    "Threads App Secret - Tooltip": "Meta开发者控制台中的App Secret，用于验证X-Hub-Signature-256 Webhook签名。",
+    "Threads token hint": "Token字段填写从Meta开发者控制台获取的长期用户访问令牌（需包含threads_basic和threads_manage_replies权限）。",
+    "Threads verify token hint": "在Meta开发者控制台的Webhook设置中，将验证令牌设置为管道名称：",
+    "Threads webhook hint": "在Threads Webhook设置中，将回调URL设置为："
   },
   "provider": {
     "API key": "API密钥",
