@@ -434,7 +434,10 @@
     "WeChat App Secret - Tooltip": "The WeChat AppSecret from the WeChat Official Account Platform, used together with AppID to obtain the access token.",
     "WeChat token hint": "Token field = WeChat AppID; App Secret field = WeChat AppSecret.",
     "WeChat verify token hint": "Set the Token in WeChat Official Account Platform server configuration to your pipe name:",
-    "WeChat webhook hint": "Set the Server URL in WeChat Official Account Platform server configuration to:"
+    "WeChat webhook hint": "Set the Server URL in WeChat Official Account Platform server configuration to:",
+    "Snapchat App Secret - Tooltip": "The App Secret from the Snap Developer Portal, used to verify webhook request signatures.",
+    "Snapchat token hint": "Token field = OAuth Access Token obtained from the Snap Developer Portal after creating a bot.",
+    "Snapchat webhook hint": "Set the Webhook URL in your Snap Developer Portal bot settings to:"
   },
   "provider": {
     "API key": "API key",

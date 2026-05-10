@@ -1177,6 +1177,10 @@ export function getOtherProviderInfo() {
         logo: `${StaticBaseUrl}/img/social_wechat.png`,
         url: "https://www.wechat.com/",
       },
+      "Snapchat": {
+        logo: `${StaticBaseUrl}/img/social_snapchat.png`,
+        url: "https://kit.snapchat.com/",
+      },
     },
   };
 

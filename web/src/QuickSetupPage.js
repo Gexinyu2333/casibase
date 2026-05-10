@@ -219,6 +219,14 @@ const PIPE_PLATFORMS = [
     tokenPlaceholder: "EAAxxxxxxxx...",
     helpUrl: "https://developers.facebook.com/docs/messenger-platform",
   },
+  {
+    id: "Snapchat",
+    label: "Snapchat",
+    desc: "Connect via Snapchat Kit Bot",
+    tokenLabel: "Access Token",
+    tokenPlaceholder: "your-oauth-access-token",
+    helpUrl: "https://kit.snapchat.com/",
+  },
 ];
 
 function ProviderCard({provider, selected, onClick}) {

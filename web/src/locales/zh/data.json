@@ -434,7 +434,10 @@
     "WeChat App Secret - Tooltip": "微信公众平台的AppSecret，与AppID一起用于获取接口调用凭证（access_token）。",
     "WeChat token hint": "Token字段填写微信AppID；App Secret字段填写微信AppSecret。",
     "WeChat verify token hint": "在微信公众平台服务器配置中，将Token设置为管道名称：",
-    "WeChat webhook hint": "在微信公众平台服务器配置中，将服务器地址(URL)设置为："
+    "WeChat webhook hint": "在微信公众平台服务器配置中，将服务器地址(URL)设置为：",
+    "Snapchat App Secret - Tooltip": "Snap开发者平台中的App Secret，用于验证Webhook请求签名。",
+    "Snapchat token hint": "Token字段填写在Snap开发者平台创建Bot后获取的OAuth访问令牌。",
+    "Snapchat webhook hint": "在Snap开发者平台Bot的Webhook设置中，将Webhook URL设置为："
   },
   "provider": {
     "API key": "API密钥",
