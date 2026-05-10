@@ -2463,8 +2463,10 @@ export function getRefinedErrorText(errorText) {
     return i18next.t("chat:Your chat text involves sensitive content. This chat has been forcibly terminated.");
   } else if (errorText.startsWith("write tcp ")) {
     return i18next.t("chat:The response has been interrupted. Please do not refresh the page during responding.");
+  } else if (errorText.includes("Please add a model provider first") || errorText.includes("请先添加模型提供商")) {
+    return i18next.t("chat:No model configured - notice");
   } else {
-    return i18next.t("chat:An error occurred during responding");
+    return errorText;
   }
 }
 

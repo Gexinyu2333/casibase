@@ -82,7 +82,9 @@
     "User desc": "The user who owns this chat",
     "Web search": "Web search",
     "Web sources": "Web sources",
-    "Your chat text involves sensitive content. This chat has been forcibly terminated.": "Your chat text involves sensitive content. This chat has been forcibly terminated."
+    "Your chat text involves sensitive content. This chat has been forcibly terminated.": "Your chat text involves sensitive content. This chat has been forcibly terminated.",
+    "No model configured - notice": "No AI model is configured yet.",
+    "No model provider - action": "Go to Quick Setup"
   },
   "file": {
     "Filename": "Filename"

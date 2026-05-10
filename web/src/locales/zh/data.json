@@ -82,7 +82,9 @@
     "User desc": "该对话的所有者",
     "Web search": "网络搜索",
     "Web sources": "网络来源",
-    "Your chat text involves sensitive content. This chat has been forcibly terminated.": "您的聊天信息涉及敏感内容。此会话已被强制终止。"
+    "Your chat text involves sensitive content. This chat has been forcibly terminated.": "您的聊天信息涉及敏感内容。此会话已被强制终止。",
+    "No model configured - notice": "尚未配置AI模型。",
+    "No model provider - action": "前往快速配置"
   },
   "file": {
     "Filename": "文件名"

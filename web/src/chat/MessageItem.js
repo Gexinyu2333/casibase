@@ -13,8 +13,9 @@
 // limitations under the License.
 
 import React, {useEffect, useMemo, useState} from "react";
+import {useHistory} from "react-router-dom";
 import {Bubble} from "@ant-design/x";
-import {Alert, Avatar, Button, Col, Collapse, Row, Space} from "antd";
+import {Alert, Avatar, Button, Collapse, Space} from "antd";
 import {FileTextOutlined, GlobalOutlined} from "@ant-design/icons";
 import moment from "moment";
 import * as Setting from "../Setting";
@@ -49,6 +50,7 @@ const MessageItem = ({
   sendMessage,
   hideThinking,
 }) => {
+  const history = useHistory();
   const [avatarSrc, setAvatarSrc] = useState(null);
   const [isRegenerating, setIsRegenerating] = useState(false);
   const [reasonExpanded, setReasonExpanded] = useState(["reason"]);
@@ -172,47 +174,54 @@ const MessageItem = ({
 
   const renderMessageContent = () => {
     if (message.errorText !== "") {
-      const regenerateButton = !hideInput ? (
-        <Button
-          danger
-          type="primary"
-          onClick={() => {
-            setIsRegenerating(true);
-            onRegenerate(index);
-          }}
-          disabled={isRegenerating}
-        >
-          {isRegenerating
-            ? i18next.t("general:Regenerating...")
-            : i18next.t("general:Regenerate")}
-        </Button>
-      ) : null;
-      const errorDescription = (
-        <div style={{fontFamily: "monospace", fontSize: "12px", whiteSpace: "pre-wrap", wordBreak: "break-all", marginTop: 4, opacity: 0.85}}>
-          {message.errorText}
-        </div>
-      );
-      return Setting.isMobile() ? (
-        <div>
+      const isNoModelProvider = message.errorText.includes("Please add a model provider first") || message.errorText.includes("请先添加模型提供商");
+      if (isNoModelProvider) {
+        return (
           <Alert
-            message={Setting.getRefinedErrorText(message.errorText)}
-            description={errorDescription}
-            type="error"
+            type="warning"
             showIcon
+            style={{borderRadius: 8, fontSize: 12, padding: "6px 12px"}}
+            message={
+              <span>
+                {Setting.getRefinedErrorText(message.errorText)}
+                {" "}
+                <Button
+                  type="link"
+                  size="small"
+                  style={{padding: 0, fontWeight: 600, fontSize: 12, height: "auto"}}
+                  onClick={() => history.push("/quick-setup")}
+                >
+                  {i18next.t("chat:No model provider - action")} →
+                </Button>
+              </span>
+            }
           />
-          {regenerateButton && (
-            <Row justify="center" style={{marginTop: 16}}>
-              <Col>{regenerateButton}</Col>
-            </Row>
-          )}
-        </div>
-      ) : (
+        );
+      }
+      return (
         <Alert
-          message={Setting.getRefinedErrorText(message.errorText)}
-          description={errorDescription}
-          type="error"
+          type="warning"
           showIcon
-          action={regenerateButton ? <div style={{marginLeft: 16}}>{regenerateButton}</div> : null}
+          style={{borderRadius: 8, fontSize: 12, padding: "6px 12px"}}
+          message={
+            <span style={{fontFamily: "monospace", fontSize: 12, wordBreak: "break-all"}}>
+              {Setting.getRefinedErrorText(message.errorText)}
+              {!hideInput && (
+                <Button
+                  size="small"
+                  type="link"
+                  style={{padding: "0 0 0 8px", fontWeight: 600, fontSize: 12, height: "auto"}}
+                  onClick={() => {
+                    setIsRegenerating(true);
+                    onRegenerate(index);
+                  }}
+                  disabled={isRegenerating}
+                >
+                  {isRegenerating ? i18next.t("general:Regenerating...") : i18next.t("general:Regenerate")} →
+                </Button>
+              )}
+            </span>
+          }
         />
       );
     }
