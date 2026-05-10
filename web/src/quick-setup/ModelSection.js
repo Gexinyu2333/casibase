@@ -81,8 +81,8 @@ function ModelSection({
           {meta.needsClientId && (
             <Row gutter={16}>
               <Col xs={24} md={12}>
-                <FieldRow label={selectedModelType === "Amazon Bedrock" ? "Access Key ID" : "Client ID"}>
-                  <Input value={clientId} onChange={e => setClientId(e.target.value)} placeholder="AKIA..." />
+                <FieldRow label={selectedModelType === "Amazon Bedrock" ? "Access Key ID" : selectedModelType === "Azure" ? i18next.t("provider:Deployment name") : "Client ID"}>
+                  <Input value={clientId} onChange={e => setClientId(e.target.value)} placeholder={selectedModelType === "Azure" ? i18next.t("setup:Enter deployment name") : "AKIA..."} />
                 </FieldRow>
               </Col>
             </Row>

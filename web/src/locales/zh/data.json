@@ -598,6 +598,7 @@
     "Connect a Messaging Platform": "连接消息平台",
     "Connect a messaging app so users can chat with your AI through Telegram, Discord, or WhatsApp. You can skip this step and set it up later.": "连接消息应用，让用户通过Telegram、Discord、WhatsApp或Slack与您的AI对话。此步骤可跳过，稍后再配置。",
     "Created Resources": "已创建的资源",
+    "Enter deployment name": "输入部署名称",
     "Enter model name": "输入模型名称",
     "Get your AI up and running in minutes — no technical knowledge required.": "几分钟内启动您的AI——无需任何技术知识。",
     "How to get a token?": "如何获取Token？",
