@@ -5,7 +5,7 @@
 <br/>
 <br/>
 
-**Next-generation personal AI assistant powered by LLM, RAG and agent loops**
+**Next-generation personal AI assistant powered by LLM, RAG and agent loops — ships as a single binary, no installation needed**
 
 *Supporting computer-use, browser-use and coding agent*
 
@@ -33,11 +33,11 @@ OpenAgent is an open-source personal AI assistant that brings together powerful 
 <div align="center">
 <br/>
 
-| Usage Analytics | Activity Monitoring |
-|:---:|:---:|
+|                                               Usage Analytics                                                |                                                 Activity Monitoring                                                  |
+|:------------------------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------------------:|
 | ![Usage Analytics](https://raw.githubusercontent.com/the-open-agent/static/master/img/screenshot-usages.png) | ![Activity Monitoring](https://raw.githubusercontent.com/the-open-agent/static/master/img/screenshot-activities.png) |
-| **Tool Management** | **Detailed Logs** |
-| ![Tool Management](https://raw.githubusercontent.com/the-open-agent/static/master/img/screenshot-tools.png) | ![Detailed Logs](https://raw.githubusercontent.com/the-open-agent/static/master/img/screenshot-logs.png) |
+|                                             **Tool Management**                                              |                                                  **Detailed Logs**                                                   |
+| ![Tool Management](https://raw.githubusercontent.com/the-open-agent/static/master/img/screenshot-tools.png)  |       ![Detailed Logs](https://raw.githubusercontent.com/the-open-agent/static/master/img/screenshot-logs.png)       |
 
 <br/>
 </div>
@@ -57,6 +57,8 @@ curl -fsSL https://raw.githubusercontent.com/the-open-agent/openagent/master/scr
 ```powershell
 irm https://raw.githubusercontent.com/the-open-agent/openagent/master/scripts/install.ps1 | iex
 ```
+
+> **Windows runs natively** — no WSL, no Docker required. You can also download `openagent_windows_amd64.exe` directly from the [latest release](https://github.com/the-open-agent/openagent/releases/latest) and double-click to run.
 
 Open [http://localhost:14000](http://localhost:14000) and you're in.
 
@@ -94,68 +96,70 @@ Connect every major LLM provider and switch between them per conversation — no
 
 ### 🔄 Autonomous Agent Loops
 
-| Capability | Description |
-|:---|:---|
-| **Browser-Use** | Drive a real browser — navigate, click, fill forms, scrape, and screenshot pages |
-| **Web Search & Fetch** | Search the web and pull live page content into the agent's context |
-| **Shell Execution** | Run shell commands and scripts directly from the agent loop |
-| **Office Automation** | Read and write Word, Excel, and PowerPoint files |
-| **MCP Integration** | Plug in any MCP-compatible server (SSE / Stdio / StreamableHTTP) and expose its tools to the agent |
-| **Transparent Tool Calls** | See every tool invocation, its arguments, and its return value — step by step |
+| Capability                 | Description                                                                                        |
+|:---------------------------|:---------------------------------------------------------------------------------------------------|
+| **Browser-Use**            | Drive a real browser — navigate, click, fill forms, scrape, and screenshot pages                   |
+| **Web Search & Fetch**     | Search the web and pull live page content into the agent's context                                 |
+| **Shell Execution**        | Run shell commands and scripts directly from the agent loop                                        |
+| **Office Automation**      | Read and write Word, Excel, and PowerPoint files                                                   |
+| **MCP Integration**        | Plug in any MCP-compatible server (SSE / Stdio / StreamableHTTP) and expose its tools to the agent |
+| **Transparent Tool Calls** | See every tool invocation, its arguments, and its return value — step by step                      |
 
 ---
 
 ### 📚 RAG & Knowledge Base
 
-| Capability | Description |
-|:---|:---|
-| **Document Ingestion** | Upload PDFs, Word docs, Excel sheets, and more — chunked, embedded, and indexed automatically |
-| **Semantic Search** | Retrieves the most relevant passages from your knowledge base before each LLM response |
-| **Pluggable Embeddings** | OpenAI, Azure, Gemini, Qwen, Cohere, Jina, HuggingFace, local models, and more |
-| **Isolated Stores** | Organise knowledge into separate stores; assign them per chat or per application |
+| Capability               | Description                                                                                   |
+|:-------------------------|:----------------------------------------------------------------------------------------------|
+| **Document Ingestion**   | Upload PDFs, Word docs, Excel sheets, and more — chunked, embedded, and indexed automatically |
+| **Semantic Search**      | Retrieves the most relevant passages from your knowledge base before each LLM response        |
+| **Pluggable Embeddings** | OpenAI, Azure, Gemini, Qwen, Cohere, Jina, HuggingFace, local models, and more                |
+| **Isolated Stores**      | Organise knowledge into separate stores; assign them per chat or per application              |
 
 ---
 
 ### ⚡ Workflow Automation
 
-| Capability | Description |
-|:---|:---|
-| **Visual Workflow Builder** | Compose multi-step pipelines with a BPMN-style drag-and-drop editor |
-| **Conditional & Parallel Execution** | Branch on gateway conditions; run independent tasks concurrently |
-| **Task Scheduling** | Trigger workflows or agent jobs on a recurring schedule |
-| **Usage Analytics** | Track token consumption and cost per provider, model, and user |
+| Capability                           | Description                                                         |
+|:-------------------------------------|:--------------------------------------------------------------------|
+| **Visual Workflow Builder**          | Compose multi-step pipelines with a BPMN-style drag-and-drop editor |
+| **Conditional & Parallel Execution** | Branch on gateway conditions; run independent tasks concurrently    |
+| **Task Scheduling**                  | Trigger workflows or agent jobs on a recurring schedule             |
+| **Usage Analytics**                  | Track token consumption and cost per provider, model, and user      |
 
 ---
 
 ### 🏗️ Platform Features
 
-| Capability | Description |
-|:---|:---|
-| **Single Sign-On** | OIDC / OAuth2 / LDAP / SAML via the built-in auth layer |
-| **Multi-tenancy** | Isolated workspaces per user or organisation |
-| **REST API + Swagger UI** | Every feature is accessible programmatically |
-| **Audit Logs** | Full activity history for every action |
-| **File & Media Management** | Built-in storage for files, images, and video content |
+| Capability                  | Description                                                                                                       |
+|:----------------------------|:------------------------------------------------------------------------------------------------------------------|
+| **Single Binary**           | One executable file — no installer, no runtime dependencies. Download and run instantly on any supported platform |
+| **Native Windows Support**  | Runs directly on Windows — no WSL, no Docker, no Linux subsystem required                                         |
+| **Single Sign-On**          | OIDC / OAuth2 / LDAP / SAML via the built-in auth layer                                                           |
+| **Multi-tenancy**           | Isolated workspaces per user or organisation                                                                      |
+| **REST API + Swagger UI**   | Every feature is accessible programmatically                                                                      |
+| **Audit Logs**              | Full activity history for every action                                                                            |
+| **File & Media Management** | Built-in storage for files, images, and video content                                                             |
 
 ---
 
 ### 📊 Admin Dashboard
 
-| Panel | What you get |
-|:---|:---|
-| **Usage Statistics** | Token & cost metrics per app, user, and model — with interactive charts and heatmaps |
+| Panel                   | What you get                                                                                |
+|:------------------------|:--------------------------------------------------------------------------------------------|
+| **Usage Statistics**    | Token & cost metrics per app, user, and model — with interactive charts and heatmaps        |
 | **Activity Monitoring** | Real-time system operations with success/error rates, operation-type breakdowns, and trends |
-| **Tool Management** | Centralised CRUD for all agent tools: browser, shell, office, web search, and more |
-| **Request Logs** | Full request/response payloads with JSON formatting, filtering, and debugging |
+| **Tool Management**     | Centralised CRUD for all agent tools: browser, shell, office, web search, and more          |
+| **Request Logs**        | Full request/response payloads with JSON formatting, filtering, and debugging               |
 
 ---
 
 ## Online Demo
 
-| Environment | URL | Notes |
-|:---|:---|:---|
-| **Live Preview** | https://demo.openagentai.org | Read-only tour — no account needed |
-| **Playground** | https://try.openagentai.org | Make changes freely — data resets every 5 minutes |
+| Environment      | URL                          | Notes                                             |
+|:-----------------|:-----------------------------|:--------------------------------------------------|
+| **Live Preview** | https://demo.openagentai.org | Read-only tour — no account needed                |
+| **Playground**   | https://try.openagentai.org  | Make changes freely — data resets every 5 minutes |
 
 ---
 
