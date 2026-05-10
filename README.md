@@ -1,88 +1,68 @@
 <div align="center">
 
-<img src="https://raw.githubusercontent.com/the-open-agent/static/master/img/openagent-logo_1600x276.png" alt="OpenAgent Logo" width="400">
+<img src="https://cdn.openagentai.org/img/openagent-logo_1900x450.png" alt="OpenAgent" width="480">
 
-<h1>OpenAgent</h1>
+<br/>
+<br/>
 
-<p><strong>Next-generation personal AI assistant powered by LLM, RAG and agent loops</strong><br>
-<em>Supporting computer-use, browser-use and coding agent</em></p>
+**Next-generation personal AI assistant powered by LLM, RAG and agent loops**
 
-<p>
-  <a href="https://github.com/the-open-agent/openagent/actions/workflows/build.yml">
-    <img alt="Build" src="https://github.com/the-open-agent/openagent/workflows/Build/badge.svg?style=flat-square">
-  </a>
-  <a href="https://github.com/the-open-agent/openagent/releases/latest">
-    <img alt="Release" src="https://img.shields.io/github/v/release/the-open-agent/openagent.svg">
-  </a>
-  <a href="https://hub.docker.com/r/casbin/openagent">
-    <img alt="Docker Pulls" src="https://img.shields.io/docker/pulls/casbin/openagent.svg">
-  </a>
-  <a href="https://goreportcard.com/report/github.com/the-open-agent/openagent">
-    <img alt="Go Report Card" src="https://goreportcard.com/badge/github.com/the-open-agent/openagent?style=flat-square">
-  </a>
-  <a href="https://github.com/the-open-agent/openagent/blob/master/LICENSE">
-    <img alt="License" src="https://img.shields.io/github/license/the-open-agent/openagent?style=flat-square">
-  </a>
-  <a href="https://discord.gg/5rPsrAzK7S">
-    <img alt="Discord" src="https://img.shields.io/discord/1022748306096537660?logo=discord&label=discord&color=5865F2">
-  </a>
-</p>
+*Supporting computer-use, browser-use and coding agent*
+
+<br/>
+
+[![Build](https://github.com/the-open-agent/openagent/workflows/Build/badge.svg?style=flat-square)](https://github.com/the-open-agent/openagent/actions/workflows/build.yml)
+[![Release](https://img.shields.io/github/v/release/the-open-agent/openagent?style=flat-square&color=4f46e5)](https://github.com/the-open-agent/openagent/releases/latest)
+[![Docker Pulls](https://img.shields.io/docker/pulls/casbin/openagent?style=flat-square&color=0ea5e9)](https://hub.docker.com/r/casbin/openagent)
+[![Go Report](https://goreportcard.com/badge/github.com/the-open-agent/openagent?style=flat-square)](https://goreportcard.com/report/github.com/the-open-agent/openagent)
+[![License](https://img.shields.io/github/license/the-open-agent/openagent?style=flat-square&color=22c55e)](https://github.com/the-open-agent/openagent/blob/master/LICENSE)
+[![Discord](https://img.shields.io/discord/1022748306096537660?logo=discord&label=discord&color=5865F2&style=flat-square)](https://discord.gg/5rPsrAzK7S)
+
+<br/>
+
+[**Live Demo**](https://demo.openagentai.org) · [**Playground**](https://try.openagentai.org) · [**Docs**](https://www.openagentai.org) · [**Discord**](https://discord.gg/5rPsrAzK7S)
 
 </div>
 
 ---
 
-## ✨ Overview
+## What is OpenAgent?
 
 OpenAgent is an open-source personal AI assistant that brings together powerful LLMs, your own knowledge base, and autonomous agent loops — all in one self-hostable platform. Connect any model provider, build a RAG knowledge base from your documents, and let agents browse the web, run code, and call any MCP-compatible tool on your behalf.
 
 <div align="center">
+<br/>
 
-| 📊 Usage Analytics | 📋 Activity Monitoring |
+| Usage Analytics | Activity Monitoring |
 |:---:|:---:|
 | ![Usage Analytics](https://raw.githubusercontent.com/the-open-agent/static/master/img/screenshot-usages.png) | ![Activity Monitoring](https://raw.githubusercontent.com/the-open-agent/static/master/img/screenshot-activities.png) |
-| 🛠️ Tool Management | 🔍 Detailed Logs |
+| **Tool Management** | **Detailed Logs** |
 | ![Tool Management](https://raw.githubusercontent.com/the-open-agent/static/master/img/screenshot-tools.png) | ![Detailed Logs](https://raw.githubusercontent.com/the-open-agent/static/master/img/screenshot-logs.png) |
 
+<br/>
 </div>
 
-> 📝 **Note:** Screenshots above showcase the built-in admin dashboard.
-
 ---
 
-## 🚀 Online Demo
+## Quick Start
 
-| 🌐 Environment | URL | 💡 Notes |
-|:---|:---|:---|
-| **Live Preview** | https://demo.openagentai.org | Read-only tour — no account needed |
-| **Playground** | https://try.openagentai.org | Make changes freely — data resets every 5 minutes |
-
----
-
-## 📦 Quick Start
-
-Pre-built binaries are available for **Linux**, **macOS**, and **Windows** (`amd64` / `arm64`). The install script downloads the latest release, installs it, and starts the server on **port 14000**.
-
-### 🔧 Install Binary (Recommended)
+Pre-built binaries for **Linux**, **macOS**, and **Windows** (`amd64` / `arm64`). The installer downloads the latest release and starts OpenAgent on **port 14000**.
 
 **macOS / Linux / WSL**
-
 ```bash
 curl -fsSL https://raw.githubusercontent.com/the-open-agent/openagent/master/scripts/install.sh | bash
 ```
 
 **Windows (PowerShell)**
-
 ```powershell
 irm https://raw.githubusercontent.com/the-open-agent/openagent/master/scripts/install.ps1 | iex
 ```
 
-Then open [http://localhost:14000](http://localhost:14000).
+Open [http://localhost:14000](http://localhost:14000) and you're in.
 
-> 💡 Optional environment variables: `OPENAGENT_VERSION`, `INSTALL_DIR`, `BIN_DIR`.
+> Optional env vars: `OPENAGENT_VERSION`, `INSTALL_DIR`, `BIN_DIR`
 
-### 🛠️ Build from Source
-
+**Build from source**
 ```bash
 # Backend
 go build
@@ -91,83 +71,107 @@ go build
 cd web && yarn install && yarn start
 ```
 
+**Docker**
+```bash
+docker-compose up
+```
+
 ---
 
-## 🌟 Highlights
-
-### 🔄 Agent Loops
-
-| Feature | Description |
-|:---|:---|
-| 🌐 **Browser-Use** | Drive a real browser: navigate, click, fill forms, scrape, and screenshot pages |
-| 🔎 **Web Search & Fetch** | Search the web and pull page content directly into the agent's context |
-| 💻 **Shell Execution** | Run shell commands and scripts from within the agent loop |
-| 📄 **Office Automation** | Read and write Word, Excel, and PowerPoint files |
-| 🔌 **MCP (Model Context Protocol)** | Connect any MCP-compatible server over SSE, Stdio, or StreamableHTTP and expose its tools to the agent |
-| 👁️ **Transparent Tool Calls** | See exactly which tool was invoked, with what arguments, and what it returned, step by step |
-
-### 📚 RAG & Knowledge Base
-
-| Feature | Description |
-|:---|:---|
-| 📤 **Document Ingestion** | Upload PDFs, Word docs, Excel sheets, and more; they are chunked, embedded, and indexed automatically |
-| 🔍 **Semantic Search** | Every chat retrieves the most relevant passages from your knowledge base before the LLM responds |
-| 🔗 **Pluggable Embedding Providers** | OpenAI, Azure, Gemini, Qwen, Cohere, Jina, HuggingFace, local models, and more |
-| 🗂️ **Per-Store Isolation** | Organise knowledge into separate stores and assign them to individual chats or applications |
+## Features
 
 ### 🤖 30+ Model Providers
 
-Works out of the box with all major LLM providers — configure as many as you like and switch between them per chat:
+Connect every major LLM provider and switch between them per conversation — no code changes required.
 
-<p align="center">
-  <code>OpenAI</code> · <code>Azure OpenAI</code> · <code>Claude (Anthropic)</code> · <code>Gemini (Google)</code> · <code>DeepSeek</code> · <code>Mistral</code> · <code>Grok</code> · <code>Qwen</code> · <code>Doubao</code> · <code>Moonshot</code> · <code>ChatGLM</code> · <code>Baichuan</code> · <code>Ernie</code> · <code>iFlytek</code> · <code>HuggingFace</code> · <code>Cohere</code> · <code>Amazon Bedrock</code> · <code>OpenRouter</code> · <code>local models</code> · <code>and more</code>
-</p>
+<div align="center">
+
+`OpenAI` · `Azure OpenAI` · `Anthropic Claude` · `Google Gemini` · `DeepSeek` · `Mistral` · `Grok` · `Qwen` · `Doubao` · `Moonshot` · `ChatGLM` · `Baichuan` · `Ernie` · `iFlytek` · `HuggingFace` · `Cohere` · `Amazon Bedrock` · `OpenRouter` · `Ollama` · `and more`
+
+</div>
+
+---
+
+### 🔄 Autonomous Agent Loops
+
+| Capability | Description |
+|:---|:---|
+| **Browser-Use** | Drive a real browser — navigate, click, fill forms, scrape, and screenshot pages |
+| **Web Search & Fetch** | Search the web and pull live page content into the agent's context |
+| **Shell Execution** | Run shell commands and scripts directly from the agent loop |
+| **Office Automation** | Read and write Word, Excel, and PowerPoint files |
+| **MCP Integration** | Plug in any MCP-compatible server (SSE / Stdio / StreamableHTTP) and expose its tools to the agent |
+| **Transparent Tool Calls** | See every tool invocation, its arguments, and its return value — step by step |
+
+---
+
+### 📚 RAG & Knowledge Base
+
+| Capability | Description |
+|:---|:---|
+| **Document Ingestion** | Upload PDFs, Word docs, Excel sheets, and more — chunked, embedded, and indexed automatically |
+| **Semantic Search** | Retrieves the most relevant passages from your knowledge base before each LLM response |
+| **Pluggable Embeddings** | OpenAI, Azure, Gemini, Qwen, Cohere, Jina, HuggingFace, local models, and more |
+| **Isolated Stores** | Organise knowledge into separate stores; assign them per chat or per application |
+
+---
 
 ### ⚡ Workflow Automation
 
-| Feature | Description |
+| Capability | Description |
 |:---|:---|
-| 🎨 **Visual Workflow Builder** | Compose multi-step pipelines with a BPMN-style editor |
-| 🔀 **Conditional & Parallel Execution** | Branch on gateway conditions and run tasks concurrently |
-| ⏰ **Task Scheduling** | Run workflows or agent jobs on a recurring schedule |
-| 📊 **Usage Analytics** | Track token consumption and cost per provider, model, and user |
-
-### 🏗️ Platform Features
-
-| Feature | Description |
-|:---|:---|
-| 🔐 **Single Sign-On** | OIDC / OAuth2 / LDAP / SAML via the integrated auth layer |
-| 🏢 **Multi-tenant** | Separate workspaces per user or organisation |
-| 🌐 **REST API + Swagger UI** | Every feature is accessible programmatically |
-| 📋 **Audit Logs** | Full activity history for every action |
-| 🗄️ **File & Video Management** | Built-in storage for files, images, and video content |
-
-### 📈 Admin Dashboard
-
-| Feature | Description |
-|:---|:---|
-| 📊 **Usage Statistics** | Comprehensive metrics covering applications, users, chats, messages, tokens, and estimated cost with interactive charts and heatmaps |
-| 📋 **Activity Monitoring** | Real-time visualization of system operations with success/error tracking, operation-type pie charts, and trend analysis |
-| 🛠️ **Tool Management** | Centralised management of all agent tools — browser-use, GUI automation, office, shell, web search, and more — with full CRUD control |
-| 🔍 **Detailed Request Logs** | Inspect complete request/response payloads with JSON formatting, filtering, and debugging capabilities for every API call |
+| **Visual Workflow Builder** | Compose multi-step pipelines with a BPMN-style drag-and-drop editor |
+| **Conditional & Parallel Execution** | Branch on gateway conditions; run independent tasks concurrently |
+| **Task Scheduling** | Trigger workflows or agent jobs on a recurring schedule |
+| **Usage Analytics** | Track token consumption and cost per provider, model, and user |
 
 ---
 
-## 📖 Documentation
+### 🏗️ Enterprise Platform
 
-👉 [https://www.openagentai.org/](https://www.openagentai.org/)
-
----
-
-## 🤝 Community
-
-| Platform | Link |
+| Capability | Description |
 |:---|:---|
-| 💬 Discord | [https://discord.gg/5rPsrAzK7S](https://discord.gg/5rPsrAzK7S) |
-| 🐛 Issues & PRs | Welcome — please open an issue first to discuss larger changes |
+| **Single Sign-On** | OIDC / OAuth2 / LDAP / SAML via the integrated Casdoor auth layer |
+| **Multi-tenancy** | Isolated workspaces per user or organisation |
+| **REST API + Swagger UI** | Every feature is accessible programmatically |
+| **Audit Logs** | Full activity history for every action |
+| **File & Media Management** | Built-in storage for files, images, and video content |
 
 ---
 
-## 📄 License
+### 📊 Admin Dashboard
 
-[Apache-2.0](https://github.com/the-open-agent/openagent/blob/master/LICENSE)
+| Panel | What you get |
+|:---|:---|
+| **Usage Statistics** | Token & cost metrics per app, user, and model — with interactive charts and heatmaps |
+| **Activity Monitoring** | Real-time system operations with success/error rates, operation-type breakdowns, and trends |
+| **Tool Management** | Centralised CRUD for all agent tools: browser, shell, office, web search, and more |
+| **Request Logs** | Full request/response payloads with JSON formatting, filtering, and debugging |
+
+---
+
+## Online Demo
+
+| Environment | URL | Notes |
+|:---|:---|:---|
+| **Live Preview** | https://demo.openagentai.org | Read-only tour — no account needed |
+| **Playground** | https://try.openagentai.org | Make changes freely — data resets every 5 minutes |
+
+---
+
+## Documentation
+
+Full docs at **[https://www.openagentai.org](https://www.openagentai.org)**
+
+---
+
+## Community
+
+- **Discord** — [discord.gg/5rPsrAzK7S](https://discord.gg/5rPsrAzK7S) · chat with maintainers and other users
+- **Issues & PRs** — welcome! Please open an issue first to discuss larger changes
+
+---
+
+## License
+
+[Apache 2.0](https://github.com/the-open-agent/openagent/blob/master/LICENSE)

@@ -27,24 +27,24 @@ type Chat struct {
 	CreatedTime string `xorm:"varchar(100)" json:"createdTime"`
 	UpdatedTime string `xorm:"varchar(100)" json:"updatedTime"`
 
-	Organization  string   `xorm:"varchar(100)" json:"organization"`
-	DisplayName   string   `xorm:"varchar(100)" json:"displayName"`
-	Store         string   `xorm:"varchar(100)" json:"store"`
-	ModelProvider string   `xorm:"varchar(100)" json:"modelProvider"`
-	Tool          string   `xorm:"varchar(100)" json:"tool"`
-	Category      string   `xorm:"varchar(100)" json:"category"`
-	User          string   `xorm:"varchar(100) index" json:"user"`
-	ClientIp      string   `xorm:"varchar(100)" json:"clientIp"`
-	UserAgent     string   `xorm:"varchar(200)" json:"userAgent"`
-	ClientIpDesc  string   `xorm:"varchar(100)" json:"clientIpDesc"`
-	UserAgentDesc string   `xorm:"varchar(100)" json:"userAgentDesc"`
-	MessageCount  int      `json:"messageCount"`
-	TokenCount    int      `json:"tokenCount"`
-	Price         float64  `json:"price"`
-	Currency      string   `xorm:"varchar(100)" json:"currency"`
-	IsHidden      bool     `json:"isHidden"`
-	IsDeleted     bool     `json:"isDeleted"`
-	NeedTitle     bool     `json:"needTitle"`
+	Organization  string  `xorm:"varchar(100)" json:"organization"`
+	DisplayName   string  `xorm:"varchar(100)" json:"displayName"`
+	Store         string  `xorm:"varchar(100)" json:"store"`
+	ModelProvider string  `xorm:"varchar(100)" json:"modelProvider"`
+	Tool          string  `xorm:"varchar(100)" json:"tool"`
+	Category      string  `xorm:"varchar(100)" json:"category"`
+	User          string  `xorm:"varchar(100) index" json:"user"`
+	ClientIp      string  `xorm:"varchar(100)" json:"clientIp"`
+	UserAgent     string  `xorm:"varchar(200)" json:"userAgent"`
+	ClientIpDesc  string  `xorm:"varchar(100)" json:"clientIpDesc"`
+	UserAgentDesc string  `xorm:"varchar(100)" json:"userAgentDesc"`
+	MessageCount  int     `json:"messageCount"`
+	TokenCount    int     `json:"tokenCount"`
+	Price         float64 `json:"price"`
+	Currency      string  `xorm:"varchar(100)" json:"currency"`
+	IsHidden      bool    `json:"isHidden"`
+	IsDeleted     bool    `json:"isDeleted"`
+	NeedTitle     bool    `json:"needTitle"`
 }
 
 func GetGlobalChats() ([]*Chat, error) {
