@@ -89,3 +89,34 @@ export function loadSkill(path) {
     },
   }).then(res => Setting.handleFetchResponse(res));
 }
+
+export function getMarketplaceSources() {
+  return fetch(`${Setting.ServerUrl}/api/get-marketplace-sources`, {
+    method: "GET",
+    credentials: "include",
+    headers: {
+      "Accept-Language": Setting.getAcceptLanguage(),
+    },
+  }).then(res => Setting.handleFetchResponse(res));
+}
+
+export function getMarketplaceSkills(source = "", keyword = "") {
+  return fetch(`${Setting.ServerUrl}/api/get-marketplace-skills?source=${encodeURIComponent(source)}&keyword=${encodeURIComponent(keyword)}`, {
+    method: "GET",
+    credentials: "include",
+    headers: {
+      "Accept-Language": Setting.getAcceptLanguage(),
+    },
+  }).then(res => Setting.handleFetchResponse(res));
+}
+
+export function installMarketplaceSkill(item) {
+  return fetch(`${Setting.ServerUrl}/api/install-marketplace-skill`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Accept-Language": Setting.getAcceptLanguage(),
+    },
+    body: JSON.stringify(item),
+  }).then(res => Setting.handleFetchResponse(res));
+}

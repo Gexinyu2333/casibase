@@ -20,8 +20,9 @@ import BaseListPage from "./BaseListPage";
 import * as Setting from "./Setting";
 import * as SkillBackend from "./backend/SkillBackend";
 import i18next from "i18next";
-import {DeleteOutlined, DownloadOutlined, EditOutlined} from "@ant-design/icons";
+import {DeleteOutlined, DownloadOutlined, EditOutlined, ShopOutlined} from "@ant-design/icons";
 import LoadSkillModal from "./LoadSkillModal";
+import SkillMarketplaceModal from "./SkillMarketplaceModal";
 
 const SKILL_TYPES = ["writing", "coding", "analysis", "translation", "reasoning", "search", "custom"];
 
@@ -31,6 +32,7 @@ class SkillListPage extends BaseListPage {
     this.state = {
       ...this.state,
       loadModalVisible: false,
+      marketplaceVisible: false,
     };
   }
 
@@ -206,6 +208,15 @@ class SkillListPage extends BaseListPage {
           onClose={() => this.setState({loadModalVisible: false})}
           onImported={(skillName) => this.props.history.push(`/skills/${skillName}`)}
         />
+        <SkillMarketplaceModal
+          open={this.state.marketplaceVisible}
+          onClose={() => this.setState({marketplaceVisible: false})}
+          onInstalled={(skillName) => {
+            this.setState({marketplaceVisible: false});
+            this.props.history.push(`/skills/${skillName}`);
+          }}
+          installedNames={(this.state.data || []).map((s) => s.name)}
+        />
         <Table
           scroll={{x: "max-content"}}
           columns={columns}
@@ -227,6 +238,15 @@ class SkillListPage extends BaseListPage {
                 onClick={() => this.setState({loadModalVisible: true})}
               >
                 {i18next.t("skill:Load Existing Skill")}
+              </Button>
+              &nbsp;&nbsp;
+              <Button
+                size="small"
+                type="default"
+                icon={<ShopOutlined />}
+                onClick={() => this.setState({marketplaceVisible: true})}
+              >
+                {i18next.t("skill:Marketplace")}
               </Button>
             </div>
           )}

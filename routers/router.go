@@ -102,6 +102,9 @@ func initAPI() {
 	beego.Router("/api/add-skill", &controllers.ApiController{}, "POST:AddSkill")
 	beego.Router("/api/delete-skill", &controllers.ApiController{}, "POST:DeleteSkill")
 	beego.Router("/api/load-skill", &controllers.ApiController{}, "GET:LoadSkill")
+	beego.Router("/api/get-marketplace-sources", &controllers.ApiController{}, "GET:GetMarketplaceSources")
+	beego.Router("/api/get-marketplace-skills", &controllers.ApiController{}, "GET:GetMarketplaceSkills")
+	beego.Router("/api/install-marketplace-skill", &controllers.ApiController{}, "POST:InstallMarketplaceSkill")
 
 	beego.Router("/api/get-global-tools", &controllers.ApiController{}, "GET:GetGlobalTools")
 	beego.Router("/api/get-tools", &controllers.ApiController{}, "GET:GetTools")
