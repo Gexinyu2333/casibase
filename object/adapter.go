@@ -30,6 +30,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"   // mysql
 	_ "github.com/lib/pq"                // postgres
 	"github.com/the-open-agent/openagent/conf"
+	"github.com/the-open-agent/openagent/embedsupport"
 	moderncsqlite "modernc.org/sqlite"
 	"xorm.io/xorm"
 )
@@ -81,6 +82,16 @@ func resolveDatabase(driverName, dataSourceName string) (string, string) {
 	if driverName != "mysql" || dataSourceName != defaultMySQLDataSourceName {
 		fmt.Printf("OpenAgent: connecting to database [driver=%s, dsn=%s, db=%s]\n", driverName, maskDSN(dataSourceName), dbName)
 		return driverName, dataSourceName
+	}
+
+	// Single-binary mode: the embedded conf/app.conf was used because no
+	// conf/app.conf file exists on disk. Always use SQLite in this case —
+	// the default MySQL credentials are almost certainly wrong, and the user
+	// has no obvious way to edit the config without creating the file manually.
+	if embedsupport.IsEmbeddedConf() {
+		dsn := sqliteDBPath()
+		fmt.Printf("OpenAgent: single-binary mode, using SQLite [dsn=%s]\n", dsn)
+		return "sqlite3", dsn
 	}
 
 	conn, err := net.DialTimeout("tcp", "localhost:3306", 2*time.Second)

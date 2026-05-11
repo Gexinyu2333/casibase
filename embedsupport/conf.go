@@ -23,6 +23,15 @@ import (
 	"github.com/beego/beego"
 )
 
+// usingEmbeddedConf is true when the embedded conf/app.conf was loaded because
+// no on-disk conf/app.conf was found. Used by other packages to detect
+// single-binary deployment mode.
+var usingEmbeddedConf bool
+
+// IsEmbeddedConf reports whether the binary is running in single-binary mode,
+// i.e. the embedded conf/app.conf was loaded because no on-disk one was found.
+func IsEmbeddedConf() bool { return usingEmbeddedConf }
+
 // setupConf reloads Beego's app config from the embedded conf/app.conf when
 // no on-disk conf/app.conf can be found next to the executable or in the cwd.
 // If confFS is nil (non-embed build), this is a no-op.
@@ -61,6 +70,7 @@ func setupConf(confFS fs.FS) {
 		return
 	}
 
+	usingEmbeddedConf = true
 	fmt.Println("embedsupport: loaded conf/app.conf from embedded binary")
 }
 
