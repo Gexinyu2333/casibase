@@ -27,7 +27,18 @@ func buildMergedBuiltinRegistry(store *Store, lang string) *tool.ToolRegistry {
 		return reg
 	}
 
-	for _, tname := range store.Tools {
+	toolNames := store.Tools
+	if len(toolNames) == 1 && toolNames[0] == "All" {
+		allTools, err := GetTools(store.Owner)
+		if err == nil {
+			toolNames = make([]string, 0, len(allTools))
+			for _, t := range allTools {
+				toolNames = append(toolNames, t.Name)
+			}
+		}
+	}
+
+	for _, tname := range toolNames {
 		id := util.GetIdFromOwnerAndName(store.Owner, tname)
 		t, err := GetTool(id)
 		if err != nil || t == nil {

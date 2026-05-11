@@ -506,6 +506,7 @@ class StoreEditPage extends React.Component {
                     value={store.skills || []}
                     onChange={(value => {this.updateStoreField("skills", value || []);})}
                   >
+                    <Option key="All" value="All">{i18next.t("store:All")}</Option>
                     {this.state.skills.filter(s => s.state === "Active").map((skill, index) => (
                       <Option key={index} value={skill.name}>
                         {skill.displayName ? `${skill.displayName} (${skill.name})` : skill.name}
@@ -525,6 +526,7 @@ class StoreEditPage extends React.Component {
                     value={store.tools || []}
                     onChange={(value => {this.updateStoreField("tools", value || []);})}
                   >
+                    <Option key="All" value="All">{i18next.t("store:All")}</Option>
                     {this.state.tools.map((tool, index) => this.renderToolOption(tool, index))}
                   </Select>,
                   12

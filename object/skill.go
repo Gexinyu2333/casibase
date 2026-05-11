@@ -341,6 +341,17 @@ func GetSkillsContent(owner string, skillNames []string) (string, error) {
 		return "", nil
 	}
 
+	if len(skillNames) == 1 && skillNames[0] == "All" {
+		allSkills, err := GetSkills(owner)
+		if err != nil {
+			return "", err
+		}
+		skillNames = []string{}
+		for _, s := range allSkills {
+			skillNames = append(skillNames, s.Name)
+		}
+	}
+
 	var parts []string
 	for _, name := range skillNames {
 		s, err := GetSkillByOwnerAndName(owner, name)

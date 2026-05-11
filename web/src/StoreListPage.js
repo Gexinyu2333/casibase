@@ -176,6 +176,8 @@ class StoreListPage extends BaseListPage {
       propertiesMap: {},
       knowledgeCount: 5,
       suggestionCount: 3,
+      skills: ["All"],
+      tools: ["All"],
       isDefault: false,
       state: "Active",
       enableExtraOptions: false,
