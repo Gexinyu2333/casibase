@@ -416,27 +416,6 @@ export function filterTableColumns(columns, formItems, actionKey = "action") {
   ].filter(col => col);
 }
 
-export function getBuiltinTools() {
-  return [
-    {
-      category: "code",
-      name: "Code Tools",
-      icon: "💻",
-      tools: [
-        {name: "execute_code", description: "Execute code"},
-      ],
-    },
-    {
-      category: "json",
-      name: "JSON Tools",
-      icon: "📋",
-      tools: [
-        {name: "process_json", description: "Process JSON"},
-      ],
-    },
-  ];
-}
-
 export function getToolFunctions(tool) {
   const type = tool.type;
   const subType = tool.subType;

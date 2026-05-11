@@ -75,8 +75,6 @@ type Store struct {
 	Skills               []string `xorm:"mediumtext" json:"skills"`
 	Tools                []string `xorm:"mediumtext" json:"tools"`
 	VectorStoreId        string   `xorm:"varchar(100)" json:"vectorStoreId"`
-	BuiltinTools         []string `xorm:"varchar(500)" json:"builtinTools"`
-
 	MemoryLimit         int               `json:"memoryLimit"`
 	Frequency           int               `json:"frequency"`
 	LimitMinutes        int               `json:"limitMinutes"`
