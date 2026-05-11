@@ -27,7 +27,6 @@ import * as ChatBackend from "./backend/ChatBackend";
 import * as MessageBackend from "./backend/MessageBackend";
 import i18next from "i18next";
 import BaseListPage from "./BaseListPage";
-import * as Conf from "./Conf";
 import {MessageCarrier} from "./chat/MessageCarrier";
 
 class ChatPage extends BaseListPage {
@@ -786,7 +785,7 @@ class ChatPage extends BaseListPage {
           )}
 
           {this.state.paneCount > 1 ? (
-            <MultiPaneManager stores={this.state.stores} filteredStores={this.state.filteredStores} defaultStore={this.state.defaultStore} account={this.props.account} messageLoading={this.state.messageLoading} messageError={this.state.messageError} onCancelMessage={this.cancelMessage} initialChat={this.state.chat} onChatUpdate={(chat) => this.setState({chat})} onSetMessageLoading={(loading) => this.setState({messageLoading: loading})} paneCount={this.state.paneCount} onPaneCountChange={(count) => this.setState({paneCount: count})} />
+            <MultiPaneManager stores={this.state.stores} filteredStores={this.state.filteredStores} defaultStore={this.state.defaultStore} account={this.props.account} site={this.props.site} messageLoading={this.state.messageLoading} messageError={this.state.messageError} onCancelMessage={this.cancelMessage} initialChat={this.state.chat} onChatUpdate={(chat) => this.setState({chat})} onSetMessageLoading={(loading) => this.setState({messageLoading: loading})} paneCount={this.state.paneCount} onPaneCountChange={(count) => this.setState({paneCount: count})} />
           ) : (
             <div style={{flex: 1, position: "relative", overflow: "auto"}}>
               {(this.state.messages === undefined || this.state.messages === null) ? null : (
@@ -796,7 +795,7 @@ class ChatPage extends BaseListPage {
                   left: 0,
                   right: 0,
                   bottom: 0,
-                  backgroundImage: `url(${Conf.StaticBaseUrl}/img/openagent-logo_1600x276.png)`,
+                  backgroundImage: `url(${Setting.getLogo("", this.props.site?.logoUrl)})`,
                   backgroundPosition: "center",
                   backgroundRepeat: "no-repeat",
                   backgroundSize: "200px auto",

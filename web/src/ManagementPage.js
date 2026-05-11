@@ -601,11 +601,11 @@ function ManagementPage(props) {
         <Route exact path="/forms/:formName/data" render={(props) => renderSigninIfNotSignedIn(<FormDataPage key={props.match.params.formName} account={account} {...props} />)} />
         <Route exact path="/resources" render={(props) => renderSigninIfNotSignedIn(<ResourceListPage account={account} {...props} />)} />
         <Route exact path="/quick-setup" render={(props) => renderSigninIfNotSignedIn(<QuickSetupPage account={account} {...props} />)} />
-        <Route exact path="/chat" render={(props) => renderSigninIfNotSignedIn(<ChatPage account={account} {...props} />)} />
-        <Route exact path="/chat/:chatName" render={(props) => renderSigninIfNotSignedIn(<ChatPage account={account} {...props} />)} />
-        <Route exact path="/stores/:owner/:storeName/chat" render={(props) => renderSigninIfNotSignedIn(<ChatPage account={account} {...props} />)} />
-        <Route exact path="/:owner/:storeName/chat" render={(props) => renderSigninIfNotSignedIn(<ChatPage account={account} {...props} />)} />
-        <Route exact path="/:owner/:storeName/chat/:chatName" render={(props) => renderSigninIfNotSignedIn(<ChatPage account={account} {...props} />)} />
+        <Route exact path="/chat" render={(props) => renderSigninIfNotSignedIn(<ChatPage account={account} site={site} {...props} />)} />
+        <Route exact path="/chat/:chatName" render={(props) => renderSigninIfNotSignedIn(<ChatPage account={account} site={site} {...props} />)} />
+        <Route exact path="/stores/:owner/:storeName/chat" render={(props) => renderSigninIfNotSignedIn(<ChatPage account={account} site={site} {...props} />)} />
+        <Route exact path="/:owner/:storeName/chat" render={(props) => renderSigninIfNotSignedIn(<ChatPage account={account} site={site} {...props} />)} />
+        <Route exact path="/:owner/:storeName/chat/:chatName" render={(props) => renderSigninIfNotSignedIn(<ChatPage account={account} site={site} {...props} />)} />
         <Route exact path="/sysinfo" render={(props) => renderSigninIfNotSignedIn(<SystemInfo account={account} {...props} />)} />
         <Route path="" render={() => <Result status="404" title="404 NOT FOUND" subTitle={i18next.t("general:Sorry, the page you visited does not exist.")} extra={<a href="/"><Button type="primary">{i18next.t("general:Back Home")}</Button></a>} />} />
       </Switch>
@@ -687,7 +687,7 @@ function ManagementPage(props) {
     return (
       <React.Fragment>
         <Footer id="footer" style={{textAlign: "center", height: "67px"}}>
-          <div dangerouslySetInnerHTML={{__html: Setting.getFooterHtml(themeAlgorithm, site?.footerHtml)}} />
+          <div dangerouslySetInnerHTML={{__html: Setting.getFooterHtml(themeAlgorithm, site?.footerHtml, site)}} />
         </Footer>
       </React.Fragment>
     );

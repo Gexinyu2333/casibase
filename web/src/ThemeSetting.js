@@ -506,12 +506,11 @@ export function getNavbarHtml(themes, storeNavbarHtml) {
   }
 }
 
-export function getFooterHtml(themes, storeFooterHtml) {
-  const defaultFooterHtml = "<a target=\"_blank\" href=\"https://github.com/the-open-agent/openagent\" rel=\"noreferrer\"><img style=\"padding-bottom: 3px;\" height=\"30\" alt=\"OpenAgent\" src=\"https://cdn.openagentai.org/img/openagent-logo_1600x276.png\" /></a>";
-  let footerHtml = Conf.FooterHtml;
-  if (storeFooterHtml && storeFooterHtml !== defaultFooterHtml) {
-    footerHtml = storeFooterHtml;
-  }
+export function getFooterHtml(themes, storeFooterHtml, site) {
+  const logoUrl = getLogo("", site?.logoUrl);
+  const defaultFooterHtml = `<a target="_blank" href="https://github.com/the-open-agent/openagent" rel="noreferrer"><img style="padding-bottom: 3px;" height="30" alt="OpenAgent" src="${logoUrl}" /></a>`;
+  const isDefaultFooter = !storeFooterHtml || storeFooterHtml.includes("/img/openagent-logo_1900x450.png");
+  let footerHtml = isDefaultFooter ? (Conf.FooterHtml || defaultFooterHtml) : storeFooterHtml;
   footerHtml = footerHtml.replace("https://cdn.openagentai.org", Conf.StaticBaseUrl);
   if (themes.includes("dark")) {
     return footerHtml.replace(/(\.png)/g, "_white$1");
