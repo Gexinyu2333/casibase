@@ -291,6 +291,86 @@ func (p *DiscordPipe) verifyWebhookSignature(body []byte, header http.Header) er
 	return nil
 }
 
+type discordSentMessage struct {
+	Id        string `json:"id"`
+	ChannelId string `json:"channel_id"`
+}
+
+type discordMessageWriter struct {
+	pipe      *DiscordPipe
+	channelId string
+	messageId string
+	lastText  string
+}
+
+func (w *discordMessageWriter) editText(text string) error {
+	if text == w.lastText {
+		return nil
+	}
+	payload := map[string]interface{}{
+		"content": text,
+	}
+	_, err := doJSONRequest(
+		w.pipe.httpClient,
+		"Discord",
+		http.MethodPatch,
+		fmt.Sprintf("%s/channels/%s/messages/%s", discordApiBaseUrl, w.channelId, w.messageId),
+		w.pipe.authorizationHeaders(),
+		payload,
+		http.StatusOK,
+	)
+	if err == nil {
+		w.lastText = text
+	}
+	return err
+}
+
+func (w *discordMessageWriter) WriteMessage(text string) error {
+	return w.editText(text)
+}
+
+func (w *discordMessageWriter) CloseMessage(text string) error {
+	return w.editText(text)
+}
+
+func (p *DiscordPipe) SendStreamMessage(chatId string, text string) (PipeMessageWriter, error) {
+	initialText := text
+	if initialText == "" {
+		initialText = "..."
+	}
+	payload := map[string]interface{}{
+		"content": initialText,
+	}
+	respBody, err := doJSONRequest(
+		p.httpClient,
+		"Discord",
+		http.MethodPost,
+		fmt.Sprintf("%s/channels/%s/messages", discordApiBaseUrl, chatId),
+		p.authorizationHeaders(),
+		payload,
+		http.StatusOK,
+		http.StatusCreated,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	var sent discordSentMessage
+	if err := json.Unmarshal(respBody, &sent); err != nil {
+		return nil, err
+	}
+	if sent.Id == "" {
+		return nil, fmt.Errorf("Discord: sendMessage returned no message ID")
+	}
+
+	return &discordMessageWriter{
+		pipe:      p,
+		channelId: chatId,
+		messageId: sent.Id,
+		lastText:  initialText,
+	}, nil
+}
+
 func (p *DiscordPipe) SetWebhook(webhookUrl string) error {
 	payload := map[string]interface{}{
 		"interactions_endpoint_url": webhookUrl,

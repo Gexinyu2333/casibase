@@ -109,3 +109,69 @@ func (p *TelegramPipe) SetWebhook(webhookUrl string) error {
 	_, err := p.doPost("setWebhook", payload)
 	return err
 }
+
+type telegramSendResult struct {
+	Ok     bool             `json:"ok"`
+	Result *telegramMessage `json:"result"`
+}
+
+type telegramMessageWriter struct {
+	pipe      *TelegramPipe
+	chatId    string
+	messageId int64
+	lastText  string
+}
+
+func (w *telegramMessageWriter) editText(text string) error {
+	if text == w.lastText {
+		return nil
+	}
+	payload := map[string]interface{}{
+		"chat_id":    w.chatId,
+		"message_id": w.messageId,
+		"text":       text,
+	}
+	_, err := w.pipe.doPost("editMessageText", payload)
+	if err == nil {
+		w.lastText = text
+	}
+	return err
+}
+
+func (w *telegramMessageWriter) WriteMessage(text string) error {
+	return w.editText(text)
+}
+
+func (w *telegramMessageWriter) CloseMessage(text string) error {
+	return w.editText(text)
+}
+
+func (p *TelegramPipe) SendStreamMessage(chatId string, text string) (PipeMessageWriter, error) {
+	initialText := text
+	if initialText == "" {
+		initialText = "..."
+	}
+	payload := map[string]interface{}{
+		"chat_id": chatId,
+		"text":    initialText,
+	}
+	respBody, err := p.doPost("sendMessage", payload)
+	if err != nil {
+		return nil, err
+	}
+
+	var result telegramSendResult
+	if err := json.Unmarshal(respBody, &result); err != nil {
+		return nil, err
+	}
+	if result.Result == nil || result.Result.MessageId == 0 {
+		return nil, fmt.Errorf("Telegram: sendMessage returned no message_id")
+	}
+
+	return &telegramMessageWriter{
+		pipe:      p,
+		chatId:    chatId,
+		messageId: result.Result.MessageId,
+		lastText:  initialText,
+	}, nil
+}

@@ -111,6 +111,95 @@ func (p *SlackPipe) SetWebhook(webhookUrl string) error {
 	return nil
 }
 
+type slackPostMessageResult struct {
+	Ok      bool   `json:"ok"`
+	Channel string `json:"channel"`
+	Ts      string `json:"ts"`
+}
+
+type slackMessageWriter struct {
+	pipe     *SlackPipe
+	channel  string
+	ts       string
+	lastText string
+}
+
+func (w *slackMessageWriter) editText(text string) error {
+	if text == w.lastText {
+		return nil
+	}
+	payload := map[string]interface{}{
+		"channel": w.channel,
+		"ts":      w.ts,
+		"text":    text,
+	}
+	headers := map[string]string{
+		"Authorization": "Bearer " + w.pipe.botToken,
+	}
+	_, err := doJSONRequest(
+		w.pipe.httpClient,
+		"Slack",
+		http.MethodPost,
+		slackApiBaseUrl+"/chat.update",
+		headers,
+		payload,
+		http.StatusOK,
+	)
+	if err == nil {
+		w.lastText = text
+	}
+	return err
+}
+
+func (w *slackMessageWriter) WriteMessage(text string) error {
+	return w.editText(text)
+}
+
+func (w *slackMessageWriter) CloseMessage(text string) error {
+	return w.editText(text)
+}
+
+func (p *SlackPipe) SendStreamMessage(chatId string, text string) (PipeMessageWriter, error) {
+	initialText := text
+	if initialText == "" {
+		initialText = "..."
+	}
+	payload := map[string]interface{}{
+		"channel": chatId,
+		"text":    initialText,
+	}
+	headers := map[string]string{
+		"Authorization": "Bearer " + p.botToken,
+	}
+	respBody, err := doJSONRequest(
+		p.httpClient,
+		"Slack",
+		http.MethodPost,
+		slackApiBaseUrl+"/chat.postMessage",
+		headers,
+		payload,
+		http.StatusOK,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	var result slackPostMessageResult
+	if err := json.Unmarshal(respBody, &result); err != nil {
+		return nil, err
+	}
+	if !result.Ok || result.Ts == "" {
+		return nil, fmt.Errorf("Slack: postMessage failed or returned no ts")
+	}
+
+	return &slackMessageWriter{
+		pipe:     p,
+		channel:  result.Channel,
+		ts:       result.Ts,
+		lastText: initialText,
+	}, nil
+}
+
 // GetWebhookResponse handles Slack's URL verification challenge and validates
 // the HMAC-SHA256 request signature on every incoming event.
 func (p *SlackPipe) GetWebhookResponse(body []byte, header http.Header) (*WebhookResponse, error) {
