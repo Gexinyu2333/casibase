@@ -24,6 +24,7 @@ import (
 	"github.com/the-open-agent/openagent/conf"
 	"github.com/the-open-agent/openagent/embedding"
 	"github.com/the-open-agent/openagent/i18n"
+	"github.com/the-open-agent/openagent/mcp"
 	"github.com/the-open-agent/openagent/model"
 	"github.com/the-open-agent/openagent/object"
 	"github.com/the-open-agent/openagent/util"
@@ -260,6 +261,8 @@ func generateMessageAnswer(id string, responseWriter http.ResponseWriter, host s
 		responseErrorStream(message, err.Error())
 		return
 	}
+
+	printAgentSessionStart(store, mcpToolSet, history)
 
 	fmt.Printf("Question: [%s]\n", question)
 	fmt.Printf("Knowledge: [\n")
@@ -591,4 +594,28 @@ func (c *ApiController) GetAnswer() {
 	}
 
 	c.ResponseOk(answer)
+}
+
+func printAgentSessionStart(store *object.Store, mcpToolSet *mcp.ToolSet, history []*model.RawMessage) {
+	fmt.Printf("\n=== Agent Session Start ===\n")
+	fmt.Printf("Store: [%s] | Model Provider: [%s] | MCP Server: [%s]\n", store.Name, store.ModelProvider, store.McpServer)
+	fmt.Printf("Skills: %v\n", store.Skills)
+	fmt.Printf("Tools: %v\n", store.Tools)
+	if mcpToolSet != nil {
+		fmt.Printf("MCP Connections: [%d server(s)]\n", len(mcpToolSet.Connections))
+		for serverName := range mcpToolSet.Connections {
+			fmt.Printf("  - MCP Server: [%s]\n", serverName)
+		}
+		fmt.Printf("Available Tools: [%d total]\n", len(mcpToolSet.Tools))
+		for _, t := range mcpToolSet.Tools {
+			fmt.Printf("  - [%s]: %s\n", t.Name, t.Description)
+		}
+		if mcpToolSet.WebSearchEnabled {
+			fmt.Printf("  - [web_search] (builtin)\n")
+		}
+	} else {
+		fmt.Printf("Available Tools: [None]\n")
+	}
+	fmt.Printf("History: [%d messages] | Memory Limit: [%d] | Knowledge Count: [%d]\n", len(history), store.MemoryLimit, store.KnowledgeCount)
+	fmt.Printf("===========================\n\n")
 }

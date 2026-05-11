@@ -106,31 +106,60 @@ func handleToolCallsParameters(toolCall openai.ToolCall, toolCalls []openai.Tool
 	return toolCalls, toolCallsMap
 }
 
+func normalizeToolCalls(toolSession *ToolSession) []openai.ToolCall {
+	if toolSession.ToolMessages.ToolCalls == nil {
+		return nil
+	}
+	toolCalls, ok := toolSession.ToolMessages.ToolCalls.([]openai.ToolCall)
+	if ok {
+		return toolCalls
+	}
+	responseFunctionToolCalls, ok := toolSession.ToolMessages.ToolCalls.([]responses.ResponseFunctionToolCall)
+	if !ok {
+		return nil
+	}
+	result := make([]openai.ToolCall, 0, len(responseFunctionToolCalls))
+	for _, tc := range responseFunctionToolCalls {
+		result = append(result, openai.ToolCall{
+			ID:       tc.ID,
+			Type:     "function",
+			Function: openai.FunctionCall{Name: tc.Name, Arguments: tc.Arguments},
+		})
+	}
+	return result
+}
+
 func QueryTextWithTools(p ModelProvider, question string, writer io.Writer, history []*RawMessage, prompt string, knowledgeMessages []*RawMessage, toolSession *ToolSession, lang string) (*ModelResult, error) {
 	var messages []*RawMessage
+
+	toolCount := 0
+	if toolSession.McpToolSet != nil {
+		toolCount = len(toolSession.McpToolSet.Tools)
+		if toolSession.McpToolSet.WebSearchEnabled {
+			toolCount++
+		}
+	}
+	fmt.Printf("\n--- LLM Call (Round 0) | Tools available: [%d] ---\n", toolCount)
+
 	modelResult, err := p.QueryText(question, writer, history, prompt, knowledgeMessages, toolSession, lang)
 	if err != nil {
 		return nil, err
 	}
 
-	if toolSession.ToolMessages.ToolCalls == nil {
-		fmt.Printf("Tool Call: [None]\n")
+	toolCalls := normalizeToolCalls(toolSession)
+	if len(toolCalls) == 0 {
+		fmt.Printf("LLM Decision: [Final Answer — no tool calls]\n")
 		return modelResult, nil
 	}
 
-	toolCalls, ok := toolSession.ToolMessages.ToolCalls.([]openai.ToolCall)
-	if !ok {
-		responseFunctionToolCalls := toolSession.ToolMessages.ToolCalls.([]responses.ResponseFunctionToolCall)
-		for _, responseFunctionToolCall := range responseFunctionToolCalls {
-			toolCalls = append(toolCalls, openai.ToolCall{
-				ID:       responseFunctionToolCall.ID,
-				Type:     "function",
-				Function: openai.FunctionCall{Name: responseFunctionToolCall.Name, Arguments: responseFunctionToolCall.Arguments},
-			})
-		}
-	}
-
+	round := 0
 	for len(toolCalls) > 0 {
+		round++
+		fmt.Printf("\n--- Agent Round %d | LLM Decision: [%d tool call(s)] ---\n", round, len(toolCalls))
+		for i, tc := range toolCalls {
+			fmt.Printf("  Tool %d: [%s] args: %s\n", i+1, tc.Function.Name, tc.Function.Arguments)
+		}
+
 		for _, toolCall := range toolCalls {
 			serverName, toolName := mcp.GetServerNameAndToolNameFromId(toolCall.Function.Name)
 
@@ -146,24 +175,18 @@ func QueryTextWithTools(p ModelProvider, question string, writer io.Writer, hist
 				return nil, err
 			}
 		}
+
 		toolSession.ToolMessages.Messages = messages
+		fmt.Printf("\n--- LLM Call (Round %d) | Tool results fed back ---\n", round)
 		modelResult, err = p.QueryText(question, writer, history, prompt, knowledgeMessages, toolSession, lang)
 		if err != nil {
 			return nil, err
 		}
-		toolCalls, ok = toolSession.ToolMessages.ToolCalls.([]openai.ToolCall)
-		if !ok {
-			toolCalls = []openai.ToolCall{}
-			responseFunctionToolCalls := toolSession.ToolMessages.ToolCalls.([]responses.ResponseFunctionToolCall)
-			for _, responseFunctionToolCall := range responseFunctionToolCalls {
-				toolCalls = append(toolCalls, openai.ToolCall{
-					ID:       responseFunctionToolCall.ID,
-					Type:     "function",
-					Function: openai.FunctionCall{Name: responseFunctionToolCall.Name, Arguments: responseFunctionToolCall.Arguments},
-				})
-			}
-		}
+
+		toolCalls = normalizeToolCalls(toolSession)
 	}
+
+	fmt.Printf("LLM Decision: [Final Answer — no more tool calls after round %d]\n", round)
 
 	for _, conn := range toolSession.McpToolSet.Connections {
 		conn.Close()
@@ -186,9 +209,6 @@ func callMcpTool(toolCall openai.ToolCall, serverName, toolName string, mcpToolS
 	if err := json.Unmarshal([]byte(toolCall.Function.Arguments), &arguments); err != nil {
 		return nil, fmt.Errorf(i18n.Translate(lang, "model:failed to parse tool arguments: %v"), err)
 	}
-
-	fmt.Printf("Tool Call: [%s]\n", toolCall.Function.Name)
-	fmt.Printf("Arguments: [%s]\n", toolCall.Function.Arguments)
 
 	// Send tool-start event immediately so the frontend can show the tool call before execution
 	toolStartData := ToolCall{
