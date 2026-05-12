@@ -59,10 +59,12 @@ func getContextLength(typ string) int {
 				return 32768
 			}
 			return 65536
+		} else if strings.Contains(typ, "v4") {
+			return 1000000
 		} else if strings.Contains(typ, "v2.5") {
 			return 8192
 		} else if strings.Contains(typ, "v3") || strings.Contains(typ, "chat") || strings.Contains(typ, "reasoner") {
-			return 65536
+			return 1000000
 		}
 	} else if strings.Contains(typ, "qwen") {
 		if strings.Contains(typ, "long") || strings.Contains(typ, "turbo") {
