@@ -151,6 +151,34 @@ func InitAdapter() {
 	}
 }
 
+// RefreshProviderAdapter re-initializes providerAdapter based on the current
+// parentDbName config (which may now come from the saved built-in site settings).
+// It is safe to call at runtime after SyncSiteToConf updates the conf overrides.
+func RefreshProviderAdapter() {
+	parentDbName := conf.GetConfigString("parentDbName")
+
+	if adapter != nil && adapter.DbName == parentDbName {
+		parentDbName = ""
+	}
+
+	if parentDbName == "" {
+		if providerAdapter != nil {
+			providerAdapter.close()
+			providerAdapter = nil
+		}
+		return
+	}
+
+	if providerAdapter != nil && providerAdapter.DbName == parentDbName {
+		return
+	}
+
+	if providerAdapter != nil {
+		providerAdapter.close()
+	}
+	providerAdapter = NewAdapterWithDbName(adapter.driverName, adapter.dataSourceName, parentDbName)
+}
+
 func CreateTables() {
 	if createDatabase {
 		err := adapter.CreateDatabase()

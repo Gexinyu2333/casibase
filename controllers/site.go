@@ -126,6 +126,7 @@ func (c *ApiController) UpdateSite() {
 
 	if success && site.Name == "site-built-in" {
 		object.SyncSiteToConf(&site)
+		object.RefreshProviderAdapter()
 		InitAuthConfig()
 		proxy.InitHttpClient()
 	}
