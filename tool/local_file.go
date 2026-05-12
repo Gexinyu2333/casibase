@@ -32,8 +32,10 @@ import (
 )
 
 const (
-	localFileDefaultReadLimit = 12000
-	localFileMaxReadLimit     = 100000
+	localFileDefaultPreviewChars = 1200
+	localFileMaxPreviewChars     = 20000
+	localFileDefaultReadLimit    = 12000
+	localFileMaxReadLimit        = 100000
 )
 
 // LocalFileTool is the Tool Type "local_file".
@@ -44,7 +46,7 @@ type LocalFileTool struct {
 func (p *LocalFileTool) BuiltinTools() []BuiltinTool {
 	return []BuiltinTool{
 		&localSpecialDirsBuiltin{},
-		&localFileScanBuiltin{},
+		&localFileScanBuiltin{lang: p.lang},
 		&localFileReadBuiltin{lang: p.lang},
 		&localFileWriteBuiltin{},
 		&localFileMoveBuiltin{},
@@ -52,9 +54,15 @@ func (p *LocalFileTool) BuiltinTools() []BuiltinTool {
 }
 
 type localFileScanItem struct {
-	Type string `json:"type"`
-	Name string `json:"name"`
-	Path string `json:"path"`
+	Type         string `json:"type"`
+	Name         string `json:"name"`
+	Path         string `json:"path"`
+	Size         int64  `json:"size,omitempty"`
+	ModifiedTime string `json:"modifiedTime,omitempty"`
+	TextLength   int    `json:"textLength,omitempty"`
+	Preview      string `json:"preview,omitempty"`
+	Truncated    bool   `json:"truncated,omitempty"`
+	Error        string `json:"error,omitempty"`
 }
 
 type localSpecialDirInfo struct {
@@ -283,7 +291,9 @@ func (b *localSpecialDirsBuiltin) Execute(_ context.Context, _ map[string]interf
 	}), nil
 }
 
-type localFileScanBuiltin struct{}
+type localFileScanBuiltin struct {
+	lang string
+}
 
 func (b *localFileScanBuiltin) GetName() string {
 	return "local_file_scan"
@@ -292,7 +302,8 @@ func (b *localFileScanBuiltin) GetName() string {
 func (b *localFileScanBuiltin) GetDescription() string {
 	return `Scan a local directory recursively and return a JSON manifest of all descendant files and directories.
 - root (required): absolute directory path for the current operating system.
-- Returns items with type, name, and path.`
+- preview_chars: maximum text preview characters per file (default 1200, max 20000). Set to 0 to skip previews.
+- Returns items with type, name, path, size, modifiedTime, and a text preview for readable files.`
 }
 
 func (b *localFileScanBuiltin) GetInputSchema() interface{} {
@@ -302,6 +313,10 @@ func (b *localFileScanBuiltin) GetInputSchema() interface{} {
 			"root": map[string]interface{}{
 				"type":        "string",
 				"description": "Absolute directory path to scan.",
+			},
+			"preview_chars": map[string]interface{}{
+				"type":        "number",
+				"description": "Maximum text preview characters per file (default 1200, max 20000). Set to 0 to skip previews.",
 			},
 		},
 		"required": []string{"root"},
@@ -322,6 +337,9 @@ func (b *localFileScanBuiltin) Execute(_ context.Context, arguments map[string]i
 		return localFileError("root must be a directory"), nil
 	}
 
+	previewChars := localFileIntArg(arguments, "preview_chars", localFileDefaultPreviewChars)
+	previewChars = localFileClamp(previewChars, 0, localFileMaxPreviewChars)
+
 	var items []localFileScanItem
 	walkErr := filepath.WalkDir(root, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
@@ -331,15 +349,34 @@ func (b *localFileScanBuiltin) Execute(_ context.Context, arguments map[string]i
 			return nil
 		}
 
-		itemType := "file"
 		if d.IsDir() {
-			itemType = "directory"
+			items = append(items, localFileScanItem{
+				Type: "directory",
+				Name: d.Name(),
+				Path: path,
+			})
+			return nil
 		}
-		items = append(items, localFileScanItem{
-			Type: itemType,
+
+		item := localFileScanItem{
+			Type: "file",
 			Name: d.Name(),
 			Path: path,
-		})
+		}
+		if fileInfo, statErr := d.Info(); statErr == nil {
+			item.Size = fileInfo.Size()
+			item.ModifiedTime = fileInfo.ModTime().Format("2006-01-02 15:04:05")
+		}
+		if previewChars > 0 {
+			ext := strings.ToLower(filepath.Ext(path))
+			if text, readErr := localFileReadText(path, ext, b.lang); readErr != nil {
+				item.Error = readErr.Error()
+			} else {
+				item.TextLength = len([]rune(text))
+				item.Preview, item.Truncated = localFileSliceText(text, 0, previewChars)
+			}
+		}
+		items = append(items, item)
 		return nil
 	})
 	if walkErr != nil {
