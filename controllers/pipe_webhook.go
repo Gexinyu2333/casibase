@@ -382,7 +382,7 @@ func sendPipeAnswer(provider pipepkg.Pipe, pipeObj *object.Pipe, incoming *pipep
 
 	var sender pipeAnswerSender = newDefaultPipeAnswerSender(provider, incoming.ChatId)
 	if streamProvider, ok := provider.(pipepkg.StreamPipe); ok {
-		if writer, streamErr := streamProvider.SendStreamMessage(incoming.ChatId, ""); streamErr == nil && writer != nil {
+		if writer, streamErr := streamProvider.SendStreamMessage(incoming, ""); streamErr == nil && writer != nil {
 			sender = newStreamPipeAnswerSender(writer)
 		}
 	}
@@ -440,11 +440,18 @@ func newStreamPipeAnswerSender(writer pipepkg.PipeMessageWriter) *streamPipeAnsw
 }
 
 func (s *streamPipeAnswerSender) WriteMessage(text string) error {
-	if text == "" || text == s.text {
+	if text == "" {
 		return nil
 	}
-	s.text = text
-	return s.writer.WriteMessage(text)
+	s.text += text
+	cleaned := s.text
+	if idx := strings.Index(cleaned, "|||"); idx >= 0 {
+		cleaned = strings.TrimSpace(cleaned[:idx])
+	}
+	if cleaned == "" {
+		return nil
+	}
+	return s.writer.WriteMessage(cleaned)
 }
 
 func (s *streamPipeAnswerSender) WriteError(text string) error {
@@ -465,6 +472,9 @@ func (s *streamPipeAnswerSender) CloseMessage(text string) error {
 		default:
 			finalText = "No response generated"
 		}
+	}
+	if idx := strings.Index(finalText, "|||"); idx >= 0 {
+		finalText = strings.TrimSpace(finalText[:idx])
 	}
 	return s.writer.CloseMessage(finalText)
 }

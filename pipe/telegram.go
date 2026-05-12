@@ -146,13 +146,13 @@ func (w *telegramMessageWriter) CloseMessage(text string) error {
 	return w.editText(text)
 }
 
-func (p *TelegramPipe) SendStreamMessage(chatId string, text string) (PipeMessageWriter, error) {
+func (p *TelegramPipe) SendStreamMessage(incoming *IncomingMessage, text string) (PipeMessageWriter, error) {
 	initialText := text
 	if initialText == "" {
 		initialText = "..."
 	}
 	payload := map[string]interface{}{
-		"chat_id": chatId,
+		"chat_id": incoming.ChatId,
 		"text":    initialText,
 	}
 	respBody, err := p.doPost("sendMessage", payload)
@@ -170,7 +170,7 @@ func (p *TelegramPipe) SendStreamMessage(chatId string, text string) (PipeMessag
 
 	return &telegramMessageWriter{
 		pipe:      p,
-		chatId:    chatId,
+		chatId:    incoming.ChatId,
 		messageId: result.Result.MessageId,
 		lastText:  initialText,
 	}, nil

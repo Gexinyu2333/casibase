@@ -28,6 +28,7 @@ type IncomingMessage struct {
 	UserId   string
 	Text     string
 	Username string
+	Metadata map[string]string // platform-specific data (e.g. Discord interaction token)
 }
 
 // Pipe is the core interface every pipe platform must implement.
@@ -45,7 +46,7 @@ type PipeMessageWriter interface {
 // StreamPipe is implemented by pipes that can progressively update an
 // in-flight response (for example via send + edit message APIs).
 type StreamPipe interface {
-	SendStreamMessage(chatId string, text string) (PipeMessageWriter, error)
+	SendStreamMessage(incoming *IncomingMessage, text string) (PipeMessageWriter, error)
 }
 
 type WebhookResponse struct {

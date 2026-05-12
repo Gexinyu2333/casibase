@@ -63,14 +63,15 @@ type discordApplicationCommandData struct {
 }
 
 type discordInteraction struct {
-	Id        string                         `json:"id"`
-	Type      int                            `json:"type"`
-	ChannelId string                         `json:"channel_id"`
-	GuildId   string                         `json:"guild_id"`
-	Token     string                         `json:"token"`
-	Member    *discordMember                 `json:"member"`
-	User      *discordUser                   `json:"user"`
-	Data      *discordApplicationCommandData `json:"data"`
+	Id            string                         `json:"id"`
+	ApplicationId string                         `json:"application_id"`
+	Type          int                            `json:"type"`
+	ChannelId     string                         `json:"channel_id"`
+	GuildId       string                         `json:"guild_id"`
+	Token         string                         `json:"token"`
+	Member        *discordMember                 `json:"member"`
+	User          *discordUser                   `json:"user"`
+	Data          *discordApplicationCommandData `json:"data"`
 }
 
 type discordGatewayEvent struct {
@@ -169,6 +170,10 @@ func (p *DiscordPipe) parseInteraction(interaction discordInteraction) *Incoming
 		UserId:   userId,
 		Text:     text,
 		Username: username,
+		Metadata: map[string]string{
+			"interaction_token": interaction.Token,
+			"application_id":    interaction.ApplicationId,
+		},
 	}
 }
 
@@ -297,10 +302,12 @@ type discordSentMessage struct {
 }
 
 type discordMessageWriter struct {
-	pipe      *DiscordPipe
-	channelId string
-	messageId string
-	lastText  string
+	pipe             *DiscordPipe
+	channelId        string
+	messageId        string
+	applicationId    string
+	interactionToken string
+	lastText         string
 }
 
 func (w *discordMessageWriter) editText(text string) error {
@@ -310,11 +317,17 @@ func (w *discordMessageWriter) editText(text string) error {
 	payload := map[string]interface{}{
 		"content": text,
 	}
+	var url string
+	if w.interactionToken != "" {
+		url = fmt.Sprintf("%s/webhooks/%s/%s/messages/@original", discordApiBaseUrl, w.applicationId, w.interactionToken)
+	} else {
+		url = fmt.Sprintf("%s/channels/%s/messages/%s", discordApiBaseUrl, w.channelId, w.messageId)
+	}
 	_, err := doJSONRequest(
 		w.pipe.httpClient,
 		"Discord",
 		http.MethodPatch,
-		fmt.Sprintf("%s/channels/%s/messages/%s", discordApiBaseUrl, w.channelId, w.messageId),
+		url,
 		w.pipe.authorizationHeaders(),
 		payload,
 		http.StatusOK,
@@ -333,11 +346,39 @@ func (w *discordMessageWriter) CloseMessage(text string) error {
 	return w.editText(text)
 }
 
-func (p *DiscordPipe) SendStreamMessage(chatId string, text string) (PipeMessageWriter, error) {
+func (p *DiscordPipe) SendStreamMessage(incoming *IncomingMessage, text string) (PipeMessageWriter, error) {
 	initialText := text
 	if initialText == "" {
 		initialText = "..."
 	}
+
+	// Deferred interaction: edit the original response instead of creating a new message
+	if token := incoming.Metadata["interaction_token"]; token != "" {
+		appID := incoming.Metadata["application_id"]
+		payload := map[string]interface{}{
+			"content": initialText,
+		}
+		_, err := doJSONRequest(
+			p.httpClient,
+			"Discord",
+			http.MethodPatch,
+			fmt.Sprintf("%s/webhooks/%s/%s/messages/@original", discordApiBaseUrl, appID, token),
+			p.authorizationHeaders(),
+			payload,
+			http.StatusOK,
+		)
+		if err != nil {
+			return nil, err
+		}
+		return &discordMessageWriter{
+			pipe:             p,
+			applicationId:    appID,
+			interactionToken: token,
+			lastText:         initialText,
+		}, nil
+	}
+
+	// Gateway message: create a new channel message
 	payload := map[string]interface{}{
 		"content": initialText,
 	}
@@ -345,7 +386,7 @@ func (p *DiscordPipe) SendStreamMessage(chatId string, text string) (PipeMessage
 		p.httpClient,
 		"Discord",
 		http.MethodPost,
-		fmt.Sprintf("%s/channels/%s/messages", discordApiBaseUrl, chatId),
+		fmt.Sprintf("%s/channels/%s/messages", discordApiBaseUrl, incoming.ChatId),
 		p.authorizationHeaders(),
 		payload,
 		http.StatusOK,
@@ -365,7 +406,7 @@ func (p *DiscordPipe) SendStreamMessage(chatId string, text string) (PipeMessage
 
 	return &discordMessageWriter{
 		pipe:      p,
-		channelId: chatId,
+		channelId: incoming.ChatId,
 		messageId: sent.Id,
 		lastText:  initialText,
 	}, nil

@@ -159,13 +159,13 @@ func (w *slackMessageWriter) CloseMessage(text string) error {
 	return w.editText(text)
 }
 
-func (p *SlackPipe) SendStreamMessage(chatId string, text string) (PipeMessageWriter, error) {
+func (p *SlackPipe) SendStreamMessage(incoming *IncomingMessage, text string) (PipeMessageWriter, error) {
 	initialText := text
 	if initialText == "" {
 		initialText = "..."
 	}
 	payload := map[string]interface{}{
-		"channel": chatId,
+		"channel": incoming.ChatId,
 		"text":    initialText,
 	}
 	headers := map[string]string{
@@ -228,7 +228,9 @@ func (p *SlackPipe) GetWebhookResponse(body []byte, header http.Header) (*Webhoo
 		}, nil
 	}
 
-	return nil, nil
+	// Return an immediate 200 for regular events so Slack does not retry.
+	// The actual message processing happens asynchronously in sendPipeAnswer.
+	return &WebhookResponse{StatusCode: http.StatusOK}, nil
 }
 
 func (p *SlackPipe) verifySignature(body []byte, header http.Header) error {
