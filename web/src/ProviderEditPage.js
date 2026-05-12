@@ -1207,21 +1207,16 @@ class ProviderEditPage extends React.Component {
     ProviderBackend.updateProvider(this.state.provider.owner, this.state.providerName, provider)
       .then((res) => {
         if (res.status === "ok") {
-          if (res.data) {
-            Setting.showMessage("success", i18next.t("general:Successfully saved"));
-            this.setState({
-              providerName: this.state.provider.name,
-              isNewProvider: false,
-            });
+          Setting.showMessage("success", i18next.t("general:Successfully saved"));
+          this.setState({
+            providerName: this.state.provider.name,
+            isNewProvider: false,
+          });
 
-            if (exitAfterSave) {
-              this.props.history.push("/providers");
-            } else {
-              this.props.history.push(`/providers/${this.state.provider.name}`);
-            }
+          if (exitAfterSave) {
+            this.props.history.push("/providers");
           } else {
-            Setting.showMessage("error", i18next.t("general:Failed to connect to server"));
-            this.updateProviderField("name", this.state.providerName);
+            this.props.history.push(`/providers/${this.state.provider.name}`);
           }
         } else {
           Setting.showMessage("error", `${i18next.t("general:Failed to save")}: ${res.msg}`);

@@ -81,18 +81,13 @@ class SiteEditPage extends React.Component {
     SiteBackend.updateSite(this.state.site.owner, this.state.siteName, this.state.site)
       .then((res) => {
         if (res.status === "ok") {
-          if (res.data) {
-            Setting.showMessage("success", i18next.t("general:Successfully saved"));
-            Setting.setThemeColor(this.state.site.themeColor || Setting.getThemeColor());
-            this.setState({siteName: this.state.site.name});
-            if (this.props.onUpdateSite) {
-              this.props.onUpdateSite();
-            }
-            this.props.history.push(`/sites/${this.state.site.name}`);
-          } else {
-            Setting.showMessage("error", i18next.t("general:Failed to connect to server"));
-            this.updateSiteField("name", this.state.siteName);
+          Setting.showMessage("success", i18next.t("general:Successfully saved"));
+          Setting.setThemeColor(this.state.site.themeColor || Setting.getThemeColor());
+          this.setState({siteName: this.state.site.name});
+          if (this.props.onUpdateSite) {
+            this.props.onUpdateSite();
           }
+          this.props.history.push(`/sites/${this.state.site.name}`);
         } else {
           Setting.showMessage("error", `${i18next.t("general:Failed to save")}: ${res.msg}`);
         }

@@ -217,11 +217,7 @@ export function submitStoreEdit(storeObj) {
   StoreBackend.updateStore(storeObj.owner, storeObj.name, store)
     .then((res) => {
       if (res.status === "ok") {
-        if (res.data) {
-          showMessage("success", i18next.t("general:Successfully saved"));
-        } else {
-          showMessage("error", i18next.t("general:Failed to save"));
-        }
+        showMessage("success", i18next.t("general:Successfully saved"));
       } else {
         showMessage("error", `${i18next.t("general:Failed to save")}: ${res.msg}`);
       }

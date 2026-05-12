@@ -143,20 +143,15 @@ class PipeEditPage extends React.Component {
     PipeBackend.updatePipe(this.state.pipe.owner, this.state.pipeName, pipe)
       .then((res) => {
         if (res.status === "ok") {
-          if (res.data) {
-            Setting.showMessage("success", i18next.t("general:Successfully saved"));
-            this.setState({
-              pipeName: this.state.pipe.name,
-              isNewPipe: false,
-            });
-            if (exitAfterSave) {
-              this.props.history.push("/pipes");
-            } else {
-              this.props.history.push(`/pipes/${this.state.pipe.name}`);
-            }
+          Setting.showMessage("success", i18next.t("general:Successfully saved"));
+          this.setState({
+            pipeName: this.state.pipe.name,
+            isNewPipe: false,
+          });
+          if (exitAfterSave) {
+            this.props.history.push("/pipes");
           } else {
-            Setting.showMessage("error", i18next.t("general:Failed to connect to server"));
-            this.updatePipeField("name", this.state.pipeName);
+            this.props.history.push(`/pipes/${this.state.pipe.name}`);
           }
         } else {
           Setting.showMessage("error", `${i18next.t("general:Failed to save")}: ${res.msg}`);

@@ -332,21 +332,16 @@ class ToolEditPage extends React.Component {
     ToolBackend.updateTool(this.state.tool.owner, this.state.toolName, tool)
       .then((res) => {
         if (res.status === "ok") {
-          if (res.data) {
-            Setting.showMessage("success", i18next.t("general:Successfully saved"));
-            this.setState({
-              toolName: this.state.tool.name,
-              isNewTool: false,
-            });
+          Setting.showMessage("success", i18next.t("general:Successfully saved"));
+          this.setState({
+            toolName: this.state.tool.name,
+            isNewTool: false,
+          });
 
-            if (exitAfterSave) {
-              this.props.history.push("/tools");
-            } else {
-              this.props.history.push(`/tools/${this.state.tool.name}`);
-            }
+          if (exitAfterSave) {
+            this.props.history.push("/tools");
           } else {
-            Setting.showMessage("error", i18next.t("general:Failed to connect to server"));
-            this.updateToolField("name", this.state.toolName);
+            this.props.history.push(`/tools/${this.state.tool.name}`);
           }
         } else {
           Setting.showMessage("error", `${i18next.t("general:Failed to save")}: ${res.msg}`);

@@ -211,22 +211,17 @@ class VectorEditPage extends React.Component {
     VectorBackend.updateVector(this.state.vector.owner, this.state.vectorName, vector)
       .then((res) => {
         if (res.status === "ok") {
-          if (res.data) {
-            Setting.showMessage("success", i18next.t("general:Successfully saved"));
-            this.setState({
-              vectorName: this.state.vector.name,
-              isNewVector: false,
-            });
+          Setting.showMessage("success", i18next.t("general:Successfully saved"));
+          this.setState({
+            vectorName: this.state.vector.name,
+            isNewVector: false,
+          });
 
-            if (exitAfterSave) {
-              this.props.history.push("/vectors");
-            } else {
-              this.props.history.push(`/vectors/${this.state.vector.name}`);
-              this.getVector();
-            }
+          if (exitAfterSave) {
+            this.props.history.push("/vectors");
           } else {
-            Setting.showMessage("error", i18next.t("general:Failed to save"));
-            this.updateVectorField("name", this.state.vectorName);
+            this.props.history.push(`/vectors/${this.state.vector.name}`);
+            this.getVector();
           }
         } else {
           Setting.showMessage("error", `${i18next.t("general:Failed to save")}: ${res.msg}`);

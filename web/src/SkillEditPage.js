@@ -262,21 +262,16 @@ class SkillEditPage extends React.Component {
     SkillBackend.updateSkill(this.state.skill.owner, this.state.skillName, skill)
       .then((res) => {
         if (res.status === "ok") {
-          if (res.data) {
-            Setting.showMessage("success", i18next.t("general:Successfully saved"));
-            this.setState({
-              skillName: this.state.skill.name,
-              isNewSkill: false,
-            });
+          Setting.showMessage("success", i18next.t("general:Successfully saved"));
+          this.setState({
+            skillName: this.state.skill.name,
+            isNewSkill: false,
+          });
 
-            if (exitAfterSave) {
-              this.props.history.push("/skills");
-            } else {
-              this.props.history.push(`/skills/${this.state.skill.name}`);
-            }
+          if (exitAfterSave) {
+            this.props.history.push("/skills");
           } else {
-            Setting.showMessage("error", i18next.t("general:Failed to connect to server"));
-            this.updateSkillField("name", this.state.skillName);
+            this.props.history.push(`/skills/${this.state.skill.name}`);
           }
         } else {
           Setting.showMessage("error", `${i18next.t("general:Failed to save")}: ${res.msg}`);

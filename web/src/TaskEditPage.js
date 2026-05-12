@@ -508,20 +508,15 @@ class TaskEditPage extends React.Component {
     TaskBackend.updateTask(this.state.task.owner, this.state.taskName, task)
       .then((res) => {
         if (res.status === "ok") {
-          if (res.data) {
-            Setting.showMessage("success", i18next.t("general:Successfully saved"));
-            this.setState({
-              taskName: this.state.task.name,
-              isNewTask: false,
-            });
-            if (exitAfterSave) {
-              this.props.history.push("/tasks");
-            } else {
-              this.props.history.push(`/tasks/${this.state.task.owner}/${this.state.task.name}`);
-            }
+          Setting.showMessage("success", i18next.t("general:Successfully saved"));
+          this.setState({
+            taskName: this.state.task.name,
+            isNewTask: false,
+          });
+          if (exitAfterSave) {
+            this.props.history.push("/tasks");
           } else {
-            Setting.showMessage("error", i18next.t("general:Failed to save"));
-            this.updateTaskField("name", this.state.taskName);
+            this.props.history.push(`/tasks/${this.state.task.owner}/${this.state.task.name}`);
           }
         } else {
           Setting.showMessage("error", `${i18next.t("general:Failed to save")}: ${res.msg}`);

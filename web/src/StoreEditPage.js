@@ -752,21 +752,16 @@ class StoreEditPage extends React.Component {
     StoreBackend.updateStore(this.state.owner, this.state.storeName, store)
       .then((res) => {
         if (res.status === "ok") {
-          if (res.data) {
-            Setting.showMessage("success", i18next.t("general:Successfully saved"));
-            this.setState({
-              storeName: this.state.store.name,
-              isNewStore: false,
-            });
-            window.dispatchEvent(new Event("storesChanged"));
-            if (exitAfterSave) {
-              this.props.history.push("/stores");
-            } else {
-              this.props.history.push(`/stores/${this.state.store.owner}/${this.state.store.name}`);
-            }
+          Setting.showMessage("success", i18next.t("general:Successfully saved"));
+          this.setState({
+            storeName: this.state.store.name,
+            isNewStore: false,
+          });
+          window.dispatchEvent(new Event("storesChanged"));
+          if (exitAfterSave) {
+            this.props.history.push("/stores");
           } else {
-            Setting.showMessage("error", i18next.t("general:Failed to connect to server"));
-            this.updateStoreField("name", this.state.storeName);
+            this.props.history.push(`/stores/${this.state.store.owner}/${this.state.store.name}`);
           }
         } else {
           Setting.showMessage("error", `${i18next.t("general:Failed to save")}: ${res.msg}`);

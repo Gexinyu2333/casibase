@@ -291,20 +291,15 @@ class FormEditPage extends React.Component {
     FormBackend.updateForm(this.state.form.owner, this.state.formName, form)
       .then((res) => {
         if (res.status === "ok") {
-          if (res.data) {
-            Setting.showMessage("success", i18next.t("general:Successfully saved"));
-            this.setState({
-              formName: this.state.form.name,
-              isNewForm: false,
-            });
-            if (exitAfterSave) {
-              this.props.history.push("/forms");
-            } else {
-              this.props.history.push(`/forms/${this.state.form.name}`);
-            }
+          Setting.showMessage("success", i18next.t("general:Successfully saved"));
+          this.setState({
+            formName: this.state.form.name,
+            isNewForm: false,
+          });
+          if (exitAfterSave) {
+            this.props.history.push("/forms");
           } else {
-            Setting.showMessage("error", i18next.t("general:Failed to save"));
-            this.updateFormField("name", this.state.formName);
+            this.props.history.push(`/forms/${this.state.form.name}`);
           }
         } else {
           Setting.showMessage("error", `${i18next.t("general:Failed to save")}: ${res.msg}`);

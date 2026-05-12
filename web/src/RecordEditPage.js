@@ -311,19 +311,14 @@ class RecordEditPage extends React.Component {
     RecordBackend.updateRecord(this.state.record.owner, this.state.recordName, record)
       .then((res) => {
         if (res.status === "ok") {
-          if (res.data) {
-            Setting.showMessage("success", i18next.t("general:Successfully saved"));
-            this.setState({
-              recordName: this.state.record.name,
-            });
-            if (willExist) {
-              this.props.history.push("/records");
-            } else {
-              this.props.history.push(`/records/${this.state.record.owner}/${encodeURIComponent(this.state.record.id)}`);
-            }
+          Setting.showMessage("success", i18next.t("general:Successfully saved"));
+          this.setState({
+            recordName: this.state.record.name,
+          });
+          if (willExist) {
+            this.props.history.push("/records");
           } else {
-            Setting.showMessage("error", i18next.t("general:Failed to connect to server"));
-            this.updateRecordField("name", this.state.recordName);
+            this.props.history.push(`/records/${this.state.record.owner}/${encodeURIComponent(this.state.record.id)}`);
           }
         } else {
           Setting.showMessage("error", `${i18next.t("general:Failed to save")}: ${res.msg}`);

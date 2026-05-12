@@ -264,21 +264,16 @@ class ChatEditPage extends React.Component {
     ChatBackend.updateChat(this.state.chat.owner, this.state.chatName, chat)
       .then((res) => {
         if (res.status === "ok") {
-          if (res.data) {
-            Setting.showMessage("success", i18next.t("general:Successfully saved"));
-            this.setState({
-              chatName: this.state.chat.name,
-              isNewChat: false,
-            });
+          Setting.showMessage("success", i18next.t("general:Successfully saved"));
+          this.setState({
+            chatName: this.state.chat.name,
+            isNewChat: false,
+          });
 
-            if (exitAfterSave) {
-              this.props.history.push("/chats");
-            } else {
-              this.props.history.push(`/chats/${this.state.chat.name}`);
-            }
+          if (exitAfterSave) {
+            this.props.history.push("/chats");
           } else {
-            Setting.showMessage("error", i18next.t("general:Failed to connect to server"));
-            this.updateChatField("name", this.state.chatName);
+            this.props.history.push(`/chats/${this.state.chat.name}`);
           }
         } else {
           Setting.showMessage("error", `${i18next.t("general:Failed to save")}: ${res.msg}`);
