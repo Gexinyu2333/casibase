@@ -27,14 +27,17 @@ import (
 )
 
 func InitDb() {
+	// Load the built-in site first so that site.ParentDbName overrides
+	// app.conf before any other initialization reads conf or uses providerAdapter.
+	initBuiltInSite()
+	if site, err := GetBuiltInSiteWithSecret(); err == nil && site != nil {
+		SyncSiteToConf(site)
+		RefreshProviderAdapter()
+	}
 	modelProviderName, embeddingProviderName, ttsProviderName, sttProviderName, imageProviderName := initBuiltInProviders()
 	initBuiltInStore(modelProviderName, embeddingProviderName, ttsProviderName, sttProviderName, imageProviderName)
 	initSkillsFromFolder()
 	initBuiltInTools()
-	initBuiltInSite()
-	if site, err := GetBuiltInSiteWithSecret(); err == nil && site != nil {
-		SyncSiteToConf(site)
-	}
 	InitUsers()
 	go printStartupStats()
 }
