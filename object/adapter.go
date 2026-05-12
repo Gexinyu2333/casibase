@@ -200,6 +200,9 @@ type Adapter struct {
 
 // finalizer is the destructor for Adapter.
 func finalizer(a *Adapter) {
+	if a.engine == nil {
+		return
+	}
 	err := a.engine.Close()
 	if err != nil {
 		panic(err)
@@ -304,6 +307,7 @@ func (a *Adapter) open() {
 }
 
 func (a *Adapter) close() {
+	runtime.SetFinalizer(a, nil) // deregister before closing to prevent double-close
 	a.engine.Close()
 	a.engine = nil
 }
