@@ -25,16 +25,15 @@ import (
 	"runtime"
 	"sort"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/ThinkInAIXYZ/go-mcp/protocol"
 	"github.com/the-open-agent/openagent/txt"
 )
 
 const (
-	localFileDefaultPreviewChars = 1200
-	localFileMaxPreviewChars     = 20000
-	localFileDefaultReadLimit    = 12000
-	localFileMaxReadLimit        = 100000
+	localFileDefaultReadLimit = 12000
+	localFileMaxReadLimit     = 100000
 )
 
 // LocalFileTool is the Tool Type "local_file".
@@ -45,23 +44,17 @@ type LocalFileTool struct {
 func (p *LocalFileTool) BuiltinTools() []BuiltinTool {
 	return []BuiltinTool{
 		&localSpecialDirsBuiltin{},
-		&localDocumentsScanBuiltin{lang: p.lang},
-		&localDocumentReadBuiltin{lang: p.lang},
-		&localTextWriteBuiltin{},
+		&localFileScanBuiltin{},
+		&localFileReadBuiltin{lang: p.lang},
+		&localFileWriteBuiltin{},
 		&localFileMoveBuiltin{},
 	}
 }
 
-type localDocumentInfo struct {
-	Path         string `json:"path"`
-	Name         string `json:"name"`
-	Extension    string `json:"extension"`
-	Size         int64  `json:"size"`
-	ModifiedTime string `json:"modifiedTime"`
-	TextLength   int    `json:"textLength,omitempty"`
-	Preview      string `json:"preview,omitempty"`
-	Truncated    bool   `json:"truncated,omitempty"`
-	Error        string `json:"error,omitempty"`
+type localFileScanItem struct {
+	Type string `json:"type"`
+	Name string `json:"name"`
+	Path string `json:"path"`
 }
 
 type localSpecialDirInfo struct {
@@ -82,13 +75,13 @@ type localSpecialDirsResult struct {
 	Directories localSpecialDirs `json:"directories"`
 }
 
-type localDocumentsScanResult struct {
+type localFileScanResult struct {
 	Root  string              `json:"root"`
 	Count int                 `json:"count"`
-	Files []localDocumentInfo `json:"files"`
+	Items []localFileScanItem `json:"items"`
 }
 
-type localDocumentReadResult struct {
+type localFileReadResult struct {
 	Path       string `json:"path"`
 	Extension  string `json:"extension"`
 	Offset     int    `json:"offset"`
@@ -98,7 +91,7 @@ type localDocumentReadResult struct {
 	Truncated  bool   `json:"truncated"`
 }
 
-type localTextWriteResult struct {
+type localFileWriteResult struct {
 	Path      string `json:"path"`
 	ByteSize  int    `json:"byteSize"`
 	Overwrote bool   `json:"overwrote"`
@@ -212,8 +205,18 @@ func localFileSliceText(text string, offset, limit int) (string, bool) {
 	return string(runes[offset:end]), truncated
 }
 
-func localFileReadDocument(path, ext, lang string) (string, error) {
-	return txt.GetParsedTextFromUrl(path, ext, lang)
+func localFileReadText(path, ext, lang string) (string, error) {
+	if _, ok := localFileSupportedExt(path); ok {
+		return txt.GetParsedTextFromUrl(path, ext, lang)
+	}
+	bs, err := os.ReadFile(path)
+	if err != nil {
+		return "", err
+	}
+	if !utf8.Valid(bs) {
+		return "", fmt.Errorf("file content is not valid UTF-8 text")
+	}
+	return string(bs), nil
 }
 
 func localFileDirectory(path string) localSpecialDirInfo {
@@ -280,22 +283,19 @@ func (b *localSpecialDirsBuiltin) Execute(_ context.Context, _ map[string]interf
 	}), nil
 }
 
-type localDocumentsScanBuiltin struct {
-	lang string
+type localFileScanBuiltin struct{}
+
+func (b *localFileScanBuiltin) GetName() string {
+	return "local_file_scan"
 }
 
-func (b *localDocumentsScanBuiltin) GetName() string {
-	return "local_documents_scan"
-}
-
-func (b *localDocumentsScanBuiltin) GetDescription() string {
-	return `Scan a local directory for supported documents and return a JSON manifest with metadata, text previews, and parse errors.
+func (b *localFileScanBuiltin) GetDescription() string {
+	return `Scan a local directory recursively and return a JSON manifest of all descendant files and directories.
 - root (required): absolute directory path for the current operating system.
-- preview_chars: maximum text preview characters per file (default 1200, max 20000).
-- max_files: optional maximum number of supported files to return.`
+- Returns items with type, name, and path.`
 }
 
-func (b *localDocumentsScanBuiltin) GetInputSchema() interface{} {
+func (b *localFileScanBuiltin) GetInputSchema() interface{} {
 	return map[string]interface{}{
 		"type": "object",
 		"properties": map[string]interface{}{
@@ -303,20 +303,12 @@ func (b *localDocumentsScanBuiltin) GetInputSchema() interface{} {
 				"type":        "string",
 				"description": "Absolute directory path to scan.",
 			},
-			"preview_chars": map[string]interface{}{
-				"type":        "number",
-				"description": "Maximum text preview characters per file (default 1200, max 20000).",
-			},
-			"max_files": map[string]interface{}{
-				"type":        "number",
-				"description": "Optional maximum number of supported files to return.",
-			},
 		},
 		"required": []string{"root"},
 	}
 }
 
-func (b *localDocumentsScanBuiltin) Execute(_ context.Context, arguments map[string]interface{}) (*protocol.CallToolResult, error) {
+func (b *localFileScanBuiltin) Execute(_ context.Context, arguments map[string]interface{}) (*protocol.CallToolResult, error) {
 	root := localFileStringArg(arguments, "root")
 	if err := localFileRequireAbsolutePath(root, "root"); err != nil {
 		return localFileError(err.Error()), nil
@@ -330,87 +322,69 @@ func (b *localDocumentsScanBuiltin) Execute(_ context.Context, arguments map[str
 		return localFileError("root must be a directory"), nil
 	}
 
-	previewChars := localFileIntArg(arguments, "preview_chars", localFileDefaultPreviewChars)
-	previewChars = localFileClamp(previewChars, 0, localFileMaxPreviewChars)
-	maxFiles := localFileIntArg(arguments, "max_files", 0)
-
-	var files []localDocumentInfo
+	var items []localFileScanItem
 	walkErr := filepath.WalkDir(root, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return nil
 		}
+		if path == root {
+			return nil
+		}
+
+		itemType := "file"
 		if d.IsDir() {
-			return nil
+			itemType = "directory"
 		}
-		ext, ok := localFileSupportedExt(path)
-		if !ok {
-			return nil
-		}
-		if maxFiles > 0 && len(files) >= maxFiles {
-			return filepath.SkipAll
-		}
-
-		item := localDocumentInfo{
-			Path:      path,
-			Name:      d.Name(),
-			Extension: ext,
-		}
-		if fileInfo, statErr := d.Info(); statErr == nil {
-			item.Size = fileInfo.Size()
-			item.ModifiedTime = fileInfo.ModTime().Format("2006-01-02 15:04:05")
-		}
-
-		text, readErr := localFileReadDocument(path, ext, b.lang)
-		if readErr != nil {
-			item.Error = readErr.Error()
-		} else {
-			item.TextLength = len([]rune(text))
-			item.Preview, item.Truncated = localFileSliceText(text, 0, previewChars)
-		}
-		files = append(files, item)
+		items = append(items, localFileScanItem{
+			Type: itemType,
+			Name: d.Name(),
+			Path: path,
+		})
 		return nil
 	})
 	if walkErr != nil {
 		return localFileError(fmt.Sprintf("failed to scan root: %s", walkErr.Error())), nil
 	}
 
-	sort.Slice(files, func(i, j int) bool {
-		return files[i].Path < files[j].Path
+	sort.Slice(items, func(i, j int) bool {
+		return items[i].Path < items[j].Path
 	})
 
-	return localFileJSON(localDocumentsScanResult{
+	return localFileJSON(localFileScanResult{
 		Root:  root,
-		Count: len(files),
-		Files: files,
+		Count: len(items),
+		Items: items,
 	}), nil
 }
 
-type localDocumentReadBuiltin struct {
+type localFileReadBuiltin struct {
 	lang string
 }
 
-func (b *localDocumentReadBuiltin) GetName() string {
-	return "local_document_read"
+func (b *localFileReadBuiltin) GetName() string {
+	return "local_file_read"
 }
 
-func (b *localDocumentReadBuiltin) GetDescription() string {
-	return `Read text from one supported local document.
+func (b *localFileReadBuiltin) GetDescription() string {
+	return `Read text from a local file.
 - path (required): absolute file path for the current operating system.
-- offset: character offset in extracted text (default 0).
+- For supported document types, extracts text with the document parser.
+- For other files, reads UTF-8 text directly.
+- offset: character offset in returned text (default 0).
 - limit: maximum characters to return (default 12000, max 100000).`
 }
 
-func (b *localDocumentReadBuiltin) GetInputSchema() interface{} {
+func (b *localFileReadBuiltin) GetInputSchema() interface{} {
 	return map[string]interface{}{
 		"type": "object",
 		"properties": map[string]interface{}{
 			"path": map[string]interface{}{
 				"type":        "string",
-				"description": "Absolute path to a supported document.",
+				"description": "Absolute path to a file.",
 			},
 			"offset": map[string]interface{}{
 				"type":        "number",
-				"description": "Character offset in extracted text (default 0).",
+				"description": "Character offset in returned text (default 0).",
 			},
 			"limit": map[string]interface{}{
 				"type":        "number",
@@ -421,7 +395,7 @@ func (b *localDocumentReadBuiltin) GetInputSchema() interface{} {
 	}
 }
 
-func (b *localDocumentReadBuiltin) Execute(_ context.Context, arguments map[string]interface{}) (*protocol.CallToolResult, error) {
+func (b *localFileReadBuiltin) Execute(_ context.Context, arguments map[string]interface{}) (*protocol.CallToolResult, error) {
 	path := localFileStringArg(arguments, "path")
 	if err := localFileRequireAbsolutePath(path, "path"); err != nil {
 		return localFileError(err.Error()), nil
@@ -433,10 +407,7 @@ func (b *localDocumentReadBuiltin) Execute(_ context.Context, arguments map[stri
 	if info.IsDir() {
 		return localFileError("path must be a file"), nil
 	}
-	ext, ok := localFileSupportedExt(path)
-	if !ok {
-		return localFileError(fmt.Sprintf("unsupported file type: %s", ext)), nil
-	}
+	ext := strings.ToLower(filepath.Ext(path))
 
 	offset := localFileIntArg(arguments, "offset", 0)
 	if offset < 0 {
@@ -445,13 +416,13 @@ func (b *localDocumentReadBuiltin) Execute(_ context.Context, arguments map[stri
 	limit := localFileIntArg(arguments, "limit", localFileDefaultReadLimit)
 	limit = localFileClamp(limit, 0, localFileMaxReadLimit)
 
-	text, err := localFileReadDocument(path, ext, b.lang)
+	text, err := localFileReadText(path, ext, b.lang)
 	if err != nil {
-		return localFileError(fmt.Sprintf("failed to read document: %s", err.Error())), nil
+		return localFileError(fmt.Sprintf("failed to read file: %s", err.Error())), nil
 	}
 	section, truncated := localFileSliceText(text, offset, limit)
 
-	return localFileJSON(localDocumentReadResult{
+	return localFileJSON(localFileReadResult{
 		Path:       path,
 		Extension:  ext,
 		Offset:     offset,
@@ -462,20 +433,20 @@ func (b *localDocumentReadBuiltin) Execute(_ context.Context, arguments map[stri
 	}), nil
 }
 
-type localTextWriteBuiltin struct{}
+type localFileWriteBuiltin struct{}
 
-func (b *localTextWriteBuiltin) GetName() string {
-	return "local_text_write"
+func (b *localFileWriteBuiltin) GetName() string {
+	return "local_file_write"
 }
 
-func (b *localTextWriteBuiltin) GetDescription() string {
-	return `Write Markdown or plain text content to a local file.
+func (b *localFileWriteBuiltin) GetDescription() string {
+	return `Write text content to a local file.
 - path (required): absolute output file path for the current operating system.
 - content (required): text content to write.
 - overwrite: set true to replace an existing file (default false).`
 }
 
-func (b *localTextWriteBuiltin) GetInputSchema() interface{} {
+func (b *localFileWriteBuiltin) GetInputSchema() interface{} {
 	return map[string]interface{}{
 		"type": "object",
 		"properties": map[string]interface{}{
@@ -485,7 +456,7 @@ func (b *localTextWriteBuiltin) GetInputSchema() interface{} {
 			},
 			"content": map[string]interface{}{
 				"type":        "string",
-				"description": "Markdown or plain text content to write.",
+				"description": "Text content to write.",
 			},
 			"overwrite": map[string]interface{}{
 				"type":        "boolean",
@@ -496,7 +467,7 @@ func (b *localTextWriteBuiltin) GetInputSchema() interface{} {
 	}
 }
 
-func (b *localTextWriteBuiltin) Execute(_ context.Context, arguments map[string]interface{}) (*protocol.CallToolResult, error) {
+func (b *localFileWriteBuiltin) Execute(_ context.Context, arguments map[string]interface{}) (*protocol.CallToolResult, error) {
 	path := localFileStringArg(arguments, "path")
 	if err := localFileRequireAbsolutePath(path, "path"); err != nil {
 		return localFileError(err.Error()), nil
@@ -540,7 +511,7 @@ func (b *localTextWriteBuiltin) Execute(_ context.Context, arguments map[string]
 		}
 	}
 
-	return localFileJSON(localTextWriteResult{
+	return localFileJSON(localFileWriteResult{
 		Path:      path,
 		ByteSize:  len([]byte(content)),
 		Overwrote: overwrote,

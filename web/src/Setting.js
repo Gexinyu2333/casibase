@@ -452,19 +452,19 @@ export function getToolFunctions(tool) {
         testContent: JSON.stringify({tool: "local_special_dirs", arguments: {}}, null, 2),
       },
       {
-        name: "local_documents_scan",
-        description: "Scan an absolute local directory for supported documents",
-        testContent: JSON.stringify({tool: "local_documents_scan", arguments: {root: "/absolute/path/to/Desktop", preview_chars: 1200}}, null, 2),
+        name: "local_file_scan",
+        description: "Scan an absolute local directory for all files and subdirectories",
+        testContent: JSON.stringify({tool: "local_file_scan", arguments: {root: "/absolute/path/to/Desktop"}}, null, 2),
       },
       {
-        name: "local_document_read",
-        description: "Read text from one supported local document",
-        testContent: JSON.stringify({tool: "local_document_read", arguments: {path: "/absolute/path/to/Desktop/report.pdf", offset: 0, limit: 12000}}, null, 2),
+        name: "local_file_read",
+        description: "Read text from a local file",
+        testContent: JSON.stringify({tool: "local_file_read", arguments: {path: "/absolute/path/to/Desktop/report.pdf", offset: 0, limit: 12000}}, null, 2),
       },
       {
-        name: "local_text_write",
-        description: "Write Markdown or plain text to an absolute local path",
-        testContent: JSON.stringify({tool: "local_text_write", arguments: {path: "/absolute/path/to/Desktop/Project Summaries/summary.md", content: "# Summary\\n\\nProject notes.", overwrite: false}}, null, 2),
+        name: "local_file_write",
+        description: "Write text to an absolute local path",
+        testContent: JSON.stringify({tool: "local_file_write", arguments: {path: "/absolute/path/to/Desktop/Project Summaries/summary.md", content: "# Summary\\n\\nProject notes.", overwrite: false}}, null, 2),
       },
       {
         name: "local_file_move",
