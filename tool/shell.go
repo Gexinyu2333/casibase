@@ -501,6 +501,7 @@ func shellStopBackground(arguments map[string]interface{}) (*protocol.CallToolRe
 func shellBuildCommand(ctx context.Context, command string) (*exec.Cmd, error) {
 	cmd := exec.CommandContext(ctx, shellPlatformShell(), shellPlatformShellArg(), command)
 	cmd.Env = shellCommandEnv(false)
+	shellSetProcessGroup(cmd)
 	return cmd, nil
 }
 
@@ -511,28 +512,42 @@ func shellBuildPtyCommand(ctx context.Context, command string) (gopty.Pty, *gopt
 	}
 	cmd := ptmx.CommandContext(ctx, shellPlatformShell(), shellPlatformShellArg(), command)
 	cmd.Env = shellCommandEnv(true)
+	shellSetProcessGroupPty(cmd)
 	return ptmx, cmd, nil
 }
 
 func shellRunForeground(ctx context.Context, command string, workdir string, usePTY bool) (string, error) {
-	cmd, err := shellBuildCommand(ctx, command)
-	if err != nil {
-		return fmt.Sprintf("Error: %s", err.Error()), err
+	if !usePTY {
+		return shellRunForegroundCmd(ctx, command, workdir)
+	}
+	return shellRunForegroundPTY(ctx, command, workdir)
+}
+
+func shellRunForegroundCmd(ctx context.Context, command string, workdir string) (string, error) {
+	cmd := exec.Command(shellPlatformShell(), shellPlatformShellArg(), command)
+	cmd.Env = shellCommandEnv(false)
+	shellSetProcessGroup(cmd)
+	if workdir != "" {
+		cmd.Dir = workdir
 	}
 
-	if !usePTY {
-		if workdir != "" {
-			cmd.Dir = workdir
-		}
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
 
-		var stdout, stderr bytes.Buffer
-		cmd.Stdout = &stdout
-		cmd.Stderr = &stderr
+	if startErr := cmd.Start(); startErr != nil {
+		return fmt.Sprintf("Error: %s", startErr.Error()), startErr
+	}
 
-		runErr := cmd.Run()
+	waitDone := make(chan error, 1)
+	go func() {
+		waitDone <- cmd.Wait()
+	}()
+
+	select {
+	case runErr := <-waitDone:
 		stdoutStr := stdout.String()
 		stderrStr := stderr.String()
-
 		if runErr != nil {
 			var parts []string
 			parts = append(parts, fmt.Sprintf("Error: %s", runErr.Error()))
@@ -544,7 +559,6 @@ func shellRunForeground(ctx context.Context, command string, workdir string, use
 			}
 			return strings.Join(parts, "\n"), runErr
 		}
-
 		result := stdoutStr
 		if stderrStr != "" {
 			if result != "" {
@@ -557,8 +571,15 @@ func shellRunForeground(ctx context.Context, command string, workdir string, use
 			result = "(no output)"
 		}
 		return result, nil
-	}
 
+	case <-ctx.Done():
+		shellKillProcessGroup(cmd.Process)
+		<-waitDone
+		return "", ctx.Err()
+	}
+}
+
+func shellRunForegroundPTY(ctx context.Context, command string, workdir string) (string, error) {
 	ptmx, ptyCmd, err := shellBuildPtyCommand(ctx, command)
 	if err != nil {
 		return fmt.Sprintf("Error: %s", err.Error()), err
@@ -586,25 +607,34 @@ func shellRunForeground(ctx context.Context, command string, workdir string, use
 		copyDone <- nil
 	}()
 
-	runErr := ptyCmd.Wait()
-	_ = ptmx.Close()
-	copyErr := <-copyDone
+	waitDone := make(chan error, 1)
+	go func() {
+		waitDone <- ptyCmd.Wait()
+	}()
 
-	if ctx.Err() == context.DeadlineExceeded {
+	select {
+	case runErr := <-waitDone:
+		_ = ptmx.Close()
+		copyErr := <-copyDone
+		if copyErr != nil && runErr == nil {
+			runErr = copyErr
+		}
+		text := output.String()
+		if text == "" {
+			text = "(no output)"
+		}
+		if runErr != nil {
+			return fmt.Sprintf("Error: %s\nOutput:\n%s", runErr.Error(), text), runErr
+		}
+		return text, nil
+
+	case <-ctx.Done():
+		shellKillProcessGroup(ptyCmd.Process)
+		_ = ptmx.Close()
+		<-waitDone
+		<-copyDone
 		return "", ctx.Err()
 	}
-	if copyErr != nil && runErr == nil {
-		runErr = copyErr
-	}
-
-	text := output.String()
-	if text == "" {
-		text = "(no output)"
-	}
-	if runErr != nil {
-		return fmt.Sprintf("Error: %s\nOutput:\n%s", runErr.Error(), text), runErr
-	}
-	return text, nil
 }
 
 func shellStringArg(arguments map[string]interface{}, key string, defaultValue string) string {
@@ -971,13 +1001,13 @@ func (s *shellSession) stop() {
 		return
 	}
 	if err := process.Signal(os.Interrupt); err != nil {
-		_ = process.Kill()
+		shellKillProcessGroup(process)
 		return
 	}
 	select {
 	case <-done:
 	case <-time.After(2 * time.Second):
-		_ = process.Kill()
+		shellKillProcessGroup(process)
 	}
 }
 
