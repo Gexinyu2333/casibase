@@ -79,7 +79,9 @@ func (p *DeepSeekProvider) QueryText(question string, writer io.Writer, history 
 	switch p.subType {
 	case "deepseek-v4-pro", "deepseek-reasoner":
 		localType = "Custom-think"
-	case "deepseek-v4-flash", "deepseek-chat":
+	case "deepseek-v4-flash":
+		localType = "Custom-think"
+	case "deepseek-chat":
 		localType = "Custom"
 	}
 	localProvider, err := NewLocalModelProvider(localType, "custom-model", p.apiKey, p.temperature, p.topP, 0, 0, BaseUrl, p.subType, 0, 0, "CNY")
