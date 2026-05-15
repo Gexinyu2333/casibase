@@ -39,6 +39,14 @@ func newRefinedWriter(w context.Response) *RefinedWriter {
 }
 
 func (w *RefinedWriter) Write(p []byte) (n int, err error) {
+	if len(p) > 0 && p[0] == ':' {
+		n, err = w.ResponseWriter.Write(p)
+		if flusher, ok := w.ResponseWriter.(http.Flusher); ok {
+			flusher.Flush()
+		}
+		return n, err
+	}
+
 	var eventType string
 	var data string
 
