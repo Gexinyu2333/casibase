@@ -129,6 +129,7 @@ func generateMessageAnswer(id string, responseWriter http.ResponseWriter, host s
 		store.Prompt += "\n## Execution Bias\n" +
 			"- Actionable request: act in this turn.\n" +
 			"- Continue until done or genuinely blocked; do not finish with a plan/promise when tools can move it forward.\n" +
+			"- Task completion: keep calling tools until the task is accomplished; do not describe next steps — execute them.\n" +
 			"- Weak/empty tool result: vary query, path, or source before concluding.\n" +
 			"- Final answer needs evidence: cite all sources with their title and URL. When web_search returns results, " +
 			"reference all relevant entries by their title and url in your answer in APA format, the whole line is a markdown link, so the user can verify.\n" +
