@@ -275,6 +275,7 @@ func generateMessageAnswer(id string, responseWriter http.ResponseWriter, host s
 	fmt.Printf("Answer: [")
 
 	prompt := store.Prompt
+	reviewQuestion := question
 	if !isReasonModel(modelProvider.SubType) {
 		if modelProvider.Type == "Alibaba Cloud" && webSearchEnabled {
 			prompt, err = getPromptWithCarrier(prompt, store.SuggestionCount, chat.NeedTitle)
@@ -432,6 +433,17 @@ func generateMessageAnswer(id string, responseWriter http.ResponseWriter, host s
 		responseErrorStream(message, err.Error())
 		return
 	}
+
+	object.StartExperienceReview(object.ExperienceReviewRequest{
+		Store:             store,
+		Chat:              chat,
+		Question:          reviewQuestion,
+		Answer:            message.Text,
+		ToolCalls:         message.ToolCalls,
+		ReasonSummary:     message.ReasonText,
+		ModelProviderName: modelProvider.GetId(),
+		Lang:              lang,
+	})
 }
 
 // GetAnswer

@@ -61,44 +61,45 @@ type Store struct {
 	CreatedTime string `xorm:"varchar(100) index(idx_store_name_created)" json:"createdTime"`
 	DisplayName string `xorm:"varchar(100)" json:"displayName"`
 
-	StorageProvider      string            `xorm:"varchar(100)" json:"storageProvider"`
-	StorageSubpath       string            `xorm:"varchar(100)" json:"storageSubpath"`
-	ImageProvider        string            `xorm:"varchar(100)" json:"imageProvider"`
-	SplitProvider        string            `xorm:"varchar(100)" json:"splitProvider"`
-	SearchProvider       string            `xorm:"varchar(100)" json:"searchProvider"`
-	ModelProvider        string            `xorm:"varchar(100)" json:"modelProvider"`
-	EmbeddingProvider    string            `xorm:"varchar(100)" json:"embeddingProvider"`
-	TextToSpeechProvider string            `xorm:"varchar(100)" json:"textToSpeechProvider"`
-	EnableTtsStreaming   bool              `xorm:"bool" json:"enableTtsStreaming"`
-	SpeechToTextProvider string            `xorm:"varchar(100)" json:"speechToTextProvider"`
-	McpServer            string            `xorm:"varchar(100)" json:"mcpServer"`
-	Skills               []string          `xorm:"mediumtext" json:"skills"`
-	Tools                []string          `xorm:"mediumtext" json:"tools"`
-	VectorStoreId        string            `xorm:"varchar(100)" json:"vectorStoreId"`
-	MemoryLimit          int               `json:"memoryLimit"`
-	Frequency            int               `json:"frequency"`
-	LimitMinutes         int               `json:"limitMinutes"`
-	KnowledgeCount       int               `json:"knowledgeCount"`
-	SuggestionCount      int               `json:"suggestionCount"`
-	Welcome              string            `xorm:"varchar(100)" json:"welcome"`
-	WelcomeTitle         string            `xorm:"varchar(100)" json:"welcomeTitle"`
-	WelcomeText          string            `xorm:"varchar(100)" json:"welcomeText"`
-	Prompt               string            `xorm:"mediumtext" json:"prompt"`
-	ExampleQuestions     []ExampleQuestion `xorm:"mediumtext" json:"exampleQuestions"`
-	Avatar               string            `xorm:"varchar(200)" json:"avatar"`
-	Title                string            `xorm:"varchar(100)" json:"title"`
-	VectorStores         []string          `xorm:"mediumtext" json:"vectorStores"`
-	ChildStores          []string          `xorm:"mediumtext" json:"childStores"`
-	ChildModelProviders  []string          `xorm:"mediumtext" json:"childModelProviders"`
-	ForbiddenWords       []string          `xorm:"text" json:"forbiddenWords"`
-	Owners               []string          `xorm:"mediumtext" json:"owners"`
-	ShowAutoRead         bool              `json:"showAutoRead"`
-	DisableFileUpload    bool              `json:"disableFileUpload"`
-	HideThinking         bool              `json:"hideThinking"`
-	EnableExtraOptions   bool              `json:"enableExtraOptions"`
-	IsDefault            bool              `json:"isDefault"`
-	State                string            `xorm:"varchar(100)" json:"state"`
-	SharedBy             string            `xorm:"varchar(100)" json:"sharedBy"`
+	StorageProvider        string            `xorm:"varchar(100)" json:"storageProvider"`
+	StorageSubpath         string            `xorm:"varchar(100)" json:"storageSubpath"`
+	ImageProvider          string            `xorm:"varchar(100)" json:"imageProvider"`
+	SplitProvider          string            `xorm:"varchar(100)" json:"splitProvider"`
+	SearchProvider         string            `xorm:"varchar(100)" json:"searchProvider"`
+	ModelProvider          string            `xorm:"varchar(100)" json:"modelProvider"`
+	EmbeddingProvider      string            `xorm:"varchar(100)" json:"embeddingProvider"`
+	TextToSpeechProvider   string            `xorm:"varchar(100)" json:"textToSpeechProvider"`
+	EnableTtsStreaming     bool              `xorm:"bool" json:"enableTtsStreaming"`
+	SpeechToTextProvider   string            `xorm:"varchar(100)" json:"speechToTextProvider"`
+	McpServer              string            `xorm:"varchar(100)" json:"mcpServer"`
+	Skills                 []string          `xorm:"mediumtext" json:"skills"`
+	Tools                  []string          `xorm:"mediumtext" json:"tools"`
+	VectorStoreId          string            `xorm:"varchar(100)" json:"vectorStoreId"`
+	MemoryLimit            int               `json:"memoryLimit"`
+	Frequency              int               `json:"frequency"`
+	LimitMinutes           int               `json:"limitMinutes"`
+	KnowledgeCount         int               `json:"knowledgeCount"`
+	SuggestionCount        int               `json:"suggestionCount"`
+	Welcome                string            `xorm:"varchar(100)" json:"welcome"`
+	WelcomeTitle           string            `xorm:"varchar(100)" json:"welcomeTitle"`
+	WelcomeText            string            `xorm:"varchar(100)" json:"welcomeText"`
+	Prompt                 string            `xorm:"mediumtext" json:"prompt"`
+	ExampleQuestions       []ExampleQuestion `xorm:"mediumtext" json:"exampleQuestions"`
+	Avatar                 string            `xorm:"varchar(200)" json:"avatar"`
+	Title                  string            `xorm:"varchar(100)" json:"title"`
+	VectorStores           []string          `xorm:"mediumtext" json:"vectorStores"`
+	ChildStores            []string          `xorm:"mediumtext" json:"childStores"`
+	ChildModelProviders    []string          `xorm:"mediumtext" json:"childModelProviders"`
+	ForbiddenWords         []string          `xorm:"text" json:"forbiddenWords"`
+	Owners                 []string          `xorm:"mediumtext" json:"owners"`
+	ShowAutoRead           bool              `json:"showAutoRead"`
+	DisableFileUpload      bool              `json:"disableFileUpload"`
+	HideThinking           bool              `json:"hideThinking"`
+	EnableExperienceReview bool              `json:"enableExperienceReview"`
+	EnableExtraOptions     bool              `json:"enableExtraOptions"`
+	IsDefault              bool              `json:"isDefault"`
+	State                  string            `xorm:"varchar(100)" json:"state"`
+	SharedBy               string            `xorm:"varchar(100)" json:"sharedBy"`
 
 	ChatCount    int `xorm:"-" json:"chatCount"`
 	MessageCount int `xorm:"-" json:"messageCount"`
