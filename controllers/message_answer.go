@@ -138,7 +138,7 @@ func generateMessageAnswer(id string, responseWriter http.ResponseWriter, host s
 	}
 
 	if len(store.Skills) > 0 {
-		skillsContent, skillErr := object.GetSkillsContent(store.Owner, store.Skills)
+		skillsContent, skillErr := object.GetSkillsCatalog(store.Owner, store.Skills)
 		if skillErr != nil {
 			responseErrorStream(message, skillErr.Error())
 			return
