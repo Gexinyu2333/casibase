@@ -238,7 +238,7 @@ class ChatPage extends BaseListPage {
     if (this.state.messages && this.state.messages.length > 0) {
       const lastMessage = this.state.messages[this.state.messages.length - 1];
       if (lastMessage.author === "AI" && this.state.messageLoading) {
-        MessageBackend.closeMessageEventSource(lastMessage.owner, lastMessage.name);
+        MessageBackend.closeMessageEventSource(lastMessage.owner, lastMessage.name, true);
 
         MessageBackend.updateMessage(lastMessage.owner, lastMessage.name, lastMessage)
           .then((res) => {

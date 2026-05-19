@@ -16,6 +16,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -39,17 +40,99 @@ import (
 // @router /get-message-answer [get]
 func (c *ApiController) GetMessageAnswer() {
 	id := c.Input().Get("id")
+	_, signedIn := c.CheckSignedIn()
+
+	message, err := object.GetMessage(id)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+	if message != nil {
+		ok := c.IsCurrentUser(message.User)
+		if !ok {
+			return
+		}
+	}
 
 	c.Ctx.ResponseWriter.Header().Set("Content-Type", "text/event-stream")
 	c.Ctx.ResponseWriter.Header().Set("Cache-Control", "no-cache")
 	c.Ctx.ResponseWriter.Header().Set("Connection", "keep-alive")
 
-	c.generateMessageAnswer(id, c.Ctx.ResponseWriter, c.Ctx.Request.Host)
+	job := messageAnswerJobs.getOrStart(id, c.Ctx.Request.Host, c.GetAcceptLanguage(), signedIn)
+	streamMessageAnswerJob(c.Ctx.ResponseWriter, c.Ctx.Request, job)
+}
+
+// CancelMessageAnswer
+// @Title CancelMessageAnswer
+// @Tag Message API
+// @Description cancel a running message answer job
+// @Param id query string true "The id of message"
+// @Success 200 {object} controllers.Response The Response object
+// @router /cancel-message-answer [post]
+func (c *ApiController) CancelMessageAnswer() {
+	id := c.Input().Get("id")
+
+	message, err := object.GetMessage(id)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+	if message == nil {
+		c.ResponseError(fmt.Sprintf("The message: %s is not found", id))
+		return
+	}
+	ok := c.IsCurrentUser(message.User)
+	if !ok {
+		return
+	}
+
+	messageAnswerJobs.cancel(id)
+	c.ResponseOk()
 }
 
 func (c *ApiController) generateMessageAnswer(id string, responseWriter http.ResponseWriter, host string) {
 	_, signedIn := c.CheckSignedIn()
 	generateMessageAnswer(id, responseWriter, host, c.GetAcceptLanguage(), signedIn, c.ResponseError)
+}
+
+func streamMessageAnswerJob(responseWriter http.ResponseWriter, request *http.Request, job *messageAnswerJob) {
+	replay, ch, unsubscribe, done := job.subscribe()
+	defer unsubscribe()
+
+	for _, chunk := range replay {
+		if _, err := responseWriter.Write(chunk); err != nil {
+			return
+		}
+		if flusher, ok := responseWriter.(http.Flusher); ok {
+			flusher.Flush()
+		}
+	}
+
+	if done {
+		return
+	}
+
+	var notify <-chan struct{}
+	if request != nil {
+		notify = request.Context().Done()
+	}
+
+	for {
+		select {
+		case chunk, ok := <-ch:
+			if !ok {
+				return
+			}
+			if _, err := responseWriter.Write(chunk); err != nil {
+				return
+			}
+			if flusher, ok := responseWriter.(http.Flusher); ok {
+				flusher.Flush()
+			}
+		case <-notify:
+			return
+		}
+	}
 }
 
 func generateMessageAnswer(id string, responseWriter http.ResponseWriter, host string, lang string, signedIn bool, responseError func(string, ...interface{})) {
@@ -307,6 +390,9 @@ func generateMessageAnswer(id string, responseWriter http.ResponseWriter, host s
 		}
 	}
 	if err != nil {
+		if errors.Is(err, errMessageAnswerCanceled) {
+			return
+		}
 		if strings.Contains(err.Error(), "write tcp") {
 			if responseError != nil {
 				responseError(err.Error())
@@ -335,6 +421,9 @@ func generateMessageAnswer(id string, responseWriter http.ResponseWriter, host s
 
 		_, err = writer.ResponseWriter.Write([]byte(fmt.Sprintf("event: message\ndata: %s\n\n", jsonData)))
 		if err != nil {
+			if errors.Is(err, errMessageAnswerCanceled) {
+				return
+			}
 			responseErrorStream(message, err.Error())
 			return
 		}
