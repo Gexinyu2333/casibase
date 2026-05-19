@@ -81,11 +81,15 @@ func (p *LocalModelProvider) GetPricing() string {
 }
 
 func (p *LocalModelProvider) CalculatePrice(modelResult *ModelResult, lang string) error {
-	// local custom model:
-	if p.subType == "custom-model" {
+	if p.inputPricePerThousandTokens > 0 || p.outputPricePerThousandTokens > 0 {
 		inputPrice := getPrice(modelResult.PromptTokenCount, p.inputPricePerThousandTokens)
 		outputPrice := getPrice(modelResult.ResponseTokenCount, p.outputPricePerThousandTokens)
 		modelResult.TotalPrice = AddPrices(inputPrice, outputPrice)
+		modelResult.Currency = p.currency
+		return nil
+	}
+	if p.subType == "custom-model" {
+		// OpenAI Compatible with no price configured: graceful fallback to price=0
 		modelResult.Currency = p.currency
 		return nil
 	}
