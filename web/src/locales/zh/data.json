@@ -62,7 +62,7 @@
     "Knowledge Fragment": "知识片段",
     "Knowledge sources": "知识来源",
     "Maximize messages": "消息列最大化",
-    "Message count": "Message count",
+    "Message count": "消息数量",
     "Mode": "模式",
     "New Chat": "新会话",
     "No model configured - notice": "尚未配置AI模型。",
@@ -261,7 +261,7 @@
     "Path": "路径",
     "Pause": "暂停",
     "Permissions": "权限",
-    "Pipes": "Pipes",
+    "Pipes": "消息管道",
     "Please input your search": "请输入搜索内容",
     "Port": "端口",
     "Preview": "预览",
@@ -353,7 +353,7 @@
     "Title": "网页标题",
     "Title - Tooltip": "浏览器中显示的网页标题",
     "Token": "Token",
-    "Token - Tooltip": "Token - Tooltip",
+    "Token - Tooltip": "用于API访问或服务集成的认证令牌",
     "Tokens": "Token数量",
     "Tool": "工具",
     "Tools": "工具",
@@ -392,11 +392,11 @@
     "Error Details": "错误详情",
     "Error Message": "错误信息",
     "Help": "帮助",
-    "Loading OpenAgent sign in.": "正在加载 OpenAgent 登录页面。",
+    "Loading OpenAgent sign in.": "正在加载OpenAgent登录页面。",
     "Login Error": "登录错误",
     "More Details": "更多详情",
     "Preparing the workspace entry screen.": "正在准备工作区入口界面。",
-    "Self-hosted. 30+ model providers. Full MCP support. Your personal AI assistant.": "私有部署。30+ 模型提供商。完整 MCP 支持。你的个人 AI 助手。",
+    "Self-hosted. 30+ model providers. Full MCP support. Your personal AI assistant.": "私有部署。30+模型提供商。完整MCP支持。你的个人AI助手。",
     "Signing in...": "正在登录...",
     "Welcome back": "欢迎回来"
   },
@@ -421,7 +421,7 @@
     "Chat ID": "会话ID",
     "Chat ID placeholder": "输入会话ID或手机号",
     "Chat Test": "消息测试",
-    "Consumer Secret": "Consumer Secret",
+    "Consumer Secret": "消费者密钥",
     "Edit Pipe": "编辑管道",
     "Facebook Messenger verify token hint": "在Meta开发者控制台中，将Webhook验证令牌设置为管道名称：",
     "Facebook Messenger webhook hint": "在Facebook应用Messenger设置中，将回调URL设置为：",
@@ -566,7 +566,7 @@
     "Upload a file...": "上传文件..."
   },
   "scan": {
-    "Latency": "Latency"
+    "Latency": "延迟"
   },
   "server": {
     "Access token": "访问令牌",
@@ -801,7 +801,7 @@
     "Unknown version": "未知版本",
     "Used": "已用",
     "cores": "核心",
-    "🚀⚡️Next-generation personal AI assistant powered by LLM, RAG and agent loops,\\nsupporting computer-use, browser-use and coding agent": "🚀⚡️Next-generation personal AI assistant powered by LLM, RAG and agent loops,\\nsupporting computer-use, browser-use and coding agent"
+    "🚀⚡️Next-generation personal AI assistant powered by LLM, RAG and agent loops,\\nsupporting computer-use, browser-use and coding agent": "🚀⚡️由LLM、RAG与Agent循环驱动的下一代个人AI助手，\\n支持computer-use、browser-use与coding agent"
   },
   "task": {
     "Advantages": "优点分析",

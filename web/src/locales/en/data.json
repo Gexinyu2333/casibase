@@ -353,7 +353,7 @@
     "Title": "Web page title",
     "Title - Tooltip": "Title for the web page in the browser",
     "Token": "Token",
-    "Token - Tooltip": "Token - Tooltip",
+    "Token - Tooltip": "Authentication token for API access or service integration",
     "Tokens": "Tokens",
     "Tool": "Tool",
     "Tools": "Tools",

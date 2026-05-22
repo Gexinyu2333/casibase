@@ -29,8 +29,8 @@
     "Error parsing BPMN file: %v": "解析BPMN文件错误：%v"
   },
   "chain": {
-    "ChainTencentChainmakerClient.Client.Invoke() error: %v": "ChainTencentChainmakerClient.Client.Invoke() 错误：%v",
-    "ChainTencentChainmakerDemoClient.Client.InvokeChainMakerDemoContract() error: %v": "ChainTencentChainmakerDemoClient.Client.InvokeChainMakerDemoContract() 错误：%v",
+    "ChainTencentChainmakerClient.Client.Invoke() error: %v": "ChainTencentChainmakerClient.Client.Invoke()错误：%v",
+    "ChainTencentChainmakerDemoClient.Client.InvokeChainMakerDemoContract() error: %v": "ChainTencentChainmakerDemoClient.Client.InvokeChainMakerDemoContract()错误：%v",
     "TencentCloudSDKError, code = %d, message = %s": "腾讯云SDK错误，错误码：%d，错误信息：%s",
     "TencentCloudSDKError: %v": "腾讯云SDK错误：%v",
     "chainmakerEndpoint is not configured": "未配置chainmaker端点（chainmakerEndpoint）",
@@ -66,7 +66,7 @@
     "You can only view your own messages": "您只能查看自己的消息"
   },
   "embedding": {
-    "calculatePrice() error: unknown model type: %s": "calculatePrice() 错误：未知模型类型：%s",
+    "calculatePrice() error: unknown model type: %s": "calculatePrice()错误：未知模型类型：%s",
     "error unmarshaling response JSON: %v": "反序列化响应JSON错误：%v",
     "failed to calculate price: %v": "计算价格失败：%v",
     "failed to create client: %v": "创建客户端失败：%v",
@@ -95,38 +95,38 @@
     "The task does not exist": "任务不存在"
   },
   "model": {
-    "QueryText() error: unknown model type: %s": "QueryText() 错误：未知模型类型：%s",
+    "QueryText() error: unknown model type: %s": "QueryText()错误：未知模型类型：%s",
     "The token count: [%d] exceeds the model: [%s]'s maximum token count: [%d]": "标记（token）数量：[%d] 超过模型：[%s] 的最大标记数量：[%d]",
-    "calculatePrice() error: video generation pricing requires duration information": "calculatePrice() 错误：视频生成定价需要时长信息",
+    "calculatePrice() error: video generation pricing requires duration information": "calculatePrice()错误：视频生成定价需要时长信息",
     "cannot calculate tokens": "无法计算标记（token）数量",
     "error getting chat completion: %v": "获取聊天补全（chat completion）错误：%v",
     "exceed max tokens": "超过最大标记（token）数量",
-    "failed to marshal content: %v": "marshal content失败: %v",
-    "failed to marshal error content: %v": "marshal error content失败: %v",
+    "failed to marshal content: %v": "序列化内容失败：%v",
+    "failed to marshal error content: %v": "序列化错误内容失败：%v",
     "failed to marshal tool response: %v": "序列化工具响应失败：%v",
     "failed to parse tool arguments: %v": "解析工具参数失败：%v",
     "failed to write response: %v": "写入响应失败：%v",
     "no generations returned": "未返回生成结果（generations）",
     "the token count: [%d] exceeds the model: [%s]'s maximum token count: [%d]": "标记（token）数量：[%d] 超过模型：[%s] 的最大标记数量：[%d]",
     "unsupported model: %s": "不支持的模型：%s",
-    "writer does not implement http.Flusher": "写入器（writer）未实现 http.Flusher 接口"
+    "writer does not implement http.Flusher": "写入器（writer）未实现http.Flusher接口"
   },
   "object": {
     "Auth application: [%s] doesn't exist": "应用：[%s] 不存在",
     "Auth organization: [%s] doesn't exist": "组织：[%s] 不存在",
     "Auth user: [%s] doesn't exist": "用户：[%s] 不存在",
-    "Casdoor application: [%s] doesn't exist": "Casdoor application: [%s] doesn't exist",
-    "Casdoor organization: [%s] doesn't exist": "Casdoor organization: [%s] doesn't exist",
-    "MCP test JSON must include non-empty \"tool\"": "MCP 测试 JSON 必须包含非空的 \"tool\" 字段",
+    "Casdoor application: [%s] doesn't exist": "Casdoor应用：[%s] 不存在",
+    "Casdoor organization: [%s] doesn't exist": "Casdoor组织：[%s] 不存在",
+    "MCP test JSON must include non-empty \"tool\"": "MCP测试JSON必须包含非空的\"tool\"字段",
     "Please add a model provider first": "请先添加模型提供商",
     "Please add an embedding provider first": "要使用此功能，请先在设置中配置嵌入模型",
     "Question message: [%s] doesn't exist": "问题消息：[%s] 不存在",
-    "SendErrorEmail() error, the receiver user: ": "SendErrorEmail() error, the receiver user: ",
-    "Server URL is empty": "Server URL is empty",
-    "The MCP server: %s is not found": "The MCP server: %s is not found",
+    "SendErrorEmail() error, the receiver user: ": "SendErrorEmail()错误，接收方用户：",
+    "Server URL is empty": "服务器URL为空",
+    "The MCP server: %s is not found": "未找到MCP服务器：%s",
     "The chat: %s is not found": "聊天：%s 未找到",
     "The embedding provider for store: %s is not found": "存储 %s 的嵌入提供商未找到",
-    "The embedding provider: %s is expected to be ": "The embedding provider: %s is expected to be ",
+    "The embedding provider: %s is expected to be ": "嵌入提供商：%s 应为",
     "The embedding provider: %s is not found": "嵌入提供商：%s 未找到",
     "The embedding provider: %s's client secret should not be empty": "嵌入提供商：%s 的客户端密钥不能为空",
     "The file URL for: %s is empty": "文件 %s 的 URL 为空",
@@ -134,7 +134,7 @@
     "The image provider for store: %s should not be empty": "存储 %s 的图像提供商不能为空",
     "The message: %s is not found": "消息：%s 未找到",
     "The model provider for store: %s is not found": "存储 %s 的模型提供商未找到",
-    "The model provider: %s is expected to be ": "The model provider: %s is expected to be ",
+    "The model provider: %s is expected to be ": "模型提供商：%s 应为",
     "The model provider: %s is not found": "模型提供商：%s 未找到",
     "The model provider: %s's client secret should not be empty": "模型提供商：%s 的客户端密钥不能为空",
     "The provider is not found": "提供商未找到",
@@ -148,14 +148,14 @@
     "failed to parse record: name %s, field %s, error: %v": "解析记录失败：名称 %s，字段 %s，错误：%v",
     "failed to update error text for record %s: %s": "更新记录 %s 的错误文本失败：%s",
     "getExtFromMimeType() error: unknown MimeType: %s": "getExtFromMimeType() 错误：未知的 MimeType：%s",
-    "invalid MCP test JSON: %v": "invalid MCP test JSON: %v",
+    "invalid MCP test JSON: %v": "无效的MCP测试JSON：%v",
     "invalid range type: %s": "无效的范围类型：%s",
-    "invalid tool test JSON in testContent: %v": "invalid tool test JSON in testContent: %v",
+    "invalid tool test JSON in testContent: %v": "testContent中的工具测试JSON无效：%v",
     "no qVector found": "未找到 qVector",
     "parseBase64Image() error: invalid image format": "parseBase64Image() 错误：无效的图像格式",
     "queryVectorSafe() error, provider: %s, %s": "queryVectorSafe() 错误，提供商：%s，%s",
-    "the STT provider type: %s is not supported": "不支持的 STT 提供商类型：%s",
-    "the TTS provider type: %s is not supported": "不支持的 TTS 提供商类型：%s",
+    "the STT provider type: %s is not supported": "不支持的STT提供商类型：%s",
+    "the TTS provider type: %s is not supported": "不支持的TTS提供商类型：%s",
     "the blockchain provider: %s is not found": "区块链提供商：%s 未找到",
     "the embedding provider type: %s is not supported": "不支持的嵌入提供商类型：%s",
     "the form: %s is not found": "表单：%s 未找到",
@@ -166,10 +166,10 @@
     "the record: %s's block ID should not be empty": "记录：%s 的区块 ID 不能为空",
     "the storage provider type: %s is not supported": "不支持的存储提供商类型：%s",
     "there is no active blockchain provider": "没有活跃的区块链提供商",
-    "tool test JSON must include non-empty \"tool\"": "tool test JSON must include non-empty \"tool\""
+    "tool test JSON must include non-empty \"tool\"": "工具测试JSON必须包含非空的\"tool\"字段"
   },
   "openai": {
-    "Invalid API key format. Expected 'Bearer API_KEY'": "API 密钥格式无效。应为 'Bearer API_KEY'",
+    "Invalid API key format. Expected 'Bearer API_KEY'": "API密钥格式无效。应为 'Bearer API_KEY'",
     "No user message found in the request": "请求中未找到用户消息"
   },
   "resource": {
@@ -181,16 +181,16 @@
   },
   "store": {
     "Cannot delete the default store": "无法删除默认存储库",
-    "given that there must be one default store in OpenAgent, you cannot set this store to non-default. You can directly set another store as default": "given that there must be one default store in OpenAgent, you cannot set this store to non-default. You can directly set another store as default"
+    "given that there must be one default store in OpenAgent, you cannot set this store to non-default. You can directly set another store as default": "OpenAgent中必须保留至少一个默认存储，因此无法将当前存储设为非默认。您可以直接将另一个存储设为默认。"
   },
   "stt": {
-    "API error: %s": "API 错误：%s",
-    "Missing required parameter: storeId": "缺少 required parameter: storeId",
+    "API error: %s": "API错误：%s",
+    "Missing required parameter: storeId": "缺少必需参数：storeId",
     "speech recognition API error: %v": "语音识别 API 错误：%v",
     "speech recognition timed out after %v seconds": "语音识别在 %v 秒后超时"
   },
   "tool": {
-    "unsupported tool type: %s": "unsupported tool type: %s"
+    "unsupported tool type: %s": "不支持的工具类型：%s"
   },
   "tts": {
     "The audio data is nil": "音频数据为空",
