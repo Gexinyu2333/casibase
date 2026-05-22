@@ -88,7 +88,7 @@ export function setThemeColor(color) {
 }
 
 export function getThemeColor() {
-  return localStorage.getItem("themeColor") ?? "";
+  return localStorage.getItem("themeColor") || "#404040";
 }
 
 export function getAcceptLanguage() {
