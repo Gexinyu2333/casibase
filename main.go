@@ -15,10 +15,14 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/beego/beego"
 	"github.com/beego/beego/logs"
@@ -26,6 +30,7 @@ import (
 	"github.com/the-open-agent/openagent/authz"
 	"github.com/the-open-agent/openagent/conf"
 	"github.com/the-open-agent/openagent/internal/cli"
+	"github.com/the-open-agent/openagent/internal/localocr"
 	"github.com/the-open-agent/openagent/object"
 	"github.com/the-open-agent/openagent/proxy"
 	"github.com/the-open-agent/openagent/routers"
@@ -102,12 +107,26 @@ func main() {
 	}
 
 	port := beego.AppConfig.DefaultInt("httpport", 14000)
-
 	err = util.StopOldInstance(port)
 	if err != nil {
 		panic(err)
 	}
 
+	ctx, stopSignal := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stopSignal()
+	defer localocr.StopManaged()
+	go func() {
+		<-ctx.Done()
+		stopSignal()
+
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		if err := beego.BeeApp.Server.Shutdown(shutdownCtx); err != nil {
+			logs.Warning("Failed to shut down HTTP server: %v", err)
+		}
+	}()
+
+	go warmupManagedLocalOCR(ctx)
 	go object.ClearThroughputPerSecond()
 
 	if util.IsDoubleClicked() {
@@ -115,4 +134,27 @@ func main() {
 	}
 
 	beego.Run(fmt.Sprintf(":%v", port))
+}
+
+func warmupManagedLocalOCR(ctx context.Context) {
+	shouldWarmup, err := object.ShouldWarmupManagedLocalOCR()
+	if err != nil {
+		logs.Warning("Failed to check managed local OCR warmup: %v", err)
+		return
+	}
+	if !shouldWarmup {
+		return
+	}
+
+	logs.Info("Warming up managed local OCR service in background")
+	endpoint, err := localocr.EnsureRunning(ctx)
+	if err != nil {
+		if ctx.Err() != nil {
+			logs.Info("Managed local OCR warmup canceled")
+			return
+		}
+		logs.Warning("Failed to warm up managed local OCR service: %v", err)
+		return
+	}
+	logs.Info("Managed local OCR service is ready at %s", endpoint)
 }

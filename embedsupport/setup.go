@@ -13,24 +13,26 @@
 // limitations under the License.
 
 // Package embedsupport wires up the optional embedded filesystems for conf,
-// web/build, and skills. When the binary is built with -tags embed, the
-// caller (main) passes the embedded fs.FS values here via Setup. At runtime,
-// on-disk files always take priority; the embedded versions are used only when
-// the corresponding directory is absent next to the executable.
+// web/build, skills, and the OCR service. When the binary is built with
+// -tags embed, the caller (main) passes the embedded fs.FS values here via
+// Setup. At runtime, on-disk files always take priority; the embedded versions
+// are used only when the corresponding directory is absent next to the executable.
 package embedsupport
 
 import "io/fs"
 
 var (
-	webFS    fs.FS
-	skillsFS fs.FS
+	webFS        fs.FS
+	skillsFS     fs.FS
+	ocrServiceFS fs.FS
 )
 
 // Setup must be called at the very start of main(), before any config values
 // are read or HTTP requests are served.
-func Setup(conf, web, skills fs.FS) {
+func Setup(conf, web, skills, ocrService fs.FS) {
 	webFS = web
 	skillsFS = skills
+	ocrServiceFS = ocrService
 	setupConf(conf)
 }
 
@@ -39,3 +41,6 @@ func WebFS() fs.FS { return webFS }
 
 // SkillsFS returns the embedded skills filesystem, or nil if not available.
 func SkillsFS() fs.FS { return skillsFS }
+
+// OcrServiceFS returns the embedded OCR service filesystem, or nil if not available.
+func OcrServiceFS() fs.FS { return ocrServiceFS }

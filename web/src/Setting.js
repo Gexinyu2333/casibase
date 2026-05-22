@@ -458,6 +458,11 @@ export function getToolFunctions(tool) {
         testContent: JSON.stringify({tool: "local_file_read", arguments: {path: "/absolute/path/to/Desktop/report.pdf", offset: 0, limit: 12000}}, null, 2),
       },
       {
+        name: "local_pdf_ocr_read",
+        description: "Read a scanned local PDF through the configured or managed OCR HTTP endpoint",
+        testContent: JSON.stringify({tool: "local_pdf_ocr_read", arguments: {path: "/absolute/path/to/Desktop/scanned.pdf"}}, null, 2),
+      },
+      {
         name: "local_file_write",
         description: "Write text to an absolute local path",
         testContent: JSON.stringify({tool: "local_file_write", arguments: {path: "/absolute/path/to/Desktop/Project Summaries/summary.md", content: "# Summary\\n\\nProject notes.", overwrite: false}}, null, 2),

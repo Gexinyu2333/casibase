@@ -223,7 +223,7 @@ class ToolEditPage extends React.Component {
                 12
               )
             ) : null}
-            {["web_search", "web_fetch", "web_browser"].includes(tool.type) ? (
+            {["web_search", "web_fetch", "web_browser", "local_file"].includes(tool.type) ? (
               this.renderToolField(
                 this.getProviderUrlLabel(tool),
                 <Input value={tool.providerUrl} onChange={e => {

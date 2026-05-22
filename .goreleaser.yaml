@@ -24,7 +24,7 @@ builds:
       - arm64
 
 # Release raw executables — no zip/tar.gz wrapper.
-# conf/, web/build/, and skills/ are baked into the binary via go:embed.
+# conf/, web/build/, skills/, and deploy/ocr-service/ are baked into the binary via go:embed.
 archives:
   - format: binary
     name_template: >-

@@ -15,19 +15,25 @@
 package tool
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/fs"
+	"mime/multipart"
+	"net/http"
 	"os"
 	"os/user"
 	"path/filepath"
 	"runtime"
 	"sort"
 	"strings"
+	"time"
 	"unicode/utf8"
 
 	"github.com/ThinkInAIXYZ/go-mcp/protocol"
+	"github.com/the-open-agent/openagent/internal/localocr"
 	"github.com/the-open-agent/openagent/txt"
 )
 
@@ -36,11 +42,13 @@ const (
 	localFileMaxPreviewChars     = 20000
 	localFileDefaultReadLimit    = 12000
 	localFileMaxReadLimit        = 100000
+	localFileOcrTimeout          = 2 * time.Minute
 )
 
 // LocalFileTool is the Tool Type "local_file".
 type LocalFileTool struct {
-	lang string
+	lang        string
+	ocrEndpoint string
 }
 
 func (p *LocalFileTool) BuiltinTools() []BuiltinTool {
@@ -48,6 +56,7 @@ func (p *LocalFileTool) BuiltinTools() []BuiltinTool {
 		&localSpecialDirsBuiltin{},
 		&localFileScanBuiltin{lang: p.lang},
 		&localFileReadBuiltin{lang: p.lang},
+		&localPdfOcrReadBuiltin{endpoint: p.ocrEndpoint},
 		&localFileWriteBuiltin{},
 		&localFileMoveBuiltin{},
 	}
@@ -97,6 +106,16 @@ type localFileReadResult struct {
 	TextLength int    `json:"textLength"`
 	Text       string `json:"text"`
 	Truncated  bool   `json:"truncated"`
+}
+
+type localPdfOcrReadResult struct {
+	Path       string `json:"path"`
+	TextLength int    `json:"textLength"`
+	Text       string `json:"text"`
+}
+
+type localPdfOcrResponse struct {
+	Text *string `json:"text"`
 }
 
 type localFileWriteResult struct {
@@ -227,6 +246,61 @@ func localFileReadText(path, ext, lang string) (string, error) {
 	return string(bs), nil
 }
 
+func localFileOcrEndpoint(ctx context.Context, endpoint string) (string, error) {
+	endpoint = strings.TrimSpace(endpoint)
+	if endpoint != "" {
+		return endpoint, nil
+	}
+	return localocr.EnsureRunning(ctx)
+}
+
+func localFilePostPdfOcr(ctx context.Context, endpoint string, path string) (string, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	var body bytes.Buffer
+	writer := multipart.NewWriter(&body)
+	part, err := writer.CreateFormFile("file", filepath.Base(path))
+	if err != nil {
+		return "", err
+	}
+	if _, err = io.Copy(part, file); err != nil {
+		return "", err
+	}
+	if err = writer.Close(); err != nil {
+		return "", err
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, &body)
+	if err != nil {
+		return "", err
+	}
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+
+	client := &http.Client{Timeout: localFileOcrTimeout}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
+		return "", fmt.Errorf("ocr endpoint returned status %d", resp.StatusCode)
+	}
+
+	var result localPdfOcrResponse
+	if err = json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return "", err
+	}
+	if result.Text == nil {
+		return "", fmt.Errorf("ocr endpoint response missing text")
+	}
+	return *result.Text, nil
+}
+
 func localFileDirectory(path string) localSpecialDirInfo {
 	info, err := os.Stat(path)
 	return localSpecialDirInfo{
@@ -288,6 +362,66 @@ func (b *localSpecialDirsBuiltin) Execute(_ context.Context, _ map[string]interf
 			Documents: localFileDirectory(filepath.Join(home, "Documents")),
 			Downloads: localFileDirectory(filepath.Join(home, "Downloads")),
 		},
+	}), nil
+}
+
+type localPdfOcrReadBuiltin struct {
+	endpoint string
+}
+
+func (b *localPdfOcrReadBuiltin) GetName() string {
+	return "local_pdf_ocr_read"
+}
+
+func (b *localPdfOcrReadBuiltin) GetDescription() string {
+	return `Read a scanned local PDF through the configured OCR HTTP endpoint.
+- path (required): absolute PDF file path for the current operating system.
+- Sends multipart/form-data field "file" to the local_file Provider URL, or the managed local OCR service when Provider URL is empty.
+- The OCR endpoint must return JSON: {"text":"recognized text"}.`
+}
+
+func (b *localPdfOcrReadBuiltin) GetInputSchema() interface{} {
+	return map[string]interface{}{
+		"type": "object",
+		"properties": map[string]interface{}{
+			"path": map[string]interface{}{
+				"type":        "string",
+				"description": "Absolute path to a local PDF file.",
+			},
+		},
+		"required": []string{"path"},
+	}
+}
+
+func (b *localPdfOcrReadBuiltin) Execute(ctx context.Context, arguments map[string]interface{}) (*protocol.CallToolResult, error) {
+	path := localFileStringArg(arguments, "path")
+	if err := localFileRequireAbsolutePath(path, "path"); err != nil {
+		return localFileError(err.Error()), nil
+	}
+	info, err := os.Stat(path)
+	if err != nil {
+		return localFileError(fmt.Sprintf("failed to access path: %s", err.Error())), nil
+	}
+	if info.IsDir() {
+		return localFileError("path must be a file"), nil
+	}
+	if strings.ToLower(filepath.Ext(path)) != ".pdf" {
+		return localFileError("path must be a PDF file"), nil
+	}
+
+	endpoint, err := localFileOcrEndpoint(ctx, b.endpoint)
+	if err != nil {
+		return localFileError(fmt.Sprintf("failed to start managed OCR service: %s", err.Error())), nil
+	}
+
+	text, err := localFilePostPdfOcr(ctx, endpoint, path)
+	if err != nil {
+		return localFileError(fmt.Sprintf("failed to read PDF through OCR endpoint: %s", err.Error())), nil
+	}
+	return localFileJSON(localPdfOcrReadResult{
+		Path:       path,
+		TextLength: len([]rune(text)),
+		Text:       text,
 	}), nil
 }
 

@@ -46,7 +46,7 @@ func New(config Config, lang string) (Tool, error) {
 	case "shell":
 		return &ShellTool{}, nil
 	case "local_file":
-		return &LocalFileTool{lang: lang}, nil
+		return &LocalFileTool{lang: lang, ocrEndpoint: config.ProviderUrl}, nil
 	case "office":
 		return &OfficeTool{subType: officeSubType(config.SubType)}, nil
 	case "web_fetch":
