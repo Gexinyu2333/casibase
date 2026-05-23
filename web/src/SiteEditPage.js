@@ -178,6 +178,13 @@ class SiteEditPage extends React.Component {
               8
             )}
             {this.renderSiteField(
+              Setting.getLabel(i18next.t("site:Endpoint"), i18next.t("site:Endpoint - Tooltip")),
+              <Input prefix={<LinkOutlined />} value={site.endpoint} onChange={e => {
+                this.updateSiteField("endpoint", e.target.value);
+              }} />,
+              8
+            )}
+            {this.renderSiteField(
               Setting.getLabel(i18next.t("store:Theme color"), i18next.t("store:Theme color - Tooltip")),
               <input type="color" value={site.themeColor || ""} style={{height: "32px", width: "64px", cursor: "pointer", border: "1px solid #d9d9d9", borderRadius: "6px", padding: "2px"}} onChange={(e) => {
                 this.updateSiteField("themeColor", e.target.value);

@@ -626,6 +626,8 @@
     "Check user balance": "Check user balance",
     "Check user balance - Tooltip": "When enabled, the system checks whether the user has sufficient balance before processing each AI request. Disable this for internal deployments where billing is not required.",
     "Edit Site": "Edit Site",
+    "Endpoint": "Endpoint",
+    "Endpoint - Tooltip": "The public URL of this OpenAgent deployment (e.g. https://try.openagentai.org). Auto-detected from the first API request if left empty.",
     "IP parsing mode": "IP parsing mode",
     "IP parsing mode - Tooltip": "Method used for parsing client IP addresses (e.g. MaxMind GeoIP2, 17monipdb)",
     "Log config": "Log config",

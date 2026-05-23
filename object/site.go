@@ -34,6 +34,7 @@ type Site struct {
 	FooterHtml    string   `xorm:"mediumtext" json:"footerHtml"`
 	StaticBaseUrl string   `xorm:"varchar(500)" json:"staticBaseUrl"`
 	NavItems      []string `xorm:"text" json:"navItems"`
+	Endpoint      string   `xorm:"varchar(500)" json:"endpoint"`
 
 	CheckUserBalance bool `xorm:"bool" json:"checkUserBalance"`
 
@@ -129,6 +130,9 @@ func UpdateSite(id string, site *Site) (bool, error) {
 	affected, err2 := adapter.engine.ID(core.PK{owner, name}).AllCols().Update(site)
 	if err2 != nil {
 		return false, err2
+	}
+	if site.Name == "site-built-in" {
+		siteEndpointNeedsAutoFill = site.Endpoint == ""
 	}
 	return affected != 0, nil
 }

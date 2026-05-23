@@ -48,6 +48,7 @@ func main() {
 	object.CreateTables()
 
 	object.InitDb()
+	object.InitSiteEndpoint()
 	authz.InitEnforcer()
 	proxy.InitHttpClient()
 	util.InitMaxmindFiles()
@@ -60,6 +61,7 @@ func main() {
 
 	beego.SetStaticPath("/swagger", "swagger")
 	beego.InsertFilter("*", beego.BeforeRouter, routers.CorsFilter)
+	beego.InsertFilter("*", beego.BeforeRouter, routers.EndpointFilter)
 	beego.InsertFilter("*", beego.BeforeRouter, routers.HstsFilter)
 	beego.InsertFilter("*", beego.BeforeRouter, routers.CacheControlFilter)
 	beego.InsertFilter("*", beego.BeforeRouter, routers.AutoSigninFilter)
