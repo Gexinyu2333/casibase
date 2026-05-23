@@ -372,7 +372,12 @@ function ManagementPage(props) {
       return newItem;
     });
 
-    return filteredItems.filter(item => !Array.isArray(item.children) || item.children.length > 0);
+    return filteredItems.filter(item => {
+      if (Array.isArray(item.children)) {
+        return item.children.length > 0;
+      }
+      return item.key === "/" || navItems.includes(item.key);
+    });
   }
 
   /** Strip sidebar items that only open Casdoor admin URLs; built-in auth uses in-app pages instead. */
@@ -394,45 +399,7 @@ function ManagementPage(props) {
 
     const navItems = site?.navItems;
 
-    if (Setting.isChatAdminUser(account)) {
-      res.push(Setting.getItem(<Link to="/chat">{i18next.t("general:Chat")}</Link>, "/chat", <CommentOutlined />));
-      res.push(Setting.getItem(<Link to="/stores">{i18next.t("general:Stores")}</Link>, "/stores", <AppstoreOutlined />));
-      res.push(Setting.getItem(<Link to="/vectors">{i18next.t("general:Vectors")}</Link>, "/vectors", <ApartmentOutlined />));
-      res.push(Setting.getItem(<Link to="/chats">{i18next.t("general:Chats")}</Link>, "/chats", <BulbOutlined />));
-      res.push(Setting.getItem(<Link to="/messages">{i18next.t("general:Messages")}</Link>, "/messages", <MessageOutlined />));
-      res.push(Setting.getItem(<Link to="/usages">{i18next.t("general:Usages")}</Link>, "/usages", <LineChartOutlined />));
-      if (Setting.isAdminUser(account)) {
-        res.push(Setting.getItem(<Link to="/visitors">{i18next.t("general:Visitors")}</Link>, "/visitors", <DashboardOutlined />));
-      }
-
-      if (window.location.pathname === "/") {
-        Setting.goToLinkSoft({props}, "/chat");
-      }
-
-      res.push(Setting.getItem(
-        <a target="_blank" rel="noreferrer" href={Setting.getMyProfileUrl(account).replace("/account", "/users")}>
-          {i18next.t("general:Users")}
-          {Setting.renderExternalLink()}
-        </a>,
-        "#",
-        <UserOutlined />));
-
-      res.push(Setting.getItem(
-        <a target="_blank" rel="noreferrer" href={Setting.getMyProfileUrl(account).replace("/account", "/resources")}>
-          {i18next.t("general:Resources")}
-          {Setting.renderExternalLink()}
-        </a>,
-        "##",
-        <TeamOutlined />));
-
-      res.push(Setting.getItem(
-        <a target="_blank" rel="noreferrer" href={Setting.getMyProfileUrl(account).replace("/account", "/permissions")}>
-          {i18next.t("general:Permissions")}
-          {Setting.renderExternalLink()}
-        </a>,
-        "###",
-        <SafetyOutlined />));
-    } else if (Setting.isTaskUser(account)) {
+    if (Setting.isTaskUser(account)) {
       res.push(Setting.getItem(<Link to="/tasks">{i18next.t("general:Tasks")}</Link>, "/tasks", <UnorderedListOutlined />));
       if (Setting.isAdminUser(account)) {
         res.push(Setting.getItem(<Link to="/scales">{i18next.t("general:Scales")}</Link>, "/scales", <FundOutlined />));
@@ -441,14 +408,6 @@ function ManagementPage(props) {
       if (window.location.pathname === "/") {
         Setting.goToLinkSoft({props}, "/tasks");
       }
-    } else if (!Setting.isAdminUser(account) && !Setting.isChatAdminUser(account)) {
-      res.push(Setting.getItem(<Link to="/chat">{i18next.t("general:Chat")}</Link>, "/chat", <CommentOutlined />));
-
-      if (window.location.pathname === "/") {
-        Setting.goToLinkSoft({props}, "/chat");
-      }
-
-      return res;
     } else {
       res.pop();
 
@@ -506,18 +465,20 @@ function ManagementPage(props) {
           </a>, "/permissions", <SafetyOutlined />),
       ]));
 
-      res.push(Setting.getItem(<Link style={{color: textColor}} to="/sites/site-built-in">{i18next.t("general:Admin")}</Link>, "/admin", <SettingOutlined />, [
-        Setting.getItem(<Link to="/sites/site-built-in">{i18next.t("general:Sites")}</Link>, "/sites", <LayoutOutlined />),
-        Setting.getItem(<Link to="/resources">{i18next.t("general:Resources")}</Link>, "/resources", <InboxOutlined />),
-        Setting.getItem(<Link to="/usages">{i18next.t("general:Usages")}</Link>, "/usages", <LineChartOutlined />),
-        Setting.getItem(<Link to="/visitors">{i18next.t("general:Visitors")}</Link>, "/visitors", <FundOutlined />),
-        Setting.getItem(<Link to="/sysinfo">{i18next.t("general:System Info")}</Link>, "/sysinfo", <DashboardOutlined />),
-        Setting.getItem(
-          <a target="_blank" rel="noreferrer" href={Setting.isLocalhost() ? `${Setting.ServerUrl}/swagger/index.html` : "/swagger/index.html"}>
-            {i18next.t("general:Swagger")}
-            {Setting.renderExternalLink()}
-          </a>, "/swagger", <ApiOutlined />),
-      ]));
+      if (Setting.isAdminUser(account)) {
+        res.push(Setting.getItem(<Link style={{color: textColor}} to="/sites/site-built-in">{i18next.t("general:Admin")}</Link>, "/admin", <SettingOutlined />, [
+          Setting.getItem(<Link to="/sites/site-built-in">{i18next.t("general:Sites")}</Link>, "/sites", <LayoutOutlined />),
+          Setting.getItem(<Link to="/resources">{i18next.t("general:Resources")}</Link>, "/resources", <InboxOutlined />),
+          Setting.getItem(<Link to="/usages">{i18next.t("general:Usages")}</Link>, "/usages", <LineChartOutlined />),
+          Setting.getItem(<Link to="/visitors">{i18next.t("general:Visitors")}</Link>, "/visitors", <FundOutlined />),
+          Setting.getItem(<Link to="/sysinfo">{i18next.t("general:System Info")}</Link>, "/sysinfo", <DashboardOutlined />),
+          Setting.getItem(
+            <a target="_blank" rel="noreferrer" href={Setting.isLocalhost() ? `${Setting.ServerUrl}/swagger/index.html` : "/swagger/index.html"}>
+              {i18next.t("general:Swagger")}
+              {Setting.renderExternalLink()}
+            </a>, "/swagger", <ApiOutlined />),
+        ]));
+      }
 
       return Setting.isBasicLoginMode(account) ? filterMenuItems(filterUserMenuItems(res), navItems) : filterMenuItems(res, navItems);
     }
