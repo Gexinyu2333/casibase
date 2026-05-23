@@ -89,14 +89,7 @@ func AutoFillSiteEndpoint(req *http.Request) {
 		return
 	}
 
-	scheme := "http"
-	if req.TLS != nil {
-		scheme = "https"
-	}
-	if proto := req.Header.Get("X-Forwarded-Proto"); proto != "" {
-		scheme = proto
-	}
-
-	site.Endpoint = scheme + "://" + req.Host
+	// Public hosts are always served over HTTPS (reverse proxy handles TLS).
+	site.Endpoint = "https://" + req.Host
 	_, _ = UpdateSite("admin/site-built-in", site)
 }
