@@ -106,8 +106,8 @@ type Store struct {
 	ChatCount    int    `xorm:"-" json:"chatCount"`
 	MessageCount int    `xorm:"-" json:"messageCount"`
 	VectorCount  int    `xorm:"-" json:"vectorCount"`
-	HubDbName string `xorm:"-" json:"hubDbName"`
-	Endpoint  string `xorm:"-" json:"endpoint"`
+	HubDbName    string `xorm:"-" json:"hubDbName"`
+	Endpoint     string `xorm:"-" json:"endpoint"`
 
 	FileTree      *TreeFile              `xorm:"mediumtext" json:"fileTree"`
 	PropertiesMap map[string]*Properties `xorm:"mediumtext" json:"propertiesMap"`
