@@ -1,4 +1,4 @@
-﻿// Copyright 2025 The OpenAgent Authors. All Rights Reserved.
+// Copyright 2025 The OpenAgent Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -133,13 +133,6 @@ class ServerEditPage extends React.Component {
       boxShadow: "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
       padding: "18px",
     };
-    const btnStyle = {
-      backgroundColor: "var(--ant-color-bg-container)",
-      borderColor: "var(--ant-color-border)",
-      border: "1px solid var(--ant-color-border)",
-      borderRadius: "10px",
-      padding: "6px 10px",
-    };
 
     return (
       <div>
@@ -147,9 +140,9 @@ class ServerEditPage extends React.Component {
           <span style={{fontSize: "22px", fontWeight: 600}}>{i18next.t("server:Edit MCP Server")}</span>
           <div style={{display: "flex", gap: "8px", marginRight: "4px"}}>
             <Space wrap>
-              <Button style={btnStyle} onClick={() => this.submitServerEdit(false)}>{i18next.t("general:Save")}</Button>
-              <Button style={btnStyle} onClick={() => this.submitServerEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
-              {this.state.isNewServer && <Button style={btnStyle} onClick={() => this.cancelServerEdit()}>{i18next.t("general:Cancel")}</Button>}
+              <Button onClick={() => this.submitServerEdit(false)}>{i18next.t("general:Save")}</Button>
+              <Button onClick={() => this.submitServerEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
+              {this.state.isNewServer && <Button onClick={() => this.cancelServerEdit()}>{i18next.t("general:Cancel")}</Button>}
             </Space>
           </div>
         </div>

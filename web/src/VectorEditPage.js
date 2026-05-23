@@ -1,4 +1,4 @@
-﻿// Copyright 2023 The OpenAgent Authors. All Rights Reserved.
+// Copyright 2023 The OpenAgent Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -91,18 +91,11 @@ class VectorEditPage extends React.Component {
     if (isViewMode) {
       return null;
     }
-    const btnStyle = {
-      backgroundColor: "var(--ant-color-bg-container)",
-      borderColor: "var(--ant-color-border)",
-      border: "1px solid var(--ant-color-border)",
-      borderRadius: "10px",
-      padding: "6px 10px",
-    };
     return (
       <Space wrap>
-        <Button style={btnStyle} onClick={() => this.submitVectorEdit(false)}>{i18next.t("general:Save")}</Button>
-        <Button style={btnStyle} onClick={() => this.submitVectorEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
-        {this.state.isNewVector && <Button style={btnStyle} onClick={() => this.cancelVectorEdit()}>{i18next.t("general:Cancel")}</Button>}
+        <Button onClick={() => this.submitVectorEdit(false)}>{i18next.t("general:Save")}</Button>
+        <Button onClick={() => this.submitVectorEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
+        {this.state.isNewVector && <Button onClick={() => this.cancelVectorEdit()}>{i18next.t("general:Cancel")}</Button>}
       </Space>
     );
   }

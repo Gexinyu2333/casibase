@@ -1,4 +1,4 @@
-﻿// Copyright 2026 The OpenAgent Authors. All Rights Reserved.
+// Copyright 2026 The OpenAgent Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -111,18 +111,11 @@ class SiteEditPage extends React.Component {
   }
 
   renderSiteActions() {
-    const btnStyle = {
-      backgroundColor: "var(--ant-color-bg-container)",
-      borderColor: "var(--ant-color-border)",
-      border: "1px solid var(--ant-color-border)",
-      borderRadius: "10px",
-      padding: "6px 10px",
-    };
 
     return (
       <Space wrap>
-        <Button style={btnStyle} onClick={() => this.submitSiteEdit(false)}>{i18next.t("general:Save")}</Button>
-        <Button style={btnStyle} onClick={() => this.submitSiteEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
+        <Button onClick={() => this.submitSiteEdit(false)}>{i18next.t("general:Save")}</Button>
+        <Button onClick={() => this.submitSiteEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
       </Space>
     );
   }

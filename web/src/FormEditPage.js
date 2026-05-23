@@ -1,4 +1,4 @@
-﻿// Copyright 2025 The OpenAgent Authors. All Rights Reserved.
+// Copyright 2025 The OpenAgent Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -84,18 +84,11 @@ class FormEditPage extends React.Component {
   }
 
   renderFormActions() {
-    const btnStyle = {
-      backgroundColor: "var(--ant-color-bg-container)",
-      borderColor: "var(--ant-color-border)",
-      border: "1px solid var(--ant-color-border)",
-      borderRadius: "10px",
-      padding: "6px 10px",
-    };
     return (
       <Space wrap>
-        <Button style={btnStyle} onClick={() => this.submitFormEdit(false)}>{i18next.t("general:Save")}</Button>
-        <Button style={btnStyle} onClick={() => this.submitFormEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
-        {this.state.isNewForm && <Button style={btnStyle} onClick={() => this.cancelFormEdit()}>{i18next.t("general:Cancel")}</Button>}
+        <Button onClick={() => this.submitFormEdit(false)}>{i18next.t("general:Save")}</Button>
+        <Button onClick={() => this.submitFormEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
+        {this.state.isNewForm && <Button onClick={() => this.cancelFormEdit()}>{i18next.t("general:Cancel")}</Button>}
       </Space>
     );
   }

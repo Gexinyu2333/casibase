@@ -106,14 +106,6 @@ class AccountPage extends React.Component {
   render() {
     const account = this.props.account;
 
-    const btnStyle = {
-      backgroundColor: "var(--ant-color-bg-container)",
-      borderColor: "var(--ant-color-border)",
-      border: "1px solid var(--ant-color-border)",
-      borderRadius: "10px",
-      padding: "6px 10px",
-    };
-
     const cardHeadStyle = {
       background: "transparent",
       borderBottom: "none",
@@ -142,7 +134,7 @@ class AccountPage extends React.Component {
           <span style={{fontSize: "22px", fontWeight: 600}}>{i18next.t("account:My Account")}</span>
           <div style={{display: "flex", gap: "8px", marginRight: "4px"}}>
             <Space wrap>
-              <Button style={btnStyle} onClick={() => this.formRef.current.submit()}>{i18next.t("general:Save")}</Button>
+              <Button onClick={() => this.formRef.current.submit()}>{i18next.t("general:Save")}</Button>
             </Space>
           </div>
         </div>
@@ -204,7 +196,7 @@ class AccountPage extends React.Component {
             <Row gutter={[16, 8]}>
               {this.renderField(
                 Setting.getLabel(i18next.t("general:Password"), i18next.t("general:Password - Tooltip")),
-                <Button style={btnStyle} onClick={() => this.setState({passwordModalVisible: true})}>
+                <Button onClick={() => this.setState({passwordModalVisible: true})}>
                   {i18next.t("account:Modify password...")}
                 </Button>,
                 12

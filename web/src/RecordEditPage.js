@@ -1,4 +1,4 @@
-﻿// Copyright 2023 The OpenAgent Authors.. All Rights Reserved.
+// Copyright 2023 The OpenAgent Authors.. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -98,25 +98,18 @@ class RecordEditPage extends React.Component {
   }
 
   renderRecordActions() {
-    const btnStyle = {
-      backgroundColor: "var(--ant-color-bg-container)",
-      borderColor: "var(--ant-color-border)",
-      border: "1px solid var(--ant-color-border)",
-      borderRadius: "10px",
-      padding: "6px 10px",
-    };
     if (this.state.mode === "123") {
       return (
         <Space wrap>
-          <Button style={btnStyle} onClick={() => this.props.history.push("/records")}>{i18next.t("general:Exit")}</Button>
+          <Button onClick={() => this.props.history.push("/records")}>{i18next.t("general:Exit")}</Button>
         </Space>
       );
     }
     return (
       <Space wrap>
-        <Button style={btnStyle} onClick={() => this.submitRecordEdit(false)}>{i18next.t("general:Save")}</Button>
-        <Button style={btnStyle} onClick={() => this.submitRecordEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
-        {this.state.mode === "add" && <Button style={btnStyle} onClick={() => this.deleteRecord()}>{i18next.t("general:Cancel")}</Button>}
+        <Button onClick={() => this.submitRecordEdit(false)}>{i18next.t("general:Save")}</Button>
+        <Button onClick={() => this.submitRecordEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
+        {this.state.mode === "add" && <Button onClick={() => this.deleteRecord()}>{i18next.t("general:Cancel")}</Button>}
       </Space>
     );
   }

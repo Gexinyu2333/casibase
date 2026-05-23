@@ -1,4 +1,4 @@
-﻿// Copyright 2023 The OpenAgent Authors. All Rights Reserved.
+// Copyright 2023 The OpenAgent Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -278,14 +278,6 @@ class ProviderEditPage extends React.Component {
 
     const cardHeadStyle = {background: "transparent", borderBottom: "none", fontWeight: 600, fontSize: "15px"};
 
-    const btnStyle = {
-      backgroundColor: "var(--ant-color-bg-container)",
-      borderColor: "var(--ant-color-border)",
-      border: "1px solid var(--ant-color-border)",
-      borderRadius: "10px",
-      padding: "6px 10px",
-    };
-
     return (
       <div>
         <div style={{marginBottom: "16px", display: "flex", alignItems: "center", justifyContent: "space-between"}}>
@@ -294,9 +286,9 @@ class ProviderEditPage extends React.Component {
           </span>
           {!isRemote && (
             <div style={{display: "flex", gap: "8px", marginRight: "4px"}}>
-              <Button style={btnStyle} onClick={() => this.submitProviderEdit(false)}>{i18next.t("general:Save")}</Button>
-              <Button style={btnStyle} onClick={() => this.submitProviderEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
-              {this.state.isNewProvider && <Button style={btnStyle} onClick={() => this.cancelProviderEdit()}>{i18next.t("general:Cancel")}</Button>}
+              <Button onClick={() => this.submitProviderEdit(false)}>{i18next.t("general:Save")}</Button>
+              <Button onClick={() => this.submitProviderEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
+              {this.state.isNewProvider && <Button onClick={() => this.cancelProviderEdit()}>{i18next.t("general:Cancel")}</Button>}
             </div>
           )}
         </div>

@@ -213,14 +213,6 @@ class PipeEditPage extends React.Component {
 
     const cardHeadStyle = {background: "transparent", borderBottom: "none", fontWeight: 600, fontSize: "15px"};
 
-    const btnStyle = {
-      backgroundColor: "var(--ant-color-bg-container)",
-      borderColor: "var(--ant-color-border)",
-      border: "1px solid var(--ant-color-border)",
-      borderRadius: "10px",
-      padding: "6px 10px",
-    };
-
     return (
       <div>
         <div style={{marginBottom: "16px", display: "flex", alignItems: "center", justifyContent: "space-between"}}>
@@ -228,9 +220,9 @@ class PipeEditPage extends React.Component {
             {i18next.t("pipe:Edit Pipe")}
           </span>
           <div style={{display: "flex", gap: "8px", marginRight: "4px"}}>
-            <Button style={btnStyle} onClick={() => this.submitPipeEdit(false)}>{i18next.t("general:Save")}</Button>
-            <Button style={btnStyle} onClick={() => this.submitPipeEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
-            {this.state.isNewPipe && <Button style={btnStyle} onClick={() => this.cancelPipeEdit()}>{i18next.t("general:Cancel")}</Button>}
+            <Button onClick={() => this.submitPipeEdit(false)}>{i18next.t("general:Save")}</Button>
+            <Button onClick={() => this.submitPipeEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
+            {this.state.isNewPipe && <Button onClick={() => this.cancelPipeEdit()}>{i18next.t("general:Cancel")}</Button>}
           </div>
         </div>
 

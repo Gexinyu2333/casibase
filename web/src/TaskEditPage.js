@@ -1,4 +1,4 @@
-﻿// Copyright 2023 The OpenAgent Authors. All Rights Reserved.
+// Copyright 2023 The OpenAgent Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -280,18 +280,11 @@ class TaskEditPage extends React.Component {
   }
 
   renderTaskActions() {
-    const btnStyle = {
-      backgroundColor: "var(--ant-color-bg-container)",
-      borderColor: "var(--ant-color-border)",
-      border: "1px solid var(--ant-color-border)",
-      borderRadius: "10px",
-      padding: "6px 10px",
-    };
     return (
       <Space wrap>
-        <Button style={btnStyle} onClick={() => this.submitTaskEdit(false)}>{i18next.t("general:Save")}</Button>
-        <Button style={btnStyle} onClick={() => this.submitTaskEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
-        {this.state.isNewTask && <Button style={btnStyle} onClick={() => this.cancelTaskEdit()}>{i18next.t("general:Cancel")}</Button>}
+        <Button onClick={() => this.submitTaskEdit(false)}>{i18next.t("general:Save")}</Button>
+        <Button onClick={() => this.submitTaskEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
+        {this.state.isNewTask && <Button onClick={() => this.cancelTaskEdit()}>{i18next.t("general:Cancel")}</Button>}
       </Space>
     );
   }
