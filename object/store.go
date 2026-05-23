@@ -101,6 +101,14 @@ type Store struct {
 	State                  string            `xorm:"varchar(100)" json:"state"`
 	SharedBy               string            `xorm:"varchar(100)" json:"sharedBy"`
 
+	Author      string `xorm:"varchar(100)" json:"author"`
+	Tutor       string `xorm:"varchar(100)" json:"tutor"`
+	Subject     string `xorm:"varchar(100)" json:"subject"`
+	Grade       string `xorm:"varchar(100)" json:"grade"`
+	Topic       string `xorm:"varchar(100)" json:"topic"`
+	Brief       string `xorm:"varchar(500)" json:"brief"`
+	Description string `xorm:"text" json:"description"`
+
 	PublishState string `xorm:"varchar(100)" json:"publishState"`
 
 	ChatCount    int    `xorm:"-" json:"chatCount"`

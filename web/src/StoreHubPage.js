@@ -53,7 +53,8 @@ class StoreHubPage extends React.Component {
     const chatPath = `/stores/${store.owner}/${store.name}/chat`;
     const chatUrl = store.endpoint ? `${store.endpoint}${chatPath}` : null;
     const initials = (store.displayName || store.name || "?")[0].toUpperCase();
-    const description = store.welcomeText || store.prompt || "";
+    const description = store.brief || store.welcomeText || store.prompt || "";
+    const authorName = store.author || store.owner;
 
     const handleClick = () => {
       if (chatUrl) {
@@ -84,13 +85,14 @@ class StoreHubPage extends React.Component {
                 {store.displayName || store.name}
               </div>
               <Text type="secondary" style={{fontSize: 12}}>
-                {i18next.t("store:By")} {store.owner}
+                {i18next.t("store:By")} {authorName}
               </Text>
-              {store.endpoint ? (
-                <div style={{marginTop: 2}}>
-                  <Tag color="blue" style={{fontSize: 11, padding: "0 4px", lineHeight: "18px"}}>{store.endpoint}</Tag>
-                </div>
-              ) : null}
+              <div style={{marginTop: 4, display: "flex", flexWrap: "wrap", gap: 4}}>
+                {store.subject ? <Tag color="purple" style={{fontSize: 11, padding: "0 4px", lineHeight: "18px", margin: 0}}>{store.subject}</Tag> : null}
+                {store.grade ? <Tag color="cyan" style={{fontSize: 11, padding: "0 4px", lineHeight: "18px", margin: 0}}>{store.grade}</Tag> : null}
+                {store.topic ? <Tag color="geekblue" style={{fontSize: 11, padding: "0 4px", lineHeight: "18px", margin: 0}}>{store.topic}</Tag> : null}
+                {store.endpoint ? <Tag color="blue" style={{fontSize: 11, padding: "0 4px", lineHeight: "18px", margin: 0}}>{store.endpoint}</Tag> : null}
+              </div>
             </div>
           </div>
           {description ? (

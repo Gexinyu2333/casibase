@@ -487,6 +487,60 @@ class StoreEditPage extends React.Component {
           </Row>
         </Card>
 
+        <Card size="small" title={renderCardTitle(i18next.t("store:Agent Profile"), i18next.t("store:Agent Profile desc"))} style={sectionCardStyle} headStyle={cardHeadStyle}>
+          <Row gutter={rowGutter}>
+            {this.renderStoreField(
+              Setting.getLabel(i18next.t("store:Author"), i18next.t("store:Author - Tooltip")),
+              <Input value={store.author} onChange={e => {
+                this.updateStoreField("author", e.target.value);
+              }} />,
+              8
+            )}
+            {this.renderStoreField(
+              Setting.getLabel(i18next.t("store:Tutor"), i18next.t("store:Tutor - Tooltip")),
+              <Input value={store.tutor} onChange={e => {
+                this.updateStoreField("tutor", e.target.value);
+              }} />,
+              8
+            )}
+            {this.renderStoreField(
+              Setting.getLabel(i18next.t("store:Subject"), i18next.t("store:Subject - Tooltip")),
+              <Input value={store.subject} onChange={e => {
+                this.updateStoreField("subject", e.target.value);
+              }} />,
+              8
+            )}
+            {this.renderStoreField(
+              Setting.getLabel(i18next.t("store:Grade"), i18next.t("store:Grade - Tooltip")),
+              <Input value={store.grade} onChange={e => {
+                this.updateStoreField("grade", e.target.value);
+              }} />,
+              8
+            )}
+            {this.renderStoreField(
+              Setting.getLabel(i18next.t("store:Topic"), i18next.t("store:Topic - Tooltip")),
+              <Input value={store.topic} onChange={e => {
+                this.updateStoreField("topic", e.target.value);
+              }} />,
+              8
+            )}
+            {this.renderStoreField(
+              Setting.getLabel(i18next.t("store:Brief"), i18next.t("store:Brief - Tooltip")),
+              <TextArea autoSize={{minRows: 1, maxRows: 3}} value={store.brief} onChange={e => {
+                this.updateStoreField("brief", e.target.value);
+              }} />,
+              24
+            )}
+            {this.renderStoreField(
+              Setting.getLabel(i18next.t("store:Description"), i18next.t("store:Description - Tooltip")),
+              <TextArea autoSize={{minRows: 3, maxRows: 10}} value={store.description} onChange={e => {
+                this.updateStoreField("description", e.target.value);
+              }} />,
+              24
+            )}
+          </Row>
+        </Card>
+
         <Card size="small" title={renderCardTitle(i18next.t("general:Providers"), i18next.t("general:Providers desc"))} style={sectionCardStyle} headStyle={cardHeadStyle}>
           <Row gutter={rowGutter}>
             {store.enableExtraOptions ? (
