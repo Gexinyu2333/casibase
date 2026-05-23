@@ -86,9 +86,9 @@ class StoreHubPage extends React.Component {
               <Text type="secondary" style={{fontSize: 12}}>
                 {i18next.t("store:By")} {store.owner}
               </Text>
-              {store.hubDbName ? (
+              {store.endpoint ? (
                 <div style={{marginTop: 2}}>
-                  <Tag color="blue" style={{fontSize: 11, padding: "0 4px", lineHeight: "18px"}}>{store.hubDbName}</Tag>
+                  <Tag color="blue" style={{fontSize: 11, padding: "0 4px", lineHeight: "18px"}}>{store.endpoint}</Tag>
                 </div>
               ) : null}
             </div>
