@@ -101,6 +101,8 @@ type Store struct {
 	State                  string            `xorm:"varchar(100)" json:"state"`
 	SharedBy               string            `xorm:"varchar(100)" json:"sharedBy"`
 
+	PublishState string `xorm:"varchar(100)" json:"publishState"`
+
 	ChatCount    int `xorm:"-" json:"chatCount"`
 	MessageCount int `xorm:"-" json:"messageCount"`
 	VectorCount  int `xorm:"-" json:"vectorCount"`
@@ -117,6 +119,15 @@ func GetGlobalStores() ([]*Store, error) {
 		return stores, err
 	}
 
+	return stores, nil
+}
+
+func GetPublishedStores() ([]*Store, error) {
+	stores := []*Store{}
+	err := adapter.engine.Desc("created_time").Where("publish_state = ?", "Published").Find(&stores)
+	if err != nil {
+		return stores, err
+	}
 	return stores, nil
 }
 

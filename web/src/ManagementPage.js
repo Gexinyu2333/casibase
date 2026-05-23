@@ -42,6 +42,7 @@ import {
   RocketOutlined,
   SafetyOutlined,
   SettingOutlined,
+  ShopOutlined,
   TeamOutlined,
   ThunderboltOutlined,
   ToolOutlined,
@@ -94,6 +95,7 @@ import FormEditPage from "./FormEditPage";
 import FormDataPage from "./FormDataPage";
 import ChatPage from "./ChatPage";
 import QuickSetupPage from "./QuickSetupPage";
+import StoreHubPage from "./StoreHubPage";
 import UsagePage from "./UsagePage";
 import VisitorPage from "./VisitorPage";
 import SystemInfo from "./SystemInfo";
@@ -454,6 +456,8 @@ function ManagementPage(props) {
 
       res.push(Setting.getItem(<Link style={{color: textColor}} to="/quick-setup">{i18next.t("general:Quick Setup")}</Link>, "/quick-setup", <RocketOutlined />));
 
+      res.push(Setting.getItem(<Link style={{color: textColor}} to="/hub">{i18next.t("general:Hub")}</Link>, "/hub", <ShopOutlined />));
+
       res.push(Setting.getItem(<Link style={{color: textColor}} to="/stores">{i18next.t("general:Basic")}</Link>, "/basic", <BulbOutlined />, [
         Setting.getItem(<Link to="/stores">{i18next.t("general:Stores")}</Link>, "/stores", <AppstoreOutlined />),
         Setting.getItem(<Link to="/chats">{i18next.t("general:Chats")}</Link>, "/chats", <OrderedListOutlined />),
@@ -601,6 +605,7 @@ function ManagementPage(props) {
         <Route exact path="/forms/:formName/data" render={(props) => renderSigninIfNotSignedIn(<FormDataPage key={props.match.params.formName} account={account} {...props} />)} />
         <Route exact path="/resources" render={(props) => renderSigninIfNotSignedIn(<ResourceListPage account={account} {...props} />)} />
         <Route exact path="/quick-setup" render={(props) => renderSigninIfNotSignedIn(<QuickSetupPage account={account} {...props} />)} />
+        <Route exact path="/hub" render={(props) => renderSigninIfNotSignedIn(<StoreHubPage account={account} {...props} />)} />
         <Route exact path="/chat" render={(props) => renderSigninIfNotSignedIn(<ChatPage account={account} site={site} {...props} />)} />
         <Route exact path="/chat/:chatName" render={(props) => renderSigninIfNotSignedIn(<ChatPage account={account} site={site} {...props} />)} />
         <Route exact path="/stores/:owner/:storeName/chat" render={(props) => renderSigninIfNotSignedIn(<ChatPage account={account} site={site} {...props} />)} />

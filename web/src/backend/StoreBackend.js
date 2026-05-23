@@ -14,6 +14,16 @@
 
 import * as Setting from "../Setting";
 
+export function getHubStores() {
+  return fetch(`${Setting.ServerUrl}/api/get-hub-stores`, {
+    method: "GET",
+    credentials: "include",
+    headers: {
+      "Accept-Language": Setting.getAcceptLanguage(),
+    },
+  }).then(res => Setting.handleFetchResponse(res));
+}
+
 export function getGlobalStores(name = "", page = "", pageSize = "", field = "", value = "", sortField = "", sortOrder = "") {
   return fetch(`${Setting.ServerUrl}/api/get-global-stores?name=${name}&p=${page}&pageSize=${pageSize}&field=${field}&value=${value}&sortField=${sortField}&sortOrder=${sortOrder}`, {
     method: "GET",

@@ -14,7 +14,7 @@
 
 import React from "react";
 import {Link} from "react-router-dom";
-import {Avatar, Button, Popconfirm, Switch, Table, Tooltip} from "antd";
+import {Avatar, Button, Popconfirm, Switch, Table, Tag, Tooltip} from "antd";
 import moment from "moment";
 import BaseListPage from "./BaseListPage";
 import * as Setting from "./Setting";
@@ -394,6 +394,24 @@ class StoreListPage extends BaseListPage {
         ...this.getColumnSearchProps("state"),
         render: (text) => {
           return text === "Active" ? Setting.getDisplayTag(i18next.t("general:Active"), "green") : Setting.getDisplayTag(i18next.t("general:Inactive"), "red");
+        },
+      },
+      {
+        title: i18next.t("store:Publish State"),
+        dataIndex: "publishState",
+        key: "publishState",
+        width: "130px",
+        sorter: (a, b) => (a.publishState || "").localeCompare(b.publishState || ""),
+        ...this.getColumnSearchProps("publishState"),
+        render: (text) => {
+          const tagMap = {
+            "": {color: "default", label: i18next.t("store:Private")},
+            "Pending": {color: "processing", label: i18next.t("store:Pending Review")},
+            "Published": {color: "success", label: i18next.t("store:Published")},
+            "Rejected": {color: "error", label: i18next.t("store:Rejected")},
+          };
+          const tag = tagMap[text || ""] || tagMap[""];
+          return <Tag color={tag.color}>{tag.label}</Tag>;
         },
       },
       {

@@ -25,6 +25,21 @@ import (
 	"github.com/the-open-agent/openagent/util"
 )
 
+// GetHubStores
+// @Title GetHubStores
+// @Tag Store API
+// @Description get published stores for the public hub (no auth required)
+// @Success 200 {array} object.Store The Response object
+// @router /get-hub-stores [get]
+func (c *ApiController) GetHubStores() {
+	stores, err := object.GetPublishedStores()
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+	c.ResponseOk(stores)
+}
+
 // GetGlobalStores
 // @Title GetGlobalStores
 // @Tag Store API

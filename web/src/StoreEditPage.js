@@ -13,8 +13,9 @@
 // limitations under the License.
 
 import React from "react";
+import {Link} from "react-router-dom";
 import Loading from "./common/Loading";
-import {Avatar, Button, Card, Col, Input, InputNumber, Modal, Row, Select, Space, Spin, Switch} from "antd";
+import {Avatar, Button, Card, Col, Input, InputNumber, Modal, Row, Select, Space, Spin, Switch, Tag} from "antd";
 import * as StoreBackend from "./backend/StoreBackend";
 import * as StorageProviderBackend from "./backend/StorageProviderBackend";
 import * as ProviderBackend from "./backend/ProviderBackend";
@@ -270,6 +271,40 @@ class StoreEditPage extends React.Component {
     return this.renderStoreField(label, <Switch checked={checked} onChange={onChange} />, span);
   }
 
+  renderPublishStateTag(state) {
+    const tagMap = {
+      "": {color: "default", text: i18next.t("store:Private")},
+      "Pending": {color: "processing", text: i18next.t("store:Pending Review")},
+      "Published": {color: "success", text: i18next.t("store:Published")},
+      "Rejected": {color: "error", text: i18next.t("store:Rejected")},
+    };
+    const tag = tagMap[state || ""] || tagMap[""];
+    return <Tag color={tag.color}>{tag.text}</Tag>;
+  }
+
+  setPublishState(newState) {
+    const store = Setting.deepCopy(this.state.store);
+    store.publishState = newState;
+    store.fileTree = undefined;
+    StoreBackend.updateStore(this.state.owner, this.state.storeName, store)
+      .then((res) => {
+        if (res.status === "ok") {
+          Setting.showMessage("success", i18next.t("general:Successfully saved"));
+          this.setState(prevState => ({
+            store: {
+              ...prevState.store,
+              publishState: newState,
+            },
+          }));
+        } else {
+          Setting.showMessage("error", `${i18next.t("general:Failed to save")}: ${res.msg}`);
+        }
+      })
+      .catch(error => {
+        Setting.showMessage("error", `${i18next.t("general:Failed to save")}: ${error}`);
+      });
+  }
+
   renderStore() {
     const store = this.state.store;
     const rowGutter = [16, 8];
@@ -412,6 +447,42 @@ class StoreEditPage extends React.Component {
                 this.updateStoreField("enableExtraOptions", checked);
               },
               6
+            )}
+          </Row>
+        </Card>
+
+        <Card size="small" title={renderCardTitle(i18next.t("store:Publishing"), i18next.t("store:Publishing desc"))} style={sectionCardStyle} headStyle={cardHeadStyle}>
+          <Row gutter={rowGutter}>
+            {this.renderStoreField(
+              Setting.getLabel(i18next.t("store:Publish State"), i18next.t("store:Publish State - Tooltip")),
+              <Space wrap>
+                {this.renderPublishStateTag(store.publishState)}
+                {Setting.isAdminUser(this.props.account) ? (
+                  <Select
+                    size="small"
+                    value={store.publishState || ""}
+                    onChange={(value) => this.setPublishState(value)}
+                    style={{width: 150}}
+                    options={[
+                      {value: "", label: i18next.t("store:Private")},
+                      {value: "Pending", label: i18next.t("store:Pending Review")},
+                      {value: "Published", label: i18next.t("store:Published")},
+                      {value: "Rejected", label: i18next.t("store:Rejected")},
+                    ]}
+                  />
+                ) : (
+                  (!store.publishState || store.publishState === "" || store.publishState === "Rejected") &&
+                  store.owner === this.props.account?.name && (
+                    <Button size="small" type="primary" ghost onClick={() => this.setPublishState("Pending")}>
+                      {i18next.t("store:Submit for Review")}
+                    </Button>
+                  )
+                )}
+                {store.publishState === "Published" && (
+                  <Link to="/hub">{i18next.t("store:View in Hub")}</Link>
+                )}
+              </Space>,
+              24
             )}
           </Row>
         </Card>
