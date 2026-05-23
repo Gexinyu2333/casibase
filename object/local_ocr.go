@@ -26,39 +26,6 @@ const (
 	localFileToolType = "local_file"
 )
 
-func ShouldWarmupManagedLocalOCR() (bool, error) {
-	stores, err := GetGlobalStores()
-	if err != nil {
-		return false, err
-	}
-
-	tools, err := GetGlobalTools()
-	if err != nil {
-		return false, err
-	}
-
-	managedLocalFileTools := map[string]*Tool{}
-	for _, t := range tools {
-		if isManagedLocalFileTool(t) {
-			managedLocalFileTools[t.GetId()] = t
-		}
-	}
-	if len(managedLocalFileTools) == 0 {
-		return false, nil
-	}
-
-	for _, store := range stores {
-		if store == nil || store.State != activeState {
-			continue
-		}
-		if storeEnablesManagedLocalFileTool(store, managedLocalFileTools) {
-			return true, nil
-		}
-	}
-
-	return false, nil
-}
-
 func isManagedLocalFileTool(t *Tool) bool {
 	return t != nil &&
 		t.Type == localFileToolType &&

@@ -131,7 +131,6 @@ func main() {
 		}
 	}()
 
-	go warmupManagedLocalOCR(ctx)
 	go object.ClearThroughputPerSecond()
 
 	if util.IsDoubleClicked() {
@@ -139,27 +138,4 @@ func main() {
 	}
 
 	beego.Run(fmt.Sprintf(":%v", port))
-}
-
-func warmupManagedLocalOCR(ctx context.Context) {
-	shouldWarmup, err := object.ShouldWarmupManagedLocalOCR()
-	if err != nil {
-		logs.Warning("Failed to check managed local OCR warmup: %v", err)
-		return
-	}
-	if !shouldWarmup {
-		return
-	}
-
-	logs.Info("Warming up managed local OCR service in background")
-	endpoint, err := localocr.EnsureRunning(ctx)
-	if err != nil {
-		if ctx.Err() != nil {
-			logs.Info("Managed local OCR warmup canceled")
-			return
-		}
-		logs.Warning("Failed to warm up managed local OCR service: %v", err)
-		return
-	}
-	logs.Info("Managed local OCR service is ready at %s", endpoint)
 }
