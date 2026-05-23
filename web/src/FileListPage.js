@@ -14,14 +14,14 @@
 
 import React from "react";
 import {Link} from "react-router-dom";
-import {Button, Popconfirm, Table, Tooltip} from "antd";
-import moment from "moment";
+import {Button, Popconfirm, Table, Tooltip, Upload} from "antd";
 import BaseListPage from "./BaseListPage";
 import * as Setting from "./Setting";
 import * as FileBackend from "./backend/FileBackend";
 import * as StoreBackend from "./backend/StoreBackend";
 import i18next from "i18next";
-import {DeleteOutlined, EditOutlined, ReloadOutlined} from "@ant-design/icons";
+import {DeleteOutlined, EditOutlined, ReloadOutlined, UploadOutlined} from "@ant-design/icons";
+import * as TreeFileBackend from "./backend/TreeFileBackend";
 
 class FileListPage extends BaseListPage {
   constructor(props) {
@@ -30,49 +30,66 @@ class FileListPage extends BaseListPage {
       ...this.state,
       refreshing: {},
     };
+    this.uploadedFileIdMap = {};
   }
 
-  newFile() {
-    const randomName = Setting.getRandomName();
-    const storeName = Setting.isDefaultStoreSelected(this.props.account) ? "store-built-in" : Setting.getRequestStore(this.props.account);
-    const objectKey = `file/file_${randomName}.txt`;
-    return {
-      owner: "admin",
-      name: `${storeName}_${objectKey}`,
-      createdTime: moment().format(),
-      filename: `file_${randomName}.txt`,
-      size: 0,
-      store: storeName,
-      storageProvider: "",
-      tokenCount: 0,
-      status: "Pending",
-      errorText: "",
-    };
-  }
-
-  addFile = async() => {
-    let storeName;
+  getStoreName = async() => {
     if (Setting.isDefaultStoreSelected(this.props.account)) {
       try {
         const res = await StoreBackend.getStore("admin", "_default_store_");
         if (res.status === "ok" && res.data?.name) {
-          storeName = res.data.name;
+          return res.data.name;
         } else {
           Setting.showMessage("error", `${i18next.t("general:Failed to get")}: ${res.msg}`);
-          return;
+          return null;
         }
       } catch (error) {
         Setting.showMessage("error", `${i18next.t("general:Failed to get")}: ${error}`);
-        return;
+        return null;
       }
     } else {
-      storeName = Setting.getRequestStore(this.props.account);
+      const storeName = Setting.getRequestStore(this.props.account);
       if (!storeName) {
         Setting.showMessage("error", i18next.t("general:Store is not available"));
+        return null;
+      }
+      return storeName;
+    }
+  };
+
+  uploadFile = async(file, info) => {
+    const storeName = await this.getStoreName();
+    if (!storeName) {
+      return;
+    }
+
+    const storeId = `admin/${storeName}`;
+    const promises = [];
+    info.fileList.forEach((uploadedFile) => {
+      if (this.uploadedFileIdMap[uploadedFile.originFileObj.uid] === 1) {
         return;
       }
+      this.uploadedFileIdMap[uploadedFile.originFileObj.uid] = 1;
+      promises.push(TreeFileBackend.addFile(storeId, "file", true, uploadedFile.name, uploadedFile.originFileObj));
+    });
+
+    if (promises.length === 0) {
+      return;
     }
-    this.props.history.push(`/stores/admin/${storeName}/view`);
+
+    Promise.all(promises)
+      .then((values) => {
+        values.forEach((res) => {
+          if (res.status !== "ok") {
+            Setting.showMessage("error", `${i18next.t("general:Failed to add")}: ${res.msg}`);
+          }
+        });
+        Setting.showMessage("success", i18next.t("general:Successfully uploaded"));
+        this.fetch({pagination: this.state.pagination});
+      })
+      .catch(error => {
+        Setting.showMessage("error", `${i18next.t("general:Failed to add")}: ${error}`);
+      });
   };
 
   deleteItem = async(i) => {
@@ -292,7 +309,9 @@ class FileListPage extends BaseListPage {
           title={() => (
             <div>
               {i18next.t("general:Files")}&nbsp;&nbsp;&nbsp;&nbsp;
-              <Button type="primary" size="small" onClick={this.addFile.bind(this)}>{i18next.t("general:Add")}</Button>
+              <Upload directory={false} multiple={true} accept="*" showUploadList={false} beforeUpload={() => false} onChange={(info) => this.uploadFile(info.file, info)}>
+                <Button type="primary" size="small" icon={<UploadOutlined />}>{i18next.t("general:Upload")}</Button>
+              </Upload>
               {this.state.selectedRowKeys.length > 0 && (
                 <Popconfirm title={`${i18next.t("general:Sure to delete")}: ${this.state.selectedRowKeys.length} ${i18next.t("general:items")} ?`} onConfirm={() => this.performBulkDelete(this.state.selectedRows, this.state.selectedRowKeys)} okText={i18next.t("general:OK")} cancelText={i18next.t("general:Cancel")}>
                   <Button type="primary" danger size="small" icon={<DeleteOutlined />} style={{marginLeft: 8}}>
