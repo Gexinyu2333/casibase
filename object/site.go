@@ -47,6 +47,7 @@ type Site struct {
 	IpParsingMode       string `xorm:"varchar(100)" json:"ipParsingMode"`
 	ParentDbName        string `xorm:"varchar(100)" json:"parentDbName"`
 	HubDbNames          string `xorm:"varchar(1000)" json:"hubDbNames"`
+	HubDesc             string `xorm:"varchar(500)" json:"hubDesc"`
 	Socks5Proxy         string `xorm:"varchar(200)" json:"socks5Proxy"`
 	LogConfig           string `xorm:"varchar(1000)" json:"logConfig"`
 }

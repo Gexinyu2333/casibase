@@ -193,6 +193,8 @@
     "Host": "Host",
     "Hub": "Hub",
     "Hub desc": "Discover and chat with public agents",
+    "Hub description": "Hub description",
+    "Hub description - Tooltip": "Custom description shown on the Hub page. Leave empty to use the default.",
     "ID": "ID",
     "Icon": "Icon",
     "Icon URL (optional)": "Icon URL (optional)",

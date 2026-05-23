@@ -333,7 +333,7 @@ class StoreHubPage extends React.Component {
         <div style={{marginBottom: 24}}>
           <h2 style={{fontWeight: 700, fontSize: 24, marginBottom: 4}}>{i18next.t("general:Hub")}</h2>
           <p style={{color: "var(--ant-color-text-secondary)", margin: 0}}>
-            {i18next.t("general:Hub desc")}
+            {this.props.site?.hubDesc || i18next.t("general:Hub desc")}
           </p>
         </div>
         {loading ? (

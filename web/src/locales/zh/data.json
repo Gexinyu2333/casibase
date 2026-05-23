@@ -193,6 +193,8 @@
     "Host": "主机",
     "Hub": "智能体广场",
     "Hub desc": "发现并体验公开的数据仓库",
+    "Hub description": "广场页面描述",
+    "Hub description - Tooltip": "在广场页面显示的自定义描述文字，留空则使用默认文字。",
     "ID": "ID",
     "Icon": "图标",
     "Icon URL (optional)": "图标URL（可选）",

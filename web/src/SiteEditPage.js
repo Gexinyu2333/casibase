@@ -178,13 +178,6 @@ class SiteEditPage extends React.Component {
               8
             )}
             {this.renderSiteField(
-              Setting.getLabel(i18next.t("provider:Endpoint"), i18next.t("provider:Endpoint - Tooltip")),
-              <Input prefix={<LinkOutlined />} value={site.endpoint} onChange={e => {
-                this.updateSiteField("endpoint", e.target.value);
-              }} />,
-              8
-            )}
-            {this.renderSiteField(
               Setting.getLabel(i18next.t("store:Theme color"), i18next.t("store:Theme color - Tooltip")),
               <input type="color" value={site.themeColor || ""} style={{height: "32px", width: "64px", cursor: "pointer", border: "1px solid #d9d9d9", borderRadius: "6px", padding: "2px"}} onChange={(e) => {
                 this.updateSiteField("themeColor", e.target.value);
@@ -196,6 +189,13 @@ class SiteEditPage extends React.Component {
 
         <Card size="small" title={renderCardTitle(i18next.t("general:Branding"), i18next.t("general:Branding desc"))} style={sectionCardStyle} headStyle={cardHeadStyle}>
           <Row gutter={rowGutter}>
+            {this.renderSiteField(
+              Setting.getLabel(i18next.t("provider:Endpoint"), i18next.t("provider:Endpoint - Tooltip")),
+              <Input prefix={<LinkOutlined />} value={site.endpoint} onChange={e => {
+                this.updateSiteField("endpoint", e.target.value);
+              }} />,
+              12
+            )}
             {this.renderSiteField(
               Setting.getLabel(i18next.t("general:Favicon URL"), i18next.t("general:Favicon URL - Tooltip")),
               <Space direction="vertical" style={{width: "100%"}}>
@@ -250,6 +250,13 @@ class SiteEditPage extends React.Component {
 
         <Card size="small" title={renderCardTitle(i18next.t("general:Content"), i18next.t("general:Content desc"))} style={sectionCardStyle} headStyle={cardHeadStyle}>
           <Row gutter={rowGutter}>
+            {this.renderSiteField(
+              Setting.getLabel(i18next.t("general:Hub description"), i18next.t("general:Hub description - Tooltip")),
+              <Input value={site.hubDesc} onChange={e => {
+                this.updateSiteField("hubDesc", e.target.value);
+              }} />,
+              24
+            )}
             {this.renderSiteField(
               Setting.getLabel(i18next.t("general:Navbar HTML"), i18next.t("general:Navbar HTML - Tooltip")),
               <Popover placement="right" content={
