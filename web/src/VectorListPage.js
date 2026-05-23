@@ -26,6 +26,25 @@ import Editor from "./common/Editor";
 class VectorListPage extends BaseListPage {
   constructor(props) {
     super(props);
+    const fileFilter = new URLSearchParams(props.location?.search).get("file");
+    if (fileFilter) {
+      this.state = {
+        ...this.state,
+        fileFilter,
+        searchText: fileFilter,
+        searchedColumn: "file",
+      };
+    }
+  }
+
+  UNSAFE_componentWillMount() {
+    const {pagination} = this.state;
+    if (this.state.fileFilter) {
+      this.fetch({pagination, searchText: this.state.fileFilter, searchedColumn: "file"});
+    } else {
+      this.fetch({pagination});
+    }
+    this.getForm();
   }
 
   newVector() {
@@ -271,7 +290,9 @@ class VectorListPage extends BaseListPage {
         <Table scroll={{x: "max-content"}} columns={filteredColumns} dataSource={vectors} rowKey="name" rowSelection={this.getRowSelection()} size="middle" bordered pagination={paginationProps}
           title={() => (
             <div>
-              {i18next.t("general:Vectors")}&nbsp;&nbsp;&nbsp;&nbsp;
+              {i18next.t("general:Vectors")}
+              {this.state.fileFilter ? <span style={{marginLeft: "8px", color: "#888", fontWeight: "normal", fontSize: "13px"}}>({this.state.fileFilter})</span> : null}
+              &nbsp;&nbsp;&nbsp;&nbsp;
               <Button type="primary" size="small" onClick={this.addVector.bind(this)}>{i18next.t("general:Add")}</Button>
               {this.state.selectedRowKeys.length > 0 && (
                 <Popconfirm title={`${i18next.t("general:Sure to delete")}: ${this.state.selectedRowKeys.length} ${i18next.t("general:items")} ?`} onConfirm={() => this.performBulkDelete(this.state.selectedRows, this.state.selectedRowKeys)} okText={i18next.t("general:OK")} cancelText={i18next.t("general:Cancel")}>
@@ -298,7 +319,8 @@ class VectorListPage extends BaseListPage {
   }
 
   fetch = (params = {}) => {
-    const field = params.searchedColumn, value = params.searchText;
+    const field = "searchedColumn" in params ? params.searchedColumn : this.state.searchedColumn;
+    const value = "searchText" in params ? params.searchText : this.state.searchText;
     const sortField = params.sortField, sortOrder = params.sortOrder;
     this.setState({loading: true});
     VectorBackend.getVectors("admin", this.getApiStoreName(), params.pagination.current, params.pagination.pageSize, field, value, sortField, sortOrder)

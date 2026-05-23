@@ -62,7 +62,6 @@ import HomePage from "./HomePage";
 import StoreListPage from "./StoreListPage";
 import StoreEditPage from "./StoreEditPage";
 import FileListPage from "./FileListPage";
-import FileViewPage from "./FileViewPage";
 import FileTreePage from "./FileTreePage";
 import ProviderListPage from "./ProviderListPage";
 import ProviderEditPage from "./ProviderEditPage";
@@ -543,7 +542,6 @@ function ManagementPage(props) {
         <Route exact path="/servers/:serverName" render={(props) => renderSigninIfNotSignedIn(<ServerEditPage account={account} {...props} />)} />
         <Route exact path="/server-store" render={(props) => renderSigninIfNotSignedIn(<ServerStorePage account={account} {...props} />)} />
         <Route exact path="/files" render={(props) => renderSigninIfNotSignedIn(<FileListPage account={account} {...props} />)} />
-        <Route exact path="/files/:fileName" render={(props) => renderSigninIfNotSignedIn(<FileViewPage account={account} {...props} />)} />
         <Route exact path="/vectors" render={(props) => renderSigninIfNotSignedIn(<VectorListPage account={account} {...props} />)} />
         <Route exact path="/vectors/:vectorName" render={(props) => renderSigninIfNotSignedIn(<VectorEditPage account={account} {...props} />)} />
         <Route exact path="/chats" render={(props) => renderSigninIfNotSignedIn(<ChatListPage account={account} {...props} />)} />

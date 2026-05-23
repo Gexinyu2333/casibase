@@ -278,7 +278,12 @@ class FileListPage extends BaseListPage {
                   size="small"
                   icon={<EditOutlined />}
                   style={{minWidth: "28px", width: "28px", height: "28px", padding: 0, borderRadius: "6px"}}
-                  onClick={() => this.props.history.push(`/files/${encodeURIComponent(record.name)}`)}
+                  onClick={() => {
+                    const objectKey = record.name.startsWith(`${record.store}_`)
+                      ? record.name.substring(record.store.length + 1)
+                      : record.name;
+                    this.props.history.push(`/vectors?file=${encodeURIComponent(objectKey)}`);
+                  }}
                 />
               </Tooltip>
               <Popconfirm
