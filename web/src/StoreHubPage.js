@@ -13,8 +13,8 @@
 // limitations under the License.
 
 import React from "react";
-import {Avatar, Button, Card, Col, Empty, Row, Spin, Tag, Tooltip, Typography} from "antd";
-import {CopyOutlined, InfoCircleOutlined, LinkOutlined} from "@ant-design/icons";
+import {Avatar, Button, Card, Col, Empty, Input, Row, Select, Spin, Tag, Tooltip, Typography} from "antd";
+import {CopyOutlined, InfoCircleOutlined, LinkOutlined, SortAscendingOutlined, SortDescendingOutlined} from "@ant-design/icons";
 import * as StoreBackend from "./backend/StoreBackend";
 import * as Setting from "./Setting";
 import i18next from "i18next";
@@ -30,6 +30,12 @@ class StoreHubPage extends React.Component {
       loading: true,
       drawerVisible: false,
       selectedStore: null,
+      searchText: "",
+      filterSubject: "",
+      filterGrade: "",
+      filterTopic: "",
+      sortField: "",
+      sortOrder: "asc",
     };
   }
 
@@ -50,6 +56,72 @@ class StoreHubPage extends React.Component {
       .catch(() => {
         this.setState({loading: false});
       });
+  }
+
+  getUniqueValues(field) {
+    const {stores} = this.state;
+    return [...new Set(stores.map(s => s[field]).filter(Boolean))].sort();
+  }
+
+  getFilteredStores() {
+    const {stores, searchText, filterSubject, filterGrade, filterTopic, sortField, sortOrder} = this.state;
+    let result = [...stores];
+
+    if (searchText) {
+      const q = searchText.toLowerCase();
+      result = result.filter(s =>
+        (s.displayName || s.name || "").toLowerCase().includes(q) ||
+        (s.author || s.owner || "").toLowerCase().includes(q) ||
+        (s.affiliation || "").toLowerCase().includes(q)
+      );
+    }
+
+    if (filterSubject) {
+      result = result.filter(s => s.subject === filterSubject);
+    }
+    if (filterGrade) {
+      result = result.filter(s => s.grade === filterGrade);
+    }
+    if (filterTopic) {
+      result = result.filter(s => s.topic === filterTopic);
+    }
+
+    if (sortField) {
+      result.sort((a, b) => {
+        let va, vb;
+        if (sortField === "displayName") {
+          va = (a.displayName || a.name || "").toLowerCase();
+          vb = (b.displayName || b.name || "").toLowerCase();
+        } else if (sortField === "author") {
+          va = (a.author || a.owner || "").toLowerCase();
+          vb = (b.author || b.owner || "").toLowerCase();
+        } else {
+          va = (a[sortField] || "").toLowerCase();
+          vb = (b[sortField] || "").toLowerCase();
+        }
+        if (va < vb) {return sortOrder === "asc" ? -1 : 1;}
+        if (va > vb) {return sortOrder === "asc" ? 1 : -1;}
+        return 0;
+      });
+    }
+
+    return result;
+  }
+
+  hasActiveFilters() {
+    const {searchText, filterSubject, filterGrade, filterTopic, sortField} = this.state;
+    return !!(searchText || filterSubject || filterGrade || filterTopic || sortField);
+  }
+
+  resetFilters() {
+    this.setState({
+      searchText: "",
+      filterSubject: "",
+      filterGrade: "",
+      filterTopic: "",
+      sortField: "",
+      sortOrder: "asc",
+    });
   }
 
   openDrawer(store) {
@@ -77,6 +149,93 @@ class StoreHubPage extends React.Component {
     }).catch(() => {
       Setting.showMessage("error", i18next.t("general:Failed to get"));
     });
+  }
+
+  renderFilterBar() {
+    const {searchText, filterSubject, filterGrade, filterTopic, sortField, sortOrder, stores} = this.state;
+    const subjects = this.getUniqueValues("subject");
+    const grades = this.getUniqueValues("grade");
+    const topics = this.getUniqueValues("topic");
+    const allLabel = i18next.t("store:All");
+    const filteredCount = this.getFilteredStores().length;
+    const isFiltered = this.hasActiveFilters();
+
+    const sortFieldOptions = [
+      {value: "", label: i18next.t("general:Sort")},
+      {value: "displayName", label: i18next.t("general:Display name")},
+      {value: "author", label: i18next.t("message:Author")},
+      {value: "affiliation", label: i18next.t("store:Affiliation")},
+      {value: "subject", label: i18next.t("store:Subject")},
+      {value: "grade", label: i18next.t("store:Grade")},
+      {value: "topic", label: i18next.t("store:Topic")},
+    ];
+
+    return (
+      <div style={{marginBottom: 16, display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center"}}>
+        <Input.Search
+          placeholder={i18next.t("store:Please input your search term")}
+          value={searchText}
+          onChange={e => this.setState({searchText: e.target.value})}
+          allowClear
+          style={{width: 220}}
+        />
+        {subjects.length > 0 ? (
+          <Select
+            value={filterSubject || ""}
+            onChange={v => this.setState({filterSubject: v})}
+            style={{minWidth: 130}}
+            options={[
+              {value: "", label: `${i18next.t("store:Subject")}: ${allLabel}`},
+              ...subjects.map(s => ({value: s, label: s})),
+            ]}
+          />
+        ) : null}
+        {grades.length > 0 ? (
+          <Select
+            value={filterGrade || ""}
+            onChange={v => this.setState({filterGrade: v})}
+            style={{minWidth: 130}}
+            options={[
+              {value: "", label: `${i18next.t("store:Grade")}: ${allLabel}`},
+              ...grades.map(g => ({value: g, label: g})),
+            ]}
+          />
+        ) : null}
+        {topics.length > 0 ? (
+          <Select
+            value={filterTopic || ""}
+            onChange={v => this.setState({filterTopic: v})}
+            style={{minWidth: 130}}
+            options={[
+              {value: "", label: `${i18next.t("store:Topic")}: ${allLabel}`},
+              ...topics.map(t => ({value: t, label: t})),
+            ]}
+          />
+        ) : null}
+        <Select
+          value={sortField}
+          onChange={v => this.setState({sortField: v})}
+          style={{minWidth: 150}}
+          options={sortFieldOptions}
+        />
+        {sortField ? (
+          <Tooltip title={sortOrder === "asc" ? i18next.t("general:Click to sort descending") : i18next.t("general:Click to sort ascending")}>
+            <Button
+              icon={sortOrder === "asc" ? <SortAscendingOutlined /> : <SortDescendingOutlined />}
+              onClick={() => this.setState({sortOrder: sortOrder === "asc" ? "desc" : "asc"})}
+            />
+          </Tooltip>
+        ) : null}
+        {isFiltered ? (
+          <Button onClick={() => this.resetFilters()}>{i18next.t("general:Reset")}</Button>
+        ) : null}
+        {isFiltered ? (
+          <Text type="secondary" style={{fontSize: 13}}>
+            {filteredCount} / {stores.length}
+          </Text>
+        ) : null}
+      </div>
+    );
   }
 
   renderStoreCard(store) {
@@ -189,6 +348,7 @@ class StoreHubPage extends React.Component {
 
   render() {
     const {loading, stores, drawerVisible, selectedStore} = this.state;
+    const filteredStores = this.getFilteredStores();
 
     return (
       <div style={{padding: "24px 32px", minHeight: "100vh", background: "var(--ant-color-bg-layout)"}}>
@@ -205,9 +365,16 @@ class StoreHubPage extends React.Component {
         ) : stores.length === 0 ? (
           <Empty description={i18next.t("general:No published agents yet")} style={{marginTop: 80}} />
         ) : (
-          <Row gutter={[16, 16]}>
-            {stores.map(store => this.renderStoreCard(store))}
-          </Row>
+          <>
+            {this.renderFilterBar()}
+            {filteredStores.length === 0 ? (
+              <Empty description={i18next.t("general:No data")} style={{marginTop: 60}} />
+            ) : (
+              <Row gutter={[16, 16]}>
+                {filteredStores.map(store => this.renderStoreCard(store))}
+              </Row>
+            )}
+          </>
         )}
         <StoreHubDrawer
           store={selectedStore}
