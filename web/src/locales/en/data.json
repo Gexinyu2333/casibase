@@ -671,6 +671,8 @@
   },
   "store": {
     "Add Permission": "Add Permission",
+    "Affiliation": "Affiliation",
+    "Affiliation - Tooltip": "Organization, school, or institution that created this agent",
     "Agent Profile": "Agent Profile",
     "Agent Profile desc": "Author, subject, and introduction for the Hub listing",
     "All": "All",

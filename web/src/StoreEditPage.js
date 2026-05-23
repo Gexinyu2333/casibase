@@ -489,6 +489,13 @@ class StoreEditPage extends React.Component {
               8
             )}
             {this.renderStoreField(
+              Setting.getLabel(i18next.t("store:Affiliation"), i18next.t("store:Affiliation - Tooltip")),
+              <Input value={store.affiliation} onChange={e => {
+                this.updateStoreField("affiliation", e.target.value);
+              }} />,
+              8
+            )}
+            {this.renderStoreField(
               Setting.getLabel(i18next.t("store:Tutor"), i18next.t("store:Tutor - Tooltip")),
               <Input value={store.tutor} onChange={e => {
                 this.updateStoreField("tutor", e.target.value);

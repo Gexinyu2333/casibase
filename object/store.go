@@ -102,6 +102,7 @@ type Store struct {
 	SharedBy               string            `xorm:"varchar(100)" json:"sharedBy"`
 
 	Author      string `xorm:"varchar(100)" json:"author"`
+	Affiliation string `xorm:"varchar(100)" json:"affiliation"`
 	Tutor       string `xorm:"varchar(100)" json:"tutor"`
 	Subject     string `xorm:"varchar(100)" json:"subject"`
 	Grade       string `xorm:"varchar(100)" json:"grade"`

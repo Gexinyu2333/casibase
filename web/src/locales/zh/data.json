@@ -671,6 +671,8 @@
   },
   "store": {
     "Add Permission": "添加权限",
+    "Affiliation": "单位",
+    "Affiliation - Tooltip": "创建此智能体的机构、学校或组织",
     "Agent Profile": "智能体档案",
     "Agent Profile desc": "在广场卡片上展示的作者、学科和简介信息",
     "All": "全部",
