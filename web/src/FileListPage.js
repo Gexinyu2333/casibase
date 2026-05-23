@@ -14,7 +14,7 @@
 
 import React from "react";
 import {Link} from "react-router-dom";
-import {Button, Popconfirm, Table, Tooltip, Upload} from "antd";
+import {Button, Image, Popconfirm, Table, Tooltip, Upload} from "antd";
 import BaseListPage from "./BaseListPage";
 import * as Setting from "./Setting";
 import * as FileBackend from "./backend/FileBackend";
@@ -220,6 +220,30 @@ class FileListPage extends BaseListPage {
         key: "tokenCount",
         width: "110px",
         sorter: (a, b) => a.tokenCount - b.tokenCount,
+      },
+      {
+        title: i18next.t("general:Preview"),
+        dataIndex: "url",
+        key: "preview",
+        width: "80px",
+        render: (text, record) => {
+          if (!record.url) {
+            return null;
+          }
+          const ext = record.filename?.split(".").pop()?.toLowerCase();
+          if (!["jpg", "jpeg", "png", "gif", "bmp", "webp", "svg", "ico", "tiff", "tif"].includes(ext)) {
+            return null;
+          }
+          return (
+            <Image
+              src={record.url}
+              width={48}
+              height={48}
+              style={{objectFit: "cover", borderRadius: "4px"}}
+              preview={{src: record.url}}
+            />
+          );
+        },
       },
       {
         title: i18next.t("general:URL"),
