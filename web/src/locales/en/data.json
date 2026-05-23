@@ -698,6 +698,8 @@
     "Embedding provider": "Embedding provider",
     "Embedding provider - Tooltip": "Text embedding service provider",
     "Enable TTS streaming": "Enable TTS streaming",
+    "External": "External",
+    "External store from": "External store from",
     "Enable TTS streaming - Tooltip": "Enable real-time streaming TTS (tradeoff latency vs stability)",
     "Enable experience review": "Enable experience review",
     "Enable experience review - Tooltip": "Enable experience review - Tooltip",

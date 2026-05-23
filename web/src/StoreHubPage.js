@@ -91,12 +91,19 @@ class StoreHubPage extends React.Component {
     const initials = (store.displayName || store.name || "?")[0].toUpperCase();
     const description = store.brief || store.welcomeText || store.prompt || "";
     const authorName = store.author || store.owner;
+    const chatUrl = this.getChatUrl(store);
+    const isExternal = !!store.hubDbName;
 
     return (
       <Col xs={24} sm={12} md={8} lg={6} key={`${store.owner}/${store.name}/${store.hubDbName}`}>
         <Card
           hoverable
-          style={{borderRadius: 12, height: "100%", cursor: "pointer"}}
+          style={{
+            borderRadius: 12,
+            height: "100%",
+            cursor: "pointer",
+            borderColor: "var(--ant-color-border)",
+          }}
           bodyStyle={{padding: "20px"}}
           onClick={() => this.openDrawer(store)}
         >
@@ -109,8 +116,17 @@ class StoreHubPage extends React.Component {
               </Avatar>
             )}
             <div style={{flex: 1, minWidth: 0}}>
-              <div style={{fontWeight: 600, fontSize: 15, lineHeight: "22px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap"}}>
-                {store.displayName || store.name}
+              <div style={{display: "flex", alignItems: "center", gap: 6, marginBottom: 2}}>
+                <div style={{fontWeight: 600, fontSize: 15, lineHeight: "22px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1}}>
+                  {store.displayName || store.name}
+                </div>
+                {isExternal ? (
+                  <Tooltip title={`${i18next.t("store:External store from")}: ${store.hubDbName}`}>
+                    <Tag color="orange" style={{fontSize: 11, padding: "0 4px", lineHeight: "18px", margin: 0, flexShrink: 0}}>
+                      {i18next.t("store:External")}
+                    </Tag>
+                  </Tooltip>
+                ) : null}
               </div>
               <Text type="secondary" style={{fontSize: 12}}>
                 {i18next.t("store:By")} {authorName}
@@ -132,6 +148,39 @@ class StoreHubPage extends React.Component {
           ) : (
             <div style={{height: 60}} />
           )}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "5px 8px",
+              background: "var(--ant-color-fill-quaternary)",
+              borderRadius: 6,
+              border: "1px solid var(--ant-color-border-secondary)",
+              marginBottom: 10,
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <LinkOutlined style={{color: "var(--ant-color-primary)", fontSize: 11, flexShrink: 0}} />
+            <Typography.Link
+              href={chatUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{flex: 1, fontSize: 11, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap"}}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {chatUrl}
+            </Typography.Link>
+            <Tooltip title={i18next.t("general:Copy")}>
+              <Button
+                type="text"
+                size="small"
+                icon={<CopyOutlined />}
+                style={{flexShrink: 0, height: 20, width: 20, minWidth: 20, padding: 0}}
+                onClick={(e) => {e.stopPropagation(); this.handleCopyLink(store);}}
+              />
+            </Tooltip>
+          </div>
           <div style={{display: "flex", alignItems: "center", gap: 4, color: "var(--ant-color-primary)", fontSize: 13}}>
             <InfoCircleOutlined />
             <span>{i18next.t("store:View Details")}</span>

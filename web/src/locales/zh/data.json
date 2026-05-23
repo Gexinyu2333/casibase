@@ -698,6 +698,8 @@
     "Embedding provider": "嵌入提供商",
     "Embedding provider - Tooltip": "文本嵌入服务提供商",
     "Enable TTS streaming": "开启TTS流式传输",
+    "External": "外部",
+    "External store from": "来自外部数据库",
     "Enable TTS streaming - Tooltip": "开始实时流式语音合成（降低延迟，但可能影响稳定性）",
     "Enable experience review": "Enable experience review",
     "Enable experience review - Tooltip": "Enable experience review - Tooltip",
