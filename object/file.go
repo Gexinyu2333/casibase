@@ -269,7 +269,7 @@ func UploadFileToStore(storeId string, userName string, filename string, fileDat
 	}
 
 	go func() {
-		_, vectorErr := AddVectorsForFile(store, objectKey, fileUrl, lang)
+		_, vectorErr := AddVectorsForFile(store, objectKey, rawUrl, lang)
 		if vectorErr != nil {
 			logs.Error("Failed to generate vectors for file %s: %v", objectKey, vectorErr)
 		}
