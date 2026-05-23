@@ -26,6 +26,8 @@ export const NavItemTree = ({disabled, casdoorAvailable, checkedKeys, defaultExp
       key: "all",
       children: [
         {title: i18next.t("general:Chat"), key: "/chat"},
+        {title: i18next.t("general:Quick Setup"), key: "/quick-setup"},
+        {title: i18next.t("general:Hub"), key: "/hub"},
         {
           title: i18next.t("general:Basic"),
           key: "/basic",
