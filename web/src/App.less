@@ -39,7 +39,7 @@ img {
   box-shadow: 0 2px 8px 0 rgb(0 0 0 / 8%);
   flex: 1;
   align-items: stretch;
-  margin: 0 3px 3px 3px !important;
+  margin: 0 3px 3px !important;
   border-radius: 12px !important;
   overflow: hidden;
 }
@@ -83,12 +83,12 @@ img {
   transition: background-color 0.15s ease;
 
   &:hover {
-    background-color: rgba(0, 0, 0, 0.05) !important;
+    background-color: rgb(0 0 0 / 5%) !important;
   }
 }
 
 [data-theme="dark"] .select-box:hover {
-  background-color: rgba(255, 255, 255, 0.08) !important;
+  background-color: rgb(255 255 255 / 8%) !important;
 }
 
 .store-select {
@@ -112,12 +112,12 @@ img {
   transition: background-color 0.15s ease;
 
   &:hover {
-    background-color: rgba(0, 0, 0, 0.05) !important;
+    background-color: rgb(0 0 0 / 5%) !important;
   }
 }
 
 [data-theme="dark"] .rightDropDown:hover {
-  background-color: rgba(255, 255, 255, 0.08) !important;
+  background-color: rgb(255 255 255 / 8%) !important;
 }
 
 .cs-conversation-header__content .cs-conversation-header__user-name {
@@ -160,6 +160,23 @@ img {
   color: inherit;
   transition: color 0.3s;
   justify-content: flex-end;
+}
+
+.chat-menu-item {
+  position: relative;
+  padding-inline-start: 40px !important;
+}
+
+.chat-menu-item .chat-status-indicator {
+  position: absolute;
+  inset-inline-start: 1.25em;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1em;
+  pointer-events: none;
 }
 
 .suggestions-item:hover {

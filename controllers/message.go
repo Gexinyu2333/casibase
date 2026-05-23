@@ -408,7 +408,7 @@ func (c *ApiController) AddMessage() {
 				return
 			}
 
-			chat.IsRead = false
+			chat.IsUnread = true
 			chat.IsGenerating = true
 			_, err = object.UpdateChat(chatId, chat)
 			if err != nil {

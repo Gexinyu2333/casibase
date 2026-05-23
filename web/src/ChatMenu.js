@@ -39,32 +39,34 @@ class ChatMenu extends React.Component {
 
   renderIndicator(chat) {
     const isDark = Setting.getIsDark();
-    const color = isDark ? "#ffffff" : "#000000";
+    const themeColor = ThemeDefault.colorPrimary || "#262626";
+    const readBorderColor = isDark ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.15)";
 
     if (chat.isGenerating) {
       return (
-        <LoadingOutlined spin style={{
-          fontSize: "12px",
-          color: ThemeDefault.colorPrimary,
-          marginRight: "12px",
-          flexShrink: 0,
-        }} />
+        <span className="chat-status-indicator">
+          <LoadingOutlined spin style={{
+            width: "1em",
+            height: "1em",
+            fontSize: "1em",
+            lineHeight: 1,
+            color: themeColor,
+          }} />
+        </span>
       );
     }
 
     return (
-      <div style={{
-        width: "10px",
-        height: "10px",
-        borderRadius: "50%",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        marginRight: "14px",
-        flexShrink: 0,
-        backgroundColor: chat.isRead === false ? color : "transparent",
-        border: chat.isRead === false ? `1px solid ${color}` : `1px solid ${isDark ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.15)"}`,
-      }} />
+      <span className="chat-status-indicator">
+        <span style={{
+          width: "0.625em",
+          height: "0.625em",
+          borderRadius: "50%",
+          display: "block",
+          backgroundColor: chat.isUnread ? themeColor : "transparent",
+          border: chat.isUnread ? `0.0625em solid ${themeColor}` : `0.0625em solid ${readBorderColor}`,
+        }} />
+      </span>
     );
   }
 
@@ -122,6 +124,7 @@ class ChatMenu extends React.Component {
           return {
             key: `${index}-${chatIndex}`,
             index: globalChatIndex,
+            className: "chat-menu-item",
             label: (
               isSelected && this.state.editChat ? (
                 <div className="menu-item-container">
@@ -150,9 +153,10 @@ class ChatMenu extends React.Component {
                 <div className="menu-item-container"
                   onMouseEnter={() => this.setState({hoveredKey: itemKey})}
                   onMouseLeave={() => this.setState({hoveredKey: null})}
+                  style={{width: "100%"}}
                 >
-                  <div style={{flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", display: "flex", alignItems: "center"}}>
-                    {this.renderIndicator(chat)}
+                  {this.renderIndicator(chat)}
+                  <div style={{flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap"}}>
                     <Tooltip title={chat.displayName}>
                       <span style={{overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap"}}>
                         {chat.displayName}

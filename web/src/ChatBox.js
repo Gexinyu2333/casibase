@@ -358,7 +358,7 @@ class ChatBox extends React.Component {
           const chat = res.data;
 
           if (this.props.onMessageEdit) {
-            this.props.onMessageEdit(chat.name);
+            this.props.onMessageEdit(chat);
           }
 
           if (!silent) {

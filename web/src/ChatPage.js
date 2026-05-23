@@ -109,13 +109,12 @@ class ChatPage extends BaseListPage {
             const status = res.data;
             const isViewing = this.state.chat?.name === chat.name;
 
-            if (chat.isGenerating && !status.isGenerating && isViewing && status.isRead === false) {
-              this.updateChatStatus(chat.name, status);
+            if (chat.isGenerating && !status.isGenerating && isViewing && status.isUnread) {
               this.markChatRead({...chat, ...status});
               return;
             }
 
-            if (status.isGenerating !== chat.isGenerating || status.isRead !== chat.isRead) {
+            if (status.isGenerating !== chat.isGenerating || status.isUnread !== chat.isUnread) {
               this.updateChatStatus(chat.name, status);
             }
           })
@@ -245,18 +244,18 @@ class ChatPage extends BaseListPage {
   };
 
   markChatRead = (chat) => {
-    if (!chat || chat.isRead !== false || chat.isGenerating) {
+    if (!chat || !chat.isUnread || chat.isGenerating) {
       return;
     }
 
-    const updatedChat = {...chat, isRead: true};
+    const updatedChat = {...chat, isUnread: false};
     ChatBackend.updateChat(chat.owner, chat.name, updatedChat)
       .then(res => {
         if (this.isChatPageUnmounted) {
           return;
         }
         if (res.status === "ok") {
-          this.updateChatStatus(chat.name, {isRead: true, isGenerating: chat.isGenerating});
+          this.updateChatStatus(chat.name, {isUnread: false, isGenerating: chat.isGenerating});
         }
       })
       .catch(error => {
@@ -787,12 +786,9 @@ class ChatPage extends BaseListPage {
       });
   }
 
-  handleMessageEdit = (chatName) => {
-    const chat = this.state.data.find(c => c.name === chatName);
-    if (chat) {
-      // get new messages
-      this.getMessages(chat);
-    }
+  handleMessageEdit = (updatedChat) => {
+    this.updateChatStatus(updatedChat.name, updatedChat);
+    this.getMessages(updatedChat);
   };
 
   getCurrentChat() {

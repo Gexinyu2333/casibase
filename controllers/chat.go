@@ -198,7 +198,7 @@ func (c *ApiController) GetChatStatus() {
 	}
 
 	c.ResponseOk(map[string]bool{
-		"isRead":       chat.IsRead,
+		"isUnread":     chat.IsUnread,
 		"isGenerating": chat.IsGenerating,
 	})
 }
