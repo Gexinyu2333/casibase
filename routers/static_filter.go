@@ -66,13 +66,6 @@ func StaticFilter(ctx *context.Context) {
 	}
 
 	if strings.HasPrefix(urlPath, "/storage") {
-		// Check if user is authenticated
-		user := GetSessionUser(ctx)
-		if user == nil {
-			responseError(ctx, "auth:Unauthorized operation")
-			return
-		}
-
 		ctx.Output.Header(headerAllowOrigin, "*")
 		ctx.Output.Header(headerAllowMethods, "POST, GET, OPTIONS, DELETE")
 		ctx.Output.Header(headerAllowHeaders, "Content-Type, Authorization")
