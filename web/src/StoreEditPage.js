@@ -240,20 +240,12 @@ class StoreEditPage extends React.Component {
       Setting.isChatAdminUser(this.props.account) &&
       !(useGlobalAdminCheck ? Setting.isGlobalAdminUser(this.props.account) : Setting.isAdminUser(this.props.account));
 
-    const btnStyle = {
-      backgroundColor: "var(--ant-color-bg-container)",
-      borderColor: "var(--ant-color-border)",
-      border: "1px solid var(--ant-color-border)",
-      borderRadius: "10px",
-      padding: "6px 10px",
-    };
-
     return (
       <Space wrap>
-        <Button style={btnStyle} onClick={() => this.submitStoreEdit(false, undefined)}>{i18next.t("general:Save")}</Button>
-        <Button style={btnStyle} onClick={() => this.submitStoreEdit(true, undefined)}>{i18next.t("general:Save & Exit")}</Button>
-        {this.state.isNewStore && <Button style={btnStyle} onClick={() => this.cancelStoreEdit()}>{i18next.t("general:Cancel")}</Button>}
-        {shouldShowClaim && <Button style={btnStyle} onClick={() => this.claimStore()}>{i18next.t("store:Claim")}</Button>}
+        <Button onClick={() => this.submitStoreEdit(false, undefined)}>{i18next.t("general:Save")}</Button>
+        <Button onClick={() => this.submitStoreEdit(true, undefined)}>{i18next.t("general:Save & Exit")}</Button>
+        {this.state.isNewStore && <Button onClick={() => this.cancelStoreEdit()}>{i18next.t("general:Cancel")}</Button>}
+        {shouldShowClaim && <Button onClick={() => this.claimStore()}>{i18next.t("store:Claim")}</Button>}
       </Space>
     );
   }

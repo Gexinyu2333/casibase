@@ -162,7 +162,7 @@ function getLightComponents() {
     Input: {
       activeShadow: "none",
       hoverBorderColor: "#a1a1aa",
-      activeBorderColor: "#18181b",
+      activeBorderColor: "#71717a",
       borderRadius: 6,
     },
     Select: {
