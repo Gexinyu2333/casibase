@@ -210,3 +210,41 @@ func (c *ApiController) RefreshFileVectors() {
 
 	c.ResponseOk(ok)
 }
+
+// UploadFile
+// @Title UploadFile
+// @Tag File API
+// @Description upload a file via storage provider and persist it in the file DB
+// @Param store query string true "The store id (owner/name)"
+// @Param file formData file true "The file to upload"
+// @Success 200 {object} controllers.Response The Response object
+// @router /upload-file [post]
+func (c *ApiController) UploadFile() {
+	userName, ok := c.RequireSignedIn()
+	if !ok {
+		return
+	}
+
+	storeId := c.Input().Get("store")
+	filename := c.Input().Get("filename")
+
+	fileData, header, err := c.GetFile("file")
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+	defer fileData.Close()
+
+	if filename == "" {
+		filename = header.Filename
+	}
+
+	origin := getOriginFromHost(c.Ctx.Request.Host)
+	fileRecord, err := object.UploadFileToStore(storeId, userName, filename, fileData, c.GetAcceptLanguage(), origin)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	c.ResponseOk(fileRecord)
+}

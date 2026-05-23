@@ -56,6 +56,19 @@ export function updateFile(owner, name, file) {
   }).then(res => Setting.handleFetchResponse(res));
 }
 
+export function uploadFile(storeId, filename, file) {
+  const formData = new FormData();
+  formData.append("file", file);
+  return fetch(`${Setting.ServerUrl}/api/upload-file?store=${storeId}&filename=${encodeURIComponent(filename)}`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Accept-Language": Setting.getAcceptLanguage(),
+    },
+    body: formData,
+  }).then(res => Setting.handleFetchResponse(res));
+}
+
 export function addFile(file) {
   const newFile = Setting.deepCopy(file);
   return fetch(`${Setting.ServerUrl}/api/add-file`, {

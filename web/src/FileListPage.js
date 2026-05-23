@@ -21,7 +21,6 @@ import * as FileBackend from "./backend/FileBackend";
 import * as StoreBackend from "./backend/StoreBackend";
 import i18next from "i18next";
 import {DeleteOutlined, DownloadOutlined, EditOutlined, ReloadOutlined, UploadOutlined} from "@ant-design/icons";
-import * as TreeFileBackend from "./backend/TreeFileBackend";
 
 class FileListPage extends BaseListPage {
   constructor(props) {
@@ -70,7 +69,7 @@ class FileListPage extends BaseListPage {
         return;
       }
       this.uploadedFileIdMap[uploadedFile.originFileObj.uid] = 1;
-      promises.push(TreeFileBackend.addFile(storeId, "file", true, uploadedFile.name, uploadedFile.originFileObj));
+      promises.push(FileBackend.uploadFile(storeId, uploadedFile.name, uploadedFile.originFileObj));
     });
 
     if (promises.length === 0) {
