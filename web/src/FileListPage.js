@@ -20,7 +20,7 @@ import * as Setting from "./Setting";
 import * as FileBackend from "./backend/FileBackend";
 import * as StoreBackend from "./backend/StoreBackend";
 import i18next from "i18next";
-import {DeleteOutlined, EditOutlined, ReloadOutlined, UploadOutlined} from "@ant-design/icons";
+import {DeleteOutlined, DownloadOutlined, EditOutlined, ReloadOutlined, UploadOutlined} from "@ant-design/icons";
 import * as TreeFileBackend from "./backend/TreeFileBackend";
 
 class FileListPage extends BaseListPage {
@@ -223,23 +223,20 @@ class FileListPage extends BaseListPage {
         sorter: (a, b) => a.tokenCount - b.tokenCount,
       },
       {
-        title: i18next.t("general:Status"),
-        dataIndex: "status",
-        key: "status",
-        width: "100px",
-        sorter: (a, b) => a.status.localeCompare(b.status),
-        ...this.getColumnSearchProps("status"),
-      },
-      {
-        title: i18next.t("message:Error text"),
-        dataIndex: "errorText",
-        key: "errorText",
-        width: "200px",
-        sorter: (a, b) => a.errorText.localeCompare(b.errorText),
-        ...this.getColumnSearchProps("errorText"),
-        render: (text, record, index) => {
+        title: i18next.t("general:URL"),
+        dataIndex: "url",
+        key: "url",
+        width: "80px",
+        render: (text, record) => {
+          if (!record.url) {
+            return null;
+          }
           return (
-            <div dangerouslySetInnerHTML={{__html: text}} />
+            <a href={record.url} target="_blank" rel="noreferrer">
+              <Button type="primary" size="small" icon={<DownloadOutlined />}>
+                {i18next.t("general:Download")}
+              </Button>
+            </a>
           );
         },
       },
