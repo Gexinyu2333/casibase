@@ -14,14 +14,14 @@
 
 import React from "react";
 import {Link} from "react-router-dom";
-import {Button, Dropdown, Popconfirm, Table} from "antd";
+import {Button, Popconfirm, Table, Tooltip} from "antd";
 import moment from "moment";
 import BaseListPage from "./BaseListPage";
 import * as Setting from "./Setting";
 import * as FileBackend from "./backend/FileBackend";
 import * as StoreBackend from "./backend/StoreBackend";
 import i18next from "i18next";
-import {DeleteOutlined, EditOutlined, MoreOutlined, ReloadOutlined} from "@ant-design/icons";
+import {DeleteOutlined, EditOutlined, ReloadOutlined} from "@ant-design/icons";
 
 class FileListPage extends BaseListPage {
   constructor(props) {
@@ -230,56 +230,48 @@ class FileListPage extends BaseListPage {
         title: i18next.t("general:Action"),
         dataIndex: "action",
         key: "action",
-        width: "150px",
+        width: "160px",
         fixed: "right",
         render: (text, record, index) => {
           return (
             <div style={{display: "flex", alignItems: "center", gap: "2px", flexWrap: "nowrap"}}>
-              <Button
-                style={{minWidth: "28px", width: "28px", height: "28px", padding: 0, borderRadius: "6px"}}
-                type="default"
-                icon={<EditOutlined />}
-                onClick={() => this.props.history.push(`/files/${encodeURIComponent(record.name)}`)}
-                title={i18next.t("general:View")}
-              />
+              <Tooltip title={i18next.t("general:View")}>
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<EditOutlined />}
+                  style={{minWidth: "28px", width: "28px", height: "28px", padding: 0, borderRadius: "6px"}}
+                  onClick={() => this.props.history.push(`/files/${encodeURIComponent(record.name)}`)}
+                />
+              </Tooltip>
               <Popconfirm
                 title={`${i18next.t("general:Sure to delete")}: ${record.name} ?`}
                 onConfirm={() => this.deleteFile(record)}
                 okText={i18next.t("general:OK")}
                 cancelText={i18next.t("general:Cancel")}
               >
-                <Button
-                  style={{minWidth: "28px", width: "28px", height: "28px", padding: 0, borderRadius: "6px"}}
-                  type="primary"
-                  danger
-                  icon={<DeleteOutlined />}
-                />
+                <Tooltip title={i18next.t("general:Delete")}>
+                  <Button
+                    type="text"
+                    size="small"
+                    danger
+                    icon={<DeleteOutlined />}
+                    style={{minWidth: "28px", width: "28px", height: "28px", padding: 0, borderRadius: "6px"}}
+                  />
+                </Tooltip>
               </Popconfirm>
-              {
-                !Setting.isLocalAdminUser(this.props.account) ? null : (
-                  <Dropdown
-                    menu={{
-                      items: [
-                        {
-                          key: "refresh-vectors",
-                          icon: <ReloadOutlined />,
-                          label: i18next.t("general:Refresh Vectors"),
-                          disabled: this.state.refreshing[index],
-                        },
-                      ],
-                      onClick: ({key}) => {
-                        if (key === "refresh-vectors") {this.refreshFileVectors(index);}
-                      },
-                    }}
-                    trigger={["click"]}
-                  >
-                    <Button
-                      style={{minWidth: "28px", width: "28px", height: "28px", padding: 0, borderRadius: "6px"}}
-                      icon={<MoreOutlined />}
-                    />
-                  </Dropdown>
-                )
-              }
+              {!Setting.isLocalAdminUser(this.props.account) ? null : (
+                <Tooltip title={i18next.t("general:Refresh Vectors")}>
+                  <Button
+                    type="text"
+                    size="small"
+                    icon={<ReloadOutlined />}
+                    style={{minWidth: "28px", width: "28px", height: "28px", padding: 0, borderRadius: "6px"}}
+                    loading={this.state.refreshing[index]}
+                    onClick={() => this.refreshFileVectors(index)}
+                  />
+                </Tooltip>
+              )}
             </div>
           );
         },
