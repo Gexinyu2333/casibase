@@ -178,7 +178,7 @@ class SiteEditPage extends React.Component {
               8
             )}
             {this.renderSiteField(
-              Setting.getLabel(i18next.t("site:Endpoint"), i18next.t("site:Endpoint - Tooltip")),
+              Setting.getLabel(i18next.t("provider:Endpoint"), i18next.t("provider:Endpoint - Tooltip")),
               <Input prefix={<LinkOutlined />} value={site.endpoint} onChange={e => {
                 this.updateSiteField("endpoint", e.target.value);
               }} />,
@@ -375,6 +375,13 @@ class SiteEditPage extends React.Component {
                 this.updateSiteField("parentDbName", e.target.value);
               }} />,
               8
+            )}
+            {this.renderSiteField(
+              Setting.getLabel(i18next.t("site:Hub DB names"), i18next.t("site:Hub DB names - Tooltip")),
+              <Input value={site.hubDbNames} placeholder={"openagent-db1, openagent-db2"} onChange={e => {
+                this.updateSiteField("hubDbNames", e.target.value);
+              }} />,
+              16
             )}
             {this.renderSiteField(
               Setting.getLabel(i18next.t("site:Socks5 proxy"), i18next.t("site:Socks5 proxy - Tooltip")),
