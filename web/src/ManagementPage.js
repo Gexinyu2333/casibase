@@ -28,6 +28,7 @@ import {
   FolderOpenOutlined,
   FormOutlined,
   FundOutlined,
+  HistoryOutlined,
   HomeOutlined,
   InboxOutlined,
   LayoutOutlined,
@@ -83,6 +84,7 @@ import ChatListPage from "./ChatListPage";
 import MessageListPage from "./MessageListPage";
 import MessageEditPage from "./MessageEditPage";
 import SessionListPage from "./SessionListPage";
+import SnapshotListPage from "./SnapshotListPage";
 import RecordListPage from "./RecordListPage";
 import RecordEditPage from "./RecordEditPage";
 import TaskListPage from "./TaskListPage";
@@ -109,7 +111,7 @@ function getMenuParentKey(uri) {
   if (uri.includes("/providers") || uri.includes("/pipes") || uri.includes("/tools") || uri.includes("/servers")) {return "/connectors";}
   if (uri.includes("/files") || uri.includes("/vectors") || uri.includes("/resources")) {return "/knowledge-base";}
   if (uri.includes("/tasks") || uri.includes("/scales") || uri.includes("/forms")) {return "/multimedia";}
-  if (uri.includes("/sessions") || uri.includes("/records")) {return "/logs";}
+  if (uri.includes("/sessions") || uri.includes("/records") || uri.includes("/snapshots")) {return "/logs";}
   if (uri.includes("/users") || uri.includes("/casdoor-resources") || uri.includes("/permissions")) {return "/identity";}
   if (uri.includes("/sysinfo") || uri.includes("/swagger") || uri.includes("/visitors") || uri.includes("/sites") || uri.includes("/usages")) {return "/admin";}
   return null;
@@ -361,11 +363,16 @@ function ManagementPage(props) {
       return menuItems;
     }
 
+    const effectiveNavItems = new Set(navItems);
+    if (effectiveNavItems.has("/records") || effectiveNavItems.has("/sessions") || effectiveNavItems.has("/logs")) {
+      effectiveNavItems.add("/snapshots");
+    }
+
     const filteredItems = menuItems.map(item => {
       if (!Array.isArray(item.children)) {
         return item;
       }
-      const filteredChildren = item.children.filter(child => navItems.includes(child.key));
+      const filteredChildren = item.children.filter(child => effectiveNavItems.has(child.key));
       const newItem = {...item};
       newItem.children = filteredChildren;
       return newItem;
@@ -375,7 +382,7 @@ function ManagementPage(props) {
       if (Array.isArray(item.children)) {
         return item.children.length > 0;
       }
-      return item.key === "/" || navItems.includes(item.key);
+      return item.key === "/" || effectiveNavItems.has(item.key);
     });
   }
 
@@ -444,6 +451,7 @@ function ManagementPage(props) {
       res.push(Setting.getItem(<Link style={{color: textColor}} to="/records">{i18next.t("general:Auditing Logs")}</Link>, "/logs", <WalletOutlined />, [
         Setting.getItem(<Link to="/records">{i18next.t("general:Logs")}</Link>, "/records", <DatabaseOutlined />),
         Setting.getItem(<Link to="/sessions">{i18next.t("general:Sessions")}</Link>, "/sessions", <OrderedListOutlined />),
+        Setting.getItem(<Link to="/snapshots">{i18next.t("general:Snapshots")}</Link>, "/snapshots", <HistoryOutlined />),
       ]));
 
       res.push(Setting.getItem(<Link style={{color: textColor}} to="#">{i18next.t("general:Identity")}</Link>, "/identity", <LockOutlined />, [
@@ -553,6 +561,7 @@ function ManagementPage(props) {
         <Route exact path="/sites/:siteName" render={(props) => renderSigninIfNotSignedIn(<SiteEditPage account={account} onUpdateSite={onUpdateSite} {...props} />)} />
         <Route exact path="/visitors" render={(props) => renderSigninIfNotSignedIn(<VisitorPage account={account} themeAlgorithm={themeAlgorithm} {...props} />)} />
         <Route exact path="/sessions" render={(props) => renderSigninIfNotSignedIn(<SessionListPage account={account} {...props} />)} />
+        <Route exact path="/snapshots" render={(props) => renderSigninIfNotSignedIn(<SnapshotListPage account={account} {...props} />)} />
         <Route exact path="/records" render={(props) => renderSigninIfNotSignedIn(<RecordListPage account={account} {...props} />)} />
         <Route exact path="/records/:organizationName/:recordName" render={(props) => renderSigninIfNotSignedIn(<RecordEditPage account={account} {...props} />)} />
         <Route exact path="/tasks" render={(props) => renderSigninIfNotSignedIn(<TaskListPage account={account} {...props} />)} />

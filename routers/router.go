@@ -214,6 +214,10 @@ func initAPI() {
 	beego.Router("/api/delete-session", &controllers.ApiController{}, "POST:DeleteSession")
 	beego.Router("/api/is-session-duplicated", &controllers.ApiController{}, "GET:IsSessionDuplicated")
 
+	beego.Router("/api/get-snapshots", &controllers.ApiController{}, "GET:GetSnapshots")
+	beego.Router("/api/get-snapshot", &controllers.ApiController{}, "GET:GetSnapshot")
+	beego.Router("/api/rollback-snapshot", &controllers.ApiController{}, "POST:RollbackSnapshot")
+
 	beego.Router("/api/get-records", &controllers.ApiController{}, "GET:GetRecords")
 	beego.Router("/api/get-record", &controllers.ApiController{}, "GET:GetRecord")
 	beego.Router("/api/update-record", &controllers.ApiController{}, "POST:UpdateRecord")

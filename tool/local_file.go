@@ -156,6 +156,11 @@ func localFileJSON(v interface{}) *protocol.CallToolResult {
 	return localFileText(string(bs))
 }
 
+var (
+	localFileRename = os.Rename
+	localFileRemove = os.Remove
+)
+
 func localFileStringArg(arguments map[string]interface{}, key string) string {
 	value, _ := arguments[key].(string)
 	return strings.TrimSpace(value)
@@ -770,13 +775,28 @@ func (b *localFileMoveBuiltin) Execute(_ context.Context, arguments map[string]i
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return localFileError(fmt.Sprintf("failed to create target directory: %s", err.Error())), nil
 	}
+	backupPath := ""
 	if targetExists {
-		if err := os.Remove(target); err != nil {
-			return localFileError(fmt.Sprintf("failed to remove existing target: %s", err.Error())), nil
+		backupPath, err = localFileMoveBackupPath(target)
+		if err != nil {
+			return localFileError(fmt.Sprintf("failed to reserve target backup path: %s", err.Error())), nil
+		}
+		if err := localFileRename(target, backupPath); err != nil {
+			return localFileError(fmt.Sprintf("failed to backup existing target: %s", err.Error())), nil
 		}
 	}
-	if err := os.Rename(source, target); err != nil {
+	if err := localFileRename(source, target); err != nil {
+		if backupPath != "" {
+			if restoreErr := localFileRename(backupPath, target); restoreErr != nil {
+				return localFileError(fmt.Sprintf("failed to move file: %s; failed to restore existing target: %s", err.Error(), restoreErr.Error())), nil
+			}
+		}
 		return localFileError(fmt.Sprintf("failed to move file: %s", err.Error())), nil
+	}
+	if backupPath != "" {
+		if err := localFileRemove(backupPath); err != nil {
+			return localFileError(fmt.Sprintf("failed to remove target backup after move: %s", err.Error())), nil
+		}
 	}
 
 	return localFileJSON(localFileMoveResult{
@@ -784,4 +804,18 @@ func (b *localFileMoveBuiltin) Execute(_ context.Context, arguments map[string]i
 		Target:    target,
 		Overwrote: targetExists,
 	}), nil
+}
+
+func localFileMoveBackupPath(target string) (string, error) {
+	dir := filepath.Dir(target)
+	base := filepath.Base(target)
+	for i := 0; i < 100; i++ {
+		path := filepath.Join(dir, fmt.Sprintf(".%s.openagent-move-backup-%d-%d", base, time.Now().UnixNano(), i))
+		if _, err := os.Lstat(path); os.IsNotExist(err) {
+			return path, nil
+		} else if err != nil {
+			return "", err
+		}
+	}
+	return "", fmt.Errorf("failed to generate unique backup path for target: %s", target)
 }

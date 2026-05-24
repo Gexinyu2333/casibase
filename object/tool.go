@@ -230,6 +230,11 @@ func testToolWithLoader(t *Tool, lang string, loadTool func(owner string, name s
 		payload.Arguments = map[string]interface{}{}
 	}
 
+	owner := strings.TrimSpace(t.Owner)
+	if owner == "" {
+		return "", fmt.Errorf("tool owner is required")
+	}
+
 	tp, err := tool.New(getToolConfig(t), lang)
 	if err != nil {
 		return "", err
@@ -240,7 +245,7 @@ func testToolWithLoader(t *Tool, lang string, loadTool func(owner string, name s
 	}
 	for _, bt := range tp.BuiltinTools() {
 		if bt.GetName() == payload.Tool {
-			foundTool = bt
+			foundTool = wrapSnapshotBuiltin(owner, bt)
 			break
 		}
 	}

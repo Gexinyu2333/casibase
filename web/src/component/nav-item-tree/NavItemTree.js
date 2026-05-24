@@ -71,6 +71,7 @@ export const NavItemTree = ({disabled, casdoorAvailable, checkedKeys, defaultExp
           children: [
             {title: i18next.t("general:Logs"), key: "/records"},
             {title: i18next.t("general:Sessions"), key: "/sessions"},
+            {title: i18next.t("general:Snapshots"), key: "/snapshots"},
           ],
         },
         {
