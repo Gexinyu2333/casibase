@@ -97,3 +97,7 @@ func (p *BaichuanModelProvider) QueryText(question string, writer io.Writer, his
 	}
 	return modelResult, nil
 }
+
+func (p *BaichuanModelProvider) ListModels() ([]string, error) {
+	return unsupportedListModels("Baichuan")
+}

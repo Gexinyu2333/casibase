@@ -215,3 +215,7 @@ func (p *iFlytekModelProvider) QueryText(question string, writer io.Writer, hist
 	}
 	return modelResult, nil
 }
+
+func (p *iFlytekModelProvider) ListModels() ([]string, error) {
+	return unsupportedListModels("iFlytek")
+}

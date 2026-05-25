@@ -16,8 +16,10 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/beego/beego/utils/pagination"
+	"github.com/the-open-agent/openagent/model"
 	"github.com/the-open-agent/openagent/object"
 	"github.com/the-open-agent/openagent/util"
 )
@@ -189,4 +191,62 @@ func (c *ApiController) DeleteProvider() {
 	}
 
 	c.ResponseOk(success)
+}
+
+// FetchProviderModels
+// @Title FetchProviderModels
+// @Tag Provider API
+// @Description fetch provider models
+// @Param body body object.Provider true "The details of the provider"
+// @Success 200 {array} string The Response object
+// @router /fetch-provider-models [post]
+func (c *ApiController) FetchProviderModels() {
+	if !c.RequireAdmin() {
+		return
+	}
+
+	var provider object.Provider
+	err := json.Unmarshal(c.Ctx.Input.RequestBody, &provider)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	if provider.ClientSecret == "***" || provider.ProviderKey == "***" {
+		dbProvider, err := object.GetProvider(fmt.Sprintf("%s/%s", provider.Owner, provider.Name))
+		if err == nil && dbProvider != nil {
+			if provider.ClientSecret == "***" {
+				provider.ClientSecret = dbProvider.ClientSecret
+			}
+			if provider.ProviderKey == "***" {
+				provider.ProviderKey = dbProvider.ProviderKey
+			}
+		}
+	}
+
+	secretKey := provider.ClientSecret
+	if secretKey == "" {
+		secretKey = provider.ProviderKey
+	}
+
+	url := provider.ProviderUrl
+
+	p, err := model.GetModelProvider(provider.Type, provider.SubType, provider.ClientId, secretKey, provider.UserKey, 0, 0, 0, 0, 0, url, provider.ApiVersion, provider.CompatibleProvider, 0, 0, "", false)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	if p == nil {
+		c.ResponseOk([]string{})
+		return
+	}
+
+	models, err := p.ListModels()
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	c.ResponseOk(models)
 }

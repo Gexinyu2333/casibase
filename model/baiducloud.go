@@ -281,3 +281,7 @@ func (p *BaiduCloudModelProvider) QueryText(question string, writer io.Writer, h
 	}
 	return modelResult, nil
 }
+
+func (p *BaiduCloudModelProvider) ListModels() ([]string, error) {
+	return unsupportedListModels("Baidu Cloud")
+}

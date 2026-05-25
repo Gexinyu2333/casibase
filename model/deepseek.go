@@ -100,3 +100,7 @@ func (p *DeepSeekProvider) QueryText(question string, writer io.Writer, history 
 	}
 	return modelResult, nil
 }
+
+func (p *DeepSeekProvider) ListModels() ([]string, error) {
+	return openaiCompatibleListModels("deepseek", p.apiKey, "https://api.deepseek.com/v1")
+}

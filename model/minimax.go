@@ -89,3 +89,7 @@ func (p *MiniMaxModelProvider) QueryText(question string, writer io.Writer, hist
 	}
 	return modelResult, nil
 }
+
+func (p *MiniMaxModelProvider) ListModels() ([]string, error) {
+	return unsupportedListModels("MiniMax")
+}

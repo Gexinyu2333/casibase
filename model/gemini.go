@@ -438,3 +438,7 @@ func (p *GeminiModelProvider) QueryText(question string, writer io.Writer, histo
 
 	return modelResult, nil
 }
+
+func (p *GeminiModelProvider) ListModels() ([]string, error) {
+	return unsupportedListModels("Gemini")
+}

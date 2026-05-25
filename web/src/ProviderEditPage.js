@@ -14,8 +14,8 @@
 
 import React from "react";
 import Loading from "./common/Loading";
-import {AutoComplete, Button, Card, Col, Input, InputNumber, Row, Select, Slider, Switch} from "antd";
-import {LinkOutlined} from "@ant-design/icons";
+import {AutoComplete, Button, Card, Col, Input, InputNumber, Row, Select, Slider, Space, Switch} from "antd";
+import {LinkOutlined, SyncOutlined} from "@ant-design/icons";
 import * as ProviderBackend from "./backend/ProviderBackend";
 import * as Setting from "./Setting";
 import i18next from "i18next";
@@ -38,7 +38,30 @@ class ProviderEditPage extends React.Component {
       provider: null,
       originalProvider: null,
       isNewProvider: props.location?.state?.isNewProvider || false,
+      fetchedModels: [],
+      isFetchingModels: false,
     };
+  }
+
+  getProviderModels() {
+    this.setState({isFetchingModels: true});
+    ProviderBackend.getProviderModels(this.state.provider)
+      .then((res) => {
+        if (res.status === "ok") {
+          this.setState({
+            fetchedModels: res.data,
+            isFetchingModels: false,
+          });
+          Setting.showMessage("success", i18next.t("provider:Successfully fetched models"));
+        } else {
+          this.setState({isFetchingModels: false});
+          Setting.showMessage("error", `${i18next.t("provider:Failed to fetch models")}: ${res.msg}`);
+        }
+      })
+      .catch(error => {
+        this.setState({isFetchingModels: false});
+        Setting.showMessage("error", `${i18next.t("provider:Failed to fetch models")}: ${error?.message || error}`);
+      });
   }
 
   UNSAFE_componentWillMount() {
@@ -359,6 +382,7 @@ class ProviderEditPage extends React.Component {
               <div style={{marginBottom: "4px"}}>{Setting.getLabel(i18next.t("general:Type"), i18next.t("general:Type - Tooltip"))}</div>
               <Select virtual={false} disabled={isRemote} style={{width: "100%"}} value={provider.type} onChange={(value => {
                 this.updateProviderField("type", value);
+                this.setState({fetchedModels: []});
                 if (provider.category === "Model") {
                   if (value === "OpenAI Compatible") {
                     this.updateProviderField("subType", "gpt-image-2");
@@ -457,38 +481,50 @@ class ProviderEditPage extends React.Component {
               !["Model", "Embedding", "Text-to-Speech", "Speech-to-Text"].includes(provider.category) ? null : (
                 <Col style={{marginTop: "5px"}} span={Setting.isMobile() ? 22 : 7}>
                   <div style={{marginBottom: "4px"}}>{Setting.getLabel(i18next.t("provider:Sub type"), i18next.t("provider:Sub type - Tooltip"))}</div>
-                  {provider.type === "Ollama" ? (
-                    <AutoComplete
-                      style={{width: "100%"}}
-                      value={provider.subType}
-                      disabled={isRemote}
-                      onChange={(value) => {
-                        this.updateProviderField("subType", value);
-                      }}
-                      options={Setting.getProviderSubTypeOptions(provider.category, provider.type).map((item) => Setting.getOption(item.name, item.id))}
-                      placeholder="Please select or enter the model name"
-                    />
-                  ) : (
-                    <Select
-                      virtual={false}
-                      style={{width: "100%"}}
-                      value={provider.subType}
-                      disabled={isRemote}
-                      onChange={(value) => {
-                        this.updateProviderField("subType", value);
-                      }}
-                      showSearch
-                      filterOption={(input, option) =>
-                        option.children.toLowerCase().includes(input.toLowerCase())
-                      }
-                    >
-                      {Setting.getProviderSubTypeOptions(provider.category, provider.type)
-                        .map((item, index) => (
-                          <Option key={index} value={item.id}>{item.name}</Option>
-                        ))
-                      }
-                    </Select>
-                  )}
+                  <Space.Compact style={{width: "100%"}}>
+                    {provider.type === "Ollama" ? (
+                      <AutoComplete
+                        style={{flex: 1}}
+                        value={provider.subType}
+                        disabled={isRemote}
+                        onChange={(value) => {
+                          this.updateProviderField("subType", value);
+                        }}
+                        options={((this.state.fetchedModels || []).length > 0 ? this.state.fetchedModels.map(m => ({id: m, name: m})) : Setting.getProviderSubTypeOptions(provider.category, provider.type)).map((item) => Setting.getOption(item.name, item.id))}
+                        placeholder={i18next.t("provider:Please select or enter the model name")}
+                      />
+                    ) : (
+                      <Select
+                        virtual={false}
+                        style={{flex: 1}}
+                        value={provider.subType}
+                        disabled={isRemote}
+                        onChange={(value) => {
+                          this.updateProviderField("subType", value);
+                        }}
+                        showSearch
+                        filterOption={(input, option) =>
+                          option.children.toLowerCase().includes(input.toLowerCase())
+                        }
+                      >
+                        {((this.state.fetchedModels || []).length > 0 ? this.state.fetchedModels.map(m => ({id: m, name: m})) : Setting.getProviderSubTypeOptions(provider.category, provider.type))
+                          .map((item, index) => (
+                            <Option key={index} value={item.id}>{item.name}</Option>
+                          ))
+                        }
+                      </Select>
+                    )}
+                    {["OpenAI", "OpenRouter", "Local", "OpenAI Compatible", "Ollama", "DeepSeek", "Moonshot", "Grok", "Silicon Flow", "Mistral", "StepFun"].includes(provider.type) && (
+                      <Button
+                        type="primary"
+                        icon={<SyncOutlined spin={this.state.isFetchingModels} />}
+                        aria-label={i18next.t("provider:Fetch models")}
+                        title={i18next.t("provider:Fetch models")}
+                        onClick={() => this.getProviderModels()}
+                        loading={this.state.isFetchingModels}
+                      />
+                    )}
+                  </Space.Compact>
                 </Col>
               )
             }
@@ -1215,7 +1251,7 @@ class ProviderEditPage extends React.Component {
         }
       })
       .catch(error => {
-        Setting.showMessage("error", `${i18next.t("general:Failed to save")}: ${error}`);
+        Setting.showMessage("error", `${i18next.t("general:Failed to save")}: ${error.message || error}`);
       });
   }
 

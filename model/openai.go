@@ -64,6 +64,7 @@ func NewOpenAiModelProvider(subType string, secretKey string, endpoint string, t
 
 func CalculateOpenAIModelPrice(model string, modelResult *ModelResult, lang string) error {
 	var inputPricePerThousandTokens, outputPricePerThousandTokens float64
+
 	switch {
 	// gpt 3.5 turbo model Support:
 	case strings.Contains(model, "gpt-3.5"):
@@ -221,9 +222,10 @@ func CalculateOpenAIModelPrice(model string, modelResult *ModelResult, lang stri
 		modelResult.Currency = "USD"
 		return nil
 	default:
-		// inputPricePerThousandTokens = 0
-		// outputPricePerThousandTokens = 0
-		return fmt.Errorf(i18n.Translate(lang, "embedding:calculatePrice() error: unknown model type: %s"), model)
+		// For unknown models, set price to 0 instead of returning error
+		inputPricePerThousandTokens = 0
+		outputPricePerThousandTokens = 0
+		modelResult.Currency = "USD"
 	}
 
 	inputPrice := getPrice(modelResult.PromptTokenCount, inputPricePerThousandTokens)
@@ -301,14 +303,24 @@ func (p *OpenAiModelProvider) GetPricing() string {
 	return getOpenAIModelPrice()
 }
 
+func (p *OpenAiModelProvider) ListModels() ([]string, error) {
+	url := p.endpoint
+	if url == "" {
+		url = "https://api.openai.com/v1"
+	}
+	return openaiCompatibleListModels("openai", p.secretKey, url)
+}
+
 func GetOpenAiClientFromToken(authToken string) openai.Client {
 	return newOpenAiClient(authToken, "")
 }
 
 func newOpenAiClient(authToken, endpoint string) openai.Client {
 	opts := []option.RequestOption{
-		option.WithHTTPClient(proxy.ProxyHttpClient),
 		option.WithAPIKey(authToken),
+	}
+	if proxy.ProxyHttpClient != nil {
+		opts = append(opts, option.WithHTTPClient(proxy.ProxyHttpClient))
 	}
 	if endpoint != "" {
 		opts = append(opts, option.WithBaseURL(endpoint))

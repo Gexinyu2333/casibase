@@ -304,3 +304,7 @@ func buildMessages(question string, history []*RawMessage, prompt string, knowle
 
 	return messages
 }
+
+func (p *AlibabacloudModelProvider) ListModels() ([]string, error) {
+	return unsupportedListModels("Alibaba Cloud")
+}

@@ -196,3 +196,7 @@ func (p *ClaudeModelProvider) QueryText(question string, writer io.Writer, histo
 
 	return modelResult, nil
 }
+
+func (p *ClaudeModelProvider) ListModels() ([]string, error) {
+	return unsupportedListModels("Claude")
+}

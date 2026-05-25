@@ -26,6 +26,7 @@ import (
 type MistralModelProvider struct {
 	client    *mistral.MistralClient
 	modelName string
+	secretKey string
 }
 
 func NewMistralProvider(apiKey, modelName string) (*MistralModelProvider, error) {
@@ -34,6 +35,7 @@ func NewMistralProvider(apiKey, modelName string) (*MistralModelProvider, error)
 	return &MistralModelProvider{
 		client:    client,
 		modelName: modelName,
+		secretKey: apiKey,
 	}, nil
 }
 
@@ -111,4 +113,8 @@ func (c *MistralModelProvider) QueryText(question string, writer io.Writer, hist
 	modelResult.PromptTokenCount += len(question)
 
 	return modelResult, nil
+}
+
+func (c *MistralModelProvider) ListModels() ([]string, error) {
+	return openaiCompatibleListModels("mistral", c.secretKey, "https://api.mistral.ai/v1")
 }

@@ -273,3 +273,7 @@ func (p *VolcengineModelProvider) QueryText(question string, writer io.Writer, h
 
 	return modelResult, nil
 }
+
+func (p *VolcengineModelProvider) ListModels() ([]string, error) {
+	return unsupportedListModels("Volcano Engine")
+}

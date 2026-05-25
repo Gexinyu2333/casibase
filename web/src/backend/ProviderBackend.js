@@ -80,6 +80,19 @@ export function deleteProvider(provider) {
   }).then(res => Setting.handleFetchResponse(res));
 }
 
+export function getProviderModels(provider) {
+  const newProvider = Setting.deepCopy(provider);
+  return fetch(`${Setting.ServerUrl}/api/fetch-provider-models`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      "Accept-Language": Setting.getAcceptLanguage(),
+    },
+    body: JSON.stringify(newProvider),
+  }).then(res => Setting.handleFetchResponse(res));
+}
+
 export function testTool(provider) {
   const newProvider = Setting.deepCopy(provider);
   return fetch(`${Setting.ServerUrl}/api/test-tool`, {

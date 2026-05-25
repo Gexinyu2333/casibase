@@ -146,3 +146,7 @@ func (p *CohereModelProvider) QueryText(message string, writer io.Writer, chat_h
 
 	return modelResult, nil
 }
+
+func (c *CohereModelProvider) ListModels() ([]string, error) {
+	return unsupportedListModels("Cohere")
+}

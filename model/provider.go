@@ -15,7 +15,14 @@
 package model
 
 import (
+	"encoding/json"
+	"fmt"
 	"io"
+	"net/http"
+	"strings"
+	"time"
+
+	"github.com/the-open-agent/openagent/proxy"
 )
 
 // DryRunPrefix is a special prefix that triggers model providers to estimate
@@ -42,6 +49,69 @@ func newModelResult(promptTokenCount int, responseTokenCount int, totalTokenCoun
 type ModelProvider interface {
 	GetPricing() string
 	QueryText(question string, writer io.Writer, history []*RawMessage, prompt string, knowledgeMessages []*RawMessage, toolSession *ToolSession, lang string) (*ModelResult, error)
+	ListModels() ([]string, error)
+}
+
+func newListModelsHTTPClient() *http.Client {
+	if proxy.ProxyHttpClient != nil {
+		clonedClient := *proxy.ProxyHttpClient
+		clonedClient.Timeout = 30 * time.Second
+		return &clonedClient
+	}
+
+	return &http.Client{
+		Timeout: 30 * time.Second,
+	}
+}
+
+func unsupportedListModels(providerType string) ([]string, error) {
+	return []string{}, fmt.Errorf("%s: ListModels() is not implemented", providerType)
+}
+
+func openaiCompatibleListModels(providerType string, secretKey string, url string) ([]string, error) {
+	if url == "" {
+		return []string{}, fmt.Errorf("%s: ListModels() error: provider URL is empty", providerType)
+	}
+
+	if !strings.HasSuffix(url, "/") {
+		url += "/"
+	}
+	url += "models"
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return []string{}, err
+	}
+
+	if secretKey != "" {
+		req.Header.Set("Authorization", "Bearer "+strings.TrimSpace(secretKey))
+	}
+
+	resp, err := newListModelsHTTPClient().Do(req)
+	if err != nil {
+		return []string{}, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return []string{}, fmt.Errorf("%s: ListModels() error: status code %d", providerType, resp.StatusCode)
+	}
+
+	var result struct {
+		Data []struct {
+			ID string `json:"id"`
+		} `json:"data"`
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return []string{}, err
+	}
+
+	var models []string
+	for _, m := range result.Data {
+		models = append(models, m.ID)
+	}
+	return models, nil
 }
 
 func GetModelProvider(typ string, subType string, clientId string, clientSecret string, userKey string, temperature float32, topP float32, topK int, frequencyPenalty float32, presencePenalty float32, providerUrl string, apiVersion string, compatibleProvider string, inputPricePerThousandTokens float64, outputPricePerThousandTokens float64, Currency string, enableThinking bool) (ModelProvider, error) {

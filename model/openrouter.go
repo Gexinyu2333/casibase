@@ -16,6 +16,7 @@ package model
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -235,4 +236,42 @@ func (p *OpenRouterModelProvider) QueryText(question string, writer io.Writer, h
 	}
 
 	return modelResult, nil
+}
+
+func (p *OpenRouterModelProvider) ListModels() ([]string, error) {
+	url := "https://openrouter.ai/api/v1/models"
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return []string{}, err
+	}
+
+	req.Header.Set("Authorization", "Bearer "+strings.TrimSpace(p.secretKey))
+	req.Header.Set("HTTP-Referer", p.siteUrl)
+	req.Header.Set("X-Title", p.siteName)
+
+	resp, err := newListModelsHTTPClient().Do(req)
+	if err != nil {
+		return []string{}, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return []string{}, fmt.Errorf("openrouter: ListModels() error: status code %d", resp.StatusCode)
+	}
+
+	var result struct {
+		Data []struct {
+			ID string `json:"id"`
+		} `json:"data"`
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return []string{}, err
+	}
+
+	models := []string{}
+	for _, m := range result.Data {
+		models = append(models, m.ID)
+	}
+	return models, nil
 }

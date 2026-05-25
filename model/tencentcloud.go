@@ -66,3 +66,7 @@ func (c *TencentCloudClient) QueryText(question string, writer io.Writer, histor
 	}
 	return modelResult, nil
 }
+
+func (c *TencentCloudClient) ListModels() ([]string, error) {
+	return unsupportedListModels("Tencent Cloud")
+}

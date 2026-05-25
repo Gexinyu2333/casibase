@@ -170,3 +170,7 @@ func (p *AmazonBedrockModelProvider) QueryText(question string, writer io.Writer
 
 	return modelResult, nil
 }
+
+func (a AmazonBedrockModelProvider) ListModels() ([]string, error) {
+	return unsupportedListModels("Amazon Bedrock")
+}

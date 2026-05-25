@@ -118,3 +118,7 @@ func (p *GrokModelProvider) QueryText(question string, writer io.Writer, history
 
 	return modelResult, nil
 }
+
+func (p *GrokModelProvider) ListModels() ([]string, error) {
+	return openaiCompatibleListModels("grok", p.secretKey, "https://api.x.ai/v1")
+}

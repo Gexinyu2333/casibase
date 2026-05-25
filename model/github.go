@@ -62,3 +62,7 @@ func (p *GitHubModelProvider) calculatePrice(modelResult *ModelResult) error {
 	modelResult.Currency = "USD"
 	return nil
 }
+
+func (p *GitHubModelProvider) ListModels() ([]string, error) {
+	return unsupportedListModels("GitHub")
+}

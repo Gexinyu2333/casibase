@@ -75,6 +75,7 @@ func initAPI() {
 	beego.Router("/api/update-provider", &controllers.ApiController{}, "POST:UpdateProvider")
 	beego.Router("/api/add-provider", &controllers.ApiController{}, "POST:AddProvider")
 	beego.Router("/api/delete-provider", &controllers.ApiController{}, "POST:DeleteProvider")
+	beego.Router("/api/fetch-provider-models", &controllers.ApiController{}, "POST:FetchProviderModels")
 
 	beego.Router("/api/get-global-pipes", &controllers.ApiController{}, "GET:GetGlobalPipes")
 	beego.Router("/api/get-pipes", &controllers.ApiController{}, "GET:GetPipes")

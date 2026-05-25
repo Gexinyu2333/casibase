@@ -121,3 +121,7 @@ func (p *ChatGLMModelProvider) QueryText(question string, writer io.Writer, hist
 
 	return modelResult, nil
 }
+
+func (c *ChatGLMModelProvider) ListModels() ([]string, error) {
+	return unsupportedListModels("ChatGLM")
+}

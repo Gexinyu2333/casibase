@@ -99,3 +99,7 @@ func (p *HuggingFaceModelProvider) QueryText(question string, writer io.Writer, 
 
 	return modelResult, nil
 }
+
+func (p *HuggingFaceModelProvider) ListModels() ([]string, error) {
+	return unsupportedListModels("Hugging Face")
+}

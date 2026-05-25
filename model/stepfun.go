@@ -94,3 +94,7 @@ func (p *StepFunModelProvider) QueryText(question string, writer io.Writer, hist
 	}
 	return modelResult, nil
 }
+
+func (p *StepFunModelProvider) ListModels() ([]string, error) {
+	return openaiCompatibleListModels("stepfun", p.apiKey, "https://api.stepfun.com/v1")
+}

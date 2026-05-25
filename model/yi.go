@@ -86,3 +86,7 @@ func (p *YiProvider) QueryText(question string, writer io.Writer, history []*Raw
 	}
 	return modelResult, nil
 }
+
+func (p *YiProvider) ListModels() ([]string, error) {
+	return unsupportedListModels("Yi")
+}

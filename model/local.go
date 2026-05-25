@@ -16,7 +16,7 @@ package model
 
 import (
 	"context"
-	"crypto/tls"
+	"encoding/json"
 	"fmt"
 	"io"
 	"math/rand"
@@ -70,7 +70,7 @@ func getLocalClientFromUrl(authToken string, url string) *openai.Client {
 	config := openai.DefaultConfig(authToken)
 	config.BaseURL = url
 
-	transport := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
+	transport := &http.Transport{}
 	httpClient := http.Client{Transport: transport}
 	config.HTTPClient = &httpClient
 
@@ -80,6 +80,56 @@ func getLocalClientFromUrl(authToken string, url string) *openai.Client {
 
 func (p *LocalModelProvider) GetPricing() string {
 	return getOpenAIModelPrice()
+}
+
+func (p *LocalModelProvider) ListModels() ([]string, error) {
+	url := p.providerUrl
+	if url == "" {
+		if p.typ == "Ollama" {
+			url = "http://localhost:11434"
+		} else {
+			return []string{}, fmt.Errorf("local: ListModels() error: provider URL is empty")
+		}
+	}
+
+	if !strings.HasSuffix(url, "/") {
+		url += "/"
+	}
+
+	var models []string
+	if p.typ == "Ollama" {
+		url += "api/tags"
+		req, err := http.NewRequest("GET", url, nil)
+		if err != nil {
+			return []string{}, err
+		}
+
+		resp, err := newListModelsHTTPClient().Do(req)
+		if err != nil {
+			return []string{}, err
+		}
+		defer resp.Body.Close()
+
+		if resp.StatusCode != http.StatusOK {
+			return []string{}, fmt.Errorf("ollama: ListModels() error: status code %d", resp.StatusCode)
+		}
+
+		var result struct {
+			Models []struct {
+				Name string `json:"name"`
+			} `json:"models"`
+		}
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			return []string{}, err
+		}
+		for _, m := range result.Models {
+			models = append(models, m.Name)
+		}
+	} else {
+		return openaiCompatibleListModels("local", p.secretKey, url)
+	}
+
+	return models, nil
 }
 
 func (p *LocalModelProvider) CalculatePrice(modelResult *ModelResult, lang string) error {

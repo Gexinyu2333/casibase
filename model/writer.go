@@ -98,3 +98,7 @@ func (p *WriterModelProvider) QueryText(question string, writer io.Writer, histo
 
 	return modelResult, nil
 }
+
+func (p *WriterModelProvider) ListModels() ([]string, error) {
+	return unsupportedListModels("Writer")
+}
