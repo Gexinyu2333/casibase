@@ -44,6 +44,8 @@ type LocalModelProvider struct {
 	inputPricePerThousandTokens  float64
 	outputPricePerThousandTokens float64
 	currency                     string
+	customClient                 *openai.Client
+	mergeToolCalls               bool
 }
 
 func NewLocalModelProvider(typ string, subType string, secretKey string, temperature float32, topP float32, frequencyPenalty float32, presencePenalty float32, providerUrl string, compatibleProvider string, inputPricePerThousandTokens float64, outputPricePerThousandTokens float64, Currency string) (*LocalModelProvider, error) {
@@ -165,21 +167,25 @@ func (p *LocalModelProvider) QueryText(question string, writer io.Writer, histor
 	var client *openai.Client
 	var flushData interface{} // Can be either flushData or flushDataThink
 
-	if p.typ == "Local" {
+	if p.customClient != nil {
+		client = p.customClient
+	} else if p.typ == "Local" {
 		client = getLocalClientFromUrl(p.secretKey, p.providerUrl)
-		flushData = flushDataThink
 	} else if p.typ == "Azure" {
 		client = getAzureClientFromToken(p.deploymentName, p.secretKey, p.providerUrl, p.apiVersion)
-		flushData = flushDataAzure
 	} else if p.typ == "GitHub" {
 		client = getGitHubClientFromToken(p.secretKey, p.providerUrl)
-		flushData = flushDataOpenai
-	} else if p.typ == "Custom" {
+	} else if p.typ == "Custom" || p.typ == "Custom-think" {
 		client = getLocalClientFromUrl(p.secretKey, p.providerUrl)
-		flushData = flushDataOpenai
-	} else if p.typ == "Custom-think" {
-		client = getLocalClientFromUrl(p.secretKey, p.providerUrl)
+	}
+
+	switch p.typ {
+	case "Local", "Custom-think":
 		flushData = flushDataThink
+	case "Azure":
+		flushData = flushDataAzure
+	default:
+		flushData = flushDataOpenai
 	}
 
 	ctx := context.Background()
@@ -220,6 +226,9 @@ func (p *LocalModelProvider) QueryText(question string, writer io.Writer, histor
 			}
 		} else {
 			messages = OpenaiRawMessagesToMessages(rawMessages)
+			if p.mergeToolCalls {
+				messages = mergeAdjacentAssistantToolCalls(messages)
+			}
 		}
 
 		// https://github.com/sashabaranov/go-openai/pull/223#issuecomment-1494372875
