@@ -523,6 +523,7 @@ export function getToolFunctions(tool) {
       {name: "excel_write", description: "Write data to an Excel spreadsheet", testContent: JSON.stringify({tool: "excel_write", arguments: {path: "/path/to/output.xlsx", data: "Name,Age\nAlice,30\nBob,25", sheet: "Sheet1"}}, null, 2)},
       {name: "pptx_read", description: "Read content from a PowerPoint presentation", testContent: JSON.stringify({tool: "pptx_read", arguments: {path: "/path/to/presentation.pptx"}}, null, 2)},
       {name: "pptx_write", description: "Write content to a PowerPoint presentation", testContent: JSON.stringify({tool: "pptx_write", arguments: {path: "/path/to/output.pptx", slides: ["Slide 1 title\nSlide 1 content", "Slide 2 title\nSlide 2 content"]}}, null, 2)},
+      {name: "pptx_generate", description: "Generate a PowerPoint presentation by running a local PptxGenJS script", testContent: JSON.stringify({tool: "pptx_generate", arguments: {path: "deck.pptx", script_path: "/path/to/build_deck.mjs", data: {title: "Quarterly Review"}, assets_dir: "/path/to/assets"}}, null, 2)},
     ];
     const subTypeMap = {
       "Word Read": [allOffice[0]],
@@ -531,6 +532,7 @@ export function getToolFunctions(tool) {
       "Excel Write": [allOffice[3]],
       "PowerPoint Read": [allOffice[4]],
       "PowerPoint Write": [allOffice[5]],
+      "PowerPoint Generate": [allOffice[6]],
     };
     return subTypeMap[subType] || allOffice;
   }

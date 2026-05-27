@@ -13,10 +13,11 @@
 // limitations under the License.
 
 // Package embedsupport wires up the optional embedded filesystems for conf,
-// web/build, skills, and the OCR service. When the binary is built with
-// -tags embed, the caller (main) passes the embedded fs.FS values here via
-// Setup. At runtime, on-disk files always take priority; the embedded versions
-// are used only when the corresponding directory is absent next to the executable.
+// web/build, skills, the OCR service, and the PPTX worker. When the binary is
+// built with -tags embed, the caller (main) passes the embedded fs.FS values
+// here via Setup. At runtime, on-disk files always take priority; the embedded
+// versions are used only when the corresponding directory is absent next to the
+// executable.
 package embedsupport
 
 import "io/fs"
@@ -25,14 +26,16 @@ var (
 	webFS        fs.FS
 	skillsFS     fs.FS
 	ocrServiceFS fs.FS
+	pptxWorkerFS fs.FS
 )
 
 // Setup must be called at the very start of main(), before any config values
 // are read or HTTP requests are served.
-func Setup(conf, web, skills, ocrService fs.FS) {
+func Setup(conf, web, skills, ocrService, pptxWorker fs.FS) {
 	webFS = web
 	skillsFS = skills
 	ocrServiceFS = ocrService
+	pptxWorkerFS = pptxWorker
 	setupConf(conf)
 }
 
@@ -44,3 +47,6 @@ func SkillsFS() fs.FS { return skillsFS }
 
 // OcrServiceFS returns the embedded OCR service filesystem, or nil if not available.
 func OcrServiceFS() fs.FS { return ocrServiceFS }
+
+// PptxWorkerFS returns the embedded PPTX worker filesystem, or nil if not available.
+func PptxWorkerFS() fs.FS { return pptxWorkerFS }

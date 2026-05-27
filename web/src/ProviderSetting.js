@@ -1285,6 +1285,7 @@ export function getProviderSubTypeOptions(category, type) {
         {id: "Excel Write", name: "Excel Write"},
         {id: "PowerPoint Read", name: "PowerPoint Read"},
         {id: "PowerPoint Write", name: "PowerPoint Write"},
+        {id: "PowerPoint Generate", name: "PowerPoint Generate"},
       ];
     } else if (type === "web_fetch") {
       return [

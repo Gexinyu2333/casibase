@@ -6,6 +6,8 @@ version: 2
 before:
   hooks:
     - go mod tidy
+    - npm ci --prefix tool/pptx-worker
+    - npm run build --prefix tool/pptx-worker
 
 builds:
   - env:
