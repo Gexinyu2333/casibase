@@ -5,21 +5,21 @@ description: Create designed, editable PowerPoint .pptx presentations with PptxG
 
 # PowerPoint
 
-Use this skill whenever a PowerPoint deck is involved. For new decks, write a trusted local PptxGenJS `.mjs` build script and run it with the `pptx_generate` tool.
+Use this skill whenever a PowerPoint deck is involved. For new decks, write a trusted local PptxGenJS `.mjs` build script and run it with the `pptx_write` tool.
 
 ## Workflow
 
 1. Decide the deck outline and choose a visual system: palette, typography, repeated motif, and slide rhythm.
 2. Create a local `.mjs` script that exports `default async function build(pptx, ctx)` or named `build(pptx, ctx)`.
 3. In the script, add slides directly with PptxGenJS. Do not generate HTML for this workflow.
-4. Call `pptx_generate` with `path`, `script_path`, optional `assets_dir`, and optional `data`.
+4. Call `pptx_write` with `path`, `script_path`, optional `assets_dir`, and optional `data`.
 5. Verify the result with `pptx_read`; for visual QA, convert the PPTX to images if the environment has LibreOffice and Poppler.
 
 ## Tool Contract
 
 ```json
 {
-  "tool": "pptx_generate",
+  "tool": "pptx_write",
   "arguments": {
     "path": "deck.pptx",
     "script_path": "/absolute/path/to/build_deck.mjs",
@@ -75,4 +75,4 @@ For API patterns, chart examples, bullets, image sizing, icons, and common file-
 - Run `pptx_read` on the generated file and check slide order, missing text, typo risk, and notes.
 - Inspect generated XML or render slides when visual precision matters.
 - Watch for overlap, text overflow, low contrast, cramped spacing, repeated layouts, and leftover placeholder text.
-- If a visual issue is found, edit the `.mjs` script and regenerate the PPTX.
+- If a visual issue is found, edit the `.mjs` script and rewrite the PPTX.

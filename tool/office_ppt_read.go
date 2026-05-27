@@ -17,8 +17,6 @@ package tool
 import (
 	"context"
 	"fmt"
-	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/ThinkInAIXYZ/go-mcp/protocol"
@@ -61,68 +59,6 @@ func (t *pptxReadBuiltin) Execute(_ context.Context, arguments map[string]interf
 		return officeToolError(fmt.Sprintf("Failed to read PowerPoint file: %s", err.Error())), nil
 	}
 	return officeToolText(result), nil
-}
-
-// ── PowerPoint write ──────────────────────────────────────────────────────────
-
-type pptxWriteBuiltin struct{}
-
-func (t *pptxWriteBuiltin) GetName() string { return "pptx_write" }
-
-func (t *pptxWriteBuiltin) GetDescription() string {
-	return `Create a PowerPoint (.pptx) file from an array of slide content strings.
-- path (required): output path for the .pptx file. Absolute paths are used as-is. Relative paths or bare filenames are resolved inside the current user's Documents folder.
-- slides (required): JSON array of slide content strings, one element per slide.
-  For each slide the first line becomes the title; remaining lines become the body text.
-Creates the file if it does not exist; overwrites otherwise.`
-}
-
-func (t *pptxWriteBuiltin) GetInputSchema() interface{} {
-	return map[string]interface{}{
-		"type": "object",
-		"properties": map[string]interface{}{
-			"path": map[string]interface{}{
-				"type":        "string",
-				"description": "Output path for the .pptx file.",
-			},
-			"slides": map[string]interface{}{
-				"type":        "array",
-				"description": "Array of slide content strings (one element per slide). First line = title, remaining lines = body.",
-				"items":       map[string]interface{}{"type": "string"},
-			},
-		},
-		"required": []string{"path", "slides"},
-	}
-}
-
-func (t *pptxWriteBuiltin) Execute(_ context.Context, arguments map[string]interface{}) (*protocol.CallToolResult, error) {
-	path, ok := arguments["path"].(string)
-	if !ok || strings.TrimSpace(path) == "" {
-		return officeToolError("Missing required parameter: path"), nil
-	}
-
-	rawSlides, ok := arguments["slides"].([]interface{})
-	if !ok || len(rawSlides) == 0 {
-		return officeToolError("Missing or empty required parameter: slides"), nil
-	}
-
-	slideTexts := make([]string, 0, len(rawSlides))
-	for i, v := range rawSlides {
-		s, ok := v.(string)
-		if !ok {
-			return officeToolError(fmt.Sprintf("slides[%d] must be a string", i)), nil
-		}
-		slideTexts = append(slideTexts, s)
-	}
-
-	resolvedPath := resolveOutputPath(path)
-	if err := writePptxFile(path, slideTexts); err != nil {
-		return officeToolError(fmt.Sprintf("Failed to write PowerPoint file: %s", err.Error())), nil
-	}
-	return officeToolText(fmt.Sprintf(
-		"Successfully wrote PowerPoint file: %s\n%d slide(s) written",
-		resolvedPath, len(slideTexts),
-	)), nil
 }
 
 // ── goppt helpers ─────────────────────────────────────────────────────────────
@@ -241,81 +177,4 @@ func extractTableShapeText(t *ppt.TableShape) string {
 		lines = append(lines, strings.Join(cells, "\t"))
 	}
 	return strings.Join(lines, "\n")
-}
-
-const (
-	// Standard 10" × 7.5" slide dimensions in EMU (914400 EMU = 1 inch).
-	slideWidth  int64 = 9144000
-	slideHeight int64 = 6858000
-
-	// Layout constants for title / body text boxes.
-	marginX  int64 = 457200 // 0.5 inch left/right margin
-	titleY   int64 = 300000
-	titleH   int64 = 1100000
-	bodyY    int64 = 1500000
-	bodyH    int64 = 5000000
-	contentW int64 = 8229600 // slideWidth - 2 * marginX
-)
-
-// writePptxFile creates a .pptx from a slice of slide text strings.
-// Each string: first line → title text box; remaining lines → body text box.
-func writePptxFile(path string, slideTexts []string) error {
-	path = resolveOutputPath(path)
-	dir := filepath.Dir(path)
-	if err := os.MkdirAll(dir, 0o755); err != nil {
-		return fmt.Errorf("failed to create directory %q: %w", dir, err)
-	}
-
-	p := ppt.New()
-
-	for i, content := range slideTexts {
-		var slide *ppt.Slide
-		if i == 0 {
-			slide = p.GetActiveSlide()
-		} else {
-			slide = p.CreateSlide()
-		}
-
-		lines := strings.Split(content, "\n")
-		title := strings.TrimSpace(lines[0])
-		bodyLines := lines[1:]
-
-		// Title text box.
-		titleShape := slide.CreateRichTextShape()
-		titleShape.BaseShape.SetOffsetX(marginX).SetOffsetY(titleY).
-			SetWidth(contentW).SetHeight(titleH)
-		titleShape.SetWordWrap(true)
-		titleShape.SetAutoFit(ppt.AutoFitNormal)
-		titleShape.GetActiveParagraph().CreateTextRun(title).GetFont().SetBold(true).SetSize(36)
-
-		// Body text box — only when there is non-empty content.
-		body := strings.TrimSpace(strings.Join(bodyLines, "\n"))
-		if body != "" {
-			bodyShape := slide.CreateRichTextShape()
-			bodyShape.BaseShape.SetOffsetX(marginX).SetOffsetY(bodyY).
-				SetWidth(contentW).SetHeight(bodyH)
-			bodyShape.SetWordWrap(true)
-			bodyShape.SetAutoFit(ppt.AutoFitNormal)
-
-			firstPara := true
-			for _, line := range bodyLines {
-				if firstPara {
-					bodyShape.GetActiveParagraph().CreateTextRun(line).GetFont().SetSize(24)
-					firstPara = false
-				} else {
-					bodyShape.CreateParagraph().CreateTextRun(line).GetFont().SetSize(24)
-				}
-			}
-		}
-	}
-
-	w, err := ppt.NewWriter(p, ppt.WriterPowerPoint2007)
-	if err != nil {
-		return fmt.Errorf("failed to create writer: %w", err)
-	}
-	pptxWriter, ok := w.(*ppt.PPTXWriter)
-	if !ok {
-		return fmt.Errorf("unexpected writer type")
-	}
-	return pptxWriter.Save(path)
 }

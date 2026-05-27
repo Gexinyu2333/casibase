@@ -54,7 +54,6 @@ const (
 	officeSubTypeExcelWrite      officeSubType = "Excel Write"
 	officeSubTypePowerPointRead  officeSubType = "PowerPoint Read"
 	officeSubTypePowerPointWrite officeSubType = "PowerPoint Write"
-	officeSubTypePowerPointGen   officeSubType = "PowerPoint Generate"
 )
 
 // allOfficeTools is the full ordered list returned when SubType is "All".
@@ -65,7 +64,6 @@ var allOfficeTools = []BuiltinTool{
 	&excelWriteBuiltin{},
 	&pptxReadBuiltin{},
 	&pptxWriteBuiltin{},
-	&pptxGenerateBuiltin{},
 }
 
 // officeToolBySubType maps each specific SubType to its single tool.
@@ -76,7 +74,6 @@ var officeToolBySubType = map[officeSubType]BuiltinTool{
 	officeSubTypeExcelWrite:      &excelWriteBuiltin{},
 	officeSubTypePowerPointRead:  &pptxReadBuiltin{},
 	officeSubTypePowerPointWrite: &pptxWriteBuiltin{},
-	officeSubTypePowerPointGen:   &pptxGenerateBuiltin{},
 }
 
 // OfficeTool is the Tool Type "office".

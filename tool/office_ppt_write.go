@@ -29,16 +29,16 @@ import (
 	"github.com/the-open-agent/openagent/embedsupport"
 )
 
-type pptxGenerateBuiltin struct{}
+type pptxWriteBuiltin struct{}
 
-type pptxGenerateArgs struct {
+type pptxWriteArgs struct {
 	Path       string          `json:"path"`
 	ScriptPath string          `json:"script_path"`
 	AssetsDir  string          `json:"assets_dir,omitempty"`
 	Data       json.RawMessage `json:"data,omitempty"`
 }
 
-type pptxGenerateWorkerResult struct {
+type pptxWriteWorkerResult struct {
 	OK         bool   `json:"ok"`
 	Path       string `json:"path"`
 	SlideCount int    `json:"slideCount"`
@@ -51,18 +51,18 @@ type pptxWorkerCandidate struct {
 	requireNodeModules bool
 }
 
-func (t *pptxGenerateBuiltin) GetName() string { return "pptx_generate" }
+func (t *pptxWriteBuiltin) GetName() string { return "pptx_write" }
 
-func (t *pptxGenerateBuiltin) GetDescription() string {
-	return `Generate a PowerPoint (.pptx) deck by running a trusted local PptxGenJS module.
-- path (required): output .pptx path. Absolute paths are used as-is. Relative paths are resolved inside the current user's Documents folder.
-- script_path (required): local .mjs file that exports default async function build(pptx, ctx) or a named build function. The script adds slides to the provided PptxGenJS instance; the worker writes the file.
-- data (optional): JSON value passed to ctx.data for content or configuration.
-- assets_dir (optional): base directory for ctx.resolveAsset() and relative ctx.imageData() paths. Defaults to the script directory.
-Use this for designed, editable decks. The script should call PptxGenJS APIs directly instead of generating HTML.`
+func (t *pptxWriteBuiltin) GetDescription() string {
+	return `Create a designed PowerPoint (.pptx) file by running a local PptxGenJS build script.
+- path (required): output path for the .pptx file. Absolute paths are used as-is. Relative paths or bare filenames are resolved inside the current user's Documents folder.
+- script_path (required): local .mjs file that exports default async function build(pptx, ctx) or a named build function. The script adds slides to the provided PptxGenJS instance.
+- data (optional): JSON value passed to ctx.data inside the script for content or configuration.
+- assets_dir (optional): base directory for ctx.resolveAsset() and ctx.imageData() calls. Defaults to the script directory.
+Creates the file if it does not exist; overwrites otherwise.`
 }
 
-func (t *pptxGenerateBuiltin) GetInputSchema() interface{} {
+func (t *pptxWriteBuiltin) GetInputSchema() interface{} {
 	return map[string]interface{}{
 		"type": "object",
 		"properties": map[string]interface{}{
@@ -87,15 +87,15 @@ func (t *pptxGenerateBuiltin) GetInputSchema() interface{} {
 	}
 }
 
-// Execute validates the requested deck generation job, writes a short-lived
+// Execute validates the requested deck write job, writes a short-lived
 // worker spec file, then runs the local Node/PptxGenJS worker.
-func (t *pptxGenerateBuiltin) Execute(ctx context.Context, arguments map[string]interface{}) (*protocol.CallToolResult, error) {
+func (t *pptxWriteBuiltin) Execute(ctx context.Context, arguments map[string]interface{}) (*protocol.CallToolResult, error) {
 	argBytes, err := json.Marshal(arguments)
 	if err != nil {
 		return officeToolError(fmt.Sprintf("Failed to parse parameters: %s", err.Error())), nil
 	}
 
-	var args pptxGenerateArgs
+	var args pptxWriteArgs
 	if err := json.Unmarshal(argBytes, &args); err != nil {
 		return officeToolError(fmt.Sprintf("Failed to parse parameters: %s", err.Error())), nil
 	}
@@ -157,7 +157,7 @@ func (t *pptxGenerateBuiltin) Execute(ctx context.Context, arguments map[string]
 
 	// Pass the job to Node through a temp JSON file so nested data does not
 	// need fragile command-line escaping. The final PPTX is not temporary.
-	specFile, err := os.CreateTemp("", "openagent-pptxgenjs-*.json")
+	specFile, err := os.CreateTemp("", "openagent-pptx-*.json")
 	if err != nil {
 		return officeToolError(fmt.Sprintf("Failed to create worker spec: %s", err.Error())), nil
 	}
@@ -179,9 +179,9 @@ func (t *pptxGenerateBuiltin) Execute(ctx context.Context, arguments map[string]
 	cmd.Stderr = &stderr
 	output, err := cmd.Output()
 	if err != nil {
-		var workerResult pptxGenerateWorkerResult
+		var workerResult pptxWriteWorkerResult
 		if len(bytes.TrimSpace(output)) > 0 && json.Unmarshal(bytes.TrimSpace(output), &workerResult) == nil && workerResult.Error != "" {
-			return officeToolError(fmt.Sprintf("Failed to generate PowerPoint file: %s", workerResult.Error)), nil
+			return officeToolError(fmt.Sprintf("Failed to write PowerPoint file: %s", workerResult.Error)), nil
 		}
 
 		detail := strings.TrimSpace(stderr.String())
@@ -191,21 +191,17 @@ func (t *pptxGenerateBuiltin) Execute(ctx context.Context, arguments map[string]
 		return officeToolError(fmt.Sprintf("Failed to run PowerPoint worker: %s", detail)), nil
 	}
 
-	var workerResult pptxGenerateWorkerResult
+	var workerResult pptxWriteWorkerResult
 	if err := json.Unmarshal(bytes.TrimSpace(output), &workerResult); err != nil {
 		return officeToolError(fmt.Sprintf("Failed to parse PowerPoint worker output: %s", err.Error())), nil
 	}
 	if !workerResult.OK {
-		return officeToolError(fmt.Sprintf("Failed to generate PowerPoint file: %s", workerResult.Error)), nil
+		return officeToolError(fmt.Sprintf("Failed to write PowerPoint file: %s", workerResult.Error)), nil
 	}
 
-	mode := workerResult.Mode
-	if mode == "" {
-		mode = "pptxgenjs"
-	}
 	return officeToolText(fmt.Sprintf(
-		"Successfully generated PowerPoint file: %s\n%d slide(s) written\nmode: %s",
-		workerResult.Path, workerResult.SlideCount, mode,
+		"Successfully wrote PowerPoint file: %s\n%d slide(s) written",
+		workerResult.Path, workerResult.SlideCount,
 	)), nil
 }
 
