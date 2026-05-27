@@ -1,6 +1,10 @@
 # PptxGenJS Reference
 
-Use this reference when writing the `.mjs` build script for the `pptx_generate` tool.
+Use this reference when writing the `.mjs` build script for the `pptx_write` tool.
+
+## Script File Creation
+
+Use `local_file_write` to write the `.mjs` script in one complete operation whenever that tool is available. Avoid repeated `shell` commands like `echo ... >> build.mjs`; they are brittle for JavaScript, especially on Windows. If you need to inspect the script, prefer `local_file_read`; if shell is the only option, use `type C:\path\build.mjs` on Windows or `cat /path/build.mjs` on Linux/macOS. Empty shell output from `echo ... >> file` is normal and should not trigger another rewrite by itself.
 
 ## Basic Structure
 
