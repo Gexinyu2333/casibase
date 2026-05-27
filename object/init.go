@@ -303,8 +303,8 @@ func initSkillsFromFolder() {
 		return
 	}
 
-	var names []string
-	newCount := 0
+	now := util.GetCurrentTime()
+	var skills []*Skill
 	for _, entry := range entries {
 		if !entry.IsDir() {
 			continue
@@ -315,32 +315,14 @@ func initSkillsFromFolder() {
 			fmt.Printf("skills: skipping %s: %v\n", dir, err)
 			continue
 		}
-
-		// Default owner for folder-loaded skills is "admin"
 		if skill.Owner == "" {
 			skill.Owner = "admin"
 		}
-
-		existing, err := getSkill(skill.Owner, skill.Name)
-		if err != nil {
-			fmt.Printf("skills: DB lookup failed for %s: %v\n", skill.Name, err)
-			continue
-		}
-		if existing != nil {
-			names = append(names, skill.Name)
-			continue
-		}
-
-		skill.CreatedTime = util.GetCurrentTime()
-		if _, err = AddSkill(skill); err != nil {
-			fmt.Printf("skills: failed to add skill %s: %v\n", skill.Name, err)
-		} else {
-			names = append(names, skill.Name)
-			newCount++
-		}
+		skill.CreatedTime = now
+		skills = append(skills, skill)
 	}
 
-	fmt.Printf("skills: %d total, %d new: %s from %s\n", len(names), newCount, strings.Join(names, ", "), skillsDir)
+	syncBuiltinSkills(skills, "admin", skillsDir)
 }
 
 // findSkillsDir returns the first existing skills/ directory found next to the
@@ -375,8 +357,8 @@ func loadSkillsFromFS(fsys fs.FS) {
 		return
 	}
 
-	var names []string
-	newCount := 0
+	now := util.GetCurrentTime()
+	var skills []*Skill
 	for _, entry := range entries {
 		if !entry.IsDir() {
 			continue
@@ -397,27 +379,38 @@ func loadSkillsFromFS(fsys fs.FS) {
 		if skill.Owner == "" {
 			skill.Owner = "admin"
 		}
-
-		existing, err := getSkill(skill.Owner, skill.Name)
-		if err != nil {
-			fmt.Printf("skills(embedded): DB lookup failed for %s: %v\n", skill.Name, err)
-			continue
-		}
-		if existing != nil {
-			names = append(names, skill.Name)
-			continue
-		}
-
-		skill.CreatedTime = util.GetCurrentTime()
-		if _, err = AddSkill(skill); err != nil {
-			fmt.Printf("skills(embedded): failed to add skill %s: %v\n", skill.Name, err)
-		} else {
-			names = append(names, skill.Name)
-			newCount++
-		}
+		skill.CreatedTime = now
+		skills = append(skills, skill)
 	}
 
-	fmt.Printf("skills(embedded): %d total, %d new: %s\n", len(names), newCount, strings.Join(names, ", "))
+	syncBuiltinSkills(skills, "admin", "(embedded)")
+}
+
+// syncBuiltinSkills replaces all built-in skills for owner with skills in one
+// delete + batch-insert round-trip. source is used only for log messages.
+func syncBuiltinSkills(skills []*Skill, owner, source string) {
+	if len(skills) == 0 {
+		return
+	}
+
+	names := make([]string, len(skills))
+	for i, s := range skills {
+		names[i] = s.Name
+	}
+
+	// Delete by name so old records with type='custom' are also cleaned up.
+	if _, err := adapter.engine.Where("owner = ?", owner).In("name", names).Delete(&Skill{}); err != nil {
+		fmt.Printf("skills: failed to delete existing skills: %v\n", err)
+		return
+	}
+
+	affected, err := addSkills(skills)
+	if err != nil {
+		fmt.Printf("skills: failed to batch-insert skills: %v\n", err)
+		return
+	}
+
+	fmt.Printf("skills: %d loaded from %s: %s\n", affected, source, strings.Join(names, ", "))
 }
 
 // loadSkillFromFS reads a skill from an fs.FS rooted at the skill's directory.
@@ -454,7 +447,7 @@ func loadSkillFromFS(skillFS fs.FS, dirName string) (*Skill, error) {
 	return &Skill{
 		Name:        name,
 		DisplayName: name,
-		Type:        "custom",
+		Type:        "built-in",
 		Description: description,
 		Homepage:    homepage,
 		Emoji:       emoji,

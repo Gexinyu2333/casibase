@@ -215,7 +215,7 @@ func LoadSkill(dir string) (*Skill, error) {
 	return &Skill{
 		Name:        name,
 		DisplayName: name,
-		Type:        "custom",
+		Type:        "built-in",
 		Description: description,
 		Homepage:    homepage,
 		Emoji:       emoji,
@@ -324,6 +324,18 @@ func AddSkill(s *Skill) (bool, error) {
 		return false, err
 	}
 	return affected != 0, nil
+}
+
+func addSkills(skills []*Skill) (int64, error) {
+	if len(skills) == 0 {
+		return 0, nil
+	}
+	// xorm Insert accepts a slice of pointers for batch insert.
+	rows := make([]interface{}, len(skills))
+	for i, s := range skills {
+		rows[i] = s
+	}
+	return adapter.engine.Insert(rows...)
 }
 
 func DeleteSkill(s *Skill) (bool, error) {
