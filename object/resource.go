@@ -148,14 +148,20 @@ func DeleteResource(resource *Resource) (bool, error) {
 	return affected != 0, nil
 }
 
-func GetResourceCount(owner, field, value string) (int64, error) {
+func GetResourceCount(owner, user, field, value string) (int64, error) {
 	session := GetDbSession(owner, -1, -1, field, value, "", "")
+	if user != "" {
+		session = session.And("user = ?", user)
+	}
 	return session.Count(&Resource{})
 }
 
-func GetPaginationResources(owner string, offset, limit int, field, value, sortField, sortOrder string) ([]*Resource, error) {
+func GetPaginationResources(owner, user string, offset, limit int, field, value, sortField, sortOrder string) ([]*Resource, error) {
 	resources := []*Resource{}
 	session := GetDbSession(owner, offset, limit, field, value, sortField, sortOrder)
+	if user != "" {
+		session = session.And("user = ?", user)
+	}
 	err := session.Find(&resources)
 	if err != nil {
 		return resources, err

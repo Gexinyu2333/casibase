@@ -309,7 +309,7 @@ func generateMessageAnswer(id string, responseWriter http.ResponseWriter, host s
 	if questionMessage != nil {
 		webSearchEnabled = questionMessage.WebSearchEnabled
 	}
-	mcpToolSet = object.MergeMcpTools(mcpToolSet, store, webSearchEnabled, lang)
+	mcpToolSet = object.MergeMcpTools(mcpToolSet, store, webSearchEnabled, message.User, lang)
 
 	var knowledge []*model.RawMessage
 	var vectorScores []object.VectorScore

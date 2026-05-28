@@ -41,27 +41,39 @@ func (c *ApiController) GetGlobalResources() {
 	sortField := c.Input().Get("sortField")
 	sortOrder := c.Input().Get("sortOrder")
 
+	userName, ok := c.RequireSignedIn()
+	if !ok {
+		return
+	}
+
+	filterUser := ""
+	if !c.IsAdmin() {
+		filterUser = userName
+	}
+
 	if limit == "" || page == "" {
-		resources, err := object.GetGlobalResources(owner)
+		var resources []*object.Resource
+		var err error
+		if filterUser == "" {
+			resources, err = object.GetGlobalResources(owner)
+		} else {
+			resources, err = object.GetResources(owner, filterUser)
+		}
 		if err != nil {
 			c.ResponseError(err.Error())
 			return
 		}
 		c.ResponseOk(resources)
 	} else {
-		if !c.RequireAdmin() {
-			return
-		}
-
 		limitInt := util.ParseInt(limit)
-		count, err := object.GetResourceCount(owner, field, value)
+		count, err := object.GetResourceCount(owner, filterUser, field, value)
 		if err != nil {
 			c.ResponseError(err.Error())
 			return
 		}
 
 		paginator := pagination.SetPaginator(c.Ctx, limitInt, count)
-		resources, err := object.GetPaginationResources(owner, paginator.Offset(), limitInt, field, value, sortField, sortOrder)
+		resources, err := object.GetPaginationResources(owner, filterUser, paginator.Offset(), limitInt, field, value, sortField, sortOrder)
 		if err != nil {
 			c.ResponseError(err.Error())
 			return
@@ -81,9 +93,19 @@ func (c *ApiController) GetGlobalResources() {
 func (c *ApiController) GetResource() {
 	id := c.Input().Get("id")
 
+	userName, ok := c.RequireSignedIn()
+	if !ok {
+		return
+	}
+
 	resource, err := object.GetResource(id)
 	if err != nil {
 		c.ResponseError(err.Error())
+		return
+	}
+
+	if resource != nil && !c.IsAdmin() && resource.User != userName {
+		c.ResponseError(c.T("auth:Unauthorized operation"))
 		return
 	}
 
@@ -149,10 +171,20 @@ func (c *ApiController) AddResource() {
 // @Success 200 {object} controllers.Response The Response object
 // @router /delete-resource [post]
 func (c *ApiController) DeleteResource() {
+	userName, ok := c.RequireSignedIn()
+	if !ok {
+		return
+	}
+
 	var resource object.Resource
 	err := json.NewDecoder(c.Ctx.Request.Body).Decode(&resource)
 	if err != nil {
 		c.ResponseError(err.Error())
+		return
+	}
+
+	if !c.IsAdmin() && resource.User != userName {
+		c.ResponseError(c.T("auth:Unauthorized operation"))
 		return
 	}
 

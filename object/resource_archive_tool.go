@@ -29,18 +29,22 @@ import (
 
 type generatedResourceArchiveBuiltinTool struct {
 	inner tool.BuiltinTool
+	owner string
+	user  string
 }
 
-var archiveGeneratedResourceFile = archiveGeneratedResourceFileToStorage
+var archiveGeneratedResourceFile = func(owner, user, path string) (*Resource, error) {
+	return archiveGeneratedResourceFileToStorage(owner, user, path)
+}
 
-func wrapGeneratedResourceBuiltin(builtin tool.BuiltinTool) tool.BuiltinTool {
+func wrapGeneratedResourceBuiltin(builtin tool.BuiltinTool, owner, user string) tool.BuiltinTool {
 	if builtin == nil {
 		return nil
 	}
 	if !isGeneratedResourceTool(builtin.GetName()) {
 		return builtin
 	}
-	return &generatedResourceArchiveBuiltinTool{inner: builtin}
+	return &generatedResourceArchiveBuiltinTool{inner: builtin, owner: owner, user: user}
 }
 
 func isGeneratedResourceTool(toolName string) bool {
@@ -75,7 +79,7 @@ func (t *generatedResourceArchiveBuiltinTool) Execute(ctx context.Context, argum
 		return result, innerErr
 	}
 
-	resource, err := archiveGeneratedResourceFile(path)
+	resource, err := archiveGeneratedResourceFile(t.owner, t.user, path)
 	if err != nil {
 		appendGeneratedResourceArchiveText(result, fmt.Sprintf("Resource archive warning: file was created but could not be saved to Resources: %s", err.Error()))
 		return result, innerErr
@@ -107,7 +111,7 @@ func resourceArchiveStringArg(arguments map[string]interface{}, key string) stri
 	return strings.TrimSpace(value)
 }
 
-func archiveGeneratedResourceFileToStorage(path string) (*Resource, error) {
+func archiveGeneratedResourceFileToStorage(owner, user, path string) (*Resource, error) {
 	info, err := os.Stat(path)
 	if err != nil {
 		return nil, err
@@ -139,7 +143,7 @@ func archiveGeneratedResourceFileToStorage(path string) (*Resource, error) {
 		return nil, err
 	}
 
-	resource := NewResourceFromUpload("admin", "", "generated", fileName, fileType, ext, fileUrl, storageName, len(fileBytes), "", "")
+	resource := NewResourceFromUpload(owner, user, "generated", fileName, fileType, ext, fileUrl, storageName, len(fileBytes), "", "")
 	if _, err = AddResource(resource); err != nil {
 		return nil, err
 	}
