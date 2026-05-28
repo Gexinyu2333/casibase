@@ -21,7 +21,7 @@ import (
 	"github.com/ThinkInAIXYZ/go-mcp/protocol"
 )
 
-// resolveOutputPath returns path unchanged if it is absolute.
+// ResolveOutputPath returns path unchanged if it is absolute.
 // For relative paths it resolves them against the current user's Documents
 // folder so that files created by the AI land in a predictable, user-visible
 // location rather than in the server's working directory.
@@ -29,7 +29,7 @@ import (
 // Resolution order:
 //  1. XDG_DOCUMENTS_DIR environment variable (Linux / freedesktop standard)
 //  2. ~/Documents as a cross-platform fallback (Windows, macOS, Linux)
-func resolveOutputPath(path string) string {
+func ResolveOutputPath(path string) string {
 	if filepath.IsAbs(path) {
 		return path
 	}

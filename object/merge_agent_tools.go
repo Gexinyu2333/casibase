@@ -55,7 +55,9 @@ func buildMergedBuiltinRegistry(store *Store, lang string) *tool.ToolRegistry {
 			continue
 		}
 		for _, bt := range tp.BuiltinTools() {
-			reg.RegisterTool(wrapSnapshotBuiltin(store.Owner, bt))
+			wrapped := wrapSnapshotBuiltin(store.Owner, bt)
+			wrapped = wrapGeneratedResourceBuiltin(wrapped)
+			reg.RegisterTool(wrapped)
 		}
 	}
 

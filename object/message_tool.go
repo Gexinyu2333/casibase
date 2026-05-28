@@ -44,7 +44,9 @@ func buildToolSetForBuiltinTool(toolName string, lang string) (*mcp.ToolSet, err
 
 	reg := tool.NewToolRegistry()
 	for _, t := range tp.BuiltinTools() {
-		reg.RegisterTool(wrapSnapshotBuiltin("admin", t))
+		wrapped := wrapSnapshotBuiltin("admin", t)
+		wrapped = wrapGeneratedResourceBuiltin(wrapped)
+		reg.RegisterTool(wrapped)
 	}
 
 	allTools := reg.GetToolsAsProtocolTools()

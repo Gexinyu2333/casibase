@@ -153,7 +153,7 @@ func (t *pptxWriteBuiltin) Execute(ctx context.Context, arguments map[string]int
 		return officeToolError(err.Error()), nil
 	}
 
-	args.Path = resolveOutputPath(args.Path)
+	args.Path = ResolveOutputPath(args.Path)
 
 	// Pass the job to Node through a temp JSON file so nested data does not
 	// need fragile command-line escaping. The final PPTX is not temporary.

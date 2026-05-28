@@ -121,7 +121,7 @@ func (t *excelWriteBuiltin) Execute(_ context.Context, arguments map[string]inte
 		sheetName = "Sheet1"
 	}
 
-	resolvedPath := resolveOutputPath(path)
+	resolvedPath := ResolveOutputPath(path)
 	rowCount, colCount, err := writeExcelFile(path, sheetName, data)
 	if err != nil {
 		return officeToolError(fmt.Sprintf("Failed to write Excel file: %s", err.Error())), nil
@@ -201,7 +201,7 @@ func readExcelFile(path, sheetName string) (string, error) {
 // writeExcelFile creates (or overwrites) an xlsx file from CSV-formatted text.
 // It returns the number of rows and the maximum column count written.
 func writeExcelFile(path, sheetName, csvData string) (rowCount, colCount int, err error) {
-	path = resolveOutputPath(path)
+	path = ResolveOutputPath(path)
 	dir := filepath.Dir(path)
 	if mkErr := os.MkdirAll(dir, 0o755); mkErr != nil {
 		return 0, 0, fmt.Errorf("failed to create directory %q: %w", dir, mkErr)

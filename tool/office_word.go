@@ -104,7 +104,7 @@ func (t *wordWriteBuiltin) Execute(_ context.Context, arguments map[string]inter
 		return officeToolError("Missing required parameter: content"), nil
 	}
 
-	resolvedPath := resolveOutputPath(path)
+	resolvedPath := ResolveOutputPath(path)
 	if err := writeWordFile(path, content); err != nil {
 		return officeToolError(fmt.Sprintf("Failed to write Word file: %s", err.Error())), nil
 	}
@@ -131,7 +131,7 @@ func readWordFile(path string) (string, error) {
 }
 
 func writeWordFile(path string, content string) error {
-	path = resolveOutputPath(path)
+	path = ResolveOutputPath(path)
 	dir := filepath.Dir(path)
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return fmt.Errorf("failed to create directory %q: %w", dir, err)
