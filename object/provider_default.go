@@ -88,17 +88,41 @@ func getFilteredProviders(providers []*Provider, needStorage bool) []*Provider {
 }
 
 func GetDefaultStorageProvider() (*Provider, error) {
-	provider := Provider{Owner: "admin", Category: "Storage", State: "Active"}
-	existed, err := adapter.engine.Get(&provider)
+	provider := Provider{Owner: "admin", Category: "Storage", IsDefault: true}
+	existed, err := adapter.engine.UseBool("is_default").Get(&provider)
 	if err != nil {
-		return &provider, err
+		return nil, err
+	}
+
+	if providerAdapter != nil && !existed {
+		existed, err = providerAdapter.engine.UseBool("is_default").Get(&provider)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if existed {
+		return &provider, nil
+	}
+
+	activeProvider := Provider{Owner: "admin", Category: "Storage", State: "Active"}
+	existed, err = adapter.engine.Get(&activeProvider)
+	if err != nil {
+		return nil, err
+	}
+
+	if providerAdapter != nil && !existed {
+		existed, err = providerAdapter.engine.Get(&activeProvider)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	if !existed {
 		return nil, nil
 	}
 
-	return &provider, nil
+	return &activeProvider, nil
 }
 
 func GetDefaultModelProvider() (*Provider, error) {
@@ -143,13 +167,13 @@ func GetDefaultEmbeddingProvider() (*Provider, error) {
 	provider := Provider{Owner: "admin", Category: "Embedding", IsDefault: true}
 	existed, err := adapter.engine.UseBool("is_default").Get(&provider)
 	if err != nil {
-		return &provider, err
+		return nil, err
 	}
 
 	if providerAdapter != nil && !existed {
 		existed, err = providerAdapter.engine.UseBool("is_default").Get(&provider)
 		if err != nil {
-			return &provider, err
+			return nil, err
 		}
 	}
 
@@ -164,13 +188,13 @@ func GetDefaultBlockchainProvider() (*Provider, error) {
 	provider := Provider{Owner: "admin", Category: "Blockchain", IsDefault: true}
 	existed, err := adapter.engine.UseBool("is_default").Get(&provider)
 	if err != nil {
-		return &provider, err
+		return nil, err
 	}
 
 	if providerAdapter != nil && !existed {
 		existed, err = providerAdapter.engine.UseBool("is_default").Get(&provider)
 		if err != nil {
-			return &provider, err
+			return nil, err
 		}
 	}
 
@@ -185,13 +209,13 @@ func GetDefaultTextToSpeechProvider() (*Provider, error) {
 	provider := Provider{Owner: "admin", Category: "Text-to-Speech", IsDefault: true}
 	existed, err := adapter.engine.UseBool("is_default").Get(&provider)
 	if err != nil {
-		return &provider, err
+		return nil, err
 	}
 
 	if providerAdapter != nil && !existed {
 		existed, err = providerAdapter.engine.UseBool("is_default").Get(&provider)
 		if err != nil {
-			return &provider, err
+			return nil, err
 		}
 	}
 
@@ -206,13 +230,13 @@ func GetDefaultSpeechToTextProvider() (*Provider, error) {
 	provider := Provider{Owner: "admin", Category: "Speech-to-Text"}
 	existed, err := adapter.engine.Get(&provider)
 	if err != nil {
-		return &provider, err
+		return nil, err
 	}
 
 	if providerAdapter != nil && !existed {
 		existed, err = providerAdapter.engine.Get(&provider)
 		if err != nil {
-			return &provider, err
+			return nil, err
 		}
 	}
 
