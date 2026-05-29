@@ -30,7 +30,7 @@ class ChatMenu extends React.Component {
     this.state = {
       openKeys: openKeys,
       selectedKeys: selectedKey ? [selectedKey] : [],
-      editChat: false,
+      editingKey: null,
       editChatName: "",
       hoveredKey: null,
       popconfirmOpenKey: null,
@@ -70,6 +70,10 @@ class ChatMenu extends React.Component {
     );
   }
 
+  getChatItemKey(chat) {
+    return `chat:${chat.owner}/${chat.name}`;
+  }
+
   chatsToItems(chats) {
     const categories = {};
     chats.forEach((chat) => {
@@ -82,16 +86,14 @@ class ChatMenu extends React.Component {
       categories[chat.category].push(chat);
     });
 
-    const selectedKeys = this.state === undefined ? [] : this.state.selectedKeys;
-    return Object.keys(categories).map((category, index) => {
+    return Object.keys(categories).map((category) => {
       return {
-        key: `${index}`,
+        key: `category:${category}`,
         icon: <LayoutOutlined />,
         label: category,
-        children: categories[category].map((chat, chatIndex) => {
+        children: categories[category].map((chat) => {
           const globalChatIndex = chats.indexOf(chat);
-          const itemKey = `${index}-${chatIndex}`;
-          const isSelected = selectedKeys.includes(itemKey);
+          const itemKey = this.getChatItemKey(chat);
           const isHovered = this.state !== undefined && this.state.hoveredKey === itemKey;
           const popconfirmOpenKey = this.state !== undefined ? this.state.popconfirmOpenKey : null;
           const showActionButtons = popconfirmOpenKey === itemKey || (isHovered && popconfirmOpenKey === null);
@@ -118,15 +120,15 @@ class ChatMenu extends React.Component {
           const onSave = (e) => {
             e.stopPropagation();
             this.props.onUpdateChatName(globalChatIndex, this.state.editChatName);
-            this.setState({editChat: false});
+            this.setState({editingKey: null});
           };
 
           return {
-            key: `${index}-${chatIndex}`,
+            key: itemKey,
             index: globalChatIndex,
             className: "chat-menu-item",
             label: (
-              isSelected && this.state.editChat ? (
+              this.state?.editingKey === itemKey ? (
                 <div className="menu-item-container">
                   <Input style={{width: "70%"}} value={this.state.editChatName}
                     onChange={(event) => {this.setState({editChatName: event.target.value});}}
@@ -146,7 +148,7 @@ class ChatMenu extends React.Component {
                     onMouseUp={handleIconMouseUp}
                     onClick={(e) => {
                       e.stopPropagation();
-                      this.setState({editChat: false});
+                      this.setState({editingKey: null});
                     }}
                   />
                 </div>) : (
@@ -174,7 +176,7 @@ class ChatMenu extends React.Component {
                           e.stopPropagation();
                           this.setState({
                             editChatName: this.props.chats[globalChatIndex].displayName,
-                            editChat: true,
+                            editingKey: itemKey,
                           });
                         }} />
                       <Popconfirm
@@ -209,11 +211,15 @@ class ChatMenu extends React.Component {
   }
 
   onSelect = (info) => {
-    const [categoryIndex, chatIndex] = info.selectedKeys[0].split("-").map(Number);
-    const selectedItem = this.chatsToItems(this.props.chats)[categoryIndex].children[chatIndex];
+    const selectedItem = this.chatsToItems(this.props.chats)
+      .flatMap(item => item.children || [])
+      .find(item => item.key === info.key);
+    if (!selectedItem) {
+      return;
+    }
     this.setState({
-      selectedKeys: [`${categoryIndex}-${chatIndex}`],
-      editChat: false,
+      selectedKeys: [selectedItem.key],
+      editingKey: null,
       editChatName: this.props.chats[selectedItem.index].displayName,
     });
 
@@ -229,7 +235,7 @@ class ChatMenu extends React.Component {
   clearSelectedKey() {
     this.setState({
       selectedKeys: [],
-      editChat: false,
+      editingKey: null,
     });
   }
 
@@ -248,23 +254,8 @@ class ChatMenu extends React.Component {
     if (!chatName) {
       return null;
     }
-    const items = this.chatsToItems(chats);
     const chat = chats.find(chat => chat.name === chatName);
-    let selectedKey = null;
-
-    for (let categoryIndex = 0; categoryIndex < items.length; categoryIndex++) {
-      const category = items[categoryIndex];
-      for (let chatIndex = 0; chatIndex < category.children.length; chatIndex++) {
-        if (category.children[chatIndex].index === chats.indexOf(chat)) {
-          selectedKey = `${categoryIndex}-${chatIndex}`;
-          break;
-        }
-      }
-      if (selectedKey) {
-        break;
-      }
-    }
-    return selectedKey;
+    return chat ? this.getChatItemKey(chat) : null;
   }
 
   onOpenChange = (keys) => {

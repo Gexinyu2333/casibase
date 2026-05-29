@@ -75,7 +75,10 @@ func (m *messageAnswerJobManager) getOrStart(id string, host string, lang string
 	m.mu.Unlock()
 
 	go func() {
-		defer job.finish()
+		defer func() {
+			job.finish()
+			cleanupMessageAnswerJobChatStatus(id)
+		}()
 		generateMessageAnswer(id, job.writer, host, lang, signedIn, nil)
 	}()
 
@@ -92,6 +95,19 @@ func (m *messageAnswerJobManager) cancel(id string) bool {
 
 	job.cancel()
 	return true
+}
+
+func cleanupMessageAnswerJobChatStatus(id string) {
+	message, err := object.GetMessage(id)
+	if err != nil || message == nil || message.Author != "AI" || message.Chat == "" {
+		return
+	}
+	if message.Text != "" || message.ErrorText != "" {
+		return
+	}
+	if err = clearMessageChatGenerating(message); err != nil {
+		fmt.Printf("failed to clear generating chat for message answer job %s: %s\n", id, err.Error())
+	}
 }
 
 func (m *messageAnswerJobManager) remove(id string, job *messageAnswerJob) {

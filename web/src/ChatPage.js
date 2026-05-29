@@ -108,8 +108,16 @@ class ChatPage extends BaseListPage {
 
             const status = res.data;
             const isViewing = this.state.chat?.name === chat.name;
+            const generationFinished = chat.isGenerating && !status.isGenerating;
 
-            if (chat.isGenerating && !status.isGenerating && isViewing && status.isUnread) {
+            if (generationFinished && isViewing && this.state.messageLoading) {
+              this.setState({
+                messageLoading: false,
+              });
+              this.getMessages({...chat, ...status}, {skipPendingAnswer: true});
+            }
+
+            if (generationFinished && isViewing && status.isUnread) {
               this.markChatRead({...chat, ...status});
               return;
             }
@@ -377,6 +385,24 @@ class ChatPage extends BaseListPage {
     }
   };
 
+  refreshChatsAndSelect(chat) {
+    const field = "user";
+    const value = this.props.account.name;
+    const sortField = "", sortOrder = "";
+    const storeName = this.state.storeName;
+
+    ChatBackend.getChats(value, storeName, -1, -1, field, value, sortField, sortOrder)
+      .then((res) => {
+        if (res.status === "ok") {
+          const chats = res.data;
+          this.setState({
+            data: chats,
+          });
+          this.menu.current?.setSelectedKeyToChat(chats, chat.name);
+        }
+      });
+  }
+
   sendMessage(text, fileName, isHidden, isRegenerated, webSearchEnabled = false) {
     const newMessage = this.newMessage(text, fileName, isHidden, isRegenerated, webSearchEnabled);
     MessageBackend.addMessage(newMessage)
@@ -390,23 +416,7 @@ class ChatPage extends BaseListPage {
           });
           this.goToLinkSoft(this.generateChatUrl(chat.name, chat.store));
 
-          const field = "user";
-          const value = this.props.account.name;
-          const sortField = "", sortOrder = "";
-          const storeName = this.state.storeName;
-          ChatBackend.getChats(value, storeName, -1, -1, field, value, sortField, sortOrder)
-            .then((res) => {
-              if (res.status === "ok") {
-                const chats = res.data;
-                this.setState({
-                  data: chats,
-                });
-                if (this.menu && this.menu.current) {
-                  this.menu.current.setSelectedKeyToChat(chats, chat.name);
-                }
-              }
-            });
-
+          this.refreshChatsAndSelect(chat);
           this.getMessages(chat);
         } else {
           Setting.showMessage("error", `${i18next.t("general:Failed to add")}: ${res.msg}`);
@@ -417,7 +427,7 @@ class ChatPage extends BaseListPage {
       });
   }
 
-  getMessages(chat) {
+  getMessages(chat, options = {}) {
     this.setState({
       messageError: false,
     });
@@ -435,6 +445,13 @@ class ChatPage extends BaseListPage {
         if (res.data.length > 0) {
           const lastMessage = res.data[res.data.length - 1];
           if (lastMessage.author === "AI" && lastMessage.replyTo !== "" && lastMessage.text === "") {
+            if (options.skipPendingAnswer) {
+              this.setState({
+                messageLoading: false,
+                messageError: lastMessage.errorText !== "",
+              });
+              return;
+            }
             let text = "";
             let reasonText = "";
             this.setState({
@@ -788,6 +805,7 @@ class ChatPage extends BaseListPage {
 
   handleMessageEdit = (updatedChat) => {
     this.updateChatStatus(updatedChat.name, updatedChat);
+    this.refreshChatsAndSelect(updatedChat);
     this.getMessages(updatedChat);
   };
 
