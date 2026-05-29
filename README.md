@@ -26,6 +26,10 @@
 
 ---
 
+English | [中文](./README_zh.md)
+
+---
+
 ## What is OpenAgent?
 
 OpenAgent is an open-source personal AI assistant that brings together powerful LLMs, your own knowledge base, and autonomous agent loops — all in one self-hostable platform. Connect any model provider, build a RAG knowledge base from your documents, and let agents browse the web, run code, and call any MCP-compatible tool on your behalf.
