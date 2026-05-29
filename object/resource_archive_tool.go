@@ -49,7 +49,7 @@ func wrapGeneratedResourceBuiltin(builtin tool.BuiltinTool, owner, user string) 
 
 func isGeneratedResourceTool(toolName string) bool {
 	switch toolName {
-	case "pptx_write", "word_write", "excel_write":
+	case "pptx_write", "word_write", "excel_write", "local_file_write":
 		return true
 	default:
 		return false
@@ -94,16 +94,14 @@ func (t *generatedResourceArchiveBuiltinTool) Execute(ctx context.Context, argum
 }
 
 func generatedResourceTargetPath(toolName string, arguments map[string]interface{}) (string, bool) {
-	switch toolName {
-	case "pptx_write", "word_write", "excel_write":
-		path := resourceArchiveStringArg(arguments, "path")
-		if path == "" {
-			return "", false
-		}
-		return filepath.Clean(tool.ResolveOutputPath(path)), true
-	default:
+	if !isGeneratedResourceTool(toolName) {
 		return "", false
 	}
+	path := resourceArchiveStringArg(arguments, "path")
+	if path == "" {
+		return "", false
+	}
+	return filepath.Clean(tool.ResolveOutputPath(path)), true
 }
 
 func resourceArchiveStringArg(arguments map[string]interface{}, key string) string {
