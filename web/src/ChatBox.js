@@ -176,6 +176,10 @@ class ChatBox extends React.Component {
     this.handleEditMessage({...message, text: message.text, updatedTime: new Date().toISOString()}, true);
   };
 
+  sendSuggestionMessage = (text, fileName = "") => {
+    this.props.sendMessage(text, fileName, false, false, this.state.webSearchEnabled);
+  };
+
   copyMessageFromHTML(message) {
     const parts = [];
 
@@ -407,7 +411,7 @@ class ChatBox extends React.Component {
             isReading={this.state.isReading}
             isLoadingTTS={this.state.isLoadingTTS}
             readingMessage={this.state.readingMessage}
-            sendMessage={(text, fileName = "") => this.props.sendMessage(text, fileName, false, false, this.state.webSearchEnabled)}
+            sendMessage={this.sendSuggestionMessage}
             files={this.state.files}
             hideThinking={this.props.store?.hideThinking === true}
           />
@@ -438,7 +442,7 @@ class ChatBox extends React.Component {
 
         {messages.length === 0 ? (
           <ChatExampleQuestions
-            sendMessage={(text, fileName = "") => this.props.sendMessage(text, fileName, false, false, this.state.webSearchEnabled)}
+            sendMessage={this.sendSuggestionMessage}
             exampleQuestions={exampleQuestions}
           />
         ) : null}

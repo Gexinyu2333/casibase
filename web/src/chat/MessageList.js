@@ -18,6 +18,21 @@ import MessageItem from "./MessageItem";
 import * as Setting from "../Setting";
 
 class MessageList extends React.Component {
+  shouldComponentUpdate(nextProps) {
+    return (
+      nextProps.messages !== this.props.messages ||
+      nextProps.account !== this.props.account ||
+      nextProps.store !== this.props.store ||
+      nextProps.hideInput !== this.props.hideInput ||
+      nextProps.disableInput !== this.props.disableInput ||
+      nextProps.isReading !== this.props.isReading ||
+      nextProps.isLoadingTTS !== this.props.isLoadingTTS ||
+      nextProps.readingMessage !== this.props.readingMessage ||
+      nextProps.files !== this.props.files ||
+      nextProps.hideThinking !== this.props.hideThinking
+    );
+  }
+
   render() {
     const {
       messages,
