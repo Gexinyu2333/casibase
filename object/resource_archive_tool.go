@@ -132,8 +132,7 @@ func archiveGeneratedResourceFileToStorage(owner, user, path string) (*Resource,
 	ext := strings.ToLower(filepath.Ext(fileName))
 	fileType := getGeneratedResourceFileType(ext)
 	storageName := fmt.Sprintf(
-		"openagent/resources/generated/%s_%s_%s",
-		resourceArchiveSafePathSegment(util.GetCurrentTime()),
+		"openagent/resources/generated/%s_%s",
 		util.GetRandomName(),
 		resourceArchiveSafePathSegment(fileName),
 	)
