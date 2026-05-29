@@ -65,6 +65,17 @@ func StaticFilter(ctx *context.Context) {
 		return
 	}
 
+	if strings.HasPrefix(urlPath, "/swagger") {
+		if !util.FileExist(filepath.Join("swagger", "index.html")) {
+			target := urlPath
+			if target == "/swagger" || target == "/swagger/" {
+				target = "/swagger/index.html"
+			}
+			http.Redirect(ctx.ResponseWriter, ctx.Request, "https://try.openagentai.org"+target, http.StatusFound)
+			return
+		}
+	}
+
 	if strings.HasPrefix(urlPath, "/storage") {
 		ctx.Output.Header(headerAllowOrigin, "*")
 		ctx.Output.Header(headerAllowMethods, "POST, GET, OPTIONS, DELETE")
