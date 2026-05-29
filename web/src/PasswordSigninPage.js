@@ -26,6 +26,7 @@ class PasswordSigninPage extends React.Component {
       loading: true,
       showSignin: false,
       errorMessage: "",
+      autoSignin: false,
     };
   }
 
@@ -41,6 +42,7 @@ class PasswordSigninPage extends React.Component {
           loading: false,
           showSignin: res.status === "ok" && !res.data?.casdoorAvailable && res.data?.signinAvailable,
           errorMessage: res.status === "ok" ? "" : res.msg,
+          autoSignin: res.status === "ok" && res.data?.autoSignin === true,
         });
       })
       .catch((error) => {
@@ -91,7 +93,7 @@ class PasswordSigninPage extends React.Component {
           <div style={{textAlign: "center", marginBottom: "36px"}}>
             <img src={this.props.logo} alt="OpenAgent" style={{width: "260px", maxWidth: "100%"}} />
           </div>
-          <Form initialValues={{username: "admin"}} onFinish={(values) => this.onFinish(values)} requiredMark={false}>
+          <Form initialValues={{username: "admin", password: this.state.autoSignin ? "123" : undefined}} onFinish={(values) => this.onFinish(values)} requiredMark={false}>
             <Form.Item name="username" rules={[{required: true, message: i18next.t("account:Please input your username")}]}>
               <Input
                 prefix={<UserOutlined style={{fontSize: "16px", color: "#222222"}} />}
