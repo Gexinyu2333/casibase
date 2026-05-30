@@ -126,7 +126,7 @@ const StoreInfoTitle = (props) => {
           }
         });
     }
-  }, [chat, defaultStore, storeInfo]);
+  }, [chat?.owner, defaultStore?.name, defaultStore?.childModelProviders?.join(","), storeInfo?.modelProvider]);
 
   const filteredModelProviders = useMemo(() => {
     if (!modelProviders.length) {
