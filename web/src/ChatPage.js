@@ -64,6 +64,7 @@ class ChatPage extends BaseListPage {
       paneCount: 1,
       storeName: currentStore, // Store the current store name in state
       draftStoreName: currentStore,
+      draftModelProvider: null,
       generationMode: "text",
     });
 
@@ -348,6 +349,9 @@ class ChatPage extends BaseListPage {
       if (urlStoreName) {
         message.store = urlStoreName;
       }
+      if (this.state.draftModelProvider) {
+        message.modelProvider = this.state.draftModelProvider;
+      }
     }
 
     if (!message.modelProvider) {
@@ -409,15 +413,32 @@ class ChatPage extends BaseListPage {
       .then((res) => {
         if (res.status === "ok") {
           const chat = res.data;
+          const draftModelProvider = this.state.draftModelProvider;
+          if (draftModelProvider) {
+            chat.modelProvider = draftModelProvider;
+          }
+          const currentGenerationMode = this.state.generationMode;
+          Setting.saveChatGenerationMode(chat.owner, chat.name, currentGenerationMode);
           this.setState({
             chat: chat,
             draftStoreName: chat.store,
-            generationMode: Setting.loadChatGenerationMode(chat.owner, chat.name),
+            draftModelProvider: null,
+            generationMode: currentGenerationMode,
           });
           this.goToLinkSoft(this.generateChatUrl(chat.name, chat.store));
 
-          this.refreshChatsAndSelect(chat);
-          this.getMessages(chat);
+          const afterRefresh = () => {
+            this.refreshChatsAndSelect(chat);
+            this.getMessages(chat);
+          };
+
+          if (draftModelProvider) {
+            ChatBackend.updateChat(chat.owner, chat.name, chat)
+              .then(() => afterRefresh())
+              .catch(() => afterRefresh());
+          } else {
+            afterRefresh();
+          }
         } else {
           Setting.showMessage("error", `${i18next.t("general:Failed to add")}: ${res.msg}`);
         }
@@ -745,6 +766,7 @@ class ChatPage extends BaseListPage {
       chatMenuVisible: false,
       messageError: false,
       draftStoreName: draftStoreName,
+      draftModelProvider: null,
       generationMode: "text",
     }, () => {
       this.menu.current?.clearSelectedKey();
@@ -940,13 +962,9 @@ class ChatPage extends BaseListPage {
               {!(Setting.isMobile() || Setting.getUrlParam("isRaw") !== null) && (
                 <Button type="text" icon={this.state.chatMenuCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />} onClick={this.toggleChatMenuCollapse} style={{margin: "0 4px"}} />
               )}
-              {this.state.chat ? (
-                <div style={{flex: 1}}>
-                  <StoreInfoTitle chat={this.state.chat} stores={this.state.stores} onChatUpdated={this.handleChatUpdate} onStoreChange={this.updateStoreAndUrl} autoRead={this.state.autoRead} onUpdateAutoRead={(checked) => this.setState({autoRead: checked})} account={this.props.account} paneCount={this.state.paneCount} onPaneCountChange={(count) => this.setState({paneCount: count})} showPaneControls={true} generationMode={this.state.generationMode} onGenerationModeChange={this.handleGenerationModeChange} />
-                </div>
-              ) : (
-                <div style={{flex: 1, minHeight: 46}} />
-              )}
+              <div style={{flex: 1}}>
+                <StoreInfoTitle chat={this.state.chat} stores={this.state.stores} onChatUpdated={this.handleChatUpdate} onStoreChange={this.updateStoreAndUrl} autoRead={this.state.autoRead} onUpdateAutoRead={(checked) => this.setState({autoRead: checked})} account={this.props.account} paneCount={this.state.paneCount} onPaneCountChange={(count) => this.setState({paneCount: count})} showPaneControls={true} generationMode={this.state.generationMode} onGenerationModeChange={this.handleGenerationModeChange} draftStoreName={this.state.draftStoreName} onDraftStoreChange={(storeName) => this.setState({draftStoreName: storeName, draftModelProvider: null})} onDraftProviderChange={(providerName) => this.setState({draftModelProvider: providerName})} />
+              </div>
             </div>
           )}
 

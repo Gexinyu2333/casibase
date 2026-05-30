@@ -21,7 +21,7 @@ import * as ChatBackend from "./backend/ChatBackend";
 import i18next from "i18next";
 
 const StoreInfoTitle = (props) => {
-  const {chat, stores, onChatUpdated, onStoreChange, autoRead, onUpdateAutoRead, account, paneCount = 1, onPaneCountChange, showPaneControls = false, generationMode = "text", onGenerationModeChange} = props;
+  const {chat, stores, onChatUpdated, onStoreChange, autoRead, onUpdateAutoRead, account, paneCount = 1, onPaneCountChange, showPaneControls = false, generationMode = "text", onGenerationModeChange, draftStoreName, onDraftStoreChange, onDraftProviderChange} = props;
 
   const [modelProviders, setModelProviders] = useState([]);
   const [selectedStore, setSelectedStore] = useState(null);
@@ -91,7 +91,7 @@ const StoreInfoTitle = (props) => {
   // Find the current store info
   const storeInfo = chat
     ? stores?.find(store => store.name === chat.store)
-    : null;
+    : (draftStoreName ? stores?.find(store => store.name === draftStoreName) : null) || stores?.find(store => store.isDefault) || null;
 
   // Initialize the local state when props change
   useEffect(() => {
@@ -106,10 +106,11 @@ const StoreInfoTitle = (props) => {
 
   // Get model providers when component mounts
   useEffect(() => {
-    if (!chat || !defaultStore || !defaultStore.childModelProviders || defaultStore.childModelProviders.length === 0) {
+    if (!defaultStore || !defaultStore.childModelProviders || defaultStore.childModelProviders.length === 0) {
       setModelProviders([]);
     } else {
-      ProviderBackend.getProviders(chat.owner)
+      const owner = chat?.owner || account?.owner || "admin";
+      ProviderBackend.getProviders(owner)
         .then((res) => {
           if (res.status === "ok") {
             const providers = res.data.filter(provider =>
@@ -191,47 +192,66 @@ const StoreInfoTitle = (props) => {
   };
 
   const handleStoreChange = (value) => {
-    // Find the store object
     const newStore = stores?.find(store => store.name === value);
-    if (newStore && chat) {
-      // Update local state immediately for UI responsiveness
-      setSelectedStore(newStore);
+    if (!newStore) {return;}
 
-      // Also update the provider if the new store has one
-      if (!chat.modelProvider && newStore.modelProvider) {
-        setSelectedProvider(newStore.modelProvider);
+    setSelectedStore(newStore);
+
+    if (!chat) {
+      if (onDraftStoreChange) {
+        onDraftStoreChange(newStore.name);
       }
+      return;
+    }
 
-      // Trigger the combined update
-      updateStoreAndChat(newStore, newStore.modelProvider);
+    if (!chat.modelProvider && newStore.modelProvider) {
+      setSelectedProvider(newStore.modelProvider);
+    }
 
-      if (onStoreChange) {
-        const updatedChat = onStoreChange(newStore);
-        if (updatedChat) {
-          chatRef.current = updatedChat;
-        }
+    updateStoreAndChat(newStore, newStore.modelProvider);
+
+    if (onStoreChange) {
+      const updatedChat = onStoreChange(newStore);
+      if (updatedChat) {
+        chatRef.current = updatedChat;
       }
     }
   };
 
   const handleProviderChange = (value) => {
-    // Find the provider object
     const newProvider = filteredModelProviders.find(provider => provider.name === value);
-    if (newProvider && storeInfo) {
+    if (!newProvider || !storeInfo) {return;}
 
-      // Trigger the combined update
-      updateStoreAndChat(null, newProvider.name);
+    setSelectedProvider(newProvider.name);
+    providerRef.current = newProvider.name;
+
+    if (!chat) {
+      if (onDraftProviderChange) {
+        onDraftProviderChange(newProvider.name);
+      }
+      return;
     }
+
+    updateStoreAndChat(null, newProvider.name);
   };
 
   useEffect(() => {
-    if (isUpdating || !chat || filteredModelProviders.length === 0) {
+    if (isUpdating || filteredModelProviders.length === 0) {
       return;
     }
     const current = selectedProvider || chat?.modelProvider || storeInfo?.modelProvider;
     const valid = filteredModelProviders.some(p => p.name === current);
     if (!valid) {
-      updateStoreAndChat(null, filteredModelProviders[0].name);
+      if (!chat) {
+        const newProvider = filteredModelProviders[0].name;
+        setSelectedProvider(newProvider);
+        providerRef.current = newProvider;
+        if (onDraftProviderChange) {
+          onDraftProviderChange(newProvider);
+        }
+      } else {
+        updateStoreAndChat(null, filteredModelProviders[0].name);
+      }
     }
   }, [generationMode, filteredModelProviders, chat?.name, chat?.modelProvider, storeInfo?.modelProvider, isUpdating]);
 
@@ -273,7 +293,7 @@ const StoreInfoTitle = (props) => {
   // User can change stores if there are multiple options available
   const canChangeStores = storeOptions.length > 1;
 
-  const shouldShowTitleBar = paneCount === 1 && (storeInfo || modelProviders.length > 0 || (showPaneControls && canManagePanes));
+  const shouldShowTitleBar = storeInfo || modelProviders.length > 0 || (showPaneControls && canManagePanes);
 
   if (!shouldShowTitleBar) {
     return null;
