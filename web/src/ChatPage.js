@@ -372,12 +372,20 @@ class ChatPage extends BaseListPage {
       if (lastMessage.author === "AI" && this.state.messageLoading) {
         MessageBackend.closeMessageEventSource(lastMessage.owner, lastMessage.name, true);
 
+        const canceledChat = this.state.chat;
         MessageBackend.updateMessage(lastMessage.owner, lastMessage.name, lastMessage)
           .then((res) => {
             if (res.status === "ok") {
               this.setState({
                 messageLoading: false,
               });
+              if (canceledChat) {
+                this.updateChatStatus(canceledChat.name, {isGenerating: false});
+                const chatInList = this.state.data?.find(c => c.name === canceledChat.name);
+                if (chatInList) {
+                  this.markChatRead({...chatInList, isGenerating: false});
+                }
+              }
             } else {
               Setting.showMessage("error", `${i18next.t("general:Failed to save")}: ${res.msg}`);
             }
@@ -623,6 +631,10 @@ class ChatPage extends BaseListPage {
               });
             }, (error) => {
               this.updateChatStatus(chat.name, {isGenerating: false});
+              const errorChat = this.state.data?.find(c => c.name === chat.name);
+              if (errorChat) {
+                this.markChatRead({...errorChat, isGenerating: false});
+              }
 
               if (!chat || (this.state.chat?.name !== chat.name)) {
                 return;
