@@ -15,7 +15,7 @@
 import React, {useEffect, useMemo, useState} from "react";
 import {useHistory} from "react-router-dom";
 import {Bubble} from "@ant-design/x";
-import {Alert, Avatar, Button, Collapse, Space} from "antd";
+import {Alert, Avatar, Button, Space} from "antd";
 import {FileTextOutlined, GlobalOutlined, InfoCircleOutlined} from "@ant-design/icons";
 import moment from "moment";
 import * as Setting from "../Setting";
@@ -28,9 +28,8 @@ import {MessageCarrier} from "./MessageCarrier";
 import SearchSourcesDrawer from "./SearchSourcesDrawer";
 import KnowledgeSourcesDrawer from "./KnowledgeSourcesDrawer";
 import ToolCallSection from "./ToolCallSection";
+import ReasoningSection from "./ReasoningSection";
 import GeneratedResourceList, {extractGeneratedResources} from "./GeneratedResourceList";
-
-const {Panel} = Collapse;
 
 const MessageItem = ({
   message,
@@ -54,7 +53,6 @@ const MessageItem = ({
   const history = useHistory();
   const [avatarSrc, setAvatarSrc] = useState(null);
   const [isRegenerating, setIsRegenerating] = useState(false);
-  const [reasonExpanded, setReasonExpanded] = useState(["reason"]);
   const [searchDrawerVisible, setSearchDrawerVisible] = useState(false);
   const [knowledgeDrawerVisible, setKnowledgeDrawerVisible] = useState(false);
   const themeColor = Setting.getThemeColor();
@@ -240,33 +238,13 @@ const MessageItem = ({
     if ((message.reasonText || message.toolCalls) && message.author === "AI") {
       return (
         <div className="message-content">
-          {!hideThinking && message.reasonText && (
-            <div className="message-reason" style={{marginBottom: "15px"}}>
-              <Collapse
-                ghost
-                activeKey={reasonExpanded}
-                onChange={setReasonExpanded}
-                style={{
-                  borderLeft: `3px solid ${themeColor}`,
-                  borderRadius: "5px",
-                  padding: "10px",
-                }}
-              >
-                <Panel
-                  header={
-                    <span style={{fontWeight: "bold", color: themeColor}}>
-                      {i18next.t("chat:Reasoning process")}
-                    </span>
-                  }
-                  key="reason"
-                  className="chat-message-collapse-panel"
-                >
-                  <div className="reason-content">
-                    {renderText(message.reasonText)}
-                  </div>
-                </Panel>
-              </Collapse>
-            </div>
+          {!hideThinking && (
+            <ReasoningSection
+              reasonText={message.reasonText}
+              isReasoningPhase={message.isReasoningPhase}
+              isDark={isDark}
+              themeColor={themeColor}
+            />
           )}
           <ToolCallSection
             toolCalls={message.toolCalls}
@@ -298,32 +276,12 @@ const MessageItem = ({
             placement="start"
             content={
               hideThinking ? renderThinkingAnimation() : (
-                <div className="message-reason">
-                  <Collapse
-                    ghost
-                    activeKey={reasonExpanded}
-                    onChange={setReasonExpanded}
-                    style={{
-                      borderLeft: `3px solid ${themeColor}`,
-                      borderRadius: "5px",
-                      padding: "10px",
-                    }}
-                  >
-                    <Panel
-                      header={
-                        <span style={{fontWeight: "bold", color: themeColor}}>
-                          {i18next.t("chat:Reasoning process")}
-                        </span>
-                      }
-                      key="reason"
-                      className="chat-message-collapse-panel"
-                    >
-                      <div className="reason-content">
-                        {renderText(message.reasonText)}
-                      </div>
-                    </Panel>
-                  </Collapse>
-                </div>
+                <ReasoningSection
+                  reasonText={message.reasonText}
+                  isReasoningPhase={message.isReasoningPhase}
+                  isDark={isDark}
+                  themeColor={themeColor}
+                />
               )
             }
             typing={!hideThinking ? {
