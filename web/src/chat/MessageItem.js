@@ -28,6 +28,7 @@ import {MessageCarrier} from "./MessageCarrier";
 import SearchSourcesDrawer from "./SearchSourcesDrawer";
 import KnowledgeSourcesDrawer from "./KnowledgeSourcesDrawer";
 import ToolCallSection from "./ToolCallSection";
+import GeneratedResourceList, {extractGeneratedResources} from "./GeneratedResourceList";
 
 const {Panel} = Collapse;
 
@@ -96,6 +97,8 @@ const MessageItem = ({
     }
     return merged;
   }, [message.searchResults, message.toolCalls]);
+
+  const generatedResources = useMemo(() => extractGeneratedResources(message.toolCalls), [message.toolCalls]);
 
   const isDark = Setting.getIsDark();
 
@@ -272,6 +275,7 @@ const MessageItem = ({
           />
 
           <div className="message-answer">
+            <GeneratedResourceList resources={generatedResources} />
             {message.html || renderText(message.text)}
           </div>
         </div>

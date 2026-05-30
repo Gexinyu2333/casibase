@@ -20,7 +20,7 @@ import (
 	"github.com/the-open-agent/openagent/util"
 )
 
-func buildMergedBuiltinRegistry(store *Store, user, lang string) *tool.ToolRegistry {
+func buildMergedBuiltinRegistry(store *Store, user, origin, lang string) *tool.ToolRegistry {
 	reg := tool.NewToolRegistry()
 
 	if store == nil {
@@ -56,7 +56,7 @@ func buildMergedBuiltinRegistry(store *Store, user, lang string) *tool.ToolRegis
 		}
 		for _, bt := range tp.BuiltinTools() {
 			wrapped := wrapSnapshotBuiltin(store.Owner, bt)
-			wrapped = wrapGeneratedResourceBuiltin(wrapped, store.Owner, user)
+			wrapped = wrapGeneratedResourceBuiltin(wrapped, store.Owner, user, origin)
 			reg.RegisterTool(wrapped)
 		}
 	}
@@ -66,7 +66,7 @@ func buildMergedBuiltinRegistry(store *Store, user, lang string) *tool.ToolRegis
 
 // MergeMcpTools merges builtin tools (from the store's tool list) and the
 // web-search flag into an existing McpToolSet, creating one if needed.
-func MergeMcpTools(mcpToolSet *mcp.ToolSet, store *Store, webSearchEnabled bool, user, lang string) *mcp.ToolSet {
+func MergeMcpTools(mcpToolSet *mcp.ToolSet, store *Store, webSearchEnabled bool, user, origin, lang string) *mcp.ToolSet {
 	if webSearchEnabled {
 		if mcpToolSet == nil {
 			mcpToolSet = &mcp.ToolSet{}
@@ -74,7 +74,7 @@ func MergeMcpTools(mcpToolSet *mcp.ToolSet, store *Store, webSearchEnabled bool,
 		mcpToolSet.WebSearchEnabled = true
 	}
 
-	reg := buildMergedBuiltinRegistry(store, user, lang)
+	reg := buildMergedBuiltinRegistry(store, user, origin, lang)
 	allTools := reg.GetToolsAsProtocolTools()
 	if len(allTools) == 0 {
 		return mcpToolSet

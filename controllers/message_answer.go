@@ -309,7 +309,8 @@ func generateMessageAnswer(id string, responseWriter http.ResponseWriter, host s
 	if questionMessage != nil {
 		webSearchEnabled = questionMessage.WebSearchEnabled
 	}
-	mcpToolSet = object.MergeMcpTools(mcpToolSet, store, webSearchEnabled, message.User, lang)
+	origin := getOriginFromHost(host)
+	mcpToolSet = object.MergeMcpTools(mcpToolSet, store, webSearchEnabled, message.User, origin, lang)
 
 	var knowledge []*model.RawMessage
 	var vectorScores []object.VectorScore
@@ -632,7 +633,8 @@ func (c *ApiController) GetAnswer() {
 	var answer string
 	var modelResult *model.ModelResult
 	if tool != "" {
-		answer, modelResult, err = object.GetAnswerWithTool(provider, tool, question, c.GetAcceptLanguage())
+		origin := getOriginFromHost(c.Ctx.Request.Host)
+		answer, modelResult, err = object.GetAnswerWithTool(provider, tool, question, userName, origin, c.GetAcceptLanguage())
 	} else {
 		answer, modelResult, err = object.GetAnswer(provider, question, c.GetAcceptLanguage())
 	}

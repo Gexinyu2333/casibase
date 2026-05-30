@@ -28,23 +28,24 @@ import (
 )
 
 type generatedResourceArchiveBuiltinTool struct {
-	inner tool.BuiltinTool
-	owner string
-	user  string
+	inner  tool.BuiltinTool
+	owner  string
+	user   string
+	origin string
 }
 
-var archiveGeneratedResourceFile = func(owner, user, path string) (*Resource, error) {
-	return archiveGeneratedResourceFileToStorage(owner, user, path)
+var archiveGeneratedResourceFile = func(owner, user, path, origin string) (*Resource, error) {
+	return archiveGeneratedResourceFileToStorage(owner, user, path, origin)
 }
 
-func wrapGeneratedResourceBuiltin(builtin tool.BuiltinTool, owner, user string) tool.BuiltinTool {
+func wrapGeneratedResourceBuiltin(builtin tool.BuiltinTool, owner, user, origin string) tool.BuiltinTool {
 	if builtin == nil {
 		return nil
 	}
 	if !isGeneratedResourceTool(builtin.GetName()) {
 		return builtin
 	}
-	return &generatedResourceArchiveBuiltinTool{inner: builtin, owner: owner, user: user}
+	return &generatedResourceArchiveBuiltinTool{inner: builtin, owner: owner, user: user, origin: origin}
 }
 
 func isGeneratedResourceTool(toolName string) bool {
@@ -79,7 +80,7 @@ func (t *generatedResourceArchiveBuiltinTool) Execute(ctx context.Context, argum
 		return result, innerErr
 	}
 
-	resource, err := archiveGeneratedResourceFile(t.owner, t.user, path)
+	resource, err := archiveGeneratedResourceFile(t.owner, t.user, path, t.origin)
 	if err != nil {
 		appendGeneratedResourceArchiveText(result, fmt.Sprintf("Resource archive warning: file was created but could not be saved to Resources: %s", err.Error()))
 		return result, innerErr
@@ -90,6 +91,12 @@ func (t *generatedResourceArchiveBuiltinTool) Execute(ctx context.Context, argum
 	}
 
 	appendGeneratedResourceArchiveText(result, fmt.Sprintf("Saved to Resources: %s", resource.Url))
+	result.Content = append(result.Content, &protocol.ResourceLink{
+		Type:     "resource_link",
+		URI:      resource.Url,
+		Name:     resource.FileName,
+		MIMEType: mime.TypeByExtension(resource.FileFormat),
+	})
 	return result, innerErr
 }
 
@@ -109,7 +116,7 @@ func resourceArchiveStringArg(arguments map[string]interface{}, key string) stri
 	return strings.TrimSpace(value)
 }
 
-func archiveGeneratedResourceFileToStorage(owner, user, path string) (*Resource, error) {
+func archiveGeneratedResourceFileToStorage(owner, user, path, origin string) (*Resource, error) {
 	info, err := os.Stat(path)
 	if err != nil {
 		return nil, err
@@ -135,7 +142,7 @@ func archiveGeneratedResourceFileToStorage(owner, user, path string) (*Resource,
 		resourceArchiveSafePathSegment(fileName),
 	)
 
-	fileUrl, err := UploadFileToStorageSafe(storageName, fileBytes, "", "")
+	fileUrl, err := UploadFileToStorageSafe(storageName, fileBytes, origin, "")
 	if err != nil {
 		return nil, err
 	}

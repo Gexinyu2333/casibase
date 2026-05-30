@@ -23,7 +23,7 @@ import (
 	"github.com/the-open-agent/openagent/util"
 )
 
-func buildToolSetForBuiltinTool(toolName string, lang string) (*mcp.ToolSet, error) {
+func buildToolSetForBuiltinTool(toolName, user, origin, lang string) (*mcp.ToolSet, error) {
 	if toolName == "" {
 		return nil, nil
 	}
@@ -45,7 +45,7 @@ func buildToolSetForBuiltinTool(toolName string, lang string) (*mcp.ToolSet, err
 	reg := tool.NewToolRegistry()
 	for _, t := range tp.BuiltinTools() {
 		wrapped := wrapSnapshotBuiltin("admin", t)
-		wrapped = wrapGeneratedResourceBuiltin(wrapped, "admin", "")
+		wrapped = wrapGeneratedResourceBuiltin(wrapped, "admin", user, origin)
 		reg.RegisterTool(wrapped)
 	}
 
@@ -60,13 +60,13 @@ func buildToolSetForBuiltinTool(toolName string, lang string) (*mcp.ToolSet, err
 	}, nil
 }
 
-func GetAnswerWithTool(modelProviderName, toolName, question, lang string) (string, *model.ModelResult, error) {
+func GetAnswerWithTool(modelProviderName, toolName, question, user, origin, lang string) (string, *model.ModelResult, error) {
 	_, modelProviderObj, err := GetModelProviderFromContext("admin", modelProviderName, lang)
 	if err != nil {
 		return "", nil, err
 	}
 
-	mcpToolSet, err := buildToolSetForBuiltinTool(toolName, lang)
+	mcpToolSet, err := buildToolSetForBuiltinTool(toolName, user, origin, lang)
 	if err != nil {
 		return "", nil, err
 	}
