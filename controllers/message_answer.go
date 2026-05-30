@@ -348,7 +348,7 @@ func generateMessageAnswer(id string, responseWriter http.ResponseWriter, host s
 		return
 	}
 
-	printAgentSessionStart(store, mcpToolSet, history)
+	printAgentSessionStart(store, modelProviderName, mcpToolSet, history)
 
 	fmt.Printf("Question: [%s]\n", question)
 	fmt.Printf("Knowledge: [\n")
@@ -709,9 +709,9 @@ func (c *ApiController) GetAnswer() {
 	c.ResponseOk(answer)
 }
 
-func printAgentSessionStart(store *object.Store, mcpToolSet *mcp.ToolSet, history []*model.RawMessage) {
+func printAgentSessionStart(store *object.Store, modelProviderName string, mcpToolSet *mcp.ToolSet, history []*model.RawMessage) {
 	fmt.Printf("\n=== Agent Session Start ===\n")
-	fmt.Printf("Store: [%s] | Model Provider: [%s] | MCP Server: [%s]\n", store.Name, store.ModelProvider, store.McpServer)
+	fmt.Printf("Store: [%s] | Model Provider: [%s] | MCP Server: [%s]\n", store.Name, modelProviderName, store.McpServer)
 	fmt.Printf("Skills: %v\n", store.Skills)
 	fmt.Printf("Tools: %v\n", store.Tools)
 	if mcpToolSet != nil {
