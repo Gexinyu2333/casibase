@@ -20,6 +20,7 @@ import (
 	"io"
 	"net/http"
 	"regexp"
+	"strings"
 
 	"github.com/beego/beego/logs"
 	"github.com/the-open-agent/openagent/i18n"
@@ -29,20 +30,22 @@ import (
 )
 
 type VolcengineModelProvider struct {
-	subType     string
-	endpointID  string
-	apiKey      string
-	temperature float32
-	topP        float32
+	subType        string
+	endpointID     string
+	apiKey         string
+	temperature    float32
+	topP           float32
+	enableThinking bool
 }
 
-func NewVolcengineModelProvider(subType string, endpointID string, apiKey string, temperature float32, topP float32) (*VolcengineModelProvider, error) {
+func NewVolcengineModelProvider(subType string, endpointID string, apiKey string, temperature float32, topP float32, enableThinking bool) (*VolcengineModelProvider, error) {
 	return &VolcengineModelProvider{
-		subType:     subType,
-		endpointID:  endpointID,
-		apiKey:      apiKey,
-		temperature: temperature,
-		topP:        topP,
+		subType:        subType,
+		endpointID:     endpointID,
+		apiKey:         apiKey,
+		temperature:    temperature,
+		topP:           topP,
+		enableThinking: enableThinking,
 	}, nil
 }
 
@@ -197,34 +200,69 @@ func (p *VolcengineModelProvider) calculatePrice(modelResult *ModelResult, lang 
 	return nil
 }
 
+func (p *VolcengineModelProvider) buildMessages(question string, history []*RawMessage, prompt string, knowledgeMessages []*RawMessage) []*model.ChatCompletionMessage {
+	var messages []*model.ChatCompletionMessage
+
+	if prompt != "" {
+		messages = append(messages, &model.ChatCompletionMessage{
+			Role:    model.ChatMessageRoleSystem,
+			Content: &model.ChatCompletionMessageContent{StringValue: volcengine.String(prompt)},
+		})
+	}
+
+	for _, knowledge := range knowledgeMessages {
+		messages = append(messages, &model.ChatCompletionMessage{
+			Role:    model.ChatMessageRoleSystem,
+			Content: &model.ChatCompletionMessageContent{StringValue: volcengine.String(knowledge.Text)},
+		})
+	}
+
+	for _, msg := range history {
+		role := model.ChatMessageRoleUser
+		if msg.Author == "AI" {
+			role = model.ChatMessageRoleAssistant
+		}
+		messages = append(messages, &model.ChatCompletionMessage{
+			Role:    role,
+			Content: &model.ChatCompletionMessageContent{StringValue: volcengine.String(msg.Text)},
+		})
+	}
+
+	messages = append(messages, &model.ChatCompletionMessage{
+		Role:    model.ChatMessageRoleUser,
+		Content: &model.ChatCompletionMessageContent{StringValue: volcengine.String(question)},
+	})
+
+	return messages
+}
+
 func (p *VolcengineModelProvider) QueryText(question string, writer io.Writer, history []*RawMessage, prompt string, knowledgeMessages []*RawMessage, toolSession *ToolSession, lang string) (*ModelResult, error) {
 	ctx := context.Background()
 	flusher, ok := writer.(http.Flusher)
 	if !ok {
 		return nil, fmt.Errorf(i18n.Translate(lang, "model:writer does not implement http.Flusher"))
 	}
+
 	client := arkruntime.NewClientWithApiKey(p.apiKey)
 
-	// set request params
-	messages := []*model.ChatCompletionMessage{
-		{
-			Role: model.ChatMessageRoleUser,
-			Content: &model.ChatCompletionMessageContent{
-				StringValue: volcengine.String(question),
-			},
-		},
-	}
-	request := model.ChatCompletionRequest{
+	messages := p.buildMessages(question, history, prompt, knowledgeMessages)
+
+	request := model.CreateChatCompletionRequest{
 		Model:         p.subType,
 		Messages:      messages,
-		Temperature:   p.temperature,
-		TopP:          p.topP,
-		Stream:        true,
+		Temperature:   &p.temperature,
+		TopP:          &p.topP,
 		StreamOptions: &model.StreamOptions{IncludeUsage: true},
 	}
 
-	flushData := func(data string) error {
-		if _, err := fmt.Fprintf(writer, "event: message\ndata: %s\n\n", data); err != nil {
+	thinkingType := model.ThinkingTypeDisabled
+	if p.enableThinking {
+		thinkingType = model.ThinkingTypeEnabled
+	}
+	request.Thinking = &model.Thinking{Type: thinkingType}
+
+	flushData := func(data, eventType string) error {
+		if _, err := fmt.Fprintf(writer, "event: %s\ndata: %s\n\n", eventType, data); err != nil {
 			return err
 		}
 		flusher.Flush()
@@ -237,10 +275,13 @@ func (p *VolcengineModelProvider) QueryText(question string, writer io.Writer, h
 		return nil, err
 	}
 	defer stream.Close()
+
 	modelResult := newModelResult(0, 0, 0)
+	var reasoningData strings.Builder
+	isLeadingReturn := true
 
 	for {
-		response, err := stream.Recv()
+		response, recvErr := stream.Recv()
 
 		if response.Usage != nil {
 			modelResult.PromptTokenCount += response.Usage.PromptTokens
@@ -248,22 +289,43 @@ func (p *VolcengineModelProvider) QueryText(question string, writer io.Writer, h
 			modelResult.TotalTokenCount += response.Usage.TotalTokens
 		}
 
-		if err != nil {
-			if err == io.EOF {
+		if recvErr != nil {
+			if recvErr == io.EOF {
 				break
 			}
-			return nil, err
+			return nil, recvErr
 		}
 
 		if len(response.Choices) == 0 {
 			continue
 		}
 
-		data := response.Choices[0].Delta.Content
-		err = flushData(data)
-		if err != nil {
-			return nil, err
+		delta := response.Choices[0].Delta
+
+		// Stream reasoning/thinking content
+		if delta.ReasoningContent != nil && *delta.ReasoningContent != "" {
+			reasoningData.WriteString(*delta.ReasoningContent)
+			if err = flushData(*delta.ReasoningContent, "reason"); err != nil {
+				return nil, err
+			}
 		}
+
+		// Stream regular content, skipping leading newlines
+		if delta.Content != "" {
+			if isLeadingReturn {
+				if strings.Count(delta.Content, "\n") == len(delta.Content) {
+					continue
+				}
+				isLeadingReturn = false
+			}
+			if err = flushData(delta.Content, "message"); err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	if toolSession != nil && toolSession.ToolMessages != nil {
+		toolSession.ToolMessages.ReasoningContent = reasoningData.String()
 	}
 
 	err = p.calculatePrice(modelResult, lang)

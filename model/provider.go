@@ -156,7 +156,7 @@ func GetModelProvider(typ string, subType string, clientId string, clientSecret 
 	} else if typ == "Baichuan" {
 		p, err = NewBaichuanModelProvider(subType, clientSecret, temperature, topP)
 	} else if typ == "Volcano Engine" {
-		p, err = NewVolcengineModelProvider(subType, providerUrl, clientSecret, temperature, topP)
+		p, err = NewVolcengineModelProvider(subType, providerUrl, clientSecret, temperature, topP, enableThinking)
 	} else if typ == "DeepSeek" {
 		p, err = NewDeepSeekProvider(subType, clientSecret, temperature, topP)
 	} else if typ == "StepFun" {

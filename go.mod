@@ -55,7 +55,7 @@ require (
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tbaas v1.0.1115
 	github.com/ua-parser/uap-go v0.0.0-20230823213814-f77b3e91e9dc
 	github.com/uandersonricardo/uiautomation v0.0.0-20250610195738-b54cd4b8ddde
-	github.com/volcengine/volcengine-go-sdk v1.0.141
+	github.com/volcengine/volcengine-go-sdk v1.2.32
 	github.com/wangbin/jiebago v0.3.2
 	github.com/workweixin/weworkapi_golang v0.0.0-20200831071321-c1fdfd3d6e7d
 	github.com/xuri/excelize/v2 v2.10.1
