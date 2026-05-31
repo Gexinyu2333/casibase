@@ -12,10 +12,13 @@ RUN npm ci && npm run build
 
 
 FROM --platform=$BUILDPLATFORM golang:1.25 AS back
+ARG VERSION
+ARG COMMIT
+ARG BUILD_DATE
 WORKDIR /go/src/openagent
 COPY . .
 RUN chmod +x ./build.sh
-RUN ./build.sh
+RUN VERSION="${VERSION}" COMMIT="${COMMIT}" BUILD_DATE="${BUILD_DATE}" ./build.sh
 
 
 FROM alpine:latest AS standard

@@ -52,9 +52,17 @@ func (c *ApiController) GetVersionInfo() {
 		return
 	}
 
+	if versionInfo, ok := util.GetVersionInfoFromBuild(); ok {
+		c.ResponseOk(versionInfo)
+		return
+	}
+
 	versionInfo, err = util.GetVersionInfoFromFile()
 	if err != nil {
-		errInfo = errInfo + ", File error: " + err.Error()
+		if errInfo != "" {
+			errInfo += ", "
+		}
+		errInfo += "File error: " + err.Error()
 		c.ResponseError(errInfo)
 		return
 	}

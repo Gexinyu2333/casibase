@@ -32,6 +32,7 @@ import (
 	"github.com/shirou/gopsutil/disk"
 	"github.com/shirou/gopsutil/mem"
 	"github.com/shirou/gopsutil/process"
+	"github.com/the-open-agent/openagent/internal/cli"
 )
 
 type SystemInfo struct {
@@ -244,11 +245,53 @@ func GetVersionInfo() (*VersionInfo, error) {
 	}
 
 	res = &VersionInfo{
-		Version:      version,
+		Version:      normalizeVersionInfoVersion(version, ref.Hash().String()),
 		CommitId:     ref.Hash().String(),
 		CommitOffset: commitOffset,
 	}
 	return res, nil
+}
+
+func normalizeVersionInfoVersion(version string, commitId string) string {
+	if version != "" {
+		return version
+	}
+	return shortCommitId(commitId)
+}
+
+func shortCommitId(commitId string) string {
+	if len(commitId) <= 8 {
+		return commitId
+	}
+	return commitId[:8]
+}
+
+func GetVersionInfoFromBuild() (*VersionInfo, bool) {
+	hasVersion := cli.Version != "" && cli.Version != "dev"
+	hasCommit := cli.Commit != "" && cli.Commit != "unknown"
+	if !hasVersion && !hasCommit {
+		return &VersionInfo{
+			Version:      "",
+			CommitId:     "",
+			CommitOffset: -1,
+		}, false
+	}
+
+	version := cli.Version
+	if !hasVersion {
+		version = ""
+	}
+	commitId := cli.Commit
+	if !hasCommit {
+		commitId = ""
+	}
+	version = normalizeVersionInfoVersion(version, commitId)
+
+	return &VersionInfo{
+		Version:      version,
+		CommitId:     commitId,
+		CommitOffset: -1,
+	}, true
 }
 
 func GetVersionInfoFromFile() (*VersionInfo, error) {
