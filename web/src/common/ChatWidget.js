@@ -22,6 +22,7 @@ import i18next from "i18next";
 import ChatBox from "../ChatBox";
 import {MessageCarrier} from "../chat/MessageCarrier";
 import {getFirstUserMessageText} from "../carrier/titleUtils";
+import {applyToolDelta, applyToolEvent, createToolDeltaFlusher} from "../chat/toolCallStream";
 
 /**
  * ChatWidget - A complete chat component with header, model selector, and chat interface
@@ -428,6 +429,25 @@ class ChatWidget extends React.Component {
     const toolCalls = [];
     let searchResults = null;
     let vectorScores = null;
+    const flushToolDelta = () => {
+      if (!chat || (this.state.currentChat?.name !== chat.name)) {
+        return;
+      }
+
+      const updatedMessages = [...this.state.messages];
+      if (updatedMessages.length === 0) {
+        return;
+      }
+      const currentMessage = updatedMessages[updatedMessages.length - 1] || lastMessage;
+      const lastMessage2 = Setting.deepCopy(currentMessage);
+      lastMessage2.toolCalls = [...toolCalls];
+      updatedMessages[updatedMessages.length - 1] = lastMessage2;
+
+      this.setState({
+        messages: updatedMessages,
+      });
+    };
+    const {scheduleFlush: scheduleToolDeltaFlush, flushNow: flushToolDeltaNow} = createToolDeltaFlusher(flushToolDelta);
     this.setState({
       messageLoading: true,
     });
@@ -505,6 +525,9 @@ class ChatWidget extends React.Component {
         lastMessage2.reasonText = reasonText;
         lastMessage2.isReasoningPhase = true;
         lastMessage2.text = "";
+        if (toolCalls.length > 0) {
+          lastMessage2.toolCalls = [...toolCalls];
+        }
 
         const updatedMessages = [...messages];
         updatedMessages[updatedMessages.length - 1] = lastMessage2;
@@ -520,45 +543,8 @@ class ChatWidget extends React.Component {
         }
         const jsonData = JSON.parse(data);
 
-        if (!jsonData.content) {
-          // tool-start: add new entry with empty content (tool is executing)
-          toolCalls.push({
-            name: jsonData.name,
-            arguments: jsonData.arguments,
-            content: "",
-          });
-        } else {
-          // tool-complete: find the last pending entry with same name and update it
-          let found = false;
-          for (let i = toolCalls.length - 1; i >= 0; i--) {
-            if (toolCalls[i].name === jsonData.name && !toolCalls[i].content) {
-              toolCalls[i] = {
-                name: jsonData.name,
-                arguments: jsonData.arguments,
-                content: jsonData.content,
-              };
-              found = true;
-              break;
-            }
-          }
-          if (!found) {
-            toolCalls.push({
-              name: jsonData.name,
-              arguments: jsonData.arguments,
-              content: jsonData.content,
-            });
-          }
-        }
-
-        const lastMessage2 = Setting.deepCopy(lastMessage);
-        lastMessage2.toolCalls = [...toolCalls];
-
-        const updatedMessages = [...messages];
-        updatedMessages[updatedMessages.length - 1] = lastMessage2;
-
-        this.setState({
-          messages: updatedMessages,
-        });
+        applyToolEvent(toolCalls, jsonData);
+        flushToolDeltaNow();
       },
       // onSearch
       (data) => {
@@ -624,6 +610,7 @@ class ChatWidget extends React.Component {
         if (!chat || (this.state.currentChat?.name !== chat.name)) {
           return;
         }
+        flushToolDeltaNow();
 
         const lastMessage2 = Setting.deepCopy(lastMessage);
         lastMessage2.text = text;
@@ -684,6 +671,14 @@ class ChatWidget extends React.Component {
           return;
         }
         this.updateChatDisplayName(update.displayName, {...chat, needTitle: update.needTitle ?? false});
+      },
+      (data) => {
+        if (!chat || (this.state.currentChat?.name !== chat.name)) {
+          return;
+        }
+        const jsonData = JSON.parse(data);
+        applyToolDelta(toolCalls, jsonData);
+        scheduleToolDeltaFlush();
       }
     );
   }

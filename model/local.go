@@ -345,6 +345,13 @@ func (p *LocalModelProvider) QueryText(question string, writer io.Writer, histor
 			}
 			if completion.Choices[0].Delta.ToolCalls != nil {
 				for _, toolCall := range completion.Choices[0].Delta.ToolCalls {
+					index := 0
+					if toolCall.Index != nil {
+						index = *toolCall.Index
+					}
+					if err = flushToolCallDelta(index, toolCall.ID, toolCall.Function.Name, toolCall.Function.Arguments, writer, lang); err != nil {
+						return nil, err
+					}
 					toolCalls, toolCallsMap = handleToolCallsParameters(toolCall, toolCalls, toolCallsMap)
 				}
 			}

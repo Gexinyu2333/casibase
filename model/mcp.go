@@ -55,6 +55,30 @@ type ToolCall struct {
 	Content   string `json:"content"`
 }
 
+type ToolCallDelta struct {
+	Index          int    `json:"index"`
+	ID             string `json:"id,omitempty"`
+	Name           string `json:"name,omitempty"`
+	ArgumentsDelta string `json:"argumentsDelta,omitempty"`
+}
+
+func flushToolCallDelta(index int, id string, name string, argumentsDelta string, writer io.Writer, lang string) error {
+	if name == "" && argumentsDelta == "" {
+		return nil
+	}
+
+	payload, err := json.Marshal(ToolCallDelta{
+		Index:          index,
+		ID:             id,
+		Name:           name,
+		ArgumentsDelta: argumentsDelta,
+	})
+	if err != nil {
+		return err
+	}
+	return flushDataThink(string(payload), "tool-delta", writer, lang)
+}
+
 func reverseToolsToOpenAi(tools []*protocol.Tool) ([]openai.Tool, error) {
 	var openaiTools []openai.Tool
 	for _, tool := range tools {

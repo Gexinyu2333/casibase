@@ -236,9 +236,12 @@ const MessageItem = ({
     }
 
     if ((message.reasonText || message.toolCalls) && message.author === "AI") {
+      const hasToolCalls = message.toolCalls && message.toolCalls.length > 0;
+      const shouldRenderInlineReason = (!message.isReasoningPhase || hasToolCalls) && !hideThinking && message.reasonText;
+
       return (
         <div className="message-content">
-          {!hideThinking && (
+          {shouldRenderInlineReason && (
             <ReasoningSection
               reasonText={message.reasonText}
               isReasoningPhase={message.isReasoningPhase}
@@ -269,7 +272,7 @@ const MessageItem = ({
   };
 
   const renderReasoningBubble = () => {
-    if (message.isReasoningPhase && message.author === "AI" && message.reasonText) {
+    if (message.isReasoningPhase && message.author === "AI" && message.reasonText && (!message.toolCalls || message.toolCalls.length === 0)) {
       return (
         <div style={{marginBottom: "8px"}}>
           <Bubble
@@ -305,7 +308,7 @@ const MessageItem = ({
   };
 
   const renderMessageBubble = () => {
-    if (message.isReasoningPhase && message.author === "AI") {
+    if (message.isReasoningPhase && message.author === "AI" && (!message.toolCalls || message.toolCalls.length === 0) && !message.text) {
       return null;
     }
 

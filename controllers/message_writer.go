@@ -55,6 +55,11 @@ func (w *RefinedWriter) Write(p []byte) (n int, err error) {
 		prefix := []byte("event: reason\ndata: ")
 		suffix := []byte("\n\n")
 		data = string(bytes.TrimSuffix(bytes.TrimPrefix(p, prefix), suffix))
+	} else if bytes.HasPrefix(p, []byte("event: tool-delta")) {
+		eventType = "tool-delta"
+		prefix := []byte("event: tool-delta\ndata: ")
+		suffix := []byte("\n\n")
+		data = string(bytes.TrimSuffix(bytes.TrimPrefix(p, prefix), suffix))
 	} else if bytes.HasPrefix(p, []byte("event: tool-start")) {
 		eventType = "tool-start"
 		prefix := []byte("event: tool-start\ndata: ")
@@ -77,9 +82,9 @@ func (w *RefinedWriter) Write(p []byte) (n int, err error) {
 		data = string(bytes.TrimSuffix(bytes.TrimPrefix(p, prefix), suffix))
 	}
 
-	// tool-start: flush immediately to frontend but do NOT buffer (no result yet)
-	if eventType == "tool-start" {
-		n, err := w.ResponseWriter.Write([]byte(fmt.Sprintf("event: tool-start\ndata: %s\n\n", data)))
+	// Tool progress events are UI-only and should not be saved in the final message.
+	if eventType == "tool-delta" || eventType == "tool-start" {
+		n, err := w.ResponseWriter.Write([]byte(fmt.Sprintf("event: %s\ndata: %s\n\n", eventType, data)))
 		if flusher, ok := w.ResponseWriter.(http.Flusher); ok {
 			flusher.Flush()
 		}

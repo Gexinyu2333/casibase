@@ -446,6 +446,19 @@ func (p *OpenAiModelProvider) QueryText(question string, writer io.Writer, histo
 				if err != nil {
 					return nil, err
 				}
+			case responses.ResponseOutputItemAddedEvent:
+				switch v := variant.Item.AsAny().(type) {
+				case responses.ResponseFunctionToolCall:
+					err = flushToolCallDelta(int(variant.OutputIndex), v.ID, v.Name, "", writer, lang)
+					if err != nil {
+						return nil, err
+					}
+				}
+			case responses.ResponseFunctionCallArgumentsDeltaEvent:
+				err = flushToolCallDelta(int(variant.OutputIndex), variant.ItemID, "", variant.Delta, writer, lang)
+				if err != nil {
+					return nil, err
+				}
 			case responses.ResponseOutputItemDoneEvent:
 				switch v := variant.Item.AsAny().(type) {
 				case responses.ResponseOutputItemImageGenerationCall:
