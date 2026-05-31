@@ -32,6 +32,13 @@ import (
 type pptxWriteBuiltin struct{}
 
 type pptxWriteArgs struct {
+	Path      string          `json:"path"`
+	Script    string          `json:"script"`
+	AssetsDir string          `json:"assets_dir,omitempty"`
+	Data      json.RawMessage `json:"data,omitempty"`
+}
+
+type pptxWriteWorkerSpec struct {
 	Path       string          `json:"path"`
 	ScriptPath string          `json:"script_path"`
 	AssetsDir  string          `json:"assets_dir,omitempty"`
@@ -54,11 +61,11 @@ type pptxWorkerCandidate struct {
 func (t *pptxWriteBuiltin) GetName() string { return "pptx_write" }
 
 func (t *pptxWriteBuiltin) GetDescription() string {
-	return `Create a designed PowerPoint (.pptx) file by running a local PptxGenJS build script.
+	return `Create a designed PowerPoint (.pptx) file by running a PptxGenJS build script.
 - path (required): output path for the .pptx file. Absolute paths are used as-is. Relative paths or bare filenames are resolved inside the current user's Documents folder.
-- script_path (required): local .mjs file that exports default async function build(pptx, ctx) or a named build function. The script adds slides to the provided PptxGenJS instance.
+- script (required): JavaScript module content that exports default async function build(pptx, ctx) or a named build function. The script adds slides to the provided PptxGenJS instance.
 - data (optional): JSON value passed to ctx.data inside the script for content or configuration.
-- assets_dir (optional): base directory for ctx.resolveAsset() and ctx.imageData() calls. Defaults to the script directory.
+- assets_dir (optional): base directory for ctx.resolveAsset() and ctx.imageData() calls.
 Creates the file if it does not exist; overwrites otherwise.`
 }
 
@@ -70,9 +77,9 @@ func (t *pptxWriteBuiltin) GetInputSchema() interface{} {
 				"type":        "string",
 				"description": "Output path for the .pptx file.",
 			},
-			"script_path": map[string]interface{}{
+			"script": map[string]interface{}{
 				"type":        "string",
-				"description": "Local .mjs file exporting default build(pptx, ctx) or named build(pptx, ctx).",
+				"description": "JavaScript module content exporting default build(pptx, ctx) or named build(pptx, ctx).",
 			},
 			"data": map[string]interface{}{
 				"type":        "object",
@@ -80,15 +87,15 @@ func (t *pptxWriteBuiltin) GetInputSchema() interface{} {
 			},
 			"assets_dir": map[string]interface{}{
 				"type":        "string",
-				"description": "Optional asset base directory for ctx.resolveAsset() and ctx.imageData(). Defaults to the script directory.",
+				"description": "Optional asset base directory for ctx.resolveAsset() and ctx.imageData().",
 			},
 		},
-		"required": []string{"path", "script_path"},
+		"required": []string{"path", "script"},
 	}
 }
 
-// Execute validates the requested deck write job, writes a short-lived
-// worker spec file, then runs the local Node/PptxGenJS worker.
+// Execute writes the inline build script to a temporary module, then runs the
+// local Node/PptxGenJS worker.
 func (t *pptxWriteBuiltin) Execute(ctx context.Context, arguments map[string]interface{}) (*protocol.CallToolResult, error) {
 	argBytes, err := json.Marshal(arguments)
 	if err != nil {
@@ -105,30 +112,12 @@ func (t *pptxWriteBuiltin) Execute(ctx context.Context, arguments map[string]int
 		return officeToolError("Missing required parameter: path"), nil
 	}
 
-	// The build script is user/agent-authored PptxGenJS code. This tool only
-	// validates and runs it; it does not generate the script itself.
-	args.ScriptPath = strings.TrimSpace(args.ScriptPath)
-	if args.ScriptPath == "" {
-		return officeToolError("Missing required parameter: script_path"), nil
-	}
-	if !filepath.IsAbs(args.ScriptPath) {
-		args.ScriptPath, err = filepath.Abs(args.ScriptPath)
-		if err != nil {
-			return officeToolError(fmt.Sprintf("Invalid script_path: %s", err.Error())), nil
-		}
-	}
-	scriptInfo, err := os.Stat(args.ScriptPath)
-	if err != nil {
-		return officeToolError(fmt.Sprintf("Invalid script_path: %s", err.Error())), nil
-	}
-	if scriptInfo.IsDir() {
-		return officeToolError("Invalid script_path: must be a file"), nil
+	if strings.TrimSpace(args.Script) == "" {
+		return officeToolError("Missing required parameter: script"), nil
 	}
 
 	args.AssetsDir = strings.TrimSpace(args.AssetsDir)
-	if args.AssetsDir == "" {
-		args.AssetsDir = filepath.Dir(args.ScriptPath)
-	} else {
+	if args.AssetsDir != "" {
 		if !filepath.IsAbs(args.AssetsDir) {
 			args.AssetsDir, err = filepath.Abs(args.AssetsDir)
 			if err != nil {
@@ -155,6 +144,28 @@ func (t *pptxWriteBuiltin) Execute(ctx context.Context, arguments map[string]int
 
 	args.Path = ResolveOutputPath(args.Path)
 
+	scriptFile, err := os.CreateTemp("", "openagent-pptx-build-*.mjs")
+	if err != nil {
+		return officeToolError(fmt.Sprintf("Failed to create build script: %s", err.Error())), nil
+	}
+	scriptPath := scriptFile.Name()
+	defer os.Remove(scriptPath)
+
+	if _, err := scriptFile.WriteString(args.Script); err != nil {
+		scriptFile.Close()
+		return officeToolError(fmt.Sprintf("Failed to write build script: %s", err.Error())), nil
+	}
+	if err := scriptFile.Close(); err != nil {
+		return officeToolError(fmt.Sprintf("Failed to close build script: %s", err.Error())), nil
+	}
+
+	spec := pptxWriteWorkerSpec{
+		Path:       args.Path,
+		ScriptPath: scriptPath,
+		AssetsDir:  args.AssetsDir,
+		Data:       args.Data,
+	}
+
 	// Pass the job to Node through a temp JSON file so nested data does not
 	// need fragile command-line escaping. The final PPTX is not temporary.
 	specFile, err := os.CreateTemp("", "openagent-pptx-*.json")
@@ -163,7 +174,7 @@ func (t *pptxWriteBuiltin) Execute(ctx context.Context, arguments map[string]int
 	}
 	defer os.Remove(specFile.Name())
 
-	if err := json.NewEncoder(specFile).Encode(args); err != nil {
+	if err := json.NewEncoder(specFile).Encode(spec); err != nil {
 		specFile.Close()
 		return officeToolError(fmt.Sprintf("Failed to write worker spec: %s", err.Error())), nil
 	}
