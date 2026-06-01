@@ -56,6 +56,8 @@ type ToolCall struct {
 	IsError   bool   `json:"isError"`
 }
 
+const toolErrorRecoveryPrompt = "The previous tool call failed. Do not finish as if the task is complete. If possible, recover by calling the appropriate tool again with corrected arguments or a different tool. If recovery is not possible, clearly explain what is blocked and what input or condition is needed."
+
 type ToolCallDelta struct {
 	Index          int    `json:"index"`
 	ID             string `json:"id,omitempty"`
@@ -188,6 +190,7 @@ func QueryTextWithTools(p ModelProvider, question string, writer io.Writer, hist
 			fmt.Printf("  Tool %d: [%s] args: %s\n", i+1, tc.Function.Name, tc.Function.Arguments)
 		}
 
+		roundHasToolError := false
 		for _, toolCall := range toolCalls {
 			serverName, toolName := mcp.GetServerNameAndToolNameFromId(toolCall.Function.Name)
 
@@ -198,9 +201,13 @@ func QueryTextWithTools(p ModelProvider, question string, writer io.Writer, hist
 				ToolCall:         toolCall,
 			})
 
-			messages, err = callMcpTool(toolCall, serverName, toolName, toolSession.McpToolSet, messages, writer, lang)
+			var toolFailed bool
+			messages, toolFailed, err = callMcpTool(toolCall, serverName, toolName, toolSession.McpToolSet, messages, writer, lang)
 			if err != nil {
 				return nil, err
+			}
+			if toolFailed {
+				roundHasToolError = true
 			}
 		}
 
@@ -212,6 +219,21 @@ func QueryTextWithTools(p ModelProvider, question string, writer io.Writer, hist
 		}
 
 		toolCalls = normalizeToolCalls(toolSession)
+		if len(toolCalls) == 0 && roundHasToolError {
+			messages = append(messages, &RawMessage{
+				Text:   toolErrorRecoveryPrompt,
+				Author: "System",
+			})
+			toolSession.ToolMessages.Messages = messages
+
+			fmt.Printf("\n--- LLM Call (Round %d recovery) | Tool error recovery prompt added ---\n", round)
+			modelResult, err = p.QueryText(question, writer, history, prompt, knowledgeMessages, toolSession, lang)
+			if err != nil {
+				return nil, err
+			}
+
+			toolCalls = normalizeToolCalls(toolSession)
+		}
 	}
 
 	fmt.Printf("LLM Decision: [Final Answer — no more tool calls after round %d]\n", round)
@@ -252,12 +274,12 @@ func startHeartbeat(writer io.Writer, mu *sync.Mutex) chan<- struct{} {
 	return stop
 }
 
-func callMcpTool(toolCall openai.ToolCall, serverName, toolName string, mcpToolSet *mcp.ToolSet, messages []*RawMessage, writer io.Writer, lang string) ([]*RawMessage, error) {
+func callMcpTool(toolCall openai.ToolCall, serverName, toolName string, mcpToolSet *mcp.ToolSet, messages []*RawMessage, writer io.Writer, lang string) ([]*RawMessage, bool, error) {
 	var arguments map[string]interface{}
 	ctx := context.Background()
 
 	if err := json.Unmarshal([]byte(toolCall.Function.Arguments), &arguments); err != nil {
-		return nil, fmt.Errorf(i18n.Translate(lang, "model:failed to parse tool arguments: %v"), err)
+		return nil, false, fmt.Errorf(i18n.Translate(lang, "model:failed to parse tool arguments: %v"), err)
 	}
 
 	// Send tool-start event immediately so the frontend can show the tool call before execution
@@ -281,14 +303,14 @@ func callMcpTool(toolCall openai.ToolCall, serverName, toolName string, mcpToolS
 	if serverName == "" {
 		// builtin tools
 		if mcpToolSet.BuiltinTools == nil {
-			return messages, nil
+			return messages, false, nil
 		}
 		result, err = mcpToolSet.BuiltinTools.ExecuteTool(ctx, toolName, arguments)
 	} else {
 		// MCP server tools
 		conn, ok := mcpToolSet.Connections[serverName]
 		if !ok {
-			return messages, nil
+			return messages, false, nil
 		}
 		req := &protocol.CallToolRequest{
 			Name:      toolName,
@@ -324,7 +346,7 @@ func callMcpTool(toolCall openai.ToolCall, serverName, toolName string, mcpToolS
 
 	responseJson, err := json.Marshal(response)
 	if err != nil {
-		return nil, fmt.Errorf(i18n.Translate(lang, "model:failed to marshal tool response: %v"), err)
+		return nil, false, fmt.Errorf(i18n.Translate(lang, "model:failed to marshal tool response: %v"), err)
 	}
 
 	var contentStr string
@@ -352,7 +374,7 @@ func callMcpTool(toolCall openai.ToolCall, serverName, toolName string, mcpToolS
 	}
 
 	messages = append(messages, createToolMessage(toolCall, string(responseJson)))
-	return messages, nil
+	return messages, !response.Success, nil
 }
 
 func GetToolCallsFromWriter(toolMessage string) []ToolCall {
