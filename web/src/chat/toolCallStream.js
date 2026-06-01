@@ -93,6 +93,7 @@ export function applyToolEvent(toolCalls, jsonData) {
           name: jsonData.name || toolCalls[i].name,
           arguments: jsonData.arguments || toolCalls[i].arguments || "",
           content: "",
+          isError: false,
           generatingArguments: false,
         };
         return toolCalls[i];
@@ -103,6 +104,7 @@ export function applyToolEvent(toolCalls, jsonData) {
       name: jsonData.name,
       arguments: jsonData.arguments || "",
       content: "",
+      isError: false,
     };
     toolCalls.push(toolCall);
     return toolCall;
@@ -115,6 +117,7 @@ export function applyToolEvent(toolCalls, jsonData) {
         name: jsonData.name,
         arguments: jsonData.arguments || toolCalls[i].arguments || "",
         content: jsonData.content,
+        isError: !!jsonData.isError,
         generatingArguments: false,
       };
       return toolCalls[i];
@@ -125,6 +128,7 @@ export function applyToolEvent(toolCalls, jsonData) {
     name: jsonData.name,
     arguments: jsonData.arguments || "",
     content: jsonData.content,
+    isError: !!jsonData.isError,
   };
   toolCalls.push(toolCall);
   return toolCall;

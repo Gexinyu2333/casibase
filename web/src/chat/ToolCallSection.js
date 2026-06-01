@@ -14,7 +14,7 @@
 
 import React, {useState} from "react";
 import {Spin} from "antd";
-import {CheckCircleFilled, CodeOutlined, DownOutlined, LoadingOutlined} from "@ant-design/icons";
+import {CheckCircleFilled, CloseCircleFilled, CodeOutlined, DownOutlined, LoadingOutlined} from "@ant-design/icons";
 import i18next from "i18next";
 import Editor from "../common/Editor";
 import {TOOL_DELTA_PREVIEW_LIMIT} from "./toolCallStream";
@@ -69,6 +69,7 @@ function renderStreamingContent(raw, isDark) {
 
 export const ToolCallCard = ({toolCall, isDark, themeColor, isLast}) => {
   const isExecuting = !toolCall.content;
+  const isError = !!toolCall.isError;
   const [expanded, setExpanded] = useState(isExecuting);
 
   const border = isDark ? "1px solid #2a2e3d" : "1px solid #e6eaf4";
@@ -143,7 +144,7 @@ export const ToolCallCard = ({toolCall, isDark, themeColor, isLast}) => {
               {i18next.t("chat:Executing...")}
             </span>
           </div>
-        ) : (
+        ) : !isError ? (
           <div style={{
             display: "flex",
             alignItems: "center",
@@ -156,6 +157,21 @@ export const ToolCallCard = ({toolCall, isDark, themeColor, isLast}) => {
             <CheckCircleFilled style={{fontSize: "11px", color: "#4ade80"}} />
             <span style={{fontSize: "11px", color: isDark ? "#4ade80" : "#16a34a", fontWeight: 500, lineHeight: 1}}>
               {i18next.t("chat:Done")}
+            </span>
+          </div>
+        ) : (
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "5px",
+            background: isDark ? "#2b171b" : "#fff1f0",
+            borderRadius: "20px",
+            padding: "3px 9px 3px 7px",
+            flexShrink: 0,
+          }}>
+            <CloseCircleFilled style={{fontSize: "11px", color: "#f87171"}} />
+            <span style={{fontSize: "11px", color: isDark ? "#f87171" : "#dc2626", fontWeight: 500, lineHeight: 1}}>
+              {i18next.t("general:Error")}
             </span>
           </div>
         )}

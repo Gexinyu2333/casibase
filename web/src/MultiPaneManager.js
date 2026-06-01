@@ -25,6 +25,7 @@ import * as ProviderBackend from "./backend/ProviderBackend";
 import i18next from "i18next";
 import {MessageCarrier} from "./chat/MessageCarrier";
 import {getFirstUserMessageText} from "./carrier/titleUtils";
+import {applyToolEvent} from "./chat/toolCallStream";
 
 const {TextArea} = Input;
 
@@ -187,11 +188,7 @@ const MultiPaneManager = ({
       (data) => {
         const jsonData = JSON.parse(data);
 
-        toolCalls.push({
-          name: jsonData.name,
-          arguments: jsonData.arguments,
-          content: jsonData.content,
-        });
+        applyToolEvent(toolCalls, jsonData);
 
         const lastMessage2 = Setting.deepCopy(lastMessage);
         lastMessage2.toolCalls = [...toolCalls];

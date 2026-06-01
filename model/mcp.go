@@ -53,6 +53,7 @@ type ToolCall struct {
 	Name      string `json:"name"`
 	Arguments string `json:"arguments"`
 	Content   string `json:"content"`
+	IsError   bool   `json:"isError"`
 }
 
 type ToolCallDelta struct {
@@ -264,6 +265,7 @@ func callMcpTool(toolCall openai.ToolCall, serverName, toolName string, mcpToolS
 		Name:      toolCall.Function.Name,
 		Arguments: toolCall.Function.Arguments,
 		Content:   "",
+		IsError:   false,
 	}
 	toolStartJSON, err := json.Marshal(toolStartData)
 	if err == nil {
@@ -333,11 +335,13 @@ func callMcpTool(toolCall openai.ToolCall, serverName, toolName string, mcpToolS
 	}
 
 	fmt.Printf("Tool Result: [%s]\n", contentStr)
+	isError := !response.Success
 
 	toolData := ToolCall{
 		Name:      toolCall.Function.Name,
 		Arguments: toolCall.Function.Arguments,
 		Content:   contentStr,
+		IsError:   isError,
 	}
 	toolJSON, err := json.Marshal(toolData)
 	if err == nil {
