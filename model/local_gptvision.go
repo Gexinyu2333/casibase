@@ -88,6 +88,11 @@ func IsVisionModel(subType string) bool {
 		"gpt-4o", "gpt-4o-2024-08-06", "gpt-4o-mini", "gpt-4o-mini-2024-07-18",
 		// Specialized
 		"computer-use-preview",
+		// OpenAI-compatible Qwen vision models
+		"qwen3.6-plus", "qwen3.6-flash",
+		"qwen3-vl-plus", "qwen3-vl-flash",
+		"qwen-vl-max", "qwen-vl-plus",
+		"qvq-max", "qvq-plus",
 	}
 
 	for _, visionModel := range visionModels {

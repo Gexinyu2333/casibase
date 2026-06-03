@@ -84,6 +84,11 @@ func getOpenAiModelType(model string) string {
 		"computer-use-preview", "gpt-oss-120b", "gpt-oss-20b",
 		// GPT-3.5 (legacy)
 		"gpt-3.5-turbo",
+		// OpenAI-compatible Qwen models
+		"qwen3.6-plus", "qwen3.6-flash",
+		"qwen3-vl-plus", "qwen3-vl-flash",
+		"qwen-vl-max", "qwen-vl-plus",
+		"qvq-max", "qvq-plus",
 		// Other
 		"deep-research", "custom-model",
 	}

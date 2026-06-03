@@ -50,6 +50,14 @@ func isWanxModel(subType string) bool {
 	return strings.HasPrefix(subType, "wanx")
 }
 
+func isQwenMultimodalModel(subType string) bool {
+	return strings.HasPrefix(subType, "qwen3.6-") ||
+		strings.HasPrefix(subType, "qwen3-vl-") ||
+		strings.HasPrefix(subType, "qwen-vl-") ||
+		strings.HasPrefix(subType, "qvq-") ||
+		strings.HasPrefix(subType, "qwen2.5-vl-")
+}
+
 func (p *AlibabacloudModelProvider) GetPricing() string {
 	return `URL:
 https://help.aliyun.com/zh/model-studio/billing-for-model-studio
@@ -61,6 +69,12 @@ https://help.aliyun.com/zh/model-studio/billing-for-model-studio
 | Qwen-Plus           | qwen-plus                       | 0.004yuan/1,000 tokens           | 0.012yuan/1,000 tokens         |
 | Qwen-Max            | qwen-max                        | 0.04yuan/1,000 tokens            | 0.12yuan/1,000 tokens          |
 | Qwen-Max            | qwen-max-longcontext            | 0.04yuan/1,000 tokens            | 0.12yuan/1,000 tokens          |
+| Qwen3.6 Plus        | qwen3.6-plus                    | tiered, from 0.002yuan/1,000 tokens | tiered, from 0.012yuan/1,000 tokens |
+| Qwen3.6 Flash       | qwen3.6-flash                   | tiered, from 0.0012yuan/1,000 tokens | tiered, from 0.0072yuan/1,000 tokens |
+| Qwen3-VL Plus       | qwen3-vl-plus                   | tiered, from 0.001yuan/1,000 tokens | tiered, from 0.010yuan/1,000 tokens |
+| Qwen3-VL Flash      | qwen3-vl-flash                  | tiered, from 0.00015yuan/1,000 tokens | tiered, from 0.0015yuan/1,000 tokens |
+| Qwen-VL Max         | qwen-vl-max                     | 0.0016yuan/1,000 tokens          | 0.004yuan/1,000 tokens         |
+| Qwen-VL Plus        | qwen-vl-plus                    | 0.0008yuan/1,000 tokens          | 0.002yuan/1,000 tokens         |
 | Qwen3-235B-a22B     | qwen3-235b-a22b                 | 0.004yuan/1,000 tokens            | 0.04yuan/1,000 tokens         |
 | Qwen3-32B           | qwen3-32b            			| 0.002yuan/1,000 tokens            | 0.02yuan/1,000 tokens         |
 | DeepSeek-R1         | deepseek-r1                     | 0.004yuan/1,000 tokens           | 0.016yuan/1,000 tokens         |
@@ -102,12 +116,26 @@ func (p *AlibabacloudModelProvider) calculatePrice(modelResult *ModelResult, lan
 		return nil
 	}
 
+	if priceItem, ok := getAlibabacloudTieredPrice(p.subType, modelResult.PromptTokenCount); ok {
+		inputPrice := getPrice(modelResult.PromptTokenCount, priceItem[0])
+		outputPrice := getPrice(modelResult.ResponseTokenCount, priceItem[1])
+		modelResult.TotalPrice = inputPrice + outputPrice
+		modelResult.Currency = "CNY"
+		return nil
+	}
+
+	// Prices are CNY per 1K tokens, converted from Alibaba Model Studio
+	// per-1M-token pricing: https://help.aliyun.com/zh/model-studio/model-pricing (checked 2026-06-03).
 	priceTable := map[string][2]float64{
 		"qwen-long":                     {0.0005, 0.002},
 		"qwen-turbo":                    {0.002, 0.006},
 		"qwen-plus":                     {0.004, 0.012},
 		"qwen-max":                      {0.040, 0.120},
 		"qwen-max-longcontext":          {0.040, 0.120},
+		"qwen-vl-max":                   {0.0016, 0.004},
+		"qwen-vl-plus":                  {0.0008, 0.002},
+		"qvq-max":                       {0.008, 0.032},
+		"qvq-plus":                      {0.002, 0.005},
 		"qwen3-235b-a22b":               {0.004, 0.04},
 		"qwen3-32b":                     {0.002, 0.02},
 		"deepseek-r1":                   {0.004, 0.016},
@@ -132,6 +160,38 @@ func (p *AlibabacloudModelProvider) calculatePrice(modelResult *ModelResult, lan
 	modelResult.TotalPrice = price
 	modelResult.Currency = "CNY"
 	return nil
+}
+
+// Tiered prices are CNY per 1K tokens, converted from Alibaba Model Studio
+// per-1M-token pricing: https://help.aliyun.com/zh/model-studio/model-pricing (checked 2026-06-03).
+func getAlibabacloudTieredPrice(subType string, promptTokenCount int) ([2]float64, bool) {
+	switch {
+	case strings.HasPrefix(subType, "qwen3.6-plus"):
+		if promptTokenCount > 256000 {
+			return [2]float64{0.008, 0.048}, true
+		}
+		return [2]float64{0.002, 0.012}, true
+	case strings.HasPrefix(subType, "qwen3.6-flash"):
+		if promptTokenCount > 256000 {
+			return [2]float64{0.0048, 0.0288}, true
+		}
+		return [2]float64{0.0012, 0.0072}, true
+	case strings.HasPrefix(subType, "qwen3-vl-plus"):
+		if promptTokenCount > 128000 {
+			return [2]float64{0.003, 0.030}, true
+		} else if promptTokenCount > 32000 {
+			return [2]float64{0.0015, 0.015}, true
+		}
+		return [2]float64{0.001, 0.010}, true
+	case strings.HasPrefix(subType, "qwen3-vl-flash"):
+		if promptTokenCount > 128000 {
+			return [2]float64{0.0006, 0.006}, true
+		} else if promptTokenCount > 32000 {
+			return [2]float64{0.0003, 0.003}, true
+		}
+		return [2]float64{0.00015, 0.0015}, true
+	}
+	return [2]float64{}, false
 }
 
 func (p *AlibabacloudModelProvider) queryWanx(ctx context.Context, question string, writer io.Writer, lang string) (*ModelResult, error) {
@@ -199,6 +259,25 @@ func (p *AlibabacloudModelProvider) QueryText(question string, writer io.Writer,
 
 	if isWanxModel(p.subType) {
 		return p.queryWanx(ctx, question, writer, lang)
+	}
+
+	if isQwenMultimodalModel(p.subType) {
+		const baseUrl = "https://dashscope.aliyuncs.com/compatible-mode/v1"
+		localProvider, err := NewLocalModelProvider("Custom-think", "custom-model", p.apiKey, p.temperature, p.topP, 0, 0, baseUrl, p.subType, 0, 0, "CNY")
+		if err != nil {
+			return nil, err
+		}
+
+		modelResult, err := localProvider.QueryText(question, writer, history, prompt, knowledgeMessages, toolSession, lang)
+		if err != nil {
+			return nil, err
+		}
+
+		err = p.calculatePrice(modelResult, lang)
+		if err != nil {
+			return nil, err
+		}
+		return modelResult, nil
 	}
 
 	cli := dashscopego.NewTongyiClient(p.subType, p.apiKey)
