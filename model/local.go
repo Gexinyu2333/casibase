@@ -259,7 +259,7 @@ func (p *LocalModelProvider) QueryText(question string, writer io.Writer, histor
 	maxTokens := getContextLength(model)
 
 	modelResult := &ModelResult{}
-	if getOpenAiModelType(p.subType) == "Chat" {
+	if getOpenAiModelType(model) == "Chat" {
 		rawMessages, err := OpenaiGenerateMessages(prompt, question, history, knowledgeMessages, model, maxTokens, lang)
 		if err != nil {
 			return nil, err
@@ -429,7 +429,7 @@ func (p *LocalModelProvider) QueryText(question string, writer io.Writer, histor
 			return nil, err
 		}
 		return modelResult, nil
-	} else if getOpenAiModelType(p.subType) == "imagesGenerations" {
+	} else if getOpenAiModelType(model) == "imagesGenerations" {
 		if strings.HasPrefix(question, "$OpenAgentDryRun$") {
 			return modelResult, nil
 		}
@@ -457,7 +457,7 @@ func (p *LocalModelProvider) QueryText(question string, writer io.Writer, histor
 			return nil, err
 		}
 		return modelResult, nil
-	} else if getOpenAiModelType(p.subType) == "Completion" {
+	} else if getOpenAiModelType(model) == "Completion" {
 		respStream, err := client.CreateCompletionStream(
 			ctx,
 			openai.CompletionRequest{
@@ -517,6 +517,6 @@ func (p *LocalModelProvider) QueryText(question string, writer io.Writer, histor
 		modelResult, err = getDefaultModelResult(model, question, response.String())
 		return modelResult, nil
 	} else {
-		return nil, fmt.Errorf(i18n.Translate(lang, "model:QueryText() error: unknown model type: %s"), p.subType)
+		return nil, fmt.Errorf(i18n.Translate(lang, "model:QueryText() error: unknown model type: %s"), model)
 	}
 }
