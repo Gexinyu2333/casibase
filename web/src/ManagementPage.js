@@ -472,7 +472,7 @@ function ManagementPage(props) {
           </a>, "/permissions", <SafetyOutlined />),
       ]));
 
-      if (Setting.isAdminUser(account)) {
+      if (Setting.isAdminUser(account) && !Setting.isChatAdminUser(account)) {
         res.push(Setting.getItem(<Link style={{color: textColor}} to="/sites/site-built-in">{i18next.t("general:Admin")}</Link>, "/admin", <SettingOutlined />, [
           Setting.getItem(<Link to="/sites/site-built-in">{i18next.t("general:Sites")}</Link>, "/sites", <LayoutOutlined />),
           Setting.getItem(<Link to="/resources">{i18next.t("general:Resources")}</Link>, "/resources", <InboxOutlined />),
@@ -485,6 +485,10 @@ function ManagementPage(props) {
               {Setting.renderExternalLink()}
             </a>, "/swagger", <ApiOutlined />),
         ]));
+      }
+
+      if (!Setting.isAdminUser(account) && !Setting.isChatAdminUser(account)) {
+        return res.filter(item => item.key === "/chat");
       }
 
       return Setting.isBasicLoginMode(account) ? filterMenuItems(filterUserMenuItems(res), navItems) : filterMenuItems(res, navItems);
