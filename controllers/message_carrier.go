@@ -114,6 +114,8 @@ func isReasonModel(typ string) bool {
 		return true
 	} else if strings.Contains(typ, "kimi-for-coding") {
 		return true
+	} else if strings.Contains(typ, "deepseek-v4-pro") {
+		return true
 	}
 	return false
 }

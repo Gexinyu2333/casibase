@@ -91,6 +91,8 @@ func getOpenAiModelType(model string) string {
 		"qvq-max", "qvq-plus",
 		// Other
 		"deep-research", "custom-model",
+		// DeepSeek models
+		"deepseek-v4-pro", "deepseek-v4-flash", "deepseek-chat", "deepseek-reasoner",
 	}
 
 	completionModels := []string{
