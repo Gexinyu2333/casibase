@@ -69,6 +69,11 @@ Open [http://localhost:14000](http://localhost:14000) and you're in.
 > Optional env vars: `OPENAGENT_VERSION`, `INSTALL_DIR`, `BIN_DIR`
 
 **Build from source**
+
+Prerequisites:
+- **Backend**: [Go](https://golang.org/dl/) 1.25.0+
+- **Frontend**: [Node.js](https://nodejs.org/) 20+ and [Yarn](https://classic.yarnpkg.com/) 1.x
+
 ```bash
 # Backend
 go build
