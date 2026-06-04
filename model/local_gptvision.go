@@ -19,7 +19,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"path/filepath"
+	"net/url"
+	"path"
 	"regexp"
 	"strings"
 
@@ -45,12 +46,49 @@ func extractImagesURL(message string) ([]string, string) {
 	return urls, message
 }
 
-func getImageRefinedText(text string) (string, error) {
-	ext := filepath.Ext(text)
+func supportedImageMimeType(mimeType string) string {
+	mimeType = strings.ToLower(strings.TrimSpace(strings.Split(mimeType, ";")[0]))
+	switch mimeType {
+	case "image/jpeg", "image/png", "image/gif", "image/webp":
+		return mimeType
+	default:
+		return ""
+	}
+}
+
+func imageMimeTypeFromURL(text string) string {
+	parsed, err := url.Parse(text)
+	target := text
+	if err == nil && parsed.Path != "" {
+		target = parsed.Path
+	}
+	ext := strings.ToLower(path.Ext(target))
 	if ext != "" {
 		ext = ext[1:]
 	}
+	switch ext {
+	case "jpg", "jpeg":
+		return "image/jpeg"
+	case "png":
+		return "image/png"
+	case "gif":
+		return "image/gif"
+	case "webp":
+		return "image/webp"
+	default:
+		return ""
+	}
+}
 
+func safeImageURLForError(text string) string {
+	parsed, err := url.Parse(text)
+	if err != nil || parsed.Host == "" {
+		return "<redacted image URL>"
+	}
+	return parsed.Scheme + "://" + parsed.Host + parsed.Path
+}
+
+func getImageRefinedText(text string) (string, error) {
 	resp, err := http.Get(text)
 	if err != nil {
 		return "", err
@@ -62,8 +100,19 @@ func getImageRefinedText(text string) (string, error) {
 		return "", err
 	}
 
+	mimeType := supportedImageMimeType(resp.Header.Get("Content-Type"))
+	if mimeType == "" {
+		mimeType = supportedImageMimeType(http.DetectContentType(data))
+	}
+	if mimeType == "" {
+		mimeType = imageMimeTypeFromURL(text)
+	}
+	if mimeType == "" {
+		return "", fmt.Errorf("unsupported image type for %s", safeImageURLForError(text))
+	}
+
 	base64Data := base64.StdEncoding.EncodeToString(data)
-	res := fmt.Sprintf("data:image/%s;base64,%s", ext, base64Data)
+	res := fmt.Sprintf("data:%s;base64,%s", mimeType, base64Data)
 	return res, nil
 }
 
@@ -127,6 +176,9 @@ func OpenaiRawMessagesToGptVisionMessages(messages []*RawMessage) ([]openai.Chat
 
 		if role == openai.ChatMessageRoleTool {
 			item.ToolCallID = message.ToolCallID
+			item.Content = message.Text
+			res = append(res, item)
+			continue
 		} else if role == openai.ChatMessageRoleAssistant {
 			if message.ToolCall.ID != "" {
 				item.ToolCalls = []openai.ToolCall{message.ToolCall}
