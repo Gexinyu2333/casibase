@@ -26,7 +26,7 @@ import (
 	"time"
 
 	"github.com/ThinkInAIXYZ/go-mcp/protocol"
-	"github.com/shirou/gopsutil/cpu"
+	"github.com/shirou/gopsutil/v3/cpu"
 )
 
 // ---------------------------------------------------------------------------

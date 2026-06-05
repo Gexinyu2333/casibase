@@ -46,7 +46,7 @@ require (
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/sashabaranov/go-openai v1.32.0
 	github.com/schollz/progressbar/v3 v3.18.0
-	github.com/shirou/gopsutil v3.21.11+incompatible
+	github.com/shirou/gopsutil/v3 v3.24.5
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.1116
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/hunyuan v1.0.1074
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tbaas v1.0.1115
@@ -80,15 +80,19 @@ require (
 	github.com/hhrutter/tiff v1.0.2 // indirect
 	github.com/holiman/uint256 v1.3.2 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
+	github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-runewidth v0.0.16 // indirect
 	github.com/mitchellh/colorstring v0.0.0-20190213212951-d06e56a500db // indirect
 	github.com/onsi/gomega v1.34.2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/power-devops/perfstat v0.0.0-20210106213030-5aafc221ea8c // indirect
 	github.com/richardlehane/mscfb v1.0.6 // indirect
 	github.com/richardlehane/msoleps v1.0.6 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/rogpeppe/go-internal v1.13.1 // indirect
+	github.com/shirou/gopsutil v3.21.11+incompatible // indirect
+	github.com/shoenig/go-m1cpu v0.1.6 // indirect
 	github.com/supranational/blst v0.3.14 // indirect
 	github.com/tidwall/sjson v1.2.5 // indirect
 	github.com/tiendc/go-deepcopy v1.7.2 // indirect

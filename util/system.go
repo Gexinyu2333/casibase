@@ -28,10 +28,10 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
-	"github.com/shirou/gopsutil/cpu"
-	"github.com/shirou/gopsutil/disk"
-	"github.com/shirou/gopsutil/mem"
-	"github.com/shirou/gopsutil/process"
+	"github.com/shirou/gopsutil/v3/cpu"
+	"github.com/shirou/gopsutil/v3/disk"
+	"github.com/shirou/gopsutil/v3/mem"
+	"github.com/shirou/gopsutil/v3/process"
 	"github.com/the-open-agent/openagent/internal/cli"
 )
 
@@ -117,36 +117,20 @@ func getDiskUsage() (uint64, uint64, error) {
 	return size, diskStat.Total, nil
 }
 
-// getNetworkUsage gets OpenAgent process's own network I/O usage
+// getNetworkUsage gets OpenAgent process's own I/O usage
 func getNetworkUsage() (uint64, uint64, uint64, error) {
 	proc, err := process.NewProcess(int32(os.Getpid()))
 	if err != nil {
 		return 0, 0, 0, err
 	}
 
-	// Try to get process-specific network I/O counters
-	netCounters, err := proc.NetIOCounters(false)
-	if err != nil || len(netCounters) == 0 {
-		// NetIOCounters may not be available on all platforms
-		// Fall back to process disk I/O as a proxy for I/O activity
-		ioCounters, err := proc.IOCounters()
-		if err != nil {
-			return 0, 0, 0, err
-		}
-		bytesSent := ioCounters.WriteBytes
-		bytesRecv := ioCounters.ReadBytes
-		bytesTotal := bytesSent + bytesRecv
-		return bytesSent, bytesRecv, bytesTotal, nil
+	ioCounters, err := proc.IOCounters()
+	if err != nil {
+		return 0, 0, 0, err
 	}
-
-	// Aggregate network I/O across all interfaces
-	var bytesSent, bytesRecv uint64
-	for _, counter := range netCounters {
-		bytesSent += counter.BytesSent
-		bytesRecv += counter.BytesRecv
-	}
+	bytesSent := ioCounters.WriteBytes
+	bytesRecv := ioCounters.ReadBytes
 	bytesTotal := bytesSent + bytesRecv
-
 	return bytesSent, bytesRecv, bytesTotal, nil
 }
 
