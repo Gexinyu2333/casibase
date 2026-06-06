@@ -26,6 +26,35 @@ func NewBasicSplitProvider() (*BasicSplitProvider, error) {
 	return &BasicSplitProvider{}, nil
 }
 
+func splitLongLine(line string, maxLength int) ([]string, error) {
+	words := strings.Fields(line)
+	var res []string
+	var temp string
+
+	for _, word := range words {
+		candidate := word
+		if temp != "" {
+			candidate = temp + " " + word
+		}
+		tokenSize, err := model.GetTokenSize("gpt-3.5-turbo", candidate)
+		if err != nil {
+			return nil, err
+		}
+		if tokenSize <= maxLength {
+			temp = candidate
+		} else {
+			if temp != "" {
+				res = append(res, temp)
+			}
+			temp = word
+		}
+	}
+	if temp != "" {
+		res = append(res, temp)
+	}
+	return res, nil
+}
+
 func (p *BasicSplitProvider) SplitText(text string) ([]string, error) {
 	const maxLength = 210
 	res := []string{}
@@ -46,14 +75,31 @@ func (p *BasicSplitProvider) SplitText(text string) ([]string, error) {
 		} else {
 			if temp != "" {
 				res = append(res, temp)
+				temp = ""
 			}
-			temp = line
+			// The line itself may exceed maxLength; split it by words
+			lineTokenSize, err := model.GetTokenSize("gpt-3.5-turbo", line)
+			if err != nil {
+				return nil, err
+			}
+			if lineTokenSize <= maxLength {
+				temp = line
+			} else {
+				parts, err := splitLongLine(line, maxLength)
+				if err != nil {
+					return nil, err
+				}
+				if len(parts) > 0 {
+					res = append(res, parts[:len(parts)-1]...)
+					temp = parts[len(parts)-1]
+				}
+			}
 		}
 	}
 
 	if temp != "" {
 		if len(temp) < 300 && len(res) > 0 {
-			res[len(res)-1] += temp
+			res[len(res)-1] += "\n" + temp
 		} else {
 			res = append(res, temp)
 		}

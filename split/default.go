@@ -119,7 +119,23 @@ func (p *DefaultSplitProvider) SplitText(text string) ([]string, error) {
 				sections = append(sections, currentSection.String())
 				currentSection.Reset()
 			}
-			currentSection.WriteString(line)
+			// The line itself may exceed maxLength; split it by words
+			lineTokenSize, err := model.GetTokenSize("gpt-3.5-turbo", line)
+			if err != nil {
+				return nil, err
+			}
+			if lineTokenSize <= maxLength {
+				currentSection.WriteString(line)
+			} else {
+				parts, err := splitLongLine(line, maxLength)
+				if err != nil {
+					return nil, err
+				}
+				if len(parts) > 0 {
+					sections = append(sections, parts[:len(parts)-1]...)
+					currentSection.WriteString(parts[len(parts)-1])
+				}
+			}
 		}
 	}
 
