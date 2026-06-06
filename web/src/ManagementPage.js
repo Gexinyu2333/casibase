@@ -364,9 +364,6 @@ function ManagementPage(props) {
     }
 
     const effectiveNavItems = new Set(navItems);
-    if (effectiveNavItems.has("/records") || effectiveNavItems.has("/sessions") || effectiveNavItems.has("/logs")) {
-      effectiveNavItems.add("/snapshots");
-    }
 
     const filteredItems = menuItems.map(item => {
       if (!Array.isArray(item.children)) {

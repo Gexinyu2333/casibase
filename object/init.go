@@ -645,7 +645,7 @@ func initBuiltInSite() {
 		"/stores", "/chats", "/messages",
 		"/files", "/vectors",
 		"/providers", "/pipes", "/skills", "/tools", "/servers",
-		"/records", "/sessions",
+		"/records", "/sessions", "/snapshots",
 		"/sites", "/resources", "/usages", "/visitors", "/sysinfo", "/swagger",
 	}
 
