@@ -160,10 +160,12 @@ func (c *ApiController) Signin() {
 // @router /signout [post]
 func (c *ApiController) Signout() {
 	user := c.GetSessionUser()
-	_, err := object.DeleteSessionId(util.GetIdFromOwnerAndName(user.Owner, user.Name), c.Ctx.Input.CruSession.SessionID())
-	if err != nil {
-		c.ResponseError(err.Error())
-		return
+	if user != nil {
+		_, err := object.DeleteSessionId(util.GetIdFromOwnerAndName(user.Owner, user.Name), c.Ctx.Input.CruSession.SessionID())
+		if err != nil {
+			c.ResponseError(err.Error())
+			return
+		}
 	}
 
 	c.SetSessionClaims(nil)
