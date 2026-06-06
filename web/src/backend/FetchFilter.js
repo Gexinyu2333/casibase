@@ -23,7 +23,10 @@ const {Text, Title} = Typography;
 
 let demoModalVisible = false;
 
-const demoModeCallback = (res) => {
+const demoModeCallback = (res, isWriteOperation) => {
+  if (!isWriteOperation) {
+    return;
+  }
   Setting.handleFetchResponse(res).then(data => {
     if (data && Setting.isResponseDenied(data) && !demoModalVisible) {
       demoModalVisible = true;
@@ -111,10 +114,13 @@ export function initDemoMode() {
 window.fetch = async(url, option = {}) => {
   requestFilters.forEach(filter => filter(url, option));
 
+  const method = (option.method || "GET").toUpperCase();
+  const isWriteOperation = method !== "GET" && method !== "HEAD";
+
   return new Promise((resolve, reject) => {
     originalFetch(url, option)
       .then(res => {
-        responseFilters.forEach(filter => filter(res.clone()));
+        responseFilters.forEach(filter => filter(res.clone(), isWriteOperation));
         resolve(res);
       })
       .catch(error => {
