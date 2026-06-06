@@ -385,7 +385,7 @@ func (c *ApiController) GetAccount() {
 	claims := c.GetSessionClaims()
 
 	// Fetch fresh user data from Casdoor in real-time for non-anonymous users
-	if claims.User.Type != "anonymous-user" && claims.User.Owner != object.UserOwner {
+	if conf.IsCasdoorAvailable() && claims.User.Type != "anonymous-user" && claims.User.Owner != object.UserOwner {
 		user, err := auth.GetUser(claims.User.Name)
 		if err != nil {
 			c.ResponseError(err.Error())
