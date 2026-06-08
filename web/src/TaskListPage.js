@@ -114,9 +114,8 @@ class TaskListPage extends BaseListPage {
   }
 
   newTask() {
-    const username = this.props.account?.name || "admin";
-    const nextIndex = String(this.getNextTaskIndex()).padStart(3, "0");
-    const taskName = `task_${username}_${nextIndex}`;
+    const randomName = Setting.getRandomName();
+    const taskName = `task_${randomName}`;
     return {
       owner: this.props.account.name,
       name: taskName,
