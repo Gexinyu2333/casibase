@@ -308,7 +308,7 @@ class TaskListPage extends BaseListPage {
           const fileName = text.split("/").filter(Boolean).pop() || text;
           return (
             <a href={text} target="_blank" rel="noopener noreferrer" download style={{display: "inline-flex", alignItems: "center", gap: "6px"}}>
-              {isPdf ? <FilePdfOutlined style={{fontSize: "20px"}} /> : <FileWordOutlined style={{fontSize: "20px"}} />}
+              {isPdf ? <FilePdfOutlined style={{fontSize: "20px", color: "#e53935"}} /> : <FileWordOutlined style={{fontSize: "20px", color: "#1565c0"}} />}
               <span style={{cursor: "pointer", overflow: "hidden", textOverflow: "ellipsis"}} title={fileName}>{fileName}</span>
             </a>
           );
