@@ -41,10 +41,10 @@ class SnapshotListPage extends BaseListPage {
 
   getActionText(action) {
     if (action === "write") {
-      return i18next.t("general:Write");
+      return i18next.t("store:Write");
     }
     if (action === "move") {
-      return i18next.t("general:Move");
+      return i18next.t("store:Move");
     }
     return action;
   }
@@ -185,8 +185,8 @@ class SnapshotListPage extends BaseListPage {
         key: "action",
         width: "100px",
         filters: [
-          {text: i18next.t("general:Write"), value: "write"},
-          {text: i18next.t("general:Move"), value: "move"},
+          {text: i18next.t("store:Write"), value: "write"},
+          {text: i18next.t("store:Move"), value: "move"},
         ],
         onFilter: (value, record) => record.action === value,
         render: (text) => <Tag>{this.getActionText(text)}</Tag>,
@@ -229,7 +229,7 @@ class SnapshotListPage extends BaseListPage {
         fixed: "right",
         render: (_, record) => (
           <div style={{display: "flex", alignItems: "center", gap: "2px", flexWrap: "nowrap"}}>
-            <Tooltip title={i18next.t("general:Details")}>
+            <Tooltip title={i18next.t("login:Details")}>
               <Button type="text" size="small" icon={<EyeOutlined />} style={{minWidth: "28px", width: "28px", height: "28px", padding: 0, borderRadius: "6px"}} onClick={() => this.showDetails(record)} />
             </Tooltip>
             {record.state === "Active" && (

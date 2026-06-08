@@ -580,18 +580,6 @@ class FileTree extends React.Component {
                   {
                     !isWritable ? null : (
                       <React.Fragment>
-                        {/* <Tooltip title={i18next.t("store:Rename")}>*/}
-                        {/*  <Button style={{marginRight: "5px"}} icon={<EditOutlined />} size="small" onClick={(e) => {*/}
-                        {/*    Setting.showMessage("error", "Rename");*/}
-                        {/*    e.stopPropagation();*/}
-                        {/*  }} />*/}
-                        {/* </Tooltip>*/}
-                        {/* <Tooltip title={i18next.t("store:Move")}>*/}
-                        {/*  <Button style={{marginRight: "5px"}} icon={<RadiusSettingOutlined />} size="small" onClick={(e) => {*/}
-                        {/*    Setting.showMessage("error", "Move");*/}
-                        {/*    e.stopPropagation();*/}
-                        {/*  }} />*/}
-                        {/* </Tooltip>*/}
                         <Tooltip title={i18next.t("general:Delete")}>
                           <span onClick={(e) => e.stopPropagation()}>
                             <Popconfirm
