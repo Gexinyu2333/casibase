@@ -26,7 +26,6 @@ import i18next from "i18next";
 import * as ConfTask from "./ConfTask";
 import * as Conf from "./Conf";
 import TaskAnalysisReport from "./TaskAnalysisReport";
-import * as Provider from "./Provider";
 
 const {TextArea} = Input;
 
@@ -233,50 +232,42 @@ class TaskListPage extends BaseListPage {
         title: i18next.t("general:Created time"),
         dataIndex: "createdTime",
         key: "createdTime",
-        width: "160px",
+        width: "180px",
         sorter: (a, b) => (a.createdTime || "").localeCompare(b.createdTime || ""),
         render: (text) => Setting.getFormattedDate(text),
       },
-      {
-        title: i18next.t("provider:Model provider"),
-        dataIndex: "provider",
-        key: "provider",
-        width: "200px",
-        sorter: (a, b) => {
-          const pa = this.state.modelProviders.find((p) => p.name === a.provider);
-          const pb = this.state.modelProviders.find((p) => p.name === b.provider);
-          const la = pa ? Setting.getProviderDisplayName(pa) : (a.provider || "");
-          const lb = pb ? Setting.getProviderDisplayName(pb) : (b.provider || "");
-          return la.localeCompare(lb);
-        },
-        ...this.getColumnSearchProps("provider"),
-        render: (text, record, index) => {
-          if (!text) {
-            return null;
-          }
-          const provider = this.state.modelProviders.find((p) => p.name === text);
-          const label = provider ? Setting.getProviderDisplayName(provider) : text;
-          return (
-            <span style={{display: "inline-flex", alignItems: "center", gap: 8}}>
-              {provider ? <Provider.ProviderLogo provider={provider} width={20} height={20} /> : null}
-              <Link to={`/providers/${text}`}>{label}</Link>
-            </span>
-          );
-        },
-      },
-      {
-        title: i18next.t("general:Type"),
-        dataIndex: "type",
-        key: "type",
-        width: "90px",
-        sorter: (a, b) => (a.type || "").localeCompare(b.type || ""),
-        ...this.getColumnSearchProps("type"),
-      },
+      // {
+      //   title: i18next.t("provider:Model provider"),
+      //   dataIndex: "provider",
+      //   key: "provider",
+      //   width: "200px",
+      //   sorter: (a, b) => {
+      //     const pa = this.state.modelProviders.find((p) => p.name === a.provider);
+      //     const pb = this.state.modelProviders.find((p) => p.name === b.provider);
+      //     const la = pa ? Setting.getProviderDisplayName(pa) : (a.provider || "");
+      //     const lb = pb ? Setting.getProviderDisplayName(pb) : (b.provider || "");
+      //     return la.localeCompare(lb);
+      //   },
+      //   ...this.getColumnSearchProps("provider"),
+      //   render: (text, record, index) => {
+      //     if (!text) {
+      //       return null;
+      //     }
+      //     const provider = this.state.modelProviders.find((p) => p.name === text);
+      //     const label = provider ? Setting.getProviderDisplayName(provider) : text;
+      //     return (
+      //       <span style={{display: "inline-flex", alignItems: "center", gap: 8}}>
+      //         {provider ? <Provider.ProviderLogo provider={provider} width={20} height={20} /> : null}
+      //         <Link to={`/providers/${text}`}>{label}</Link>
+      //       </span>
+      //     );
+      //   },
+      // },
       {
         title: i18next.t("task:Scale"),
         dataIndex: "scale",
         key: "scale",
-        width: "200px",
+        width: "150px",
         sorter: (a, b) => (a.scale || "").localeCompare(b.scale || ""),
         ...this.getColumnSearchProps("scale_ref"),
         render: (text, record) => {
@@ -290,7 +281,7 @@ class TaskListPage extends BaseListPage {
             </div>
           ) : null;
           const link = (
-            <Link to={`/scales/${record.scale}`}>{record.scale}</Link>
+            <Link to={`/scales/${record.scale}`}>{record.scale.includes("/") ? record.scale.split("/").slice(1).join("/") : record.scale}</Link>
           );
           if (!body) {
             return link;
@@ -328,6 +319,7 @@ class TaskListPage extends BaseListPage {
         dataIndex: "result",
         key: "result",
         width: "100px",
+        fixed: "right",
         sorter: (a, b) => (Number(a.score) || 0) - (Number(b.score) || 0),
         render: (text, record) => {
           const parsed = this.parseReportResult(record.result);
