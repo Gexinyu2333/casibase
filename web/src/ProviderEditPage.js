@@ -799,6 +799,16 @@ class ProviderEditPage extends React.Component {
                     }} />
                   </Col>
                 </Row>
+                <Row style={{marginTop: "20px"}} >
+                  <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
+                    {Setting.getLabel(i18next.t("provider:CDN domain"), i18next.t("provider:CDN domain - Tooltip"))}
+                  </Col>
+                  <Col span={22} >
+                    <Input disabled={isRemote} value={this.state.provider.cdnDomain} onChange={e => {
+                      this.updateProviderField("cdnDomain", e.target.value);
+                    }} />
+                  </Col>
+                </Row>
               </>
             ) : null
           }

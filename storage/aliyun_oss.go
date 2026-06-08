@@ -26,12 +26,13 @@ import (
 )
 
 type AliyunOssStorageProvider struct {
-	client   *oss.Client
-	bucket   string
-	endpoint string
+	client    *oss.Client
+	bucket    string
+	endpoint  string
+	cdnDomain string
 }
 
-func NewAliyunOssStorageProvider(accessKeyId string, accessKeySecret string, region string, bucket string, endpoint string) (*AliyunOssStorageProvider, error) {
+func NewAliyunOssStorageProvider(accessKeyId string, accessKeySecret string, region string, bucket string, endpoint string, cdnDomain string) (*AliyunOssStorageProvider, error) {
 	cfg := oss.LoadDefaultConfig().
 		WithCredentialsProvider(credentials.NewStaticCredentialsProvider(accessKeyId, accessKeySecret, "")).
 		WithRegion(region).
@@ -39,13 +40,22 @@ func NewAliyunOssStorageProvider(accessKeyId string, accessKeySecret string, reg
 
 	client := oss.NewClient(cfg)
 	return &AliyunOssStorageProvider{
-		client:   client,
-		bucket:   bucket,
-		endpoint: endpoint,
+		client:    client,
+		bucket:    bucket,
+		endpoint:  endpoint,
+		cdnDomain: cdnDomain,
 	}, nil
 }
 
 func (p *AliyunOssStorageProvider) getObjectUrl(key string) string {
+	if p.cdnDomain != "" {
+		domain := p.cdnDomain
+		if !strings.HasPrefix(domain, "http") {
+			domain = "https://" + domain
+		}
+		domain = strings.TrimRight(domain, "/")
+		return fmt.Sprintf("%s/%s", domain, key)
+	}
 	endpoint := p.endpoint
 	if !strings.HasPrefix(endpoint, "http") {
 		endpoint = "https://" + endpoint

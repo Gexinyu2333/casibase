@@ -29,13 +29,13 @@ type StorageProvider interface {
 	DeleteObject(key string) error
 }
 
-func GetStorageProvider(typ string, clientId string, clientSecret string, region string, bucket string, endpoint string, providerName string, vectorStoreId string, lang string) (StorageProvider, error) {
+func GetStorageProvider(typ string, clientId string, clientSecret string, region string, bucket string, endpoint string, cdnDomain string, providerName string, vectorStoreId string, lang string) (StorageProvider, error) {
 	var p StorageProvider
 	var err error
 	if typ == "Local File System" {
 		p, err = NewLocalFileSystemStorageProvider(clientId)
 	} else if typ == "Alibaba Cloud OSS" {
-		p, err = NewAliyunOssStorageProvider(clientId, clientSecret, region, bucket, endpoint)
+		p, err = NewAliyunOssStorageProvider(clientId, clientSecret, region, bucket, endpoint, cdnDomain)
 	} else {
 		p, err = NewCasdoorProvider(providerName, lang)
 	}
