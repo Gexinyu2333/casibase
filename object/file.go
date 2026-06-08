@@ -21,8 +21,8 @@ import (
 	"mime/multipart"
 	"strings"
 
-	"github.com/beego/beego/logs"
 	"github.com/the-open-agent/openagent/i18n"
+	"github.com/the-open-agent/openagent/storage"
 	"github.com/the-open-agent/openagent/util"
 	"xorm.io/core"
 )
@@ -128,27 +128,23 @@ func AddFile(file *File) (bool, error) {
 }
 
 func DeleteFile(file *File, lang string) (bool, error) {
-	var objectKey string
-	prefix := fmt.Sprintf("%s_", file.Store)
-	if strings.HasPrefix(file.Name, prefix) {
-		objectKey = strings.TrimPrefix(file.Name, prefix)
+	// Derive the object key: strip the "store_" prefix when present, otherwise use name as-is.
+	objectKey := file.Name
+	if file.Store != "" {
+		prefix := fmt.Sprintf("%s_", file.Store)
+		if strings.HasPrefix(file.Name, prefix) {
+			objectKey = strings.TrimPrefix(file.Name, prefix)
+		}
 	}
 	if objectKey == "" {
 		return false, fmt.Errorf(i18n.Translate(lang, "object:The file: %s is not found"), file.Name)
 	}
 
-	store, err := getStore(file.Owner, file.Store)
+	storageProviderObj, err := getDefaultStorageProviderObj(lang)
 	if err != nil {
 		return false, err
 	}
-	if store == nil {
-		return false, fmt.Errorf(i18n.Translate(lang, "account:The store: %s is not found"), file.Store)
-	}
 
-	storageProviderObj, err := store.GetStorageProviderObj(lang)
-	if err != nil {
-		return false, fmt.Errorf(i18n.Translate(lang, "object:The provider: %s does not exist"), store.StorageProvider)
-	}
 	err = storageProviderObj.DeleteObject(objectKey)
 	if err != nil {
 		return false, err
@@ -218,16 +214,37 @@ func deleteFileRecord(owner string, storeName string, objectKey string) error {
 	return err
 }
 
-func UploadFileToStore(storeId string, userName string, filename string, fileData multipart.File, lang string, origin string) (*File, error) {
-	store, err := GetStore(storeId)
+// getDefaultStorageProviderObj returns the storage provider marked as IsDefault.
+func getDefaultStorageProviderObj(lang string) (storage.StorageProvider, error) {
+	provider, err := GetDefaultStorageProvider()
 	if err != nil {
 		return nil, err
 	}
-	if store == nil {
-		return nil, fmt.Errorf(i18n.Translate(lang, "account:The store: %s is not found"), storeId)
+	if provider == nil {
+		return nil, fmt.Errorf(i18n.Translate(lang, "object:The provider: %s does not exist"), "default storage provider")
+	}
+	return provider.GetStorageProviderObj("", lang)
+}
+
+func UploadFile(owner string, userName string, filename string, fileData multipart.File, lang string, origin string) (*File, error) {
+	provider, err := GetDefaultStorageProvider()
+	if err != nil {
+		return nil, err
+	}
+	if provider == nil {
+		return nil, fmt.Errorf(i18n.Translate(lang, "object:The provider: %s does not exist"), "default storage provider")
 	}
 
-	storageProviderObj, err := store.GetStorageProviderObj(lang)
+	defaultStore, err := GetDefaultStore(owner)
+	if err != nil {
+		return nil, err
+	}
+	storeName := ""
+	if defaultStore != nil {
+		storeName = defaultStore.Name
+	}
+
+	storageProviderObj, err := provider.GetStorageProviderObj("", lang)
 	if err != nil {
 		return nil, err
 	}
@@ -240,7 +257,7 @@ func UploadFileToStore(storeId string, userName string, filename string, fileDat
 	}
 
 	fileSize := int64(fileBuffer.Len())
-	rawUrl, err := storageProviderObj.PutObject(userName, store.Name, objectKey, fileBuffer)
+	rawUrl, err := storageProviderObj.PutObject(userName, provider.Name, objectKey, fileBuffer)
 	if err != nil {
 		return nil, err
 	}
@@ -251,13 +268,13 @@ func UploadFileToStore(storeId string, userName string, filename string, fileDat
 	}
 
 	fileRecord := &File{
-		Owner:           store.Owner,
-		Name:            getFileName(store.Name, objectKey),
+		Owner:           owner,
+		Name:            objectKey,
 		CreatedTime:     util.GetCurrentTime(),
 		Filename:        filename,
 		Size:            fileSize,
-		Store:           store.Name,
-		StorageProvider: store.StorageProvider,
+		Store:           storeName,
+		StorageProvider: provider.Name,
 		Url:             fileUrl,
 		TokenCount:      0,
 		Status:          FileStatusPending,
@@ -267,13 +284,6 @@ func UploadFileToStore(storeId string, userName string, filename string, fileDat
 	if err != nil {
 		return nil, err
 	}
-
-	go func() {
-		_, vectorErr := AddVectorsForFile(store, objectKey, rawUrl, lang)
-		if vectorErr != nil {
-			logs.Error("Failed to generate vectors for file %s: %v", objectKey, vectorErr)
-		}
-	}()
 
 	return fileRecord, nil
 }

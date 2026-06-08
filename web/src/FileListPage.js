@@ -18,7 +18,6 @@ import {Button, Image, Popconfirm, Table, Tooltip, Upload} from "antd";
 import BaseListPage from "./BaseListPage";
 import * as Setting from "./Setting";
 import * as FileBackend from "./backend/FileBackend";
-import * as StoreBackend from "./backend/StoreBackend";
 import i18next from "i18next";
 import {DeleteOutlined, DownloadOutlined, EditOutlined, ReloadOutlined, UploadOutlined} from "@ant-design/icons";
 
@@ -32,44 +31,14 @@ class FileListPage extends BaseListPage {
     this.uploadedFileIdMap = {};
   }
 
-  getStoreName = async() => {
-    if (Setting.isDefaultStoreSelected(this.props.account)) {
-      try {
-        const res = await StoreBackend.getStore("admin", "_default_store_");
-        if (res.status === "ok" && res.data?.name) {
-          return res.data.name;
-        } else {
-          Setting.showMessage("error", `${i18next.t("general:Failed to get")}: ${res.msg}`);
-          return null;
-        }
-      } catch (error) {
-        Setting.showMessage("error", `${i18next.t("general:Failed to get")}: ${error}`);
-        return null;
-      }
-    } else {
-      const storeName = Setting.getRequestStore(this.props.account);
-      if (!storeName) {
-        Setting.showMessage("error", i18next.t("general:Store is not available"));
-        return null;
-      }
-      return storeName;
-    }
-  };
-
-  uploadFile = async(file, info) => {
-    const storeName = await this.getStoreName();
-    if (!storeName) {
-      return;
-    }
-
-    const storeId = `admin/${storeName}`;
+  uploadFile = (file, info) => {
     const promises = [];
     info.fileList.forEach((uploadedFile) => {
       if (this.uploadedFileIdMap[uploadedFile.originFileObj.uid] === 1) {
         return;
       }
       this.uploadedFileIdMap[uploadedFile.originFileObj.uid] = 1;
-      promises.push(FileBackend.uploadFile(storeId, uploadedFile.name, uploadedFile.originFileObj));
+      promises.push(FileBackend.uploadFile(uploadedFile.name, uploadedFile.originFileObj));
     });
 
     if (promises.length === 0) {
@@ -166,21 +135,7 @@ class FileListPage extends BaseListPage {
           );
         },
       },
-      {
-        title: i18next.t("general:Name"),
-        dataIndex: "name",
-        key: "name",
-        width: "140px",
-        sorter: (a, b) => a.name.localeCompare(b.name),
-        ...this.getColumnSearchProps("name"),
-        render: (text, record, index) => {
-          return (
-            <Link to={`/files/${encodeURIComponent(text)}`}>
-              {text}
-            </Link>
-          );
-        },
-      },
+
       {
         title: i18next.t("file:Filename"),
         dataIndex: "filename",
