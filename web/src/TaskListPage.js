@@ -14,14 +14,15 @@
 
 import React from "react";
 import {Link} from "react-router-dom";
-import {Button, Input, Popconfirm, Popover, Table, Tag, Tooltip} from "antd";
-import {DeleteOutlined, EditOutlined, FilePdfOutlined, FileWordOutlined} from "@ant-design/icons";
+import {Avatar, Button, Input, Popconfirm, Popover, Space, Table, Tag, Tooltip} from "antd";
+import {DeleteOutlined, EditOutlined, FilePdfOutlined, FileWordOutlined, UserOutlined} from "@ant-design/icons";
 import moment from "moment";
 import BaseListPage from "./BaseListPage";
 import * as Setting from "./Setting";
 import * as TaskBackend from "./backend/TaskBackend";
 import * as ScaleBackend from "./backend/ScaleBackend";
 import * as ProviderBackend from "./backend/ProviderBackend";
+import * as OrganizationUserBackend from "./backend/OrganizationUserBackend";
 import i18next from "i18next";
 import * as ConfTask from "./ConfTask";
 import * as Conf from "./Conf";
@@ -61,6 +62,7 @@ class TaskListPage extends BaseListPage {
       ...this.state,
       modelProviders: [],
       publicScales: [],
+      organizationUsers: [],
       pagination: {
         ...this.state.pagination,
         pageSize: 100,
@@ -75,6 +77,11 @@ class TaskListPage extends BaseListPage {
         this.setState({publicScales: res.data});
       }
     });
+    OrganizationUserBackend.getOrganizationUsers().then((res) => {
+      if (res.status === "ok" && Array.isArray(res.data)) {
+        this.setState({organizationUsers: res.data});
+      }
+    });
     if (Setting.isAdminUser(this.props.account)) {
       ProviderBackend.getProviders(this.props.account.name).then((res) => {
         if (res.status === "ok" && res.data) {
@@ -82,6 +89,11 @@ class TaskListPage extends BaseListPage {
         }
       });
     }
+  }
+
+  getUserAvatar(username) {
+    const user = this.state.organizationUsers.find((u) => u.name === username);
+    return user?.avatar || "";
   }
 
   getScalePreviewText(record) {
@@ -198,10 +210,18 @@ class TaskListPage extends BaseListPage {
         sorter: (a, b) => (a.owner || "").localeCompare(b.owner || ""),
         ...this.getColumnSearchProps("owner"),
         render: (text, record, index) => {
+          const avatarUrl = this.getUserAvatar(text);
           return (
-            <a target="_blank" rel="noreferrer" href={Setting.getMyProfileUrl(this.props.account).replace("/account", `/users/${Conf.AuthConfig.organizationName}/${text}`)}>
-              {text}
-            </a>
+            <Space size={6}>
+              {avatarUrl ? (
+                <Avatar size={22} src={avatarUrl} />
+              ) : (
+                <Avatar size={22} icon={<UserOutlined />} />
+              )}
+              <a target="_blank" rel="noreferrer" href={Setting.getMyProfileUrl(this.props.account).replace("/account", `/users/${Conf.AuthConfig.organizationName}/${text}`)}>
+                {text}
+              </a>
+            </Space>
           );
         },
       },
