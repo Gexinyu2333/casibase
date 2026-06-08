@@ -99,7 +99,9 @@ func (c *ApiController) UploadTaskDocument() {
 	}
 
 	// Upload file to storage
-	filePath := fmt.Sprintf("openagent/task-documents/%s/%s", userName, fileName)
+	// Replace '+' with '_' to avoid '+'-as-space ambiguity in CDN URLs
+	safeFileName := strings.ReplaceAll(fileName, "+", "_")
+	filePath := fmt.Sprintf("openagent/task-documents/%s/%s", userName, safeFileName)
 	host := c.Ctx.Request.Host
 	origin := getOriginFromHost(host)
 	fileUrl, err := object.UploadFileToStorageSafe(filePath, fileBytes, origin, c.GetAcceptLanguage())
