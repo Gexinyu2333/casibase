@@ -64,16 +64,22 @@ var allOfficeTools = []BuiltinTool{
 	&excelWriteBuiltin{},
 	&pptxReadBuiltin{},
 	&pptxWriteBuiltin{},
+	&pptxTemplateAnalyzeBuiltin{},
+	&pptxTemplateFillBuiltin{},
 }
 
-// officeToolBySubType maps each specific SubType to its single tool.
-var officeToolBySubType = map[officeSubType]BuiltinTool{
-	officeSubTypeWordRead:        &wordReadBuiltin{},
-	officeSubTypeWordWrite:       &wordWriteBuiltin{},
-	officeSubTypeExcelRead:       &excelReadBuiltin{},
-	officeSubTypeExcelWrite:      &excelWriteBuiltin{},
-	officeSubTypePowerPointRead:  &pptxReadBuiltin{},
-	officeSubTypePowerPointWrite: &pptxWriteBuiltin{},
+// officeToolBySubType maps each specific SubType to its exposed tools.
+var officeToolBySubType = map[officeSubType][]BuiltinTool{
+	officeSubTypeWordRead:       {&wordReadBuiltin{}},
+	officeSubTypeWordWrite:      {&wordWriteBuiltin{}},
+	officeSubTypeExcelRead:      {&excelReadBuiltin{}},
+	officeSubTypeExcelWrite:     {&excelWriteBuiltin{}},
+	officeSubTypePowerPointRead: {&pptxReadBuiltin{}},
+	officeSubTypePowerPointWrite: {
+		&pptxWriteBuiltin{},
+		&pptxTemplateAnalyzeBuiltin{},
+		&pptxTemplateFillBuiltin{},
+	},
 }
 
 // OfficeTool is the Tool Type "office".
@@ -88,8 +94,8 @@ func (p *OfficeTool) BuiltinTools() []BuiltinTool {
 	if p.subType == officeSubTypeAll || p.subType == "" {
 		return allOfficeTools
 	}
-	if t, ok := officeToolBySubType[p.subType]; ok {
-		return []BuiltinTool{t}
+	if tools, ok := officeToolBySubType[p.subType]; ok {
+		return tools
 	}
 	return allOfficeTools
 }

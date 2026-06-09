@@ -85,7 +85,7 @@ const ChatInput = React.forwardRef(({
   function handleFileUploadClick() {
     const input = document.createElement("input");
     input.type = "file";
-    input.accept = "image/*, .txt, .md, .yaml, .csv, .docx, .pdf, .xlsx";
+    input.accept = "image/*, .txt, .md, .yaml, .csv, .docx, .pdf, .xlsx, .pptx";
     input.multiple = false;
     input.style.display = "none";
 

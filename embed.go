@@ -16,7 +16,7 @@
 
 // This file is only compiled when building with -tags embed.
 // It embeds conf/, web/build/ (without source-map files), skills/, the OCR
-// service, and the PPTX worker into the binary, and wires them up via
+// service and the PPTX worker into the binary, and wires them up via
 // embedsupport.Setup so that the server can run from a single executable
 // without any on-disk assets.
 // On-disk files always take priority over the embedded versions at runtime.

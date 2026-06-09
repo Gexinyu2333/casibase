@@ -50,7 +50,7 @@ func wrapGeneratedResourceBuiltin(builtin tool.BuiltinTool, owner, user, origin 
 
 func isGeneratedResourceTool(toolName string) bool {
 	switch toolName {
-	case "pptx_write", "word_write", "excel_write", "local_file_write":
+	case "pptx_write", "pptx_template_fill", "word_write", "excel_write", "local_file_write":
 		return true
 	default:
 		return false

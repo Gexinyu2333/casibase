@@ -222,7 +222,7 @@ func dataURLMimeType(dataURL string) string {
 func RefineMessageFiles(message *Message, origin string, lang string) error {
 	text := message.Text
 	// re := regexp.MustCompile(`data:image\/([a-zA-Z]*);base64,([^"]*)`)
-	re := regexp.MustCompile(`data:([a-zA-Z]*\/[a-zA-Z\-\.]*);base64,[a-zA-Z0-9+/=_-]+`)
+	re := regexp.MustCompile(`data:([a-zA-Z0-9][a-zA-Z0-9!#$&^_.+\-]*\/[a-zA-Z0-9][a-zA-Z0-9!#$&^_.+\-]*);base64,[a-zA-Z0-9+/=_-]+`)
 	matches := re.FindAllString(text, -1)
 	if len(matches) > 0 {
 		if message.FileName == "" {
