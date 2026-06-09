@@ -20,7 +20,7 @@ import * as Setting from "./Setting";
 import * as Conf from "./Conf";
 import * as FileBackend from "./backend/FileBackend";
 import i18next from "i18next";
-import {DeleteOutlined, DownloadOutlined, EditOutlined, ReloadOutlined, UploadOutlined} from "@ant-design/icons";
+import {DeleteOutlined, EditOutlined, ReloadOutlined, UploadOutlined} from "@ant-design/icons";
 
 class FileListPage extends BaseListPage {
   constructor(props) {
@@ -187,12 +187,20 @@ class FileListPage extends BaseListPage {
         width: "200px",
         sorter: (a, b) => a.filename.localeCompare(b.filename),
         ...this.getColumnSearchProps("filename"),
-        render: (text) => {
-          return (
+        render: (text, record) => {
+          const inner = (
             <span style={{display: "inline-flex", alignItems: "center", gap: "6px"}}>
               <Setting.IconFont type={Setting.getFileIconType(text)} style={{fontSize: "18px"}} />
               {text}
             </span>
+          );
+          if (!record.url) {
+            return inner;
+          }
+          return (
+            <a href={record.url} target="_blank" rel="noreferrer" download>
+              {inner}
+            </a>
           );
         },
       },
@@ -234,24 +242,6 @@ class FileListPage extends BaseListPage {
               style={{objectFit: "cover", borderRadius: "4px"}}
               preview={{src: record.url}}
             />
-          );
-        },
-      },
-      {
-        title: i18next.t("general:URL"),
-        dataIndex: "url",
-        key: "url",
-        width: "80px",
-        render: (text, record) => {
-          if (!record.url) {
-            return null;
-          }
-          return (
-            <a href={record.url} target="_blank" rel="noreferrer">
-              <Button type="primary" size="small" icon={<DownloadOutlined />}>
-                {i18next.t("general:Download")}
-              </Button>
-            </a>
           );
         },
       },
