@@ -205,15 +205,28 @@ func getFileName(storeName string, objectKey string) string {
 	return fmt.Sprintf("%s_%s", storeName, objectKey)
 }
 
-func GetFileCount(owner, field, value string) (int64, error) {
+func GetFileCount(owner, store, field, value string) (int64, error) {
 	session := GetDbSession(owner, -1, -1, field, value, "", "")
+	if store != "" {
+		return session.Count(&File{Store: store})
+	}
 	return session.Count(&File{})
 }
 
-func GetPaginationFiles(owner string, offset, limit int, field, value, sortField, sortOrder string) ([]*File, error) {
+func GetPaginationFiles(owner, store string, offset, limit int, field, value, sortField, sortOrder string) ([]*File, error) {
 	files := []*File{}
 	session := GetDbSession(owner, offset, limit, field, value, sortField, sortOrder)
-	err := session.Find(&files)
+	var err error
+	if store != "" {
+		err = session.Find(&files, &File{Store: store})
+	} else {
+		err = session.Find(&files)
+	}
+	if err != nil {
+		return files, err
+	}
+
+	err = populateFileVectorCounts(files)
 	if err != nil {
 		return files, err
 	}

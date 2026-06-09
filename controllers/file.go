@@ -31,6 +31,7 @@ import (
 func (c *ApiController) GetGlobalFiles() {
 	limit := c.Input().Get("pageSize")
 	page := c.Input().Get("p")
+	store := c.Input().Get("store")
 	field := c.Input().Get("field")
 	value := c.Input().Get("value")
 	sortField := c.Input().Get("sortField")
@@ -40,7 +41,11 @@ func (c *ApiController) GetGlobalFiles() {
 		var files []*object.File
 		var err error
 		if c.IsGlobalAdmin() {
-			files, err = object.GetGlobalFiles()
+			if store != "" {
+				files, err = object.GetFilesByStore("", store)
+			} else {
+				files, err = object.GetGlobalFiles()
+			}
 		} else {
 			username := c.GetSessionUsername()
 			files, err = object.GetFiles(username)
@@ -64,21 +69,21 @@ func (c *ApiController) GetGlobalFiles() {
 		var err error
 
 		if c.IsGlobalAdmin() {
-			count, err = object.GetFileCount("", field, value)
+			count, err = object.GetFileCount("", store, field, value)
 			if err != nil {
 				c.ResponseError(err.Error())
 				return
 			}
 			paginator := pagination.SetPaginator(c.Ctx, limit, count)
-			files, err = object.GetPaginationFiles("", paginator.Offset(), limit, field, value, sortField, sortOrder)
+			files, err = object.GetPaginationFiles("", store, paginator.Offset(), limit, field, value, sortField, sortOrder)
 		} else {
-			count, err = object.GetFileCount(username, field, value)
+			count, err = object.GetFileCount(username, store, field, value)
 			if err != nil {
 				c.ResponseError(err.Error())
 				return
 			}
 			paginator := pagination.SetPaginator(c.Ctx, limit, count)
-			files, err = object.GetPaginationFiles(username, paginator.Offset(), limit, field, value, sortField, sortOrder)
+			files, err = object.GetPaginationFiles(username, store, paginator.Offset(), limit, field, value, sortField, sortOrder)
 		}
 		if err != nil {
 			c.ResponseError(err.Error())

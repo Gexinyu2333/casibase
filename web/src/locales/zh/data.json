@@ -87,8 +87,7 @@
     "Your chat text involves sensitive content. This chat has been forcibly terminated.": "您的聊天信息涉及敏感内容。此会话已被强制终止。"
   },
   "file": {
-    "Filename": "文件名",
-    "Vector count": "向量数量"
+    "Filename": "文件名"
   },
   "form": {
     "Edit Form": "编辑表单",
@@ -794,6 +793,7 @@
     "Split provider": "分词提供商",
     "Split provider - Tooltip": "文本分割策略",
     "Start Chat": "开始对话",
+    "Storage": "Storage",
     "Storage provider": "存储提供商",
     "Storage provider - Tooltip": "数据持久化服务提供商",
     "Storage subpath": "存储子路径",

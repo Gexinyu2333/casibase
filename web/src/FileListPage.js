@@ -245,7 +245,7 @@ class FileListPage extends BaseListPage {
         },
       },
       {
-        title: i18next.t("file:Vector count"),
+        title: i18next.t("store:Vector count"),
         dataIndex: "vectorCount",
         key: "vectorCount",
         width: "130px",
@@ -384,10 +384,10 @@ class FileListPage extends BaseListPage {
   }
 
   fetch = (params = {}) => {
-    //     const field = params.searchedColumn, value = params.searchText;
-    //     const sortField = params.sortField, sortOrder = params.sortOrder;
+    const field = params.searchedColumn, value = params.searchText;
+    const sortField = params.sortField, sortOrder = params.sortOrder;
     this.setState({loading: true});
-    FileBackend.getGlobalFiles()
+    FileBackend.getGlobalFiles(Setting.getRequestStore(this.props.account), params.pagination?.current, params.pagination?.pageSize, field, value, sortField, sortOrder)
       .then((res) => {
         this.setState({
           loading: false,
@@ -397,7 +397,7 @@ class FileListPage extends BaseListPage {
             data: res.data,
             pagination: {
               ...params.pagination,
-              total: res.data?.length || 0,
+              total: res.data2 !== undefined ? res.data2 : (res.data?.length || 0),
             },
             searchText: params.searchText,
             searchedColumn: params.searchedColumn,

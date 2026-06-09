@@ -87,8 +87,7 @@
     "Your chat text involves sensitive content. This chat has been forcibly terminated.": "Your chat text involves sensitive content. This chat has been forcibly terminated."
   },
   "file": {
-    "Filename": "Filename",
-    "Vector count": "Vector count"
+    "Filename": "Filename"
   },
   "form": {
     "Edit Form": "Edit Form",
@@ -794,6 +793,7 @@
     "Split provider": "Split provider",
     "Split provider - Tooltip": "Text splitting strategy for document processing",
     "Start Chat": "Start Chat",
+    "Storage": "Storage",
     "Storage provider": "Storage provider",
     "Storage provider - Tooltip": "Storage service provider for data persistence",
     "Storage subpath": "Storage subpath",
