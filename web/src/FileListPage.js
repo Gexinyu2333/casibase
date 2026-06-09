@@ -19,8 +19,10 @@ import BaseListPage from "./BaseListPage";
 import * as Setting from "./Setting";
 import * as Conf from "./Conf";
 import * as FileBackend from "./backend/FileBackend";
+import * as StorageProviderBackend from "./backend/StorageProviderBackend";
+import * as ProviderBackend from "./backend/ProviderBackend";
 import i18next from "i18next";
-import {DeleteOutlined, EditOutlined, ReloadOutlined, UploadOutlined} from "@ant-design/icons";
+import {DeleteOutlined, NodeIndexOutlined, ReloadOutlined, UploadOutlined} from "@ant-design/icons";
 
 class FileListPage extends BaseListPage {
   constructor(props) {
@@ -28,8 +30,26 @@ class FileListPage extends BaseListPage {
     this.state = {
       ...this.state,
       refreshing: {},
+      providers: {},
     };
     this.uploadedFileIdMap = {};
+  }
+
+  componentDidMount() {
+    super.componentDidMount?.();
+    Promise.all([
+      StorageProviderBackend.getStorageProviders(this.props.account?.name),
+      ProviderBackend.getProviders(this.props.account?.name),
+    ]).then(([res1, res2]) => {
+      const providers = {};
+      if (res1.status === "ok") {
+        res1.data.forEach(p => {providers[p.name] = p;});
+      }
+      if (res2.status === "ok") {
+        res2.data.forEach(p => {providers[p.name] = p;});
+      }
+      this.setState({providers});
+    });
   }
 
   uploadFile = (file, info) => {
@@ -129,7 +149,7 @@ class FileListPage extends BaseListPage {
         title: i18next.t("general:Owner"),
         dataIndex: "owner",
         key: "owner",
-        width: "110px",
+        width: "130px",
         sorter: (a, b) => (a.owner || "").localeCompare(b.owner || ""),
         ...this.getColumnSearchProps("owner"),
         render: (text, record, index) => {
@@ -147,7 +167,7 @@ class FileListPage extends BaseListPage {
         title: i18next.t("general:Store"),
         dataIndex: "store",
         key: "store",
-        width: "130px",
+        width: "150px",
         sorter: (a, b) => a.store.localeCompare(b.store),
         ...this.getColumnSearchProps("store"),
         render: (text, record, index) => {
@@ -159,17 +179,24 @@ class FileListPage extends BaseListPage {
         },
       },
       {
-        title: i18next.t("store:Storage provider"),
+        title: i18next.t("store:Storage"),
         dataIndex: "storageProvider",
         key: "storageProvider",
-        width: "170px",
+        width: "120px",
         sorter: (a, b) => a.storageProvider.localeCompare(b.storageProvider),
         ...this.getColumnSearchProps("storageProvider"),
         render: (text, record, index) => {
+          const provider = this.state.providers[text];
+          const logoUrl = provider ? Setting.getProviderLogoURL(provider) : "";
+          const icon = logoUrl
+            ? <img width={24} height={24} src={logoUrl} alt={text} style={{objectFit: "contain"}} />
+            : <span>{text}</span>;
           return (
-            <Link to={`/providers/${text}`}>
-              {text}
-            </Link>
+            <Tooltip title={text}>
+              <Link to={`/providers/${text}`}>
+                {icon}
+              </Link>
+            </Tooltip>
           );
         },
       },
@@ -177,7 +204,7 @@ class FileListPage extends BaseListPage {
         title: i18next.t("general:Created time"),
         dataIndex: "createdTime",
         key: "createdTime",
-        width: "150px",
+        width: "180px",
         sorter: (a, b) => a.createdTime.localeCompare(b.createdTime),
         defaultSortOrder: "descend",
         render: (text, record, index) => {
@@ -188,7 +215,6 @@ class FileListPage extends BaseListPage {
         title: i18next.t("file:Filename"),
         dataIndex: "filename",
         key: "filename",
-        width: "200px",
         sorter: (a, b) => a.filename.localeCompare(b.filename),
         ...this.getColumnSearchProps("filename"),
         render: (text, record) => {
@@ -212,7 +238,7 @@ class FileListPage extends BaseListPage {
         title: i18next.t("general:Size"),
         dataIndex: "size",
         key: "size",
-        width: "100px",
+        width: "120px",
         sorter: (a, b) => a.size - b.size,
         render: (text, record, index) => {
           return Setting.getFormattedSize(text);
@@ -222,14 +248,14 @@ class FileListPage extends BaseListPage {
         title: i18next.t("chat:Token count"),
         dataIndex: "tokenCount",
         key: "tokenCount",
-        width: "110px",
+        width: "130px",
         sorter: (a, b) => a.tokenCount - b.tokenCount,
       },
       {
         title: i18next.t("general:Preview"),
         dataIndex: "url",
         key: "preview",
-        width: "100px",
+        width: "150px",
         render: (text, record) => {
           if (!record.url) {
             return null;
@@ -262,7 +288,7 @@ class FileListPage extends BaseListPage {
                 <Button
                   type="text"
                   size="small"
-                  icon={<EditOutlined />}
+                  icon={<NodeIndexOutlined />}
                   style={{minWidth: "28px", width: "28px", height: "28px", padding: 0, borderRadius: "6px"}}
                   onClick={() => {
                     const objectKey = record.name.startsWith(`${record.store}_`)
