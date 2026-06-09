@@ -154,14 +154,20 @@ class FileListPage extends BaseListPage {
           );
         },
       },
-
       {
-        title: i18next.t("file:Filename"),
-        dataIndex: "filename",
-        key: "filename",
-        width: "200px",
-        sorter: (a, b) => a.filename.localeCompare(b.filename),
-        ...this.getColumnSearchProps("filename"),
+        title: i18next.t("store:Storage provider"),
+        dataIndex: "storageProvider",
+        key: "storageProvider",
+        width: "170px",
+        sorter: (a, b) => a.storageProvider.localeCompare(b.storageProvider),
+        ...this.getColumnSearchProps("storageProvider"),
+        render: (text, record, index) => {
+          return (
+            <Link to={`/providers/${text}`}>
+              {text}
+            </Link>
+          );
+        },
       },
       {
         title: i18next.t("general:Created time"),
@@ -175,6 +181,22 @@ class FileListPage extends BaseListPage {
         },
       },
       {
+        title: i18next.t("file:Filename"),
+        dataIndex: "filename",
+        key: "filename",
+        width: "200px",
+        sorter: (a, b) => a.filename.localeCompare(b.filename),
+        ...this.getColumnSearchProps("filename"),
+        render: (text) => {
+          return (
+            <span style={{display: "inline-flex", alignItems: "center", gap: "6px"}}>
+              <Setting.IconFont type={Setting.getFileIconType(text)} style={{fontSize: "18px"}} />
+              {text}
+            </span>
+          );
+        },
+      },
+      {
         title: i18next.t("general:Size"),
         dataIndex: "size",
         key: "size",
@@ -182,21 +204,6 @@ class FileListPage extends BaseListPage {
         sorter: (a, b) => a.size - b.size,
         render: (text, record, index) => {
           return Setting.getFormattedSize(text);
-        },
-      },
-      {
-        title: i18next.t("store:Storage provider"),
-        dataIndex: "storageProvider",
-        key: "storageProvider",
-        width: "150px",
-        sorter: (a, b) => a.storageProvider.localeCompare(b.storageProvider),
-        ...this.getColumnSearchProps("storageProvider"),
-        render: (text, record, index) => {
-          return (
-            <Link to={`/providers/${text}`}>
-              {text}
-            </Link>
-          );
         },
       },
       {

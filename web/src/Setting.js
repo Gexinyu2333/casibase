@@ -13,6 +13,11 @@
 // limitations under the License.
 
 import i18next from "i18next";
+import {createFromIconfontCN} from "@ant-design/icons";
+
+export const IconFont = createFromIconfontCN({
+  scriptUrl: "https://cdn.open-ct.com/icon/iconfont.js",
+});
 import Sdk from "casdoor-js-sdk";
 import * as StoreBackend from "./backend/StoreBackend";
 import * as Conf from "./Conf";

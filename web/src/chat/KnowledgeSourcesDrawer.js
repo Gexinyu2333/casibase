@@ -15,13 +15,8 @@
 import React, {useEffect, useState} from "react";
 import {Drawer, Spin} from "antd";
 import i18next from "i18next";
-import {createFromIconfontCN} from "@ant-design/icons";
 import * as Setting from "../Setting";
 import * as VectorBackend from "../backend/VectorBackend";
-
-const IconFont = createFromIconfontCN({
-  scriptUrl: "https://cdn.open-ct.com/icon/iconfont.js",
-});
 
 const KnowledgeSourceItem = ({vectorScore, vectorData, idx, themeColor, account}) => {
   const isDark = Setting.getIsDark();
@@ -103,7 +98,7 @@ const KnowledgeSourceItem = ({vectorScore, vectorData, idx, themeColor, account}
           }}
           onClick={handleFileOpen}
         >
-          <IconFont type={Setting.getFileIconType(vectorData.file)} />
+          <Setting.IconFont type={Setting.getFileIconType(vectorData.file)} />
         </span>
         <span
           style={{

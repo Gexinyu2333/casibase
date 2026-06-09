@@ -15,7 +15,7 @@
 import React from "react";
 import {withRouter} from "react-router-dom";
 import {Button, Card, Col, Descriptions, Empty, Input, Modal, Popconfirm, Radio, Result, Row, Spin, Tooltip, Tree, Upload} from "antd";
-import {CloudUploadOutlined, DeleteOutlined, DownloadOutlined, FileDoneOutlined, FolderAddOutlined, InfoCircleTwoTone, UploadOutlined, createFromIconfontCN} from "@ant-design/icons";
+import {CloudUploadOutlined, DeleteOutlined, DownloadOutlined, FileDoneOutlined, FolderAddOutlined, InfoCircleTwoTone, UploadOutlined} from "@ant-design/icons";
 import moment from "moment";
 import * as Setting from "./Setting";
 import * as TreeFileBackend from "./backend/TreeFileBackend";
@@ -32,10 +32,6 @@ import FileTable from "./table/FileTable";
 import Editor from "./common/Editor";
 
 const {Search} = Input;
-
-const IconFont = createFromIconfontCN({
-  scriptUrl: "https://cdn.open-ct.com/icon/iconfont.js",
-});
 
 class FileTree extends React.Component {
   constructor(props) {
@@ -624,7 +620,7 @@ class FileTree extends React.Component {
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
               >
-                <IconFont type="icon-testfolder" />
+                <Setting.IconFont type="icon-testfolder" />
                 <Tooltip color={"rgb(255,255,255,0.8)"} placement="right" title={
                   <div>
                     {
@@ -738,7 +734,7 @@ class FileTree extends React.Component {
         }}
         icon={(file) => {
           if (file.isLeaf) {
-            return <IconFont type={Setting.getFileIconType(file.data.key)} />;
+            return <Setting.IconFont type={Setting.getFileIconType(file.data.key)} />;
           }
         }}
       />
