@@ -48,12 +48,16 @@ class FileListPage extends BaseListPage {
 
     Promise.all(promises)
       .then((values) => {
+        let hasError = false;
         values.forEach((res) => {
           if (res.status !== "ok") {
+            hasError = true;
             Setting.showMessage("error", `${i18next.t("general:Failed to add")}: ${res.msg}`);
           }
         });
-        Setting.showMessage("success", i18next.t("general:Successfully uploaded"));
+        if (!hasError) {
+          Setting.showMessage("success", i18next.t("general:Successfully uploaded"));
+        }
         this.fetch({pagination: this.state.pagination});
       })
       .catch(error => {
