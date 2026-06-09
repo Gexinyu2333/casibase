@@ -19,6 +19,27 @@ import (
 	"strings"
 )
 
+// getEffectiveHubDbNames returns the HubDbNames for the given site.
+// If the site's own HubDbNames is empty and ParentDbName is set, it falls back
+// to the HubDbNames of the parent DB's site-built-in.
+func getEffectiveHubDbNames(site *Site) string {
+	if hubDbNames := strings.TrimSpace(site.HubDbNames); hubDbNames != "" {
+		return hubDbNames
+	}
+	parentDbName := strings.TrimSpace(site.ParentDbName)
+	if parentDbName == "" {
+		return ""
+	}
+	parentAdapter := NewAdapterWithDbName(adapter.driverName, adapter.dataSourceName, parentDbName)
+	parentSite := &Site{Owner: "admin", Name: "site-built-in"}
+	_, err := parentAdapter.engine.Get(parentSite)
+	parentAdapter.close()
+	if err != nil {
+		return ""
+	}
+	return strings.TrimSpace(parentSite.HubDbNames)
+}
+
 // GetPublishedStoresFromAllDbs returns published stores from the local DB plus
 // any additional databases listed in site-built-in's HubDbNames field.
 // Stores from external DBs carry HubDbName set to their source database name.
@@ -29,11 +50,16 @@ func GetPublishedStoresFromAllDbs() ([]*Store, error) {
 	}
 
 	site, err := GetBuiltInSiteWithSecret()
-	if err != nil || site == nil || strings.TrimSpace(site.HubDbNames) == "" {
+	if err != nil || site == nil {
 		return stores, nil
 	}
 
-	for _, dbName := range strings.Split(site.HubDbNames, ",") {
+	hubDbNames := getEffectiveHubDbNames(site)
+	if hubDbNames == "" {
+		return stores, nil
+	}
+
+	for _, dbName := range strings.Split(hubDbNames, ",") {
 		dbName = strings.TrimSpace(dbName)
 		if dbName == "" || dbName == adapter.DbName {
 			continue
