@@ -68,8 +68,12 @@ p, anonymous, *, /api/get-storage-providers
 p, anonymous, *, /api/get-store
 p, anonymous, *, /api/get-vector
 p, anonymous, *, /api/get-providers
+p, anonymous, *, /api/get-provider
+p, anonymous, *, /api/get-built-in-site
 p, anonymous, *, /api/get-global-stores
+p, anonymous, *, /api/get-store-names
 p, anonymous, *, /api/get-chat
+p, anonymous, *, /api/get-chat-status
 p, anonymous, *, /api/get-message
 p, anonymous, *, /api/get-tasks
 p, anonymous, *, /api/get-task
