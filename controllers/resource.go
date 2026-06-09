@@ -245,6 +245,11 @@ func (c *ApiController) UploadResource() {
 
 	// Detect MIME type and file type category
 	ext := strings.ToLower(filepath.Ext(fileName))
+
+	if err = validateFileExtension(fileName, c.GetAcceptLanguage()); err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
 	mimeType := header.Header.Get("Content-Type")
 	if mimeType == "" {
 		mimeType = mime.TypeByExtension(ext)

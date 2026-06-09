@@ -174,7 +174,8 @@
   },
   "resource": {
     "Invalid file data format": "无效的文件数据格式",
-    "Only docx and pdf files are allowed": "仅允许 docx 和 pdf 文件"
+    "Only docx and pdf files are allowed": "仅允许 docx 和 pdf 文件",
+    "Unsupported legacy file format %s, please convert to a modern format (e.g. .docx, .pptx, .xlsx) before uploading": "不支持旧版文件格式 %s，请将其转换为新版格式（如 .docx、.pptx、.xlsx）后再上传"
   },
   "storage": {
     "storage provider name: [%s] doesn't exist": "存储提供商名称：[%s] 不存在"

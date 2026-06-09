@@ -174,7 +174,8 @@
   },
   "resource": {
     "Invalid file data format": "Invalid file data format",
-    "Only docx and pdf files are allowed": "Only docx and pdf files are allowed"
+    "Only docx and pdf files are allowed": "Only docx and pdf files are allowed",
+    "Unsupported legacy file format %s, please convert to a modern format (e.g. .docx, .pptx, .xlsx) before uploading": "Unsupported legacy file format %s, please convert to a modern format (e.g. .docx, .pptx, .xlsx) before uploading"
   },
   "storage": {
     "storage provider name: [%s] doesn't exist": "storage provider name: [%s] doesn't exist"
