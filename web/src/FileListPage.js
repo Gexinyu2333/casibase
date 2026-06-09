@@ -245,6 +245,23 @@ class FileListPage extends BaseListPage {
         },
       },
       {
+        title: i18next.t("file:Vector count"),
+        dataIndex: "vectorCount",
+        key: "vectorCount",
+        width: "130px",
+        sorter: (a, b) => a.vectorCount - b.vectorCount,
+        render: (text, record) => {
+          const objectKey = record.name.startsWith(`${record.store}_`)
+            ? record.name.substring(record.store.length + 1)
+            : record.name;
+          return (
+            <a onClick={() => this.props.history.push(`/vectors?file=${encodeURIComponent(objectKey)}`)}>
+              {text}
+            </a>
+          );
+        },
+      },
+      {
         title: i18next.t("chat:Token count"),
         dataIndex: "tokenCount",
         key: "tokenCount",
@@ -256,6 +273,7 @@ class FileListPage extends BaseListPage {
         dataIndex: "url",
         key: "preview",
         width: "150px",
+        fixed: "right",
         render: (text, record) => {
           if (!record.url) {
             return null;
@@ -284,7 +302,7 @@ class FileListPage extends BaseListPage {
         render: (text, record, index) => {
           return (
             <div style={{display: "flex", alignItems: "center", gap: "2px", flexWrap: "nowrap"}}>
-              <Tooltip title={i18next.t("general:View")}>
+              <Tooltip title={i18next.t("vector:View Vector")}>
                 <Button
                   type="text"
                   size="small"

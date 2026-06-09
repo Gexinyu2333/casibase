@@ -87,7 +87,8 @@
     "Your chat text involves sensitive content. This chat has been forcibly terminated.": "Your chat text involves sensitive content. This chat has been forcibly terminated."
   },
   "file": {
-    "Filename": "Filename"
+    "Filename": "Filename",
+    "Vector count": "Vector count"
   },
   "form": {
     "Edit Form": "Edit Form",

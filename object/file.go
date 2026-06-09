@@ -47,13 +47,47 @@ type File struct {
 	StorageProvider string     `xorm:"varchar(100)" json:"storageProvider"`
 	Url             string     `xorm:"varchar(500)" json:"url"`
 	TokenCount      int        `json:"tokenCount"`
+	VectorCount     int        `xorm:"-" json:"vectorCount"`
 	Status          FileStatus `xorm:"varchar(100)" json:"status"`
 	ErrorText       string     `xorm:"mediumtext" json:"errorText"`
+}
+
+func populateFileVectorCounts(files []*File) error {
+	type result struct {
+		File  string
+		Store string
+		Count int64
+	}
+	var results []result
+	err := adapter.engine.Table("vector").Select("file, store, count(*) as count").GroupBy("file, store").Find(&results)
+	if err != nil {
+		return err
+	}
+
+	countMap := make(map[string]int, len(results))
+	for _, r := range results {
+		countMap[r.Store+"/"+r.File] = int(r.Count)
+	}
+
+	for _, file := range files {
+		prefix := file.Store + "_"
+		objectKey := file.Name
+		if strings.HasPrefix(file.Name, prefix) {
+			objectKey = strings.TrimPrefix(file.Name, prefix)
+		}
+		file.VectorCount = countMap[file.Store+"/"+objectKey]
+	}
+	return nil
 }
 
 func GetGlobalFiles() ([]*File, error) {
 	files := []*File{}
 	err := adapter.engine.Asc("owner").Desc("created_time").Find(&files)
+	if err != nil {
+		return files, err
+	}
+
+	err = populateFileVectorCounts(files)
 	if err != nil {
 		return files, err
 	}
