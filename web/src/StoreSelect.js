@@ -58,17 +58,15 @@ function StoreSelect(props) {
         if (res.status === "ok") {
           setStores(res.data);
 
-          // Iron rule: if localStorage already has a specific store, NEVER override it during
-          // initialization. The user or a store-specific URL is the only thing allowed to change it.
-          const storedStore = Setting.getStore();
-          const storedStoreIsValid = storedStore && storedStore !== "All" &&
-            res.data.some(store => store.name === storedStore);
-
-          if (storedStoreIsValid) {
-            // Already have a valid current store — just sync the display widget, don't touch localStorage.
-            setValue(storedStore);
+          // Iron rule: if the user has previously saved a value in localStorage (even "All"),
+          // NEVER override it during initialization. Only a user action changes it.
+          // Distinguish "explicitly set to All" from "never set" by checking localStorage directly.
+          const rawStoredStore = localStorage.getItem("store");
+          if (rawStoredStore !== null) {
+            // User has an explicit choice saved — just sync the display widget.
+            setValue(rawStoredStore);
           } else {
-            // No valid store in localStorage yet. Apply defaults:
+            // First visit / localStorage cleared. Apply defaults:
             // 1. Homepage-bound store takes priority.
             // 2. Fall back to first store in the list.
             const userBoundStore = getUserBoundStore(res.data);
