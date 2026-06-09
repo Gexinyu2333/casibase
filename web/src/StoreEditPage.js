@@ -243,7 +243,7 @@ class StoreEditPage extends React.Component {
     return (
       <Space wrap>
         <Button onClick={() => this.submitStoreEdit(false, undefined)}>{i18next.t("general:Save")}</Button>
-        <Button onClick={() => this.submitStoreEdit(true, undefined)}>{i18next.t("general:Save & Exit")}</Button>
+        <Button type="primary" onClick={() => this.submitStoreEdit(true, undefined)}>{i18next.t("general:Save & Exit")}</Button>
         {this.state.isNewStore && <Button onClick={() => this.cancelStoreEdit()}>{i18next.t("general:Cancel")}</Button>}
         {shouldShowClaim && <Button onClick={() => this.claimStore()}>{i18next.t("store:Claim")}</Button>}
       </Space>

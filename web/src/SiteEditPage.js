@@ -115,7 +115,7 @@ class SiteEditPage extends React.Component {
     return (
       <Space wrap>
         <Button onClick={() => this.submitSiteEdit(false)}>{i18next.t("general:Save")}</Button>
-        <Button onClick={() => this.submitSiteEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
+        <Button type="primary" onClick={() => this.submitSiteEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
       </Space>
     );
   }

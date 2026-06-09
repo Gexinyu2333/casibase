@@ -108,7 +108,7 @@ class RecordEditPage extends React.Component {
     return (
       <Space wrap>
         <Button onClick={() => this.submitRecordEdit(false)}>{i18next.t("general:Save")}</Button>
-        <Button onClick={() => this.submitRecordEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
+        <Button type="primary" onClick={() => this.submitRecordEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
         {this.state.mode === "add" && <Button onClick={() => this.deleteRecord()}>{i18next.t("general:Cancel")}</Button>}
       </Space>
     );

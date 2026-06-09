@@ -310,7 +310,7 @@ class ProviderEditPage extends React.Component {
           {!isRemote && (
             <div style={{display: "flex", gap: "8px", marginRight: "4px"}}>
               <Button onClick={() => this.submitProviderEdit(false)}>{i18next.t("general:Save")}</Button>
-              <Button onClick={() => this.submitProviderEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
+              <Button type="primary" onClick={() => this.submitProviderEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
               {this.state.isNewProvider && <Button onClick={() => this.cancelProviderEdit()}>{i18next.t("general:Cancel")}</Button>}
             </div>
           )}

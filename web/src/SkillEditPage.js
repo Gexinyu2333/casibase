@@ -102,7 +102,7 @@ class SkillEditPage extends React.Component {
           <div style={{display: "flex", gap: "8px", marginRight: "4px"}}>
             <Space wrap>
               <Button onClick={() => this.submitSkillEdit(false)}>{i18next.t("general:Save")}</Button>
-              <Button onClick={() => this.submitSkillEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
+              <Button type="primary" onClick={() => this.submitSkillEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
               {this.state.isNewSkill && <Button onClick={() => this.cancelSkillEdit()}>{i18next.t("general:Cancel")}</Button>}
             </Space>
           </div>

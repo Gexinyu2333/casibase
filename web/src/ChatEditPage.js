@@ -118,7 +118,7 @@ class ChatEditPage extends React.Component {
     return (
       <Space wrap>
         <Button onClick={() => this.submitChatEdit(false)}>{i18next.t("general:Save")}</Button>
-        <Button onClick={() => this.submitChatEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
+        <Button type="primary" onClick={() => this.submitChatEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
         {this.state.isNewChat && <Button onClick={() => this.cancelChatEdit()}>{i18next.t("general:Cancel")}</Button>}
       </Space>
     );

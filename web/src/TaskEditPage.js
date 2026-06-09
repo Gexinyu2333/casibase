@@ -283,7 +283,7 @@ class TaskEditPage extends React.Component {
     return (
       <Space wrap>
         <Button onClick={() => this.submitTaskEdit(false)}>{i18next.t("general:Save")}</Button>
-        <Button onClick={() => this.submitTaskEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
+        <Button type="primary" onClick={() => this.submitTaskEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
         {this.state.isNewTask && <Button onClick={() => this.cancelTaskEdit()}>{i18next.t("general:Cancel")}</Button>}
       </Space>
     );

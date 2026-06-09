@@ -159,7 +159,7 @@ class MessageEditPage extends React.Component {
     return (
       <Space wrap>
         <Button onClick={() => this.submitMessageEdit(false)}>{i18next.t("general:Save")}</Button>
-        <Button onClick={() => this.submitMessageEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
+        <Button type="primary" onClick={() => this.submitMessageEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
         {this.state.isNewMessage && <Button onClick={() => this.cancelMessageEdit()}>{i18next.t("general:Cancel")}</Button>}
       </Space>
     );

@@ -141,7 +141,7 @@ class ServerEditPage extends React.Component {
           <div style={{display: "flex", gap: "8px", marginRight: "4px"}}>
             <Space wrap>
               <Button onClick={() => this.submitServerEdit(false)}>{i18next.t("general:Save")}</Button>
-              <Button onClick={() => this.submitServerEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
+              <Button type="primary" onClick={() => this.submitServerEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
               {this.state.isNewServer && <Button onClick={() => this.cancelServerEdit()}>{i18next.t("general:Cancel")}</Button>}
             </Space>
           </div>

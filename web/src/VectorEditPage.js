@@ -94,7 +94,7 @@ class VectorEditPage extends React.Component {
     return (
       <Space wrap>
         <Button onClick={() => this.submitVectorEdit(false)}>{i18next.t("general:Save")}</Button>
-        <Button onClick={() => this.submitVectorEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
+        <Button type="primary" onClick={() => this.submitVectorEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
         {this.state.isNewVector && <Button onClick={() => this.cancelVectorEdit()}>{i18next.t("general:Cancel")}</Button>}
       </Space>
     );

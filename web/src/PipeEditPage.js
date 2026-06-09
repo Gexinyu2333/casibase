@@ -221,7 +221,7 @@ class PipeEditPage extends React.Component {
           </span>
           <div style={{display: "flex", gap: "8px", marginRight: "4px"}}>
             <Button onClick={() => this.submitPipeEdit(false)}>{i18next.t("general:Save")}</Button>
-            <Button onClick={() => this.submitPipeEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
+            <Button type="primary" onClick={() => this.submitPipeEdit(true)}>{i18next.t("general:Save & Exit")}</Button>
             {this.state.isNewPipe && <Button onClick={() => this.cancelPipeEdit()}>{i18next.t("general:Cancel")}</Button>}
           </div>
         </div>
