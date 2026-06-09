@@ -16,6 +16,7 @@ package object
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 	"time"
 
@@ -529,9 +530,41 @@ func GetStoreCountByOwner(owner, field, value string) (int64, error) {
 	return session.Where("owner = ?", owner).Count(&Store{})
 }
 
+var storeVirtualSortFields = map[string]bool{
+	"chatCount":    true,
+	"messageCount": true,
+	"vectorCount":  true,
+}
+
+func IsStoreVirtualSortField(sortField string) bool {
+	return storeVirtualSortFields[sortField]
+}
+
+func SortStoresInMemory(stores []*Store, sortField, sortOrder string) {
+	sort.SliceStable(stores, func(i, j int) bool {
+		var vi, vj int
+		switch sortField {
+		case "chatCount":
+			vi, vj = stores[i].ChatCount, stores[j].ChatCount
+		case "messageCount":
+			vi, vj = stores[i].MessageCount, stores[j].MessageCount
+		case "vectorCount":
+			vi, vj = stores[i].VectorCount, stores[j].VectorCount
+		}
+		if sortOrder == "ascend" {
+			return vi < vj
+		}
+		return vi > vj
+	})
+}
+
 func GetPaginationStores(offset, limit int, name, field, value, sortField, sortOrder string) ([]*Store, error) {
 	stores := []*Store{}
-	session := GetDbSession("", offset, limit, field, value, sortField, sortOrder)
+	dbSortField, dbSortOrder := sortField, sortOrder
+	if storeVirtualSortFields[sortField] {
+		dbSortField, dbSortOrder = "", ""
+	}
+	session := GetDbSession("", offset, limit, field, value, dbSortField, dbSortOrder)
 	var err error
 	if name != "" {
 		err = session.Find(&stores, &Store{Name: name})
@@ -547,7 +580,11 @@ func GetPaginationStores(offset, limit int, name, field, value, sortField, sortO
 
 func GetPaginationStoresByOwner(owner string, offset, limit int, field, value, sortField, sortOrder string) ([]*Store, error) {
 	stores := []*Store{}
-	session := GetDbSession("", offset, limit, field, value, sortField, sortOrder)
+	dbSortField, dbSortOrder := sortField, sortOrder
+	if storeVirtualSortFields[sortField] {
+		dbSortField, dbSortOrder = "", ""
+	}
+	session := GetDbSession("", offset, limit, field, value, dbSortField, dbSortOrder)
 	err := session.Where("owner = ?", owner).Find(&stores)
 	if err != nil {
 		return stores, err

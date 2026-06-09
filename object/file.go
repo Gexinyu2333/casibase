@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"io"
 	"mime/multipart"
+	"sort"
 	"strings"
 
 	"github.com/the-open-agent/openagent/i18n"
@@ -213,9 +214,17 @@ func GetFileCount(owner, store, field, value string) (int64, error) {
 	return session.Count(&File{})
 }
 
+var fileVirtualSortFields = map[string]bool{
+	"vectorCount": true,
+}
+
 func GetPaginationFiles(owner, store string, offset, limit int, field, value, sortField, sortOrder string) ([]*File, error) {
 	files := []*File{}
-	session := GetDbSession(owner, offset, limit, field, value, sortField, sortOrder)
+	dbSortField, dbSortOrder := sortField, sortOrder
+	if fileVirtualSortFields[sortField] {
+		dbSortField, dbSortOrder = "", ""
+	}
+	session := GetDbSession(owner, offset, limit, field, value, dbSortField, dbSortOrder)
 	var err error
 	if store != "" {
 		err = session.Find(&files, &File{Store: store})
@@ -229,6 +238,15 @@ func GetPaginationFiles(owner, store string, offset, limit int, field, value, so
 	err = populateFileVectorCounts(files)
 	if err != nil {
 		return files, err
+	}
+
+	if fileVirtualSortFields[sortField] {
+		sort.SliceStable(files, func(i, j int) bool {
+			if sortOrder == "ascend" {
+				return files[i].VectorCount < files[j].VectorCount
+			}
+			return files[i].VectorCount > files[j].VectorCount
+		})
 	}
 
 	return files, nil

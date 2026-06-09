@@ -108,6 +108,10 @@ func (c *ApiController) GetGlobalStores() {
 			return
 		}
 
+		if object.IsStoreVirtualSortField(sortField) {
+			object.SortStoresInMemory(stores, sortField, sortOrder)
+		}
+
 		c.ResponseOk(stores, count)
 	}
 }
