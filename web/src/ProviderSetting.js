@@ -947,10 +947,15 @@ export function getModelSubTypeOptions(type) {
     ];
   } else if (type === "MiniMax") {
     return [
-      {id: "MiniMax-Text-01", name: "MiniMax-Text-01"},
-      {id: "abab6.5s-chat", name: "abab6.5s-chat"},
-      {id: "abab6.5g-chat", name: "abab6.5g-chat"},
-      {id: "abab6.5t-chat", name: "abab6.5t-chat"},
+      {id: "MiniMax-M3", name: "MiniMax-M3"},
+      {id: "MiniMax-M2.7", name: "MiniMax-M2.7"},
+      {id: "MiniMax-M2.7-highspeed", name: "MiniMax-M2.7-highspeed"},
+      {id: "MiniMax-M2.5", name: "MiniMax-M2.5"},
+      {id: "MiniMax-M2.5-highspeed", name: "MiniMax-M2.5-highspeed"},
+      {id: "MiniMax-M2.1", name: "MiniMax-M2.1"},
+      {id: "MiniMax-M2.1-highspeed", name: "MiniMax-M2.1-highspeed"},
+      {id: "MiniMax-M2", name: "MiniMax-M2"},
+      {id: "M2-her", name: "M2-her"},
     ];
   } else if (type === "Ollama") {
     return [
