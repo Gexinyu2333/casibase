@@ -69,7 +69,7 @@ function buildBreadcrumbItems(uri) {
 
   const lastSegment = pathSegments[pathSegments.length - 1];
   const lastLabelKey = RESOURCE_LABELS[lastSegment];
-  const lastLabel = lastLabelKey ? i18next.t(lastLabelKey) : lastSegment;
+  const lastLabel = lastLabelKey ? i18next.t(lastLabelKey) : decodeURIComponent(lastSegment);
 
   return [
     homeItem,
