@@ -225,7 +225,7 @@ class FileListPage extends BaseListPage {
         title: i18next.t("general:Preview"),
         dataIndex: "url",
         key: "preview",
-        width: "80px",
+        width: "100px",
         render: (text, record) => {
           if (!record.url) {
             return null;
@@ -237,9 +237,9 @@ class FileListPage extends BaseListPage {
           return (
             <Image
               src={record.url}
-              width={48}
-              height={48}
-              style={{objectFit: "cover", borderRadius: "4px"}}
+              width={80}
+              height={80}
+              style={{objectFit: "contain", borderRadius: "4px"}}
               preview={{src: record.url}}
             />
           );
