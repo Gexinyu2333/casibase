@@ -37,7 +37,14 @@ func (c *ApiController) GetGlobalFiles() {
 	sortOrder := c.Input().Get("sortOrder")
 
 	if limit == "" || page == "" {
-		files, err := object.GetGlobalFiles()
+		var files []*object.File
+		var err error
+		if c.IsGlobalAdmin() {
+			files, err = object.GetGlobalFiles()
+		} else {
+			username := c.GetSessionUsername()
+			files, err = object.GetFiles(username)
+		}
 		if err != nil {
 			c.ResponseError(err.Error())
 			return
@@ -49,21 +56,36 @@ func (c *ApiController) GetGlobalFiles() {
 			return
 		}
 
+		username := c.GetSessionUsername()
 		limit := util.ParseInt(limit)
-		count, err := object.GetFileCount("", field, value)
+
+		var count int64
+		var files []*object.File
+		var err error
+
+		if c.IsGlobalAdmin() {
+			count, err = object.GetFileCount("", field, value)
+			if err != nil {
+				c.ResponseError(err.Error())
+				return
+			}
+			paginator := pagination.SetPaginator(c.Ctx, limit, count)
+			files, err = object.GetPaginationFiles("", paginator.Offset(), limit, field, value, sortField, sortOrder)
+		} else {
+			count, err = object.GetFileCount(username, field, value)
+			if err != nil {
+				c.ResponseError(err.Error())
+				return
+			}
+			paginator := pagination.SetPaginator(c.Ctx, limit, count)
+			files, err = object.GetPaginationFiles(username, paginator.Offset(), limit, field, value, sortField, sortOrder)
+		}
 		if err != nil {
 			c.ResponseError(err.Error())
 			return
 		}
 
-		paginator := pagination.SetPaginator(c.Ctx, limit, count)
-		files, err := object.GetPaginationFiles("", paginator.Offset(), limit, field, value, sortField, sortOrder)
-		if err != nil {
-			c.ResponseError(err.Error())
-			return
-		}
-
-		c.ResponseOk(files, paginator.Nums())
+		c.ResponseOk(files, count)
 	}
 }
 
@@ -238,7 +260,7 @@ func (c *ApiController) UploadFile() {
 	}
 
 	origin := getOriginFromHost(c.Ctx.Request.Host)
-	fileRecord, err := object.UploadFile("admin", userName, filename, fileData, c.GetAcceptLanguage(), origin)
+	fileRecord, err := object.UploadFile(userName, userName, filename, fileData, c.GetAcceptLanguage(), origin)
 	if err != nil {
 		c.ResponseError(err.Error())
 		return

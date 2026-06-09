@@ -17,6 +17,7 @@ import {Link} from "react-router-dom";
 import {Button, Image, Popconfirm, Table, Tooltip, Upload} from "antd";
 import BaseListPage from "./BaseListPage";
 import * as Setting from "./Setting";
+import * as Conf from "./Conf";
 import * as FileBackend from "./backend/FileBackend";
 import i18next from "i18next";
 import {DeleteOutlined, DownloadOutlined, EditOutlined, ReloadOutlined, UploadOutlined} from "@ant-design/icons";
@@ -121,6 +122,24 @@ class FileListPage extends BaseListPage {
   renderTable(files) {
     const columns = [
       {
+        title: i18next.t("general:Owner"),
+        dataIndex: "owner",
+        key: "owner",
+        width: "110px",
+        sorter: (a, b) => (a.owner || "").localeCompare(b.owner || ""),
+        ...this.getColumnSearchProps("owner"),
+        render: (text, record, index) => {
+          if (!text || text.startsWith("u-")) {
+            return text;
+          }
+          return (
+            <a target="_blank" rel="noreferrer" href={Setting.getMyProfileUrl(this.props.account).replace("/account", `/users/${Conf.AuthConfig.organizationName}/${text}`)}>
+              {text}
+            </a>
+          );
+        },
+      },
+      {
         title: i18next.t("general:Store"),
         dataIndex: "store",
         key: "store",
@@ -143,6 +162,17 @@ class FileListPage extends BaseListPage {
         width: "200px",
         sorter: (a, b) => a.filename.localeCompare(b.filename),
         ...this.getColumnSearchProps("filename"),
+      },
+      {
+        title: i18next.t("general:Created time"),
+        dataIndex: "createdTime",
+        key: "createdTime",
+        width: "150px",
+        sorter: (a, b) => a.createdTime.localeCompare(b.createdTime),
+        defaultSortOrder: "descend",
+        render: (text, record, index) => {
+          return Setting.getFormattedDate(text);
+        },
       },
       {
         title: i18next.t("general:Size"),
@@ -312,8 +342,7 @@ class FileListPage extends BaseListPage {
     //     const field = params.searchedColumn, value = params.searchText;
     //     const sortField = params.sortField, sortOrder = params.sortOrder;
     this.setState({loading: true});
-    const store = this.state.storeName;
-    FileBackend.getFiles("admin", store)
+    FileBackend.getGlobalFiles()
       .then((res) => {
         this.setState({
           loading: false,
