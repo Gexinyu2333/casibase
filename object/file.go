@@ -239,10 +239,10 @@ func UploadFile(owner string, userName string, filename string, fileData multipa
 	if err != nil {
 		return nil, err
 	}
-	storeName := ""
-	if defaultStore != nil {
-		storeName = defaultStore.Name
+	if defaultStore == nil {
+		return nil, fmt.Errorf(i18n.Translate(lang, "object:No store found for user: %s, please create a store first"), owner)
 	}
+	storeName := defaultStore.Name
 
 	storageProviderObj, err := provider.GetStorageProviderObj("", lang)
 	if err != nil {
