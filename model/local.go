@@ -441,7 +441,7 @@ func (p *LocalModelProvider) QueryText(question string, writer io.Writer, histor
 			return nil, err
 		}
 		return modelResult, nil
-	} else if getOpenAiModelType(model) == "imagesGenerations" {
+	} else if getOpenAiModelType(model) == "ImageGeneration" {
 		if strings.HasPrefix(question, "$OpenAgentDryRun$") {
 			return modelResult, nil
 		}
