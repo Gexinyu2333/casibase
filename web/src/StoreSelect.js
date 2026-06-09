@@ -58,17 +58,26 @@ function StoreSelect(props) {
         if (res.status === "ok") {
           setStores(res.data);
 
-          // Check if user has Homepage binding to a store
-          const userBoundStore = getUserBoundStore(res.data);
-          if (userBoundStore) {
-            // User is bound to a specific store, force select it
-            handleOnChange(userBoundStore);
+          // Iron rule: if localStorage already has a specific store, NEVER override it during
+          // initialization. The user or a store-specific URL is the only thing allowed to change it.
+          const storedStore = Setting.getStore();
+          const storedStoreIsValid = storedStore && storedStore !== "All" &&
+            res.data.some(store => store.name === storedStore);
+
+          if (storedStoreIsValid) {
+            // Already have a valid current store — just sync the display widget, don't touch localStorage.
+            setValue(storedStore);
           } else {
-            // User is not bound, use normal behavior
-            const selectedValueExist = res.data.filter(store => store.name === value).length > 0;
-            if (Setting.getStore() === undefined || !selectedValueExist) {
-              const storeItems = getStoreItems();
-              handleOnChange(storeItems.length > 0 ? storeItems[0].value : "");
+            // No valid store in localStorage yet. Apply defaults:
+            // 1. Homepage-bound store takes priority.
+            // 2. Fall back to first store in the list.
+            const userBoundStore = getUserBoundStore(res.data);
+            if (userBoundStore) {
+              handleOnChange(userBoundStore);
+            } else {
+              // Use res.data directly because the stores state update hasn't re-rendered yet
+              const firstStore = res.data.length > 0 ? res.data[0].name : "";
+              handleOnChange(firstStore);
             }
           }
           setInitialized(true);

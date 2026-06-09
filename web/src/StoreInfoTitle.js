@@ -83,15 +83,33 @@ const StoreInfoTitle = (props) => {
     return () => window.removeEventListener("resize", checkIsMobile);
   }, []);
 
+  // Track the localStorage current store so storeInfo recomputes when it changes.
+  const [localStorageStore, setLocalStorageStore] = useState(Setting.getStoreCurrent);
+
+  useEffect(() => {
+    const handleStoreChanged = () => {
+      setLocalStorageStore(Setting.getStoreCurrent());
+    };
+    window.addEventListener("storeChanged", handleStoreChanged);
+    return () => window.removeEventListener("storeChanged", handleStoreChanged);
+  }, []);
+
   // Update refs when props change
   useEffect(() => {
     chatRef.current = chat;
   }, [chat]);
 
-  // Find the current store info
+  // Find the current store info.
+  // Priority for the !chat (draft) case:
+  //   1. draftStoreName (explicitly chosen for this draft)
+  //   2. localStorage current store (localStorageStore state, kept in sync via storeChanged event)
+  //   3. isDefault store (last resort)
   const storeInfo = chat
     ? stores?.find(store => store.name === chat.store)
-    : (draftStoreName ? stores?.find(store => store.name === draftStoreName) : null) || stores?.find(store => store.isDefault) || null;
+    : (draftStoreName ? stores?.find(store => store.name === draftStoreName) : null)
+      || (localStorageStore ? stores?.find(store => store.name === localStorageStore) : null)
+      || stores?.find(store => store.isDefault)
+      || null;
 
   // Initialize the local state when props change
   useEffect(() => {

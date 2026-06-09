@@ -30,21 +30,25 @@ class HomePage extends React.Component {
   }
 
   UNSAFE_componentWillMount() {
-    this.getStore();
+    this.initStore();
   }
 
-  getStore() {
+  initStore() {
+    // If there is already a valid current store in localStorage, use it directly.
+    const currentStore = Setting.getStoreCurrent();
+    if (currentStore) {
+      this.setState({storeFetched: true});
+      return;
+    }
+
+    // No current store yet — fetch the default store and save it.
     StoreBackend.getStore("admin", "_default_store_")
       .then((res) => {
         if (res.status === "ok") {
-          if (res.data && typeof res.data2 === "string" && res.data2 !== "") {
-            res.data.error = res.data2;
+          if (res.data) {
+            Setting.setStore(res.data.name);
           }
-
-          this.setState({
-            store: res.data,
-            storeFetched: true,
-          });
+          this.setState({storeFetched: true});
         } else {
           Setting.showMessage("error", `${i18next.t("general:Failed to get")}: ${res.msg}`);
           this.setState({storeFetched: true});

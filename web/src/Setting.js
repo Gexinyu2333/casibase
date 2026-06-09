@@ -271,6 +271,13 @@ export function getStore() {
   return store !== null ? store : "All";
 }
 
+// Returns the current store name from localStorage, or null if not set or set to "All".
+// Use this when you need the actual store (not the "All" sentinel).
+export function getStoreCurrent() {
+  const store = localStorage.getItem("store");
+  return store && store !== "All" ? store : null;
+}
+
 export function getRequestStore(account) {
   if (isLocalAdminUser(account)) {
     return getStore() === "All" ? "" : getStore();

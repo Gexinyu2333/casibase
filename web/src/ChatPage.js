@@ -45,11 +45,13 @@ class ChatPage extends BaseListPage {
     const savedCollapsedState = localStorage.getItem("chatMenuCollapsed");
     const chatMenuCollapsed = savedCollapsedState ? JSON.parse(savedCollapsedState) : false;
 
-    // if URL path contains store name, set it to the store select widget
-    const currentStore = this.getStore();
-    if (currentStore) {
-      Setting.setStore(currentStore);
+    // If URL path contains a store name, update localStorage to that store.
+    // Otherwise, use whatever is already in localStorage (never override it).
+    const urlStore = this.getStore();
+    if (urlStore) {
+      Setting.setStore(urlStore);
     }
+    const currentStore = urlStore || Setting.getStoreCurrent();
 
     this.setState({
       loading: true,
