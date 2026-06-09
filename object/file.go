@@ -249,7 +249,7 @@ func UploadFile(owner string, userName string, filename string, fileData multipa
 		return nil, err
 	}
 
-	objectKey := fmt.Sprintf("file/%s", filename)
+	objectKey := fmt.Sprintf("file_%s/%s", util.GetRandomName(), filename)
 	fileBuffer := bytes.NewBuffer(nil)
 	_, err = io.Copy(fileBuffer, fileData)
 	if err != nil {
