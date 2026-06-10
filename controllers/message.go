@@ -59,7 +59,15 @@ func (c *ApiController) GetGlobalMessages() {
 		var messages []*object.Message
 		var err error
 
-		if c.IsStoreAdmin() {
+		if c.IsGlobalAdmin() {
+			count, err = object.GetMessageCount("admin", field, value, store)
+			if err != nil {
+				c.ResponseError(err.Error())
+				return
+			}
+			paginator := pagination.SetPaginator(c.Ctx, limitInt, count)
+			messages, err = object.GetPaginationMessages("admin", paginator.Offset(), limitInt, field, value, sortField, sortOrder, store)
+		} else if c.IsStoreAdmin() {
 			// Store admin sees messages belonging to their stores
 			storeNames, err2 := getStoreNamesForUser(username)
 			if err2 != nil {
@@ -78,14 +86,6 @@ func (c *ApiController) GetGlobalMessages() {
 			}
 			paginator := pagination.SetPaginator(c.Ctx, limitInt, count)
 			messages, err = object.GetPaginationMessagesByStoreNames(storeNames, paginator.Offset(), limitInt, field, value, sortField, sortOrder)
-		} else if c.IsGlobalAdmin() {
-			count, err = object.GetMessageCount("admin", field, value, store)
-			if err != nil {
-				c.ResponseError(err.Error())
-				return
-			}
-			paginator := pagination.SetPaginator(c.Ctx, limitInt, count)
-			messages, err = object.GetPaginationMessages("admin", paginator.Offset(), limitInt, field, value, sortField, sortOrder, store)
 		} else {
 			// Regular user sees only their own messages
 			count, err = object.GetMessageCountByUser(username, store, field, value)

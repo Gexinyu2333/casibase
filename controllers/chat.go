@@ -60,10 +60,15 @@ func (c *ApiController) GetGlobalChats() {
 		var chats []*object.Chat
 		var err error
 
-		// Store admins (chat-admin / 教师) must be checked before global admins: users who have
-		// both Casdoor isAdmin and chat-admin would otherwise hit the global branch and bypass
-		// store scoping when ?store= is empty.
-		if c.IsStoreAdmin() {
+		if c.IsGlobalAdmin() {
+			count, err = object.GetChatCount("", field, value, store)
+			if err != nil {
+				c.ResponseError(err.Error())
+				return
+			}
+			paginator := pagination.SetPaginator(c.Ctx, limitInt, count)
+			chats, err = object.GetPaginationChats("", paginator.Offset(), limitInt, field, value, sortField, sortOrder, store)
+		} else if c.IsStoreAdmin() {
 			// Store admin sees chats belonging to their stores
 			storeNames, err2 := getStoreNamesForUser(username)
 			if err2 != nil {
@@ -82,14 +87,6 @@ func (c *ApiController) GetGlobalChats() {
 			}
 			paginator := pagination.SetPaginator(c.Ctx, limitInt, count)
 			chats, err = object.GetPaginationChatsByStoreNames(storeNames, paginator.Offset(), limitInt, field, value, sortField, sortOrder)
-		} else if c.IsGlobalAdmin() {
-			count, err = object.GetChatCount("", field, value, store)
-			if err != nil {
-				c.ResponseError(err.Error())
-				return
-			}
-			paginator := pagination.SetPaginator(c.Ctx, limitInt, count)
-			chats, err = object.GetPaginationChats("", paginator.Offset(), limitInt, field, value, sortField, sortOrder, store)
 		} else {
 			// Regular user sees only their own chats
 			count, err = object.GetChatCountByUser(username, store, field, value)
