@@ -33,131 +33,137 @@ import (
 // @Success 200 {object} openai.ChatCompletionResponse
 // @router /api/chat/completions [post]
 func (c *ApiController) ChatCompletions() {
-	// Authenticate using API key
-	apiKey := c.Ctx.Request.Header.Get("Authorization")
-	if !strings.HasPrefix(apiKey, "Bearer ") {
+	auth := c.Ctx.Request.Header.Get("Authorization")
+	if !strings.HasPrefix(auth, "Bearer ") {
 		c.ResponseError(c.T("openai:Invalid API key format. Expected 'Bearer API_KEY'"))
 		return
 	}
+	apiKey := strings.TrimPrefix(auth, "Bearer ")
 
-	apiKey = strings.TrimPrefix(apiKey, "Bearer ")
-
-	// Get the model provider based on API key
-	modelProvider, err := object.GetModelProviderByProviderKey(apiKey, c.GetAcceptLanguage())
-	if err != nil {
-		c.ResponseError(fmt.Sprintf("Authentication failed: %s", err.Error()))
-		return
-	}
-
-	// Parse request body
 	var request openai.ChatCompletionRequest
-	err = json.Unmarshal(c.Ctx.Input.RequestBody, &request)
-	if err != nil {
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &request); err != nil {
 		c.ResponseError(fmt.Sprintf("Failed to parse request: %s", err.Error()))
 		return
 	}
 
-	// Extract messages: system prompt, conversation history, and final user question
-	var question string
-	var systemPrompt string
-	var history []*model.RawMessage
-
-	for _, msg := range request.Messages {
-		switch msg.Role {
-		case "system":
-			systemPrompt = msg.Content
-		case "user":
-			question = msg.Content
-			history = append(history, &model.RawMessage{Author: "Human", Text: msg.Content})
-		case "assistant":
-			history = append(history, &model.RawMessage{Author: "AI", Text: msg.Content})
-		}
-	}
-
-	if question == "" {
-		c.ResponseError(c.T("openai:No user message found in the request"))
-		return
-	}
-
-	// history passed to QueryText should exclude the final user message (it's passed as question)
-	if len(history) > 0 {
-		history = history[:len(history)-1]
-	}
-
-	// Setup for streaming if enabled
-	requestId := util.GenerateUUID()
-	if request.Stream {
-		c.Ctx.ResponseWriter.Header().Set("Content-Type", "text/event-stream")
-		c.Ctx.ResponseWriter.Header().Set("Cache-Control", "no-cache")
-		c.Ctx.ResponseWriter.Header().Set("Connection", "keep-alive")
-	}
-
-	// Create custom writer for OpenAI format
-	writer := &OpenAIWriter{
-		Response:  *c.Ctx.ResponseWriter, // Embed Response by dereferencing the pointer
-		Buffer:    []byte{},
-		RequestID: requestId,
-		Stream:    request.Stream,
-		Cleaner:   *NewCleaner(6),
-		Model:     request.Model,
-	}
-
-	knowledge := []*model.RawMessage{}
-
-	// Call the model provider
-	modelResult, err := modelProvider.QueryText(question, writer, history, systemPrompt, knowledge, nil, c.GetAcceptLanguage())
+	question, systemPrompt, history, err := parseOpenAIMessages(request.Messages)
 	if err != nil {
 		c.ResponseError(err.Error())
 		return
 	}
 
-	// Handle response based on streaming mode
-	if !request.Stream {
-		// For non-streaming, send complete response at once
-		answer := writer.MessageString()
-
-		// Create response using go-openai structures
-		response := openai.ChatCompletionResponse{
-			ID:      "chatcmpl-" + requestId,
-			Object:  "chat.completion",
-			Created: util.GetCurrentUnixTime(),
-			Model:   request.Model,
-			Choices: []openai.ChatCompletionChoice{
-				{
-					Index: 0,
-					Message: openai.ChatCompletionMessage{
-						Role:    "assistant",
-						Content: answer,
-					},
-					FinishReason: openai.FinishReasonStop,
-				},
-			},
-			Usage: openai.Usage{
-				PromptTokens:     modelResult.PromptTokenCount,
-				CompletionTokens: modelResult.ResponseTokenCount,
-				TotalTokens:      modelResult.TotalTokenCount,
-			},
-		}
-
-		jsonResponse, err := json.Marshal(response)
-		if err != nil {
-			c.ResponseError(err.Error())
-			return
-		}
-
-		c.Ctx.Output.Header("Content-Type", "application/json")
-		c.Ctx.Output.Body(jsonResponse)
-	} else {
-		// For streaming, close the stream with token counts
-		err = writer.Close(
-			modelResult.PromptTokenCount,
-			modelResult.ResponseTokenCount,
-			modelResult.TotalTokenCount,
-		)
-		if err != nil {
-			c.ResponseError(err.Error())
-			return
-		}
+	store, err := object.GetStoreByApiKey(apiKey)
+	if err != nil {
+		c.ResponseError(fmt.Sprintf("Authentication failed: %s", err.Error()))
+		return
 	}
+	if store != nil {
+		c.chatCompletionsViaStore(store, request, question, systemPrompt, history)
+		return
+	}
+
+	modelProvider, err := object.GetModelProviderByProviderKey(apiKey, c.GetAcceptLanguage())
+	if err != nil {
+		c.ResponseError(fmt.Sprintf("Authentication failed: %s", err.Error()))
+		return
+	}
+	c.chatCompletionsViaProvider(modelProvider, request, question, systemPrompt, history)
+}
+
+// chatCompletionsViaStore calls the model through a Store and persists chat + messages.
+func (c *ApiController) chatCompletionsViaStore(store *object.Store, request openai.ChatCompletionRequest, question, systemPrompt string, history []*model.RawMessage) {
+	lang := c.GetAcceptLanguage()
+	requestId := util.GenerateUUID()
+
+	modelProviderRecord, err := object.GetProviderFromName(store.Owner, store.ModelProvider, lang)
+	if err != nil || modelProviderRecord == nil {
+		c.ResponseError(fmt.Sprintf("Store model provider not found: %s", store.ModelProvider))
+		return
+	}
+	modelProviderObj, err := modelProviderRecord.GetModelProvider(lang)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	prompt := store.Prompt
+	if systemPrompt != "" {
+		prompt = systemPrompt
+	}
+
+	chat, _, aiMsg, err := createApiChatSession(store, modelProviderRecord.Name, question, requestId)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	writer := newOpenAIWriter(c.Ctx.ResponseWriter, request, requestId)
+	modelResult, err := modelProviderObj.QueryText(question, writer, history, prompt, []*model.RawMessage{}, nil, lang)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	if err = applyResultToApiSession(aiMsg, chat, writer, modelResult); err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	c.sendOpenAIResponse(writer, request, requestId, modelResult)
+}
+
+// chatCompletionsViaProvider calls the model directly through a Provider without recording.
+func (c *ApiController) chatCompletionsViaProvider(modelProvider model.ModelProvider, request openai.ChatCompletionRequest, question, systemPrompt string, history []*model.RawMessage) {
+	requestId := util.GenerateUUID()
+	writer := newOpenAIWriter(c.Ctx.ResponseWriter, request, requestId)
+
+	modelResult, err := modelProvider.QueryText(question, writer, history, systemPrompt, []*model.RawMessage{}, nil, c.GetAcceptLanguage())
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	c.sendOpenAIResponse(writer, request, requestId, modelResult)
+}
+
+// sendOpenAIResponse writes the final OpenAI-format response (streaming close or full JSON body).
+func (c *ApiController) sendOpenAIResponse(writer *OpenAIWriter, request openai.ChatCompletionRequest, requestId string, modelResult *model.ModelResult) {
+	if request.Stream {
+		if err := writer.Close(modelResult.PromptTokenCount, modelResult.ResponseTokenCount, modelResult.TotalTokenCount); err != nil {
+			c.ResponseError(err.Error())
+			return
+		}
+		c.EnableRender = false
+		return
+	}
+
+	response := openai.ChatCompletionResponse{
+		ID:      "chatcmpl-" + requestId,
+		Object:  "chat.completion",
+		Created: util.GetCurrentUnixTime(),
+		Model:   request.Model,
+		Choices: []openai.ChatCompletionChoice{
+			{
+				Index: 0,
+				Message: openai.ChatCompletionMessage{
+					Role:    "assistant",
+					Content: writer.MessageString(),
+				},
+				FinishReason: openai.FinishReasonStop,
+			},
+		},
+		Usage: openai.Usage{
+			PromptTokens:     modelResult.PromptTokenCount,
+			CompletionTokens: modelResult.ResponseTokenCount,
+			TotalTokens:      modelResult.TotalTokenCount,
+		},
+	}
+	jsonResponse, err := json.Marshal(response)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+	c.Ctx.Output.Header("Content-Type", "application/json")
+	c.Ctx.Output.Body(jsonResponse)
 	c.EnableRender = false
 }

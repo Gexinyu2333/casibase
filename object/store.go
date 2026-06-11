@@ -111,6 +111,8 @@ type Store struct {
 	Brief       string `xorm:"varchar(500)" json:"brief"`
 	Description string `xorm:"text" json:"description"`
 
+	ApiKey string `xorm:"varchar(100) index" json:"apiKey"`
+
 	PublishState string `xorm:"varchar(100)" json:"publishState"`
 
 	ChatCount    int    `xorm:"-" json:"chatCount"`
@@ -151,6 +153,21 @@ func GetStores(owner string) ([]*Store, error) {
 	}
 
 	return stores, nil
+}
+
+func GetStoreByApiKey(apiKey string) (*Store, error) {
+	if apiKey == "" {
+		return nil, nil
+	}
+	store := &Store{}
+	existed, err := adapter.engine.Where("api_key = ?", apiKey).Get(store)
+	if err != nil {
+		return nil, err
+	}
+	if !existed {
+		return nil, nil
+	}
+	return store, nil
 }
 
 func GetDefaultStore(owner string) (*Store, error) {
