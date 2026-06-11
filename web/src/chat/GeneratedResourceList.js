@@ -13,10 +13,11 @@
 // limitations under the License.
 
 import React from "react";
-import {Avatar, Button, Card, Flex, Tag, Typography} from "antd";
-import {DownloadOutlined, FileTextOutlined} from "@ant-design/icons";
+import {Button, Card, Flex, Tag, Typography} from "antd";
+import {DownloadOutlined} from "@ant-design/icons";
 import {saveAs} from "file-saver";
 import i18next from "i18next";
+import * as Setting from "../Setting";
 
 const listStyle = {width: "100%", maxWidth: 760, marginBottom: 12};
 const cardStyle = {width: "100%"};
@@ -98,7 +99,7 @@ const GeneratedResourceList = ({resources}) => {
         return (
           <Card key={`${resource.uri}-${idx}`} size="small" style={cardStyle}>
             <Flex align="center" gap="middle" style={rowStyle}>
-              <Avatar shape="square" size={48} icon={<FileTextOutlined />} />
+              <Setting.IconFont type={Setting.getFileIconType(fileName)} style={{fontSize: "48px", lineHeight: 1, flexShrink: 0}} />
               <Flex vertical gap={2} style={metaStyle}>
                 <Typography.Text strong ellipsis={{tooltip: fileName}}>
                   {fileName}
