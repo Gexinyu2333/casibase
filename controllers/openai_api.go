@@ -57,16 +57,20 @@ func (c *ApiController) ChatCompletions() {
 		return
 	}
 
-	// Extract messages content
+	// Extract messages: system prompt, conversation history, and final user question
 	var question string
 	var systemPrompt string
+	var history []*model.RawMessage
 
 	for _, msg := range request.Messages {
-		if msg.Role == "system" {
+		switch msg.Role {
+		case "system":
 			systemPrompt = msg.Content
-		} else if msg.Role == "user" {
-			// Keep the last user message
+		case "user":
 			question = msg.Content
+			history = append(history, &model.RawMessage{Author: "Human", Text: msg.Content})
+		case "assistant":
+			history = append(history, &model.RawMessage{Author: "AI", Text: msg.Content})
 		}
 	}
 
@@ -75,9 +79,9 @@ func (c *ApiController) ChatCompletions() {
 		return
 	}
 
-	// Combine system prompt with user question if available
-	if systemPrompt != "" {
-		question = fmt.Sprintf("System: %s\n\nUser: %s", systemPrompt, question)
+	// history passed to QueryText should exclude the final user message (it's passed as question)
+	if len(history) > 0 {
+		history = history[:len(history)-1]
 	}
 
 	// Setup for streaming if enabled
@@ -98,12 +102,10 @@ func (c *ApiController) ChatCompletions() {
 		Model:     request.Model,
 	}
 
-	// Prepare empty history and knowledge for the model
-	history := []*model.RawMessage{}
 	knowledge := []*model.RawMessage{}
 
 	// Call the model provider
-	modelResult, err := modelProvider.QueryText(question, writer, history, "", knowledge, nil, c.GetAcceptLanguage())
+	modelResult, err := modelProvider.QueryText(question, writer, history, systemPrompt, knowledge, nil, c.GetAcceptLanguage())
 	if err != nil {
 		c.ResponseError(err.Error())
 		return
