@@ -223,7 +223,7 @@ func ensureParagraphTextNodes(paragraph *xmlNode) []*xmlNode {
 	run := paragraph.child(nsDrawingML, "r")
 	if run == nil {
 		run = element(nsDrawingML, "r")
-		paragraph.Children = append(paragraph.Children, run)
+		insertBeforeParagraphEnd(paragraph, run)
 	}
 	text := run.child(nsDrawingML, "t")
 	if text == nil {
@@ -231,6 +231,18 @@ func ensureParagraphTextNodes(paragraph *xmlNode) []*xmlNode {
 		run.Children = append(run.Children, text)
 	}
 	return []*xmlNode{text}
+}
+
+func insertBeforeParagraphEnd(paragraph, child *xmlNode) {
+	for index, current := range paragraph.Children {
+		if current.Name.Space == nsDrawingML && current.Name.Local == "endParaRPr" {
+			paragraph.Children = append(paragraph.Children, nil)
+			copy(paragraph.Children[index+1:], paragraph.Children[index:])
+			paragraph.Children[index] = child
+			return
+		}
+	}
+	paragraph.Children = append(paragraph.Children, child)
 }
 
 func setNormalAutofit(body *xmlNode, singleLine bool) {
