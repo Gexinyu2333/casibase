@@ -155,6 +155,29 @@ func GetStores(owner string) ([]*Store, error) {
 	return stores, nil
 }
 
+func generateStoreApiKey() string {
+	return fmt.Sprintf("sk-%s", util.GetRandomString(24))
+}
+
+func GetMaskedStore(store *Store) *Store {
+	if store == nil {
+		return nil
+	}
+
+	if store.ApiKey != "" {
+		store.ApiKey = "***"
+	}
+
+	return store
+}
+
+func GetMaskedStores(stores []*Store) []*Store {
+	for _, store := range stores {
+		store = GetMaskedStore(store)
+	}
+	return stores
+}
+
 func GetStoreByApiKey(apiKey string) (*Store, error) {
 	if apiKey == "" {
 		return nil, nil
@@ -294,6 +317,10 @@ func UpdateStore(id string, store *Store) (bool, error) {
 		return false, nil
 	}
 
+	if store.ApiKey == "" {
+		store.ApiKey = generateStoreApiKey()
+	}
+
 	_, err = adapter.engine.ID(core.PK{owner, name}).AllCols().Update(store)
 	if err != nil {
 		return false, err
@@ -304,6 +331,10 @@ func UpdateStore(id string, store *Store) (bool, error) {
 }
 
 func AddStore(store *Store) (bool, error) {
+	if store.ApiKey == "" {
+		store.ApiKey = generateStoreApiKey()
+	}
+
 	affected, err := adapter.engine.Insert(store)
 	if err != nil {
 		return false, err

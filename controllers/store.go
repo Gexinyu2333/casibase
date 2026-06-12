@@ -138,7 +138,7 @@ func (c *ApiController) GetStores() {
 		return
 	}
 
-	c.ResponseOk(stores)
+	c.ResponseOk(object.GetMaskedStores(stores))
 }
 
 // GetStore
@@ -168,12 +168,12 @@ func (c *ApiController) GetStore() {
 		origin := getOriginFromHost(host)
 		err = store.Populate(origin, c.GetAcceptLanguage())
 		if err != nil {
-			c.ResponseOk(store, err.Error())
+			c.ResponseOk(object.GetMaskedStore(store), err.Error())
 			return
 		}
 	}
 
-	c.ResponseOk(store)
+	c.ResponseOk(object.GetMaskedStore(store))
 }
 
 // UpdateStore
@@ -209,6 +209,10 @@ func (c *ApiController) UpdateStore() {
 	if oldStore == nil {
 		c.ResponseError(fmt.Sprintf("store: %s not found", id))
 		return
+	}
+
+	if store.ApiKey == "***" {
+		store.ApiKey = oldStore.ApiKey
 	}
 
 	store.SharedBy = oldStore.SharedBy

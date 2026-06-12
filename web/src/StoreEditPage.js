@@ -537,6 +537,13 @@ class StoreEditPage extends React.Component {
               }} />,
               24
             )}
+            {this.renderStoreField(
+              Setting.getLabel(i18next.t("general:API key"), i18next.t("general:API key - Tooltip")),
+              <Input.Password value={store.apiKey} onChange={e => {
+                this.updateStoreField("apiKey", e.target.value);
+              }} />,
+              24
+            )}
           </Row>
         </Card>
 
