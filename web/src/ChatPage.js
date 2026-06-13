@@ -420,6 +420,7 @@ class ChatPage extends BaseListPage {
 
   sendMessage(text, fileName, isHidden, isRegenerated, webSearchEnabled = false) {
     const newMessage = this.newMessage(text, fileName, isHidden, isRegenerated, webSearchEnabled);
+    this.setState({messageLoading: true});
     MessageBackend.addMessage(newMessage)
       .then((res) => {
         if (res.status === "ok") {
@@ -451,10 +452,12 @@ class ChatPage extends BaseListPage {
             afterRefresh();
           }
         } else {
+          this.setState({messageLoading: false});
           Setting.showMessage("error", `${i18next.t("general:Failed to add")}: ${res.msg}`);
         }
       })
       .catch(error => {
+        this.setState({messageLoading: false});
         Setting.showMessage("error", `${i18next.t("general:Failed to connect to server")}: ${error}`);
       });
   }
