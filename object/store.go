@@ -389,18 +389,19 @@ func (store *Store) GetImageProviderObj(lang string) (storage.StorageProvider, e
 		return nil, fmt.Errorf(i18n.Translate(lang, "object:The image provider for store: %s should not be empty"), store.GetId())
 	}
 
-	if conf.IsCasdoorAvailable() {
-		return storage.NewCasdoorProvider(store.ImageProvider, lang)
-	}
-
 	provider, err := GetProviderByOwnerAndName(store.Owner, store.ImageProvider)
 	if err != nil {
 		return nil, err
 	}
-	if provider == nil {
-		return nil, fmt.Errorf(i18n.Translate(lang, "object:The image provider for store: %s should not be empty"), store.GetId())
+	if provider != nil {
+		return provider.GetStorageProviderObj("", lang)
 	}
-	return provider.GetStorageProviderObj("", lang)
+
+	if conf.IsCasdoorAvailable() {
+		return storage.NewCasdoorProvider(store.ImageProvider, lang)
+	}
+
+	return nil, fmt.Errorf(i18n.Translate(lang, "object:The image provider for store: %s should not be empty"), store.GetId())
 }
 
 func (store *Store) GetModelProvider() (*Provider, error) {
