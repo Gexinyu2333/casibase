@@ -42,6 +42,7 @@ func CheckPlan(library *Library, plan *Plan) *CheckReport {
 		checkReplacements(report, planIndex+1, source, item.Replacements)
 		checkTables(report, planIndex+1, source, item.TableEdits)
 		checkCharts(report, planIndex+1, source, item.ChartEdits)
+		checkImages(report, planIndex+1, source, item.ImageEdits)
 	}
 	return report
 }
@@ -414,4 +415,55 @@ func displayWidth(value float64) interface{} {
 		return int(value)
 	}
 	return math.Round(value*10) / 10
+}
+
+func checkImages(report *CheckReport, planIndex int, slide *SlideLibraryItem, edits []ImageEdit) {
+	seen := make(map[string]bool)
+	for _, edit := range edits {
+		if edit.ImageID == "" {
+			addCheck(report, "ERROR", CheckResult{
+				"plan_slide": planIndex, "source_slide": slide.SlideIndex,
+				"message": "image edit requires a non-empty image_id",
+			})
+			continue
+		}
+		if edit.ImagePath == "" {
+			addCheck(report, "ERROR", CheckResult{
+				"plan_slide": planIndex, "source_slide": slide.SlideIndex,
+				"image_id": edit.ImageID,
+				"message":  "image edit requires a non-empty image_path",
+			})
+			continue
+		}
+		if seen[edit.ImageID] {
+			addCheck(report, "ERROR", CheckResult{
+				"plan_slide": planIndex, "source_slide": slide.SlideIndex,
+				"image_id": edit.ImageID,
+				"message":  "duplicate image_id in the same plan slide",
+			})
+			continue
+		}
+		seen[edit.ImageID] = true
+
+		found := false
+		for index := range slide.Images {
+			if slide.Images[index].ImageID == edit.ImageID {
+				found = true
+				break
+			}
+		}
+		if !found {
+			addCheck(report, "ERROR", CheckResult{
+				"plan_slide": planIndex, "source_slide": slide.SlideIndex,
+				"image_id": edit.ImageID,
+				"message":  "image target not found in slide library",
+			})
+			continue
+		}
+		addCheck(report, "OK", CheckResult{
+			"plan_slide": planIndex, "source_slide": slide.SlideIndex,
+			"image_id": edit.ImageID,
+			"message":  "image edit target is valid",
+		})
+	}
 }

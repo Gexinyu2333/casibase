@@ -97,6 +97,14 @@ type ChartInfo struct {
 	categoryAxis  *chartCategoryAxis
 }
 
+type ImageInfo struct {
+	ImageID     string   `json:"image_id"`
+	ShapeID     string   `json:"shape_id"`
+	ShapeName   string   `json:"shape_name"`
+	Description string   `json:"description,omitempty"`
+	Geometry    Geometry `json:"geometry"`
+}
+
 type SlideObject struct {
 	ShapeID   string   `json:"shape_id"`
 	ShapeName string   `json:"shape_name"`
@@ -113,6 +121,7 @@ type SlideLibraryItem struct {
 	Slots       []TextSlot    `json:"slots"`
 	Tables      []TableInfo   `json:"tables"`
 	Charts      []ChartInfo   `json:"charts"`
+	Images      []ImageInfo   `json:"images"`
 	Objects     []SlideObject `json:"objects"`
 }
 
@@ -157,6 +166,11 @@ type TableEdit struct {
 	Optional  bool            `json:"optional,omitempty"`
 }
 
+type ImageEdit struct {
+	ImageID   string `json:"image_id"`
+	ImagePath string `json:"image_path"`
+}
+
 type ChartEdit struct {
 	ChartID    string        `json:"chart_id,omitempty"`
 	ShapeID    string        `json:"shape_id,omitempty"`
@@ -172,6 +186,7 @@ type PlanSlide struct {
 	Replacements       []Replacement   `json:"replacements,omitempty"`
 	TableEdits         []TableEdit     `json:"table_edits,omitempty"`
 	ChartEdits         []ChartEdit     `json:"chart_edits,omitempty"`
+	ImageEdits         []ImageEdit     `json:"image_edits,omitempty"`
 	Notes              string          `json:"notes,omitempty"`
 	SpeakerNotes       string          `json:"speaker_notes,omitempty"`
 	Transition         json.RawMessage `json:"transition,omitempty"`

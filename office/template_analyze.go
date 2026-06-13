@@ -76,6 +76,9 @@ func Analyze(pkg *Package, sourcePPTX string) (*Library, error) {
 					"chart_id": "s01_ch4", "categories": []string{"A", "B"},
 					"series": []interface{}{map[string]interface{}{"name": "系列1", "values": []int{1, 2}}},
 				}},
+				"image_edits": []interface{}{map[string]interface{}{
+					"image_id": "s01_img5", "image_path": "https://example.com/image.png",
+				}},
 			}},
 		},
 	}
@@ -99,6 +102,10 @@ func Analyze(pkg *Package, sourcePPTX string) (*Library, error) {
 		if err != nil {
 			return nil, err
 		}
+		images, err := analyzeImages(pkg, slide, ref, objectByID)
+		if err != nil {
+			return nil, err
+		}
 		var textParts []string
 		for _, slot := range slots {
 			if slot.Text != "" {
@@ -108,7 +115,8 @@ func Analyze(pkg *Package, sourcePPTX string) (*Library, error) {
 		slideText := strings.Join(textParts, "\n")
 		library.Slides = append(library.Slides, SlideLibraryItem{
 			SlideIndex: ref.Index, PageType: classifyPageType(ref.Index, len(refs), slideText, len(slots)),
-			TextSummary: truncateRunes(slideText, 500), Slots: slots, Tables: tables, Charts: charts, Objects: objects,
+			TextSummary: truncateRunes(slideText, 500), Slots: slots, Tables: tables, Charts: charts,
+			Images: images, Objects: objects,
 		})
 	}
 	library.SlideCount = len(library.Slides)
