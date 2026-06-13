@@ -247,12 +247,6 @@ func generateMessageAnswer(id string, responseWriter http.ResponseWriter, host s
 		}
 
 		question = questionMessage.Text
-
-		question, err = refineQuestionTextViaParsingUrlContent(question, lang)
-		if err != nil {
-			responseErrorStream(message, err.Error())
-			return
-		}
 	}
 
 	if question == "" {

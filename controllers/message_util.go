@@ -20,14 +20,12 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"path/filepath"
 	"regexp"
 	"strings"
 
 	"github.com/beego/beego"
 	"github.com/the-open-agent/openagent/i18n"
 	"github.com/the-open-agent/openagent/object"
-	"github.com/the-open-agent/openagent/txt"
 	"github.com/the-open-agent/openagent/util"
 )
 
@@ -126,25 +124,6 @@ func (c *ApiController) ResponseErrorStream(message *object.Message, errorText s
 	if err := writeMessageErrorStream(c.Ctx.ResponseWriter, c.GetAcceptLanguage(), message, errorText); err != nil {
 		c.ResponseError(err.Error())
 	}
-}
-
-func refineQuestionTextViaParsingUrlContent(question string, lang string) (string, error) {
-	re := regexp.MustCompile(`href="([^"]+)"`)
-	urls := re.FindStringSubmatch(question)
-	if len(urls) == 0 {
-		return question, nil
-	}
-
-	href := urls[1]
-	ext := filepath.Ext(href)
-	content, err := txt.GetParsedTextFromUrl(href, ext, lang)
-	if err != nil {
-		return "", err
-	}
-
-	aTag := regexp.MustCompile(`<a\s+[^>]*href=["']([^"']+)["'][^>]*>.*?</a>`)
-	res := aTag.ReplaceAllString(question, content)
-	return res, nil
 }
 
 func ConvertMessageDataToJSON(data string) ([]byte, error) {

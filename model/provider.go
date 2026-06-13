@@ -181,5 +181,5 @@ func GetModelProvider(typ string, subType string, clientId string, clientSecret 
 	if err != nil {
 		return nil, err
 	}
-	return p, nil
+	return wrapFileContentProvider(typ, p), nil
 }
