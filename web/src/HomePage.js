@@ -65,7 +65,7 @@ class HomePage extends React.Component {
       }
 
       return (
-        <ChatPage account={this.props.account} />
+        <ChatPage account={this.props.account} history={this.props.history} match={this.props.match} />
       );
     }
 
@@ -75,7 +75,7 @@ class HomePage extends React.Component {
       if (!this.state.storeFetched) {
         return null;
       } else {
-        return <ChatPage account={this.props.account} />;
+        return <ChatPage account={this.props.account} history={this.props.history} match={this.props.match} />;
       }
     }
   }
