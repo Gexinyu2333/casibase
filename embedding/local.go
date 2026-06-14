@@ -91,7 +91,12 @@ func (p *LocalEmbeddingProvider) calculatePrice(res *EmbeddingResult, lang strin
 		pricePerThousandTokens = p.pricePerThousandTokens
 		res.Currency = p.currency
 	default:
-		return fmt.Errorf(i18n.Translate(lang, "embedding:calculatePrice() error: unknown model type: %s"), embeddingModel)
+		if p.typ == "Local" {
+			pricePerThousandTokens = p.pricePerThousandTokens
+			res.Currency = p.currency
+		} else {
+			return fmt.Errorf(i18n.Translate(lang, "embedding:calculatePrice() error: unknown model type: %s"), embeddingModel)
+		}
 	}
 
 	res.Price = getPrice(res.TokenCount, pricePerThousandTokens)
