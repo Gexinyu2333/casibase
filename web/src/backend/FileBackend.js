@@ -56,10 +56,10 @@ export function updateFile(owner, name, file) {
   }).then(res => Setting.handleFetchResponse(res));
 }
 
-export function uploadFile(filename, file) {
+export function uploadFile(filename, file, store = "") {
   const formData = new FormData();
   formData.append("file", file);
-  return fetch(`${Setting.ServerUrl}/api/upload-file?filename=${encodeURIComponent(filename)}`, {
+  return fetch(`${Setting.ServerUrl}/api/upload-file?filename=${encodeURIComponent(filename)}&store=${encodeURIComponent(store)}`, {
     method: "POST",
     credentials: "include",
     headers: {

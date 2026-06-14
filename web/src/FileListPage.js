@@ -59,7 +59,7 @@ class FileListPage extends BaseListPage {
         return;
       }
       this.uploadedFileIdMap[uploadedFile.originFileObj.uid] = 1;
-      promises.push(FileBackend.uploadFile(uploadedFile.name, uploadedFile.originFileObj));
+      promises.push(FileBackend.uploadFile(uploadedFile.name, uploadedFile.originFileObj, Setting.getStoreCurrent() || ""));
     });
 
     if (promises.length === 0) {

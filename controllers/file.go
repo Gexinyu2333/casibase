@@ -256,6 +256,7 @@ func (c *ApiController) UploadFile() {
 	}
 
 	filename := c.Input().Get("filename")
+	store := c.Input().Get("store")
 
 	fileData, header, err := c.GetFile("file")
 	if err != nil {
@@ -274,7 +275,7 @@ func (c *ApiController) UploadFile() {
 	}
 
 	origin := getOriginFromHost(c.Ctx.Request.Host)
-	fileRecord, err := object.UploadFile(userName, userName, filename, fileData, c.GetAcceptLanguage(), origin)
+	fileRecord, err := object.UploadFile(userName, userName, filename, store, fileData, c.GetAcceptLanguage(), origin)
 	if err != nil {
 		c.ResponseError(err.Error())
 		return

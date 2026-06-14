@@ -291,7 +291,7 @@ func getDefaultStorageProviderObj(lang string) (storage.StorageProvider, error) 
 	return provider.GetStorageProviderObj("", lang)
 }
 
-func UploadFile(owner string, userName string, filename string, fileData multipart.File, lang string, origin string) (*File, error) {
+func UploadFile(owner string, userName string, filename string, storeName string, fileData multipart.File, lang string, origin string) (*File, error) {
 	provider, err := GetDefaultStorageProvider()
 	if err != nil {
 		return nil, err
@@ -300,14 +300,16 @@ func UploadFile(owner string, userName string, filename string, fileData multipa
 		return nil, fmt.Errorf(i18n.Translate(lang, "object:The provider: %s does not exist"), "default storage provider")
 	}
 
-	defaultStore, err := GetDefaultStore(owner)
-	if err != nil {
-		return nil, err
+	if storeName == "" {
+		defaultStore, err := GetDefaultStore(owner)
+		if err != nil {
+			return nil, err
+		}
+		if defaultStore == nil {
+			return nil, fmt.Errorf(i18n.Translate(lang, "object:No store found for user: %s, please create a store first"), owner)
+		}
+		storeName = defaultStore.Name
 	}
-	if defaultStore == nil {
-		return nil, fmt.Errorf(i18n.Translate(lang, "object:No store found for user: %s, please create a store first"), owner)
-	}
-	storeName := defaultStore.Name
 
 	storageProviderObj, err := provider.GetStorageProviderObj("", lang)
 	if err != nil {
