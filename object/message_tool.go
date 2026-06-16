@@ -61,7 +61,7 @@ func buildToolSetForBuiltinTool(toolName, user, origin, lang string) (*mcp.ToolS
 }
 
 func GetAnswerWithTool(modelProviderName, toolName, question, user, origin, lang string) (string, *model.ModelResult, error) {
-	_, modelProviderObj, err := GetModelProviderFromContext("admin", modelProviderName, lang)
+	modelProvider, modelProviderObj, err := GetModelProviderFromContext("admin", modelProviderName, lang)
 	if err != nil {
 		return "", nil, err
 	}
@@ -86,6 +86,7 @@ func GetAnswerWithTool(modelProviderName, toolName, question, user, origin, lang
 		toolSession := &model.ToolSession{
 			McpToolSet:   mcpToolSet,
 			ToolMessages: messages,
+			IsVision:     modelProvider != nil && model.IsVisionModel(modelProvider.SubType),
 		}
 		modelResult, err = model.QueryTextWithTools(modelProviderObj, question, &writer, history, prompt, knowledge, toolSession, lang)
 	} else {

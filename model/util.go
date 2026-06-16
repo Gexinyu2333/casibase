@@ -33,6 +33,12 @@ type RawMessage struct {
 	ReasoningContent string
 	ToolCall         openai.ToolCall
 	ToolCallID       string
+	Images           []ImageAttachment
+}
+
+type ImageAttachment struct {
+	Data     []byte
+	MimeType string
 }
 
 type SearchResult struct {

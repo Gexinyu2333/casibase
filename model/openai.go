@@ -16,6 +16,7 @@ package model
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -781,6 +782,17 @@ func openaiRawMessagesToGptVisionMessages(messages []*RawMessage) (responses.Res
 			itemContentList = append(itemContentList, responses.ResponseInputContentUnionParam{
 				OfInputImage: &responses.ResponseInputImageParam{
 					ImageURL: param.NewOpt[string](imageText),
+				},
+			})
+		}
+		for _, image := range message.Images {
+			itemContentList = append(itemContentList, responses.ResponseInputContentUnionParam{
+				OfInputImage: &responses.ResponseInputImageParam{
+					ImageURL: param.NewOpt[string](fmt.Sprintf(
+						"data:%s;base64,%s",
+						image.MimeType,
+						base64.StdEncoding.EncodeToString(image.Data),
+					)),
 				},
 			})
 		}

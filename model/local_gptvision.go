@@ -223,6 +223,15 @@ func OpenaiRawMessagesToGptVisionMessages(messages []*RawMessage) ([]openai.Chat
 				},
 			})
 		}
+		for _, image := range message.Images {
+			item.MultiContent = append(item.MultiContent, openai.ChatMessagePart{
+				Type: openai.ChatMessagePartTypeImageURL,
+				ImageURL: &openai.ChatMessageImageURL{
+					URL:    fmt.Sprintf("data:%s;base64,%s", image.MimeType, base64.StdEncoding.EncodeToString(image.Data)),
+					Detail: openai.ImageURLDetailAuto,
+				},
+			})
+		}
 
 		res = append(res, item)
 	}

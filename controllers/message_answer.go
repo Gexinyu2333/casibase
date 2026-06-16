@@ -403,6 +403,7 @@ func generateMessageAnswer(id string, responseWriter http.ResponseWriter, host s
 		toolSession := &model.ToolSession{
 			McpToolSet:   mcpToolSet,
 			ToolMessages: messages,
+			IsVision:     model.IsVisionModel(modelProvider.SubType),
 		}
 		modelResult, err = model.QueryTextWithTools(modelProviderObj, question, writer, history, prompt, knowledge, toolSession, lang)
 	} else {

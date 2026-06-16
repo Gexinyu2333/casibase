@@ -31,7 +31,7 @@ import (
 	"golang.org/x/net/html"
 )
 
-// WebSearchTool is the Tool Type "web_search" (single web_search tool).
+// WebSearchTool is the Tool Type "web_search".
 type WebSearchTool struct {
 	engine         webSearchEngine
 	apiKey         string
@@ -67,6 +67,12 @@ func NewWebSearchTool(config Config) (*WebSearchTool, error) {
 
 func (p *WebSearchTool) BuiltinTools() []BuiltinTool {
 	return []BuiltinTool{&webSearchBuiltin{
+		engine:         p.engine,
+		apiKey:         p.apiKey,
+		searchEngineID: p.searchEngineID,
+		endpoint:       p.endpoint,
+		httpClient:     p.httpClient,
+	}, &imageSearchBuiltin{
 		engine:         p.engine,
 		apiKey:         p.apiKey,
 		searchEngineID: p.searchEngineID,
@@ -141,6 +147,12 @@ type googleSearchResponse struct {
 		Link        string `json:"link"`
 		Snippet     string `json:"snippet"`
 		DisplayLink string `json:"displayLink"`
+		Image       struct {
+			ContextLink   string `json:"contextLink"`
+			ThumbnailLink string `json:"thumbnailLink"`
+			Width         int    `json:"width"`
+			Height        int    `json:"height"`
+		} `json:"image"`
 	} `json:"items"`
 	Error *struct {
 		Message string `json:"message"`
@@ -172,6 +184,12 @@ type baiduWebSearchResponse struct {
 		Content   string `json:"content"`
 		Website   string `json:"website"`
 		WebAnchor string `json:"web_anchor"`
+		Type      string `json:"type"`
+		Image     *struct {
+			URL    string `json:"url"`
+			Width  string `json:"width"`
+			Height string `json:"height"`
+		} `json:"image"`
 	} `json:"references"`
 }
 
@@ -433,11 +451,23 @@ func runGoogleSearch(ctx context.Context, params webSearchParams, apiKey string,
 }
 
 func runBaiduSearch(ctx context.Context, params webSearchParams, apiKey string, endpoint string, httpClient *http.Client) ([]webSearchResult, error) {
+	response, err := fetchBaiduSearch(ctx, params, apiKey, endpoint, "web", httpClient)
+	if err != nil {
+		return nil, err
+	}
+	results := parseBaiduSearchResponse(response)
+	if len(results) == 0 {
+		return nil, fmt.Errorf("Baidu returned no results")
+	}
+	return limitWebSearchResults(results, params.Count), nil
+}
+
+func fetchBaiduSearch(ctx context.Context, params webSearchParams, apiKey string, endpoint string, resourceType string, httpClient *http.Client) (baiduWebSearchResponse, error) {
 	if strings.TrimSpace(apiKey) == "" {
-		return nil, fmt.Errorf("Baidu search requires an API key in clientSecret")
+		return baiduWebSearchResponse{}, fmt.Errorf("Baidu search requires an API key in clientSecret")
 	}
 
-	requestBody := baiduWebSearchRequest{
+	requestBytes, err := json.Marshal(baiduWebSearchRequest{
 		Messages: []baiduWebSearchMessage{
 			{
 				Content: params.Query,
@@ -447,41 +477,42 @@ func runBaiduSearch(ctx context.Context, params webSearchParams, apiKey string, 
 		SearchSource: "baidu_search_v2",
 		ResourceTypeFilter: []baiduWebSearchResourceType{
 			{
-				Type: "web",
+				Type: resourceType,
 				TopK: params.Count,
 			},
 		},
-	}
-	requestBytes, err := json.Marshal(requestBody)
+	})
 	if err != nil {
-		return nil, err
+		return baiduWebSearchResponse{}, err
 	}
 
-	headers := map[string]string{
-		"Content-Type":               "application/json",
-		"X-Appbuilder-Authorization": fmt.Sprintf("Bearer %s", apiKey),
-	}
-	body, err := fetchWebSearchAPI(ctx, http.MethodPost, resolveWebSearchEndpoint(endpoint, baiduWebSearchEndpoint), nil, bytes.NewReader(requestBytes), headers, httpClient)
+	body, err := fetchWebSearchAPI(
+		ctx,
+		http.MethodPost,
+		resolveWebSearchEndpoint(endpoint, baiduWebSearchEndpoint),
+		nil,
+		bytes.NewReader(requestBytes),
+		map[string]string{
+			"Content-Type":               "application/json",
+			"X-Appbuilder-Authorization": fmt.Sprintf("Bearer %s", apiKey),
+		},
+		httpClient,
+	)
 	if err != nil {
-		return nil, err
+		return baiduWebSearchResponse{}, err
 	}
 
 	var response baiduWebSearchResponse
 	if err := json.Unmarshal(body, &response); err != nil {
-		return nil, err
+		return baiduWebSearchResponse{}, err
 	}
 	if response.Code != "" && len(response.References) == 0 {
 		if response.Message != "" {
-			return nil, fmt.Errorf("Baidu returned an error: %s", response.Message)
+			return baiduWebSearchResponse{}, fmt.Errorf("Baidu returned an error: %s", response.Message)
 		}
-		return nil, fmt.Errorf("Baidu returned an error: %s", response.Code)
+		return baiduWebSearchResponse{}, fmt.Errorf("Baidu returned an error: %s", response.Code)
 	}
-
-	results := parseBaiduSearchResponse(response)
-	if len(results) == 0 {
-		return nil, fmt.Errorf("Baidu returned no results")
-	}
-	return limitWebSearchResults(results, params.Count), nil
+	return response, nil
 }
 
 func fetchWebSearchAPI(ctx context.Context, method string, endpoint string, query url.Values, body io.Reader, headers map[string]string, httpClient *http.Client) ([]byte, error) {
