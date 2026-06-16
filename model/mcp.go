@@ -195,7 +195,7 @@ func QueryTextWithTools(p ModelProvider, question string, writer io.Writer, hist
 			serverName, toolName := mcp.GetServerNameAndToolNameFromId(toolCall.Function.Name)
 
 			messages = append(messages, &RawMessage{
-				Text:             "Call result from " + toolCall.Function.Name,
+				Text:             "",
 				Author:           "AI",
 				ReasoningContent: toolSession.ToolMessages.ReasoningContent,
 				ToolCall:         toolCall,
