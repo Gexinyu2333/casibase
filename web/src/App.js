@@ -112,6 +112,8 @@ class App extends Component {
       this.setState({selectedMenuKey: "/chat"});
     } else if (uri.includes("/server-store")) {
       this.setState({selectedMenuKey: "/servers"});
+    } else if (uri.includes("/analysis")) {
+      this.setState({selectedMenuKey: "/analysis"});
     } else if (uri.includes("/stores")) {
       this.setState({selectedMenuKey: "/stores"});
     } else if (uri.includes("/skills")) {

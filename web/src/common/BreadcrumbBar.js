@@ -18,6 +18,7 @@ import {Link} from "react-router-dom";
 import i18next from "i18next";
 
 const RESOURCE_LABELS = {
+  "analysis": "store:Analysis",
   "stores": "general:Stores",
   "files": "general:Files",
   "providers": "general:Providers",

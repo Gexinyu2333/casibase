@@ -24,7 +24,7 @@ import * as Conf from "./Conf";
 import * as StorageProviderBackend from "./backend/StorageProviderBackend";
 import * as ProviderBackend from "./backend/ProviderBackend";
 import StoreShareModal from "./StoreShareModal";
-import {CopyOutlined, DeleteOutlined, EditOutlined, ExportOutlined, FolderOpenOutlined, ReloadOutlined, ShareAltOutlined} from "@ant-design/icons";
+import {BarChartOutlined, CopyOutlined, DeleteOutlined, EditOutlined, ExportOutlined, FolderOpenOutlined, ReloadOutlined, ShareAltOutlined} from "@ant-design/icons";
 import copy from "copy-to-clipboard";
 
 const defaultPrompt = "You are an expert in your field and you specialize in using your knowledge to answer or solve people's problems.";
@@ -465,6 +465,16 @@ class StoreListPage extends BaseListPage {
                   style={{minWidth: "28px", width: "28px", height: "28px", padding: 0, borderRadius: "6px"}}
                 />
               </Tooltip>
+              <Tooltip title={i18next.t("store:Analysis")}>
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<BarChartOutlined />}
+                  disabled={!record.messageCount}
+                  onClick={() => this.props.history.push(`/analysis/${record.owner}/${record.name}`)}
+                  style={{minWidth: "28px", width: "28px", height: "28px", padding: 0, borderRadius: "6px"}}
+                />
+              </Tooltip>
               {!this.state.hideChat && (
                 <>
                   <Tooltip title={i18next.t("general:Copy Link")}>
@@ -576,6 +586,9 @@ class StoreListPage extends BaseListPage {
                 {i18next.t("store:Hide chat")}:
                 <Switch checked={this.state.hideChat} onChange={this.toggleHideChat} style={{marginLeft: 8}} />
               </span>
+              <Button size="small" icon={<BarChartOutlined />} style={{marginLeft: 16}} onClick={() => this.props.history.push("/analysis")}>
+                {i18next.t("store:Analysis")}
+              </Button>
             </div>
           )}
           loading={this.getTableLoading()}

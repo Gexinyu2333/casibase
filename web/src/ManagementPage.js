@@ -62,6 +62,8 @@ import BreadcrumbBar from "./common/BreadcrumbBar";
 import HomePage from "./HomePage";
 import StoreListPage from "./StoreListPage";
 import StoreEditPage from "./StoreEditPage";
+import AnalysisEditPage from "./AnalysisEditPage";
+import AnalysisListPage from "./AnalysisListPage";
 import FileListPage from "./FileListPage";
 import FileTreePage from "./FileTreePage";
 import ProviderListPage from "./ProviderListPage";
@@ -539,6 +541,8 @@ function ManagementPage(props) {
         <Route exact path="/stores/:owner/:storeName/chats" render={(props) => renderSigninIfNotSignedIn(<ChatListPage account={account} {...props} />)} />
         <Route exact path="/stores/:owner/:storeName/messages" render={(props) => renderSigninIfNotSignedIn(<MessageListPage account={account} {...props} />)} />
         <Route exact path="/stores/:owner/:storeName/vectors" render={(props) => renderSigninIfNotSignedIn(<VectorListPage account={account} {...props} />)} />
+        <Route exact path="/analysis" render={(props) => renderSigninIfNotSignedIn(<AnalysisListPage account={account} {...props} />)} />
+        <Route exact path="/analysis/:owner/:storeName" render={(props) => renderSigninIfNotSignedIn(<AnalysisEditPage account={account} {...props} />)} />
         <Route exact path="/providers" render={(props) => renderSigninIfNotSignedIn(<ProviderListPage account={account} {...props} />)} />
         <Route exact path="/providers/:providerName" render={(props) => renderSigninIfNotSignedIn(<ProviderEditPage account={account} {...props} />)} />
         <Route exact path="/pipes" render={(props) => renderSigninIfNotSignedIn(<PipeListPage account={account} {...props} />)} />

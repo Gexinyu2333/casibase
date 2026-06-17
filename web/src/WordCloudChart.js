@@ -15,6 +15,7 @@
 import React, {Component} from "react";
 import * as echarts from "echarts";
 import "echarts-wordcloud";
+import i18next from "i18next";
 
 class WordCloudChart extends Component {
   constructor(props) {
@@ -40,7 +41,7 @@ class WordCloudChart extends Component {
       tooltip: {
         show: true,
         formatter: function(params) {
-          return `词频: ${params.value}`;
+          return `${i18next.t("store:Word frequency")}: ${params.value}`;
         },
       },
       series: [{
@@ -50,10 +51,10 @@ class WordCloudChart extends Component {
         top: "0%",
         width: "100%",
         height: "80%",
-        sizeRange: [20, 100],
+        sizeRange: this.props.sizeRange || [20, 100],
         rotationRange: [-45, 45],
         rotationStep: 5,
-        gridSize: 20,
+        gridSize: this.props.gridSize || 20,
         drawOutOfBound: false,
         layoutAnimation: true,
         textStyle: {
@@ -83,7 +84,7 @@ class WordCloudChart extends Component {
 
   render() {
     return (
-      <div ref={this.chartRef} style={{width: "100%", height: "calc(100vh - 200px)"}}></div>
+      <div ref={this.chartRef} style={{width: "100%", height: this.props.height || "calc(100vh - 200px)"}}></div>
     );
   }
 }
