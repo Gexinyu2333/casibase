@@ -390,6 +390,7 @@ class StoreListPage extends BaseListPage {
         dataIndex: "state",
         key: "state",
         width: "90px",
+        fixed: "right",
         sorter: (a, b) => a.state.localeCompare(b.state),
         ...this.getColumnSearchProps("state"),
         render: (text) => {
@@ -400,7 +401,8 @@ class StoreListPage extends BaseListPage {
         title: i18next.t("store:Publish State"),
         dataIndex: "publishState",
         key: "publishState",
-        width: "130px",
+        width: i18next.language === "zh" ? "130px" : "150px",
+        fixed: "right",
         sorter: (a, b) => (a.publishState || "").localeCompare(b.publishState || ""),
         ...this.getColumnSearchProps("publishState"),
         render: (text) => {
