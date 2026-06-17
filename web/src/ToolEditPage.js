@@ -75,7 +75,7 @@ class ToolEditPage extends React.Component {
 
   getClientSecretLabel(tool) {
     if (tool.type === "web_search") {
-      return Setting.getLabel(i18next.t("provider:API key"), i18next.t("provider:API key - Tooltip"));
+      return Setting.getLabel(i18next.t("general:API key"), i18next.t("general:API key - Tooltip"));
     }
     return Setting.getLabel(i18next.t("provider:Client secret"), i18next.t("provider:Client secret - Tooltip"));
   }

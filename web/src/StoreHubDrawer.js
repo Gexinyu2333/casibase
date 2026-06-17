@@ -14,7 +14,7 @@
 
 import React from "react";
 import {Avatar, Button, Divider, Drawer, Tag, Tooltip, Typography} from "antd";
-import {CommentOutlined, CopyOutlined, LinkOutlined} from "@ant-design/icons";
+import {CommentOutlined, CopyOutlined, LinkOutlined, RobotOutlined} from "@ant-design/icons";
 import * as Setting from "./Setting";
 import i18next from "i18next";
 
@@ -35,7 +35,8 @@ export function getChatUrl(store) {
 //   onClose     – () => void
 //   onStartChat – (store) => void
 //   onCopyLink  – (store) => void
-function StoreHubDrawer({store, visible, onClose, onStartChat, onCopyLink}) {
+//   onViewAgent – (store) => void
+function StoreHubDrawer({store, visible, onClose, onStartChat, onCopyLink, onViewAgent}) {
   if (!store) {
     return null;
   }
@@ -156,8 +157,18 @@ function StoreHubDrawer({store, visible, onClose, onStartChat, onCopyLink}) {
         </div>
       </div>
 
-      {/* ── Start Chat button (pinned to bottom) ── */}
-      <div style={{paddingTop: 16, borderTop: "1px solid var(--ant-color-border-secondary)"}}>
+      {/* ── Action buttons (pinned to bottom) ── */}
+      <div style={{paddingTop: 16, borderTop: "1px solid var(--ant-color-border-secondary)", display: "flex", flexDirection: "column", gap: 8}}>
+        {onViewAgent ? (
+          <Button
+            size="large"
+            block
+            icon={<RobotOutlined />}
+            onClick={() => onViewAgent(store)}
+          >
+            {i18next.t("store:Enter Agent")}
+          </Button>
+        ) : null}
         <Button
           type="primary"
           size="large"

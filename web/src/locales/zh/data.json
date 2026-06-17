@@ -101,6 +101,8 @@
     "iFrame": "内嵌框架"
   },
   "general": {
+    "API key": "API key",
+    "API key - Tooltip": "API key - Tooltip",
     "Access secret": "访问密钥",
     "Access secret - Tooltip": "用于API访问认证的密钥",
     "Action": "操作",
@@ -461,8 +463,6 @@
     "X Direct Messages webhook hint": "在X开发者平台的Account Activity API订阅中，将Webhook URL设置为："
   },
   "provider": {
-    "API key": "API密钥",
-    "API key - Tooltip": "用于身份验证的API密钥",
     "API version": "API版本",
     "API version - Tooltip": "Azure API版本",
     "Advanced Model Parameters": "高级模型参数",
@@ -723,6 +723,7 @@
     "Enable experience review - Tooltip": "Enable experience review - Tooltip",
     "Enable extra options": "启用扩展选项",
     "Enable extra options - Tooltip": "开启后显示高级配置，如存储、向量、Agent、语音与集成等相关字段",
+    "Enter Agent": "进入智能体",
     "Example questions": "示例问题",
     "Example questions - Tooltip": "在聊天界面展示给用户的示例问题建议",
     "External": "外部",

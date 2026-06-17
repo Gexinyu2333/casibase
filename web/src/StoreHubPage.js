@@ -14,7 +14,7 @@
 
 import React from "react";
 import {Avatar, Button, Card, Col, Empty, Input, Row, Select, Spin, Tag, Tooltip, Typography} from "antd";
-import {CopyOutlined, InfoCircleOutlined, LinkOutlined, SortAscendingOutlined, SortDescendingOutlined} from "@ant-design/icons";
+import {CopyOutlined, InfoCircleOutlined, LinkOutlined, RobotOutlined, SortAscendingOutlined, SortDescendingOutlined} from "@ant-design/icons";
 import * as StoreBackend from "./backend/StoreBackend";
 import * as Setting from "./Setting";
 import i18next from "i18next";
@@ -140,6 +140,11 @@ class StoreHubPage extends React.Component {
       this.closeDrawer();
       this.props.history.push(chatPath);
     }
+  }
+
+  handleViewAgent(store) {
+    this.closeDrawer();
+    this.props.history.push(`/agents/${store.owner}/${store.name}`);
   }
 
   handleCopyLink(store) {
@@ -337,9 +342,18 @@ class StoreHubPage extends React.Component {
               />
             </Tooltip>
           </div>
-          <div style={{display: "flex", alignItems: "center", gap: 4, color: "var(--ant-color-primary)", fontSize: 13}}>
-            <InfoCircleOutlined />
-            <span>{i18next.t("store:View Details")}</span>
+          <div style={{display: "flex", alignItems: "center", justifyContent: "space-between"}}>
+            <div style={{display: "flex", alignItems: "center", gap: 4, color: "var(--ant-color-primary)", fontSize: 13}}>
+              <InfoCircleOutlined />
+              <span>{i18next.t("store:View Details")}</span>
+            </div>
+            <div
+              style={{display: "flex", alignItems: "center", gap: 4, color: "var(--ant-color-text-secondary)", fontSize: 13, cursor: "pointer"}}
+              onClick={(e) => {e.stopPropagation(); this.handleViewAgent(store);}}
+            >
+              <RobotOutlined />
+              <span>{i18next.t("store:Enter Agent")}</span>
+            </div>
           </div>
         </Card>
       </Col>
@@ -382,6 +396,7 @@ class StoreHubPage extends React.Component {
           onClose={() => this.closeDrawer()}
           onStartChat={(store) => this.handleStartChat(store)}
           onCopyLink={(store) => this.handleCopyLink(store)}
+          onViewAgent={(store) => this.handleViewAgent(store)}
         />
       </div>
     );

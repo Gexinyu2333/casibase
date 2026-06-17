@@ -101,6 +101,8 @@
     "iFrame": "iFrame"
   },
   "general": {
+    "API key": "API key",
+    "API key - Tooltip": "API key - Tooltip",
     "Access secret": "Access secret",
     "Access secret - Tooltip": "Secret key for API access authentication",
     "Action": "Action",
@@ -461,8 +463,6 @@
     "X Direct Messages webhook hint": "Set the Webhook URL in your X Developer Portal Account Activity API subscription to:"
   },
   "provider": {
-    "API key": "API key",
-    "API key - Tooltip": "API key for authentication",
     "API version": "API version",
     "API version - Tooltip": "Azure API version",
     "Advanced Model Parameters": "Advanced Model Parameters",
@@ -723,6 +723,7 @@
     "Enable experience review - Tooltip": "Enable experience review - Tooltip",
     "Enable extra options": "Enable extra options",
     "Enable extra options - Tooltip": "When enabled, show advanced agent settings such as storage, embedding, agents, and integrations",
+    "Enter Agent": "Enter Agent",
     "Example questions": "Example questions",
     "Example questions - Tooltip": "Suggested example questions shown to users in the chat UI.",
     "External": "External",

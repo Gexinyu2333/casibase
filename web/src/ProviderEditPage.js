@@ -87,7 +87,7 @@ class ProviderEditPage extends React.Component {
       if (provider.type === "Tencent Cloud") {
         return Setting.getLabel(i18next.t("general:Secret ID"), i18next.t("general:Secret ID - Tooltip"));
       } else if (provider.type === "Baidu Cloud") {
-        return Setting.getLabel(i18next.t("provider:API key"), i18next.t("provider:API key - Tooltip"));
+        return Setting.getLabel(i18next.t("general:API key"), i18next.t("general:API key - Tooltip"));
       } else if (provider.type === "Azure") {
         return Setting.getLabel(i18next.t("provider:Deployment name"), i18next.t("provider:Deployment name - Tooltip"));
       } else if (provider.type === "MiniMax") {
@@ -149,7 +149,7 @@ class ProviderEditPage extends React.Component {
       }
       return Setting.getLabel(i18next.t("general:Secret key"), i18next.t("general:Secret key - Tooltip"));
     } else if (provider.category === "Model") {
-      return Setting.getLabel(i18next.t("provider:API key"), i18next.t("provider:API key - Tooltip"));
+      return Setting.getLabel(i18next.t("general:API key"), i18next.t("general:API key - Tooltip"));
     } else if (provider.category === "Blockchain") {
       if (provider.type === "Ethereum") {
         return Setting.getLabel(i18next.t("provider:Private key"), i18next.t("provider:Private key - Tooltip"));

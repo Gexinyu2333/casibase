@@ -19,6 +19,8 @@ import i18next from "i18next";
 
 const RESOURCE_LABELS = {
   "analysis": "store:Analysis",
+  "agents": "general:Hub",
+  "hub": "general:Hub",
   "stores": "general:Stores",
   "files": "general:Files",
   "providers": "general:Providers",
@@ -72,9 +74,11 @@ function buildBreadcrumbItems(uri) {
   const lastLabelKey = RESOURCE_LABELS[lastSegment];
   const lastLabel = lastLabelKey ? i18next.t(lastLabelKey) : decodeURIComponent(lastSegment);
 
+  const listPath = rootSegment === "agents" ? "/hub" : `/${rootSegment}`;
+
   return [
     homeItem,
-    {title: <Link to={`/${rootSegment}`}>{i18next.t(listLabelKey)}</Link>},
+    {title: <Link to={listPath}>{i18next.t(listLabelKey)}</Link>},
     {title: lastLabel},
   ];
 }
