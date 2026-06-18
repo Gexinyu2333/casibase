@@ -105,6 +105,26 @@ type ImageInfo struct {
 	Geometry    Geometry `json:"geometry"`
 }
 
+type SmartArtNodeInfo struct {
+	NodeID         string `json:"node_id"`
+	Text           string `json:"text"`
+	ParagraphCount int    `json:"paragraph_count"`
+	Editable       bool   `json:"editable"`
+	Reason         string `json:"reason,omitempty"`
+	modelID        string
+	presIDs        []string
+}
+
+type SmartArtInfo struct {
+	SmartArtID string             `json:"smartart_id"`
+	ShapeID    string             `json:"shape_id"`
+	ShapeName  string             `json:"shape_name"`
+	Geometry   Geometry           `json:"geometry"`
+	Editable   bool               `json:"editable"`
+	Reason     string             `json:"reason,omitempty"`
+	Nodes      []SmartArtNodeInfo `json:"nodes"`
+}
+
 type SlideObject struct {
 	ShapeID   string   `json:"shape_id"`
 	ShapeName string   `json:"shape_name"`
@@ -115,14 +135,15 @@ type SlideObject struct {
 }
 
 type SlideLibraryItem struct {
-	SlideIndex  int           `json:"slide_index"`
-	PageType    string        `json:"page_type"`
-	TextSummary string        `json:"text_summary"`
-	Slots       []TextSlot    `json:"slots"`
-	Tables      []TableInfo   `json:"tables"`
-	Charts      []ChartInfo   `json:"charts"`
-	Images      []ImageInfo   `json:"images"`
-	Objects     []SlideObject `json:"objects"`
+	SlideIndex  int            `json:"slide_index"`
+	PageType    string         `json:"page_type"`
+	TextSummary string         `json:"text_summary"`
+	Slots       []TextSlot     `json:"slots"`
+	Tables      []TableInfo    `json:"tables"`
+	Charts      []ChartInfo    `json:"charts"`
+	Images      []ImageInfo    `json:"images"`
+	SmartArts   []SmartArtInfo `json:"smartarts"`
+	Objects     []SlideObject  `json:"objects"`
 }
 
 type Canvas struct {
@@ -180,6 +201,21 @@ type ChartEdit struct {
 	Optional   bool          `json:"optional,omitempty"`
 }
 
+type SmartArtNodeEdit struct {
+	NodeID     string   `json:"node_id,omitempty"`
+	Text       string   `json:"text,omitempty"`
+	Paragraphs []string `json:"paragraphs,omitempty"`
+	Optional   bool     `json:"optional,omitempty"`
+}
+
+type SmartArtEdit struct {
+	SmartArtID string             `json:"smartart_id,omitempty"`
+	ShapeID    string             `json:"shape_id,omitempty"`
+	ShapeName  string             `json:"shape_name,omitempty"`
+	Nodes      []SmartArtNodeEdit `json:"nodes"`
+	Optional   bool               `json:"optional,omitempty"`
+}
+
 type PlanSlide struct {
 	SourceSlide        int             `json:"source_slide"`
 	Purpose            string          `json:"purpose,omitempty"`
@@ -187,6 +223,7 @@ type PlanSlide struct {
 	TableEdits         []TableEdit     `json:"table_edits,omitempty"`
 	ChartEdits         []ChartEdit     `json:"chart_edits,omitempty"`
 	ImageEdits         []ImageEdit     `json:"image_edits,omitempty"`
+	SmartArtEdits      []SmartArtEdit  `json:"smartart_edits,omitempty"`
 	Notes              string          `json:"notes,omitempty"`
 	SpeakerNotes       string          `json:"speaker_notes,omitempty"`
 	Transition         json.RawMessage `json:"transition,omitempty"`

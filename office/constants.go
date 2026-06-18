@@ -40,6 +40,8 @@ const (
 	RelationshipTypeNotesSlide      = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/notesSlide"
 	RelationshipTypeNotesMaster     = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/notesMaster"
 	RelationshipTypeChart           = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart"
+	RelationshipTypeDiagramData     = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/diagramData"
+	RelationshipTypeDiagramDrawing  = "http://schemas.microsoft.com/office/2007/relationships/diagramDrawing"
 	RelationshipTypeEmbeddedPackage = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/package"
 	RelationshipTypeTheme           = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme"
 	RelationshipTypeImage           = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"

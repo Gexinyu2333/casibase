@@ -27,6 +27,8 @@ import (
 const (
 	nsDrawingML     = "http://schemas.openxmlformats.org/drawingml/2006/main"
 	nsChart         = "http://schemas.openxmlformats.org/drawingml/2006/chart"
+	nsDiagram       = "http://schemas.openxmlformats.org/drawingml/2006/diagram"
+	nsDiagram2008   = "http://schemas.microsoft.com/office/drawing/2008/diagram"
 	nsPresentation  = "http://schemas.openxmlformats.org/presentationml/2006/main"
 	nsOfficeRels    = "http://schemas.openxmlformats.org/officeDocument/2006/relationships"
 	nsSpreadsheetML = "http://schemas.openxmlformats.org/spreadsheetml/2006/main"
@@ -101,6 +103,8 @@ type namespaceDeclaration struct {
 var preferredNamespacePrefixes = map[string]string{
 	nsDrawingML:     "a",
 	nsChart:         "c",
+	nsDiagram:       "dgm",
+	nsDiagram2008:   "dsp",
 	nsPresentation:  "p",
 	nsOfficeRels:    "r",
 	nsSpreadsheetML: "x",
@@ -267,6 +271,17 @@ func (n *xmlNode) setAttr(space, local, value string) {
 		}
 	}
 	n.Attr = append(n.Attr, xml.Attr{Name: xml.Name{Space: space, Local: local}, Value: value})
+}
+
+func (n *xmlNode) removeAttr(space, local string) {
+	kept := n.Attr[:0]
+	for _, item := range n.Attr {
+		if item.Name.Space == space && item.Name.Local == local {
+			continue
+		}
+		kept = append(kept, item)
+	}
+	n.Attr = kept
 }
 
 func (n *xmlNode) child(space, local string) *xmlNode {

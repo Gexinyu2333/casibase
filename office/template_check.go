@@ -43,6 +43,7 @@ func CheckPlan(library *Library, plan *Plan) *CheckReport {
 		checkTables(report, planIndex+1, source, item.TableEdits)
 		checkCharts(report, planIndex+1, source, item.ChartEdits)
 		checkImages(report, planIndex+1, source, item.ImageEdits)
+		checkSmartArts(report, planIndex+1, source, item.SmartArtEdits)
 	}
 	return report
 }

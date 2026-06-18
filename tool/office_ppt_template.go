@@ -59,7 +59,7 @@ func (t *pptxTemplateAnalyzeBuiltin) GetName() string { return "pptx_template_an
 func (t *pptxTemplateAnalyzeBuiltin) GetDescription() string {
 	return `Analyze a user-provided PowerPoint template before filling it.
 - template (required): local .pptx path or an HTTP(S) URL from a chat attachment.
-Returns template_fill_pptx_library.v1 JSON with slide types, text slot IDs, image IDs, table IDs, chart IDs, geometry, capacity metrics, and a plan contract. Use the returned IDs to build a template_fill_pptx_plan.v1 plan, then call pptx_template_fill.`
+Returns template_fill_pptx_library.v1 JSON with slide types, text slot IDs, image IDs, table IDs, chart IDs, SmartArt IDs and node IDs, geometry, capacity metrics, and a plan contract. Use the returned IDs to build a template_fill_pptx_plan.v1 plan, then call pptx_template_fill.`
 }
 
 func (t *pptxTemplateAnalyzeBuiltin) GetInputSchema() interface{} {
@@ -107,11 +107,12 @@ func (t *pptxTemplateFillBuiltin) GetName() string { return "pptx_template_fill"
 
 func (t *pptxTemplateFillBuiltin) GetDescription() string {
 	return `Create a new PowerPoint file by deterministically filling and reusing slides from an existing template.
-- Call pptx_template_analyze first and use its exact slide, slot, table, chart, and image IDs.
+- Call pptx_template_analyze first and use its exact slide, slot, table, chart, image, SmartArt, and SmartArt node IDs.
 - template: local .pptx path or HTTP(S) chat attachment URL.
 - path: exact output .pptx path; relative paths resolve to the user's Documents folder.
-- plan: template_fill_pptx_plan.v1 object. Slides may be selected, repeated, and reordered. Each slide supports replacements, table_edits, chart_edits, image_edits, and notes.
+- plan: template_fill_pptx_plan.v1 object. Slides may be selected, repeated, and reordered. Each slide supports replacements, table_edits, chart_edits, image_edits, smartart_edits, and notes.
 - image_edits: each edit needs an image_id and image_path (local PNG/JPEG path or HTTP(S) URL). Only PNG and JPEG are supported. Replacing an image preserves the template picture frame's position, size, rotation, cropping, and styles without recomputing the aspect ratio.
+- smartart_edits: each edit targets an existing SmartArt from analysis by smartart_id, shape_id, or shape_name and replaces existing node text by node_id or array order. The first version keeps node count, layout, colors, and style unchanged. Empty text intentionally clears a node.
 - Do not insert manual line breaks into titles unless they are intentional; single-line template titles are auto-fitted by default.
 - Keep replacement text concise and respect capacity warnings. New text/image or text/text collisions are validation errors: shorten the content or choose another template slide.
 - transition defaults to "keep", preserving source transitions and object animations.
@@ -212,6 +213,43 @@ func (t *pptxTemplateFillBuiltin) GetInputSchema() interface{} {
 											),
 										},
 										"required": []string{"image_id", "image_path"},
+									},
+								},
+								"smartart_edits": map[string]interface{}{
+									"type": "array",
+									"items": map[string]interface{}{
+										"type": "object",
+										"properties": map[string]interface{}{
+											"smartart_id": stringProperty("SmartArt ID from template analysis. Prefer this selector when available."),
+											"shape_id":    stringProperty("Optional SmartArt shape ID from template analysis."),
+											"shape_name":  stringProperty("Optional SmartArt shape name from template analysis."),
+											"optional": map[string]interface{}{
+												"type":        "boolean",
+												"description": "Skip this SmartArt edit if the target is absent. Defaults to false.",
+												"default":     false,
+											},
+											"nodes": map[string]interface{}{
+												"type": "array",
+												"items": map[string]interface{}{
+													"type": "object",
+													"properties": map[string]interface{}{
+														"node_id": stringProperty("Optional SmartArt node ID from analysis. If omitted, nodes are matched by array order."),
+														"text":    stringProperty("Replacement node text. An empty string clears the node."),
+														"paragraphs": map[string]interface{}{
+															"type":        "array",
+															"description": "Optional replacement paragraphs. Overrides text when present; an empty array clears the node.",
+															"items":       map[string]interface{}{"type": "string"},
+														},
+														"optional": map[string]interface{}{
+															"type":        "boolean",
+															"description": "Skip this node edit if the node is absent. Defaults to false.",
+															"default":     false,
+														},
+													},
+												},
+											},
+										},
+										"required": []string{"nodes"},
 									},
 								},
 								"notes":      stringProperty("Speaker notes for the generated slide."),
@@ -351,7 +389,7 @@ func compactPptxCheckReport(report *office.CheckReport) *office.CheckReport {
 		}
 		result := office.CheckResult{}
 		for _, key := range []string{
-			"status", "plan_slide", "source_slide", "slot_id", "table_id", "chart_id", "image_id", "selector",
+			"status", "plan_slide", "source_slide", "slot_id", "table_id", "chart_id", "image_id", "smartart_id", "node_id", "selector",
 			"new_text", "message", "estimated_font_scale_percent", "capacity_visual_width", "collisions",
 			"category_axis_font_size_pt", "category_label_area_percent", "category_labels_fit",
 			"longest_category", "longest_category_visual_width", "suggested_max_visual_width",
@@ -398,6 +436,8 @@ func pptxCheckSuggestion(item office.CheckResult) string {
 			return "Shorten the longest category label; the chart already uses the maximum label area and minimum 8pt axis font."
 		}
 		return "Make every chart series contain exactly one value for each category."
+	case strings.Contains(message, "SmartArt"):
+		return "Re-run pptx_template_analyze and use an exact SmartArt ID and node ID from the returned library."
 	case status == "WARN":
 		return "Shorten this text or choose a larger slot to avoid very small rendered text."
 	default:
