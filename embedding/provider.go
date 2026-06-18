@@ -24,6 +24,7 @@ type EmbeddingResult struct {
 	TokenCount int
 	Price      float64
 	Currency   string
+	Data       []float32
 }
 
 type EmbeddingProvider interface {

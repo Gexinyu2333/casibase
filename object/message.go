@@ -65,6 +65,7 @@ type Message struct {
 	WebSearchEnabled  bool                 `json:"webSearchEnabled"`
 	ModelProvider     string               `xorm:"varchar(100)" json:"modelProvider"`
 	EmbeddingProvider string               `xorm:"varchar(100)" json:"embeddingProvider"`
+	Data              []float32            `xorm:"mediumtext" json:"data"`
 	VectorScores      []VectorScore        `xorm:"mediumtext" json:"vectorScores"`
 	LikeUsers         []string             `json:"likeUsers"`
 	DisLikeUsers      []string             `json:"dislikeUsers"`

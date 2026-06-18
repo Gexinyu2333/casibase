@@ -355,6 +355,9 @@ func generateMessageAnswer(id string, responseWriter http.ResponseWriter, host s
 		questionMessage.TokenCount = embeddingResult.TokenCount
 		questionMessage.Price = embeddingResult.Price
 		questionMessage.Currency = embeddingResult.Currency
+		if embeddingResult.Data != nil {
+			questionMessage.Data = embeddingResult.Data
+		}
 
 		_, err = object.UpdateMessage(questionMessage.GetId(), questionMessage, false)
 		if err != nil {

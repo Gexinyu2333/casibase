@@ -482,6 +482,24 @@ class MessageListPage extends BaseListPage {
         },
       },
       {
+        title: i18next.t("general:Data"),
+        dataIndex: "data",
+        key: "data",
+        width: "200px",
+        render: (text, record, index) => {
+          if (!record.data || record.data.length === 0) {
+            return null;
+          }
+          return (
+            <Tooltip placement="left" title={Setting.getShortText(JSON.stringify(record.data), 1000)}>
+              <div style={{maxWidth: "200px"}}>
+                {Setting.getShortText(JSON.stringify(record.data), 50)}
+              </div>
+            </Tooltip>
+          );
+        },
+      },
+      {
         title: i18next.t("message:Suggestions"),
         dataIndex: "suggestions",
         key: "suggestions",

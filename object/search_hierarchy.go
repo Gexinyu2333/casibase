@@ -67,6 +67,9 @@ func (p *HierarchySearchProvider) Search(relatedStores []string, embeddingProvid
 	if qVector == nil || len(qVector) == 0 {
 		return nil, embeddingResult, fmt.Errorf(i18n.Translate(lang, "object:no qVector found"))
 	}
+	if embeddingResult != nil {
+		embeddingResult.Data = qVector
+	}
 
 	similarities, err := getNearestVectors(qVector, vectorData, knowledgeCount)
 	if err != nil {

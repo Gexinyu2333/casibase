@@ -294,6 +294,11 @@ class MessageEditPage extends React.Component {
               }} />,
               24
             )}
+            {message.data && message.data.length > 0 && this.renderMessageField(
+              Setting.getLabel(i18next.t("general:Data"), i18next.t("general:Data - Tooltip")),
+              <TextArea autoSize={{minRows: 1, maxRows: 5}} value={JSON.stringify(message.data)} disabled={true} />,
+              24
+            )}
           </Row>
         </Card>
 
