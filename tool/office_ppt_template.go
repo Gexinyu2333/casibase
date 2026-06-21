@@ -30,7 +30,9 @@ import (
 	"time"
 
 	"github.com/ThinkInAIXYZ/go-mcp/protocol"
-	"github.com/the-open-agent/openagent/office"
+	office "github.com/the-open-agent/office-tool-use"
+	officemodel "github.com/the-open-agent/office-tool-use/model"
+	"github.com/the-open-agent/office-tool-use/ooxml"
 )
 
 const (
@@ -59,7 +61,7 @@ func (t *pptxTemplateAnalyzeBuiltin) GetName() string { return "pptx_template_an
 func (t *pptxTemplateAnalyzeBuiltin) GetDescription() string {
 	return `Analyze a user-provided PowerPoint template before filling it.
 - template (required): local .pptx path or an HTTP(S) URL from a chat attachment.
-Returns template_fill_pptx_library.v1 JSON with slide types, text slot IDs, image IDs, table IDs, chart IDs, SmartArt IDs and node IDs, geometry, capacity metrics, and a plan contract. Use the returned IDs to build a template_fill_pptx_plan.v1 plan, then call pptx_template_fill.`
+Returns template_fill_pptx_library.v1 JSON with slide types, text slot IDs, image IDs, table IDs, chart IDs, SmartArt IDs and node IDs, SmartArt resize structure/groups, geometry, capacity metrics, and a plan contract. Use the returned IDs to build a template_fill_pptx_plan.v1 plan, then call pptx_template_fill.`
 }
 
 func (t *pptxTemplateAnalyzeBuiltin) GetInputSchema() interface{} {
@@ -91,7 +93,7 @@ func (t *pptxTemplateAnalyzeBuiltin) Execute(ctx context.Context, arguments map[
 	}
 	defer cleanup()
 
-	library, err := office.AnalyzeFile(templatePath, office.DefaultLimits())
+	library, err := office.AnalyzeFile(templatePath, ooxml.DefaultLimits())
 	if err != nil {
 		return officeToolError(fmt.Sprintf("Failed to analyze PowerPoint template: %s", err.Error())), nil
 	}
@@ -111,8 +113,9 @@ func (t *pptxTemplateFillBuiltin) GetDescription() string {
 - template: local .pptx path or HTTP(S) chat attachment URL.
 - path: exact output .pptx path; relative paths resolve to the user's Documents folder.
 - plan: template_fill_pptx_plan.v1 object. Slides may be selected, repeated, and reordered. Each slide supports replacements, table_edits, chart_edits, image_edits, smartart_edits, and notes.
+- The output contains exactly plan.slides in order. To edit a few pages while preserving the rest, include every source slide from the analysis and leave unchanged slides with only source_slide/purpose.
 - image_edits: each edit needs an image_id and image_path (local PNG/JPEG path or HTTP(S) URL). Only PNG and JPEG are supported. Replacing an image preserves the template picture frame's position, size, rotation, cropping, and styles without recomputing the aspect ratio.
-- smartart_edits: each edit targets an existing SmartArt from analysis by smartart_id, shape_id, or shape_name and replaces existing node text by node_id or array order. The first version keeps node count, layout, colors, and style unchanged. Empty text intentionally clears a node.
+- smartart_edits: each edit targets an existing SmartArt from analysis by smartart_id, shape_id, or shape_name. Use nodes to replace node text by node_id or array order. If analysis returns resizable=true, set resize=true and provide the complete desired node list by array order to append/delete tail nodes. For parent/child SmartArt layouts, prefer structure_ops: add_child adds one child under parent_node_id, and add_root adds one empty root-level parent. Resizing or structure_ops remove the cached SmartArt drawing so PowerPoint recalculates it when opened. Empty text intentionally clears a node.
 - Do not insert manual line breaks into titles unless they are intentional; single-line template titles are auto-fitted by default.
 - Keep replacement text concise and respect capacity warnings. New text/image or text/text collisions are validation errors: shorten the content or choose another template slide.
 - transition defaults to "keep", preserving source transitions and object animations.
@@ -228,6 +231,11 @@ func (t *pptxTemplateFillBuiltin) GetInputSchema() interface{} {
 												"description": "Skip this SmartArt edit if the target is absent. Defaults to false.",
 												"default":     false,
 											},
+											"resize": map[string]interface{}{
+												"type":        "boolean",
+												"description": "When the analyzed SmartArt has resizable=true, use the nodes array as the complete desired node list and append/delete only tail nodes. Defaults to false.",
+												"default":     false,
+											},
 											"nodes": map[string]interface{}{
 												"type": "array",
 												"items": map[string]interface{}{
@@ -248,8 +256,30 @@ func (t *pptxTemplateFillBuiltin) GetInputSchema() interface{} {
 													},
 												},
 											},
+											"structure_ops": map[string]interface{}{
+												"type":        "array",
+												"description": "Optional structure operations for resizable parent/child SmartArt. Use add_child to add exactly one child under parent_node_id; use add_root to add exactly one root-level parent with no children.",
+												"items": map[string]interface{}{
+													"type": "object",
+													"properties": map[string]interface{}{
+														"op":             stringProperty("Structure operation: add_child or add_root."),
+														"parent_node_id": stringProperty("Required for add_child. Must be a root_node_id from analysis structure.groups."),
+														"text":           stringProperty("Text for the newly created node. An empty string creates an empty node."),
+														"paragraphs": map[string]interface{}{
+															"type":        "array",
+															"description": "Optional paragraphs for the newly created node. Overrides text when present.",
+															"items":       map[string]interface{}{"type": "string"},
+														},
+														"optional": map[string]interface{}{
+															"type":        "boolean",
+															"description": "Skip this structure operation if it cannot be applied. Defaults to false.",
+															"default":     false,
+														},
+													},
+													"required": []string{"op"},
+												},
+											},
 										},
-										"required": []string{"nodes"},
 									},
 								},
 								"notes":      stringProperty("Speaker notes for the generated slide."),
@@ -306,11 +336,11 @@ func (t *pptxTemplateFillBuiltin) Execute(ctx context.Context, arguments map[str
 	if len(bytes.TrimSpace(args.Plan)) == 0 || bytes.Equal(bytes.TrimSpace(args.Plan), []byte("null")) {
 		return officeToolError("Missing required parameter: plan"), nil
 	}
-	var plan office.Plan
+	var plan officemodel.Plan
 	if err := json.Unmarshal(args.Plan, &plan); err != nil {
 		return officeToolError(fmt.Sprintf("Invalid plan: %s", err.Error())), nil
 	}
-	if plan.Schema != office.PlanSchema {
+	if plan.Schema != officemodel.PlanSchema {
 		return officeToolError("Invalid plan: schema must be template_fill_pptx_plan.v1"), nil
 	}
 
@@ -329,12 +359,12 @@ func (t *pptxTemplateFillBuiltin) Execute(ctx context.Context, arguments map[str
 		duration = 0.5
 	}
 	outputPath := ResolveOutputPath(args.Path)
-	cleanupImages, err := resolvePptxPlanImages(ctx, &plan, office.DefaultLimits().MaxPartSize)
+	cleanupImages, err := resolvePptxPlanImages(ctx, &plan, ooxml.DefaultLimits().MaxPartSize)
 	if err != nil {
 		return officeToolError(fmt.Sprintf("Failed to resolve plan images: %s", err.Error())), nil
 	}
 	defer cleanupImages()
-	library, err := office.AnalyzeFile(templatePath, office.DefaultLimits())
+	library, err := office.AnalyzeFile(templatePath, ooxml.DefaultLimits())
 	if err != nil {
 		return officeToolError(fmt.Sprintf("Failed to fill PowerPoint template: %s", err.Error())), nil
 	}
@@ -342,12 +372,12 @@ func (t *pptxTemplateFillBuiltin) Execute(ctx context.Context, arguments map[str
 		templatePath,
 		outputPath,
 		&plan,
-		office.ApplyOptions{
+		officemodel.ApplyOptions{
 			Transition:         transition,
 			TransitionDuration: duration,
 			Library:            library,
 		},
-		office.DefaultLimits(),
+		ooxml.DefaultLimits(),
 	)
 	if err != nil {
 		if validationReport != nil {
@@ -371,14 +401,14 @@ func (t *pptxTemplateFillBuiltin) Execute(ctx context.Context, arguments map[str
 	)), nil
 }
 
-func compactPptxCheckReport(report *office.CheckReport) *office.CheckReport {
+func compactPptxCheckReport(report *officemodel.CheckReport) *officemodel.CheckReport {
 	if report == nil {
 		return nil
 	}
-	compact := &office.CheckReport{
+	compact := &officemodel.CheckReport{
 		Schema:  report.Schema,
 		Summary: report.Summary,
-		Results: []office.CheckResult{},
+		Results: []officemodel.CheckResult{},
 	}
 	for _, item := range report.Results {
 		status, _ := item["status"].(string)
@@ -387,7 +417,7 @@ func compactPptxCheckReport(report *office.CheckReport) *office.CheckReport {
 		if status != "ERROR" && !(status == "WARN" && ((hasScale && scale < 60) || (hasChartFit && !chartLabelsFit))) {
 			continue
 		}
-		result := office.CheckResult{}
+		result := officemodel.CheckResult{}
 		for _, key := range []string{
 			"status", "plan_slide", "source_slide", "slot_id", "table_id", "chart_id", "image_id", "smartart_id", "node_id", "selector",
 			"new_text", "message", "estimated_font_scale_percent", "capacity_visual_width", "collisions",
@@ -407,7 +437,7 @@ func compactPptxCheckReport(report *office.CheckReport) *office.CheckReport {
 	return compact
 }
 
-func pptxCheckSuggestion(item office.CheckResult) string {
+func pptxCheckSuggestion(item officemodel.CheckResult) string {
 	status, _ := item["status"].(string)
 	message, _ := item["message"].(string)
 	switch {
@@ -550,7 +580,7 @@ func downloadPptxTemplate(ctx context.Context, location *url.URL) (string, func(
 	return path, cleanup, nil
 }
 
-func resolvePptxPlanImages(ctx context.Context, plan *office.Plan, limit int64) (func(), error) {
+func resolvePptxPlanImages(ctx context.Context, plan *officemodel.Plan, limit int64) (func(), error) {
 	var tempFiles []string
 	cleanup := func() {
 		for _, path := range tempFiles {

@@ -54,6 +54,7 @@ require (
 	github.com/uandersonricardo/uiautomation v0.0.0-20250610195738-b54cd4b8ddde
 	github.com/volcengine/volcengine-go-sdk v1.2.32
 	github.com/xuri/excelize/v2 v2.10.1
+	golang.org/x/image v0.38.0
 	golang.org/x/net v0.52.0
 	golang.org/x/sync v0.20.0
 	golang.org/x/text v0.35.0
@@ -101,7 +102,6 @@ require (
 	github.com/xuri/efp v0.0.1 // indirect
 	github.com/xuri/nfp v0.0.2-0.20250530014748-2ddeb826f9a9 // indirect
 	go.opentelemetry.io/otel/sdk/metric v1.35.0 // indirect
-	golang.org/x/image v0.38.0 // indirect
 	golang.org/x/time v0.9.0 // indirect
 	google.golang.org/grpc v1.71.0 // indirect
 )
@@ -190,6 +190,7 @@ require (
 	github.com/spf13/viper v1.18.2 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7 // indirect
+	github.com/the-open-agent/office-tool-use v0.1.0
 	github.com/tidwall/gjson v1.18.0 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
@@ -207,7 +208,7 @@ require (
 	golang.org/x/exp v0.0.0-20260312153236-7ab1446f8b90 // indirect
 	golang.org/x/mod v0.34.0 // indirect
 	golang.org/x/oauth2 v0.27.0
-	golang.org/x/sys v0.42.0
+	golang.org/x/sys v0.46.0
 	golang.org/x/term v0.41.0 // indirect
 	golang.org/x/tools v0.43.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250218202821-56aae31c358a // indirect
