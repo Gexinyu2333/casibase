@@ -17,6 +17,11 @@ openagent
 vendor/
 node_modules/
 tool/pptx-worker/worker.bundle.mjs
+web/public/flag-icons/
+web/public/gravatar/
+web/public/icon/
+web/public/img/
+web/public/site/
 
 data/**
 !data/template/

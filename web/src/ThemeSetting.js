@@ -48,6 +48,10 @@ export function getDefaultAiAvatar() {
   return `${StaticBaseUrl}/img/openagent.png`;
 }
 
+export function getAvatarFallback() {
+  return `${StaticBaseUrl}/gravatar/error.png`;
+}
+
 export function getUserAvatar(message, account) {
   if (message.author === "AI") {
     return getDefaultAiAvatar();

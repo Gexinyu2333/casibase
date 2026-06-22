@@ -40,11 +40,10 @@ function getDefaultLogoURL(provider) {
     return "";
   }
 
-  // Extract the path after StaticBaseUrl and prepend the default CDN URL
-  const defaultCdnUrl = "https://cdn.openagentai.org";
+  const defaultStaticBaseUrl = process.env.REACT_APP_EMBED_STATIC_ASSETS === "true" ? "" : "https://cdn.openagentai.org";
   const pathMatch = logoPath.match(/\/img\/.+$/);
   if (pathMatch) {
-    return `${defaultCdnUrl}${pathMatch[0]}`;
+    return `${defaultStaticBaseUrl}${pathMatch[0]}`;
   }
   return "";
 }

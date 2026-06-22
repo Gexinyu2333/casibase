@@ -28,6 +28,7 @@ import (
 var (
 	siteConfigOverrides = map[string]string{}
 	siteConfigMu        sync.RWMutex
+	embeddedWebAssets   bool
 )
 
 func SetSiteOverrides(overrides map[string]string) {
@@ -36,6 +37,10 @@ func SetSiteOverrides(overrides map[string]string) {
 	for k, v := range overrides {
 		siteConfigOverrides[k] = v
 	}
+}
+
+func SetEmbeddedWebAssetsEnabled(enabled bool) {
+	embeddedWebAssets = enabled
 }
 
 const FrontendBaseDir = "../openagent"
@@ -218,6 +223,7 @@ func GetWebConfig() *WebConfig {
 	config.IsDemoMode = GetConfigBool("isDemoMode")
 
 	config.ThemeDefault.ColorPrimary = GetDefaultColorPrimary()
+	NormalizeEmbeddedWebConfig(config)
 
 	return config
 }

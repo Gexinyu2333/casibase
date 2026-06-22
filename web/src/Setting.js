@@ -15,8 +15,12 @@
 import i18next from "i18next";
 import {createFromIconfontCN} from "@ant-design/icons";
 
+const iconfontScriptUrl = process.env.REACT_APP_EMBED_STATIC_ASSETS === "true"
+  ? "/icon/iconfont.js"
+  : "https://cdn.open-ct.com/icon/iconfont.js";
+
 export const IconFont = createFromIconfontCN({
-  scriptUrl: "https://cdn.open-ct.com/icon/iconfont.js",
+  scriptUrl: iconfontScriptUrl,
 });
 import Sdk from "casdoor-js-sdk";
 import * as StoreBackend from "./backend/StoreBackend";

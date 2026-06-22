@@ -43,7 +43,18 @@ jobs:
           node-version: 22
           cache: 'yarn'
           cache-dependency-path: ./web/yarn.lock
-      - run: yarn install && CI=false yarn run build
+      - run: yarn install
+        working-directory: ./web
+      - name: Prepare embedded web static assets
+        if: github.repository == 'the-open-agent/openagent' && github.event_name == 'push'
+        run: ./scripts/prepare-embedded-web-assets.sh
+      - name: Build embedded frontend
+        if: github.repository == 'the-open-agent/openagent' && github.event_name == 'push'
+        run: CI=false REACT_APP_EMBED_STATIC_ASSETS=true yarn run build
+        working-directory: ./web
+      - name: Build frontend
+        if: github.repository != 'the-open-agent/openagent' || github.event_name != 'push'
+        run: CI=false yarn run build
         working-directory: ./web
       - name: Upload build artifacts
         if: github.repository == 'the-open-agent/openagent' && github.event_name == 'push'

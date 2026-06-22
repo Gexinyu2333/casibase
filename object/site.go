@@ -111,8 +111,21 @@ func GetBuiltInSite() (*Site, error) {
 	site, err := GetSite("admin/site-built-in")
 	if site != nil {
 		site.ClientSecret = ""
+		NormalizeEmbeddedSiteAssets(site)
 	}
 	return site, err
+}
+
+func NormalizeEmbeddedSiteAssets(site *Site) {
+	if site == nil {
+		return
+	}
+
+	site.StaticBaseUrl = conf.NormalizeEmbeddedStaticBaseUrl(site.StaticBaseUrl)
+	site.FaviconUrl = conf.NormalizeEmbeddedAssetUrl(site.FaviconUrl)
+	site.LogoUrl = conf.NormalizeEmbeddedAssetUrl(site.LogoUrl)
+	site.NavbarHtml = conf.NormalizeEmbeddedAssetHtml(site.NavbarHtml)
+	site.FooterHtml = conf.NormalizeEmbeddedAssetHtml(site.FooterHtml)
 }
 
 func GetBuiltInSiteWithSecret() (*Site, error) {

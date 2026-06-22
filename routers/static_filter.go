@@ -26,6 +26,7 @@ import (
 	"strings"
 
 	"github.com/beego/beego/context"
+	"github.com/beego/beego/logs"
 	"github.com/the-open-agent/openagent/conf"
 	"github.com/the-open-agent/openagent/embedsupport"
 	"github.com/the-open-agent/openagent/util"
@@ -111,10 +112,14 @@ func StaticFilter(ctx *context.Context) {
 		if util.FileExist(fallback) {
 			err := util.AppendWebConfigCookie(ctx)
 			if err != nil {
-				fmt.Println(err)
+				logs.Error("AppendWebConfigCookie() error: %s", err.Error())
 			}
 			makeGzipResponse(ctx.ResponseWriter, ctx.Request, fallback)
 		} else if embedsupport.WebFS() != nil {
+			err := util.AppendWebConfigCookie(ctx)
+			if err != nil {
+				logs.Error("AppendWebConfigCookie() error: %s", err.Error())
+			}
 			embedsupport.ServeEmbedded(ctx.ResponseWriter, ctx.Request, urlPath)
 		} else {
 			ctx.ResponseWriter.Header().Set("Content-Type", "text/html; charset=utf-8")

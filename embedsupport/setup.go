@@ -20,7 +20,11 @@
 // executable.
 package embedsupport
 
-import "io/fs"
+import (
+	"io/fs"
+
+	"github.com/the-open-agent/openagent/conf"
+)
 
 var (
 	webFS        fs.FS
@@ -31,12 +35,13 @@ var (
 
 // Setup must be called at the very start of main(), before any config values
 // are read or HTTP requests are served.
-func Setup(conf, web, skills, ocrService, pptxWorker fs.FS) {
+func Setup(confFS, web, skills, ocrService, pptxWorker fs.FS) {
 	webFS = web
 	skillsFS = skills
 	ocrServiceFS = ocrService
 	pptxWorkerFS = pptxWorker
-	setupConf(conf)
+	setupConf(confFS)
+	conf.SetEmbeddedWebAssetsEnabled(web != nil)
 }
 
 // WebFS returns the embedded web/build filesystem, or nil if not available.
