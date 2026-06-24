@@ -23,10 +23,10 @@ import (
 	"net/http"
 	"strings"
 
-	dashscopesdk "github.com/casibase/dashscope-go-sdk"
-	"github.com/casibase/dashscope-go-sdk/wanx"
 	"github.com/casibase/dashscopego"
 	"github.com/casibase/dashscopego/qwen"
+	dashscopesdk "github.com/the-open-agent/dashscope-go-sdk"
+	"github.com/the-open-agent/dashscope-go-sdk/wanx"
 	"github.com/the-open-agent/openagent/i18n"
 )
 

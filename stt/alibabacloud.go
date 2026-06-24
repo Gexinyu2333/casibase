@@ -23,9 +23,9 @@ import (
 	"sync"
 	"time"
 
-	dashscopego "github.com/casibase/dashscope-go-sdk"
+	dashscopego "github.com/the-open-agent/dashscope-go-sdk"
 
-	"github.com/casibase/dashscope-go-sdk/paraformer"
+	"github.com/the-open-agent/dashscope-go-sdk/paraformer"
 	"github.com/the-open-agent/openagent/i18n"
 )
 

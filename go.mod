@@ -18,7 +18,6 @@ require (
 	github.com/carmel/gooxml v0.0.0-20220216072414-40ff56130850
 	github.com/casbin/casbin/v2 v2.135.0
 	github.com/casdoor/casdoor-go-sdk v1.44.0
-	github.com/casibase/dashscope-go-sdk v0.0.2
 	github.com/casibase/dashscopego v0.6.0
 	github.com/casibase/go-openrouter v1.0.0
 	github.com/casibase/pdf v1.2.0
@@ -50,6 +49,7 @@ require (
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.1116
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/hunyuan v1.0.1074
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tbaas v1.0.1115
+	github.com/the-open-agent/dashscope-go-sdk v1.1.0
 	github.com/ua-parser/uap-go v0.0.0-20230823213814-f77b3e91e9dc
 	github.com/uandersonricardo/uiautomation v0.0.0-20250610195738-b54cd4b8ddde
 	github.com/volcengine/volcengine-go-sdk v1.2.32
