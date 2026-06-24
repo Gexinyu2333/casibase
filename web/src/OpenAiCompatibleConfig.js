@@ -14,6 +14,7 @@
 
 import React from "react";
 import {Col, Input, Row, Space} from "antd";
+import {LinkOutlined} from "@ant-design/icons";
 import i18next from "i18next";
 import * as Setting from "./Setting";
 import CopyButton from "./common/CopyButton";
@@ -21,11 +22,10 @@ import {getOpenAiCompatibleBaseUrl, getOpenAiCompatibleChatCompletionsUrl} from 
 
 function ReadOnlyCopyInput({value}) {
   return (
-    <Input
-      readOnly
-      value={value}
-      addonAfter={<CopyButton value={value} />}
-    />
+    <Space.Compact style={{width: "100%"}}>
+      <Input readOnly prefix={<LinkOutlined />} value={value} />
+      <CopyButton value={value} />
+    </Space.Compact>
   );
 }
 
@@ -39,21 +39,23 @@ function OpenAiCompatibleConfig({apiKey, apiKeyDisabled = false, onApiKeyChange}
         <div style={{fontWeight: 600}}>{i18next.t("general:OpenAI compatible API")}</div>
         <div style={{color: "var(--ant-color-text-secondary)", fontSize: "13px"}}>{i18next.t("general:API integration hint")}</div>
       </Space>
-      <Row gutter={16}>
-        <Col style={{marginTop: "12px"}} span={Setting.isMobile() ? 22 : 8}>
+      <Row gutter={48}>
+        <Col style={{marginTop: "12px"}} span={Setting.isMobile() ? 22 : 7}>
           <div style={{marginBottom: "4px"}}>{i18next.t("general:External API key")}</div>
-          <Input.Password
-            value={apiKey}
-            disabled={apiKeyDisabled}
-            addonAfter={<CopyButton value={apiKey} disabled={apiKeyDisabled} />}
-            onChange={onApiKeyChange}
-          />
+          <Space.Compact style={{width: "100%"}}>
+            <Input.Password
+              value={apiKey}
+              disabled={apiKeyDisabled}
+              onChange={onApiKeyChange}
+            />
+            <CopyButton value={apiKey} disabled={apiKeyDisabled} />
+          </Space.Compact>
         </Col>
-        <Col style={{marginTop: "12px"}} span={Setting.isMobile() ? 22 : 8}>
+        <Col style={{marginTop: "12px"}} span={Setting.isMobile() ? 22 : 7}>
           <div style={{marginBottom: "4px"}}>{i18next.t("general:Base URL")}</div>
           <ReadOnlyCopyInput value={baseUrl} />
         </Col>
-        <Col style={{marginTop: "12px"}} span={Setting.isMobile() ? 22 : 8}>
+        <Col style={{marginTop: "12px"}} span={Setting.isMobile() ? 22 : 7}>
           <div style={{marginBottom: "4px"}}>{i18next.t("general:Chat completions endpoint")}</div>
           <ReadOnlyCopyInput value={chatCompletionsUrl} />
         </Col>

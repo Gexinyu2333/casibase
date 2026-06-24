@@ -13,7 +13,10 @@
 // limitations under the License.
 
 export function getOpenAiCompatibleBaseUrl() {
-  return `${window.location.origin}/api`;
+  const origin = window.location.port === "13001"
+    ? window.location.origin.replace(":13001", ":14000")
+    : window.location.origin;
+  return `${origin}/api`;
 }
 
 export function getOpenAiCompatibleChatCompletionsUrl() {
