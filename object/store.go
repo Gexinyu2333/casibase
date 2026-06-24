@@ -20,6 +20,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/the-open-agent/openagent/auth"
 	"github.com/the-open-agent/openagent/conf"
 	"github.com/the-open-agent/openagent/i18n"
 	"github.com/the-open-agent/openagent/storage"
@@ -111,7 +112,7 @@ type Store struct {
 	Brief       string `xorm:"varchar(500)" json:"brief"`
 	Description string `xorm:"text" json:"description"`
 
-	ApiKey string `xorm:"varchar(100) index" json:"apiKey"`
+	ExternalApiKey string `xorm:"varchar(100) index" json:"externalApiKey"`
 
 	PublishState string `xorm:"varchar(100)" json:"publishState"`
 
@@ -159,21 +160,21 @@ func generateStoreApiKey() string {
 	return fmt.Sprintf("sk-%s", util.GetRandomString(24))
 }
 
-func GetMaskedStore(store *Store) *Store {
+func GetMaskedStore(store *Store, user *auth.User) *Store {
 	if store == nil {
 		return nil
 	}
 
-	if store.ApiKey != "" {
-		store.ApiKey = "***"
+	if store.ExternalApiKey != "" && !util.IsGlobalAdmin(user) && (user == nil || user.Name != store.Owner) {
+		store.ExternalApiKey = "***"
 	}
 
 	return store
 }
 
-func GetMaskedStores(stores []*Store) []*Store {
+func GetMaskedStores(stores []*Store, user *auth.User) []*Store {
 	for _, store := range stores {
-		store = GetMaskedStore(store)
+		GetMaskedStore(store, user)
 	}
 	return stores
 }
@@ -183,7 +184,7 @@ func GetStoreByApiKey(apiKey string) (*Store, error) {
 		return nil, nil
 	}
 	store := &Store{}
-	existed, err := adapter.engine.Where("api_key = ?", apiKey).Get(store)
+	existed, err := adapter.engine.Where("external_api_key = ?", apiKey).Get(store)
 	if err != nil {
 		return nil, err
 	}
@@ -317,8 +318,8 @@ func UpdateStore(id string, store *Store) (bool, error) {
 		return false, nil
 	}
 
-	if store.ApiKey == "" {
-		store.ApiKey = generateStoreApiKey()
+	if store.ExternalApiKey == "" {
+		store.ExternalApiKey = generateStoreApiKey()
 	}
 
 	_, err = adapter.engine.ID(core.PK{owner, name}).AllCols().Update(store)
@@ -331,8 +332,8 @@ func UpdateStore(id string, store *Store) (bool, error) {
 }
 
 func AddStore(store *Store) (bool, error) {
-	if store.ApiKey == "" {
-		store.ApiKey = generateStoreApiKey()
+	if store.ExternalApiKey == "" {
+		store.ExternalApiKey = generateStoreApiKey()
 	}
 
 	affected, err := adapter.engine.Insert(store)

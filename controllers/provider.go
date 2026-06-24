@@ -212,21 +212,21 @@ func (c *ApiController) FetchProviderModels() {
 		return
 	}
 
-	if provider.ClientSecret == "***" || provider.ProviderKey == "***" {
+	if provider.ClientSecret == "***" || provider.ExternalApiKey == "***" {
 		dbProvider, err := object.GetProvider(fmt.Sprintf("%s/%s", provider.Owner, provider.Name))
 		if err == nil && dbProvider != nil {
 			if provider.ClientSecret == "***" {
 				provider.ClientSecret = dbProvider.ClientSecret
 			}
-			if provider.ProviderKey == "***" {
-				provider.ProviderKey = dbProvider.ProviderKey
+			if provider.ExternalApiKey == "***" {
+				provider.ExternalApiKey = dbProvider.ExternalApiKey
 			}
 		}
 	}
 
 	secretKey := provider.ClientSecret
 	if secretKey == "" {
-		secretKey = provider.ProviderKey
+		secretKey = provider.ExternalApiKey
 	}
 
 	url := provider.ProviderUrl

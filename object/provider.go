@@ -45,7 +45,7 @@ type Provider struct {
 	ClientId           string `xorm:"varchar(100)" json:"clientId"`
 	ClientSecret       string `xorm:"varchar(2000)" json:"clientSecret"`
 	Region             string `xorm:"varchar(100)" json:"region"`
-	ProviderKey        string `xorm:"varchar(100)" json:"providerKey"`
+	ExternalApiKey     string `xorm:"varchar(100)" json:"externalApiKey"`
 	ProviderUrl        string `xorm:"varchar(200)" json:"providerUrl"`
 	ApiVersion         string `xorm:"varchar(100)" json:"apiVersion"`
 	CompatibleProvider string `xorm:"varchar(100)" json:"compatibleProvider"`
@@ -98,8 +98,8 @@ func GetMaskedProvider(provider *Provider, isMaskEnabled bool, user *auth.User) 
 	}
 
 	if !util.IsAdmin(user) {
-		if provider.ProviderKey != "" {
-			provider.ProviderKey = "***"
+		if provider.ExternalApiKey != "" {
+			provider.ExternalApiKey = "***"
 		}
 		if provider.UserKey != "" {
 			provider.UserKey = "***"
@@ -268,8 +268,8 @@ func UpdateProvider(id string, provider *Provider) (bool, error) {
 }
 
 func AddProvider(provider *Provider) (bool, error) {
-	if provider.ProviderKey == "" && provider.Category == "Model" {
-		provider.ProviderKey = generateProviderKey()
+	if provider.ExternalApiKey == "" && provider.Category == "Model" {
+		provider.ExternalApiKey = generateProviderKey()
 	}
 
 	if providerAdapter != nil && provider.IsRemote {
@@ -596,8 +596,8 @@ func (p *Provider) processProviderParams(providerDb *Provider) {
 	if p.SignKey == "***" {
 		p.SignKey = providerDb.SignKey
 	}
-	if p.ProviderKey == "" && p.Category == "Model" {
-		p.ProviderKey = generateProviderKey()
+	if p.ExternalApiKey == "" && p.Category == "Model" {
+		p.ExternalApiKey = generateProviderKey()
 	}
 
 	if p.Type == "Ollama" && p.ProviderUrl != "" && !strings.HasPrefix(p.ProviderUrl, "http") {

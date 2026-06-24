@@ -101,6 +101,7 @@
     "iFrame": "内嵌框架"
   },
   "general": {
+    "API integration hint": "使用下方的密钥与 OpenAI 兼容的 Base URL，即可在第三方客户端中调用。",
     "API key": "API key",
     "API key - Tooltip": "API key - Tooltip",
     "Access secret": "访问密钥",
@@ -130,6 +131,7 @@
     "Change": "Change",
     "Chat": "我的问答",
     "Chat - Tooltip": "与AI交互的对话界面（用于项目生成指导）",
+    "Chat completions endpoint": "对话补全接口地址",
     "Chat desc": "欢迎语、提示词及对话行为设置",
     "Chats": "会话",
     "City": "城市",
@@ -171,6 +173,7 @@
     "Error": "错误",
     "Exit": "退出",
     "Expand row": "展开行",
+    "External API key": "对外 API 密钥",
     "Failed to add": "添加失败",
     "Failed to call TTS API, will use default browser TTS instead": "调用TTS接口失败，将使用浏览器默认的TTS",
     "Failed to cancel": "取消失败",
@@ -259,6 +262,7 @@
     "ON": "开",
     "Object": "对象",
     "Object - Tooltip": "结构化请求数据体",
+    "OpenAI compatible API": "OpenAI 兼容 API",
     "Options": "选项",
     "Options desc": "高级选项，用于精细调控智能体行为与集成",
     "Org ID": "组织ID",

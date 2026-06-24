@@ -30,14 +30,14 @@ func GetProviderByProviderKey(providerKey string, lang string) (*Provider, error
 	provider := &Provider{}
 
 	// Try to find in main database first
-	existed, err := adapter.engine.Where("provider_key = ?", providerKey).Get(provider)
+	existed, err := adapter.engine.Where("external_api_key = ?", providerKey).Get(provider)
 	if err != nil {
 		return nil, err
 	}
 
 	// If not found in main database, try provider adapter
 	if providerAdapter != nil && !existed {
-		existed, err = providerAdapter.engine.Where("provider_key = ?", providerKey).Get(provider)
+		existed, err = providerAdapter.engine.Where("external_api_key = ?", providerKey).Get(provider)
 		if err != nil {
 			return nil, err
 		}

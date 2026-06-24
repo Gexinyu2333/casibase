@@ -25,6 +25,7 @@ import ModelTestWidget from "./common/TestModelWidget";
 import TtsTestWidget from "./common/TestTtsWidget";
 import EmbedTestWidget from "./common/TestEmbedWidget";
 import TestMcpWidget from "./common/TestMcpWidget";
+import OpenAiCompatibleConfig from "./OpenAiCompatibleConfig";
 
 const {Option} = Select;
 const {TextArea} = Input;
@@ -123,10 +124,6 @@ class ProviderEditPage extends React.Component {
       }
     }
     return Setting.getLabel(i18next.t("general:Provider URL"), i18next.t("general:Provider URL - Tooltip"));
-  }
-
-  getProviderKeyLabel(provider) {
-    return Setting.getLabel(i18next.t("provider:Provider key"), i18next.t("provider:Provider key - Tooltip"));
   }
 
   modelCategoryShowsProviderUrlInput(type) {
@@ -1051,25 +1048,19 @@ class ProviderEditPage extends React.Component {
               ].map(item => Setting.getOption(item.label, item.value))} />
             </Col>
           </Row>
-          {
-            this.state.provider.category === "Model" ? (
-              <Row style={{marginTop: "20px"}} >
-                <Col style={{marginTop: "5px"}} span={(Setting.isMobile()) ? 22 : 2}>
-                  {this.getProviderKeyLabel(this.state.provider)}
-                </Col>
-                <Col span={22} >
-                  <Input.Password
-                    value={this.state.provider.providerKey}
-                    disabled={!Setting.isAdminUser(this.props.account)}
-                    onChange={e => {
-                      this.updateProviderField("providerKey", e.target.value);
-                    }}
-                  />
-                </Col>
-              </Row>
-            ) : null
-          }
         </Card>
+
+        {this.state.provider.category === "Model" && (
+          <Card size="small" style={sectionCardStyle} headStyle={cardHeadStyle}>
+            <OpenAiCompatibleConfig
+              apiKey={this.state.provider.externalApiKey}
+              apiKeyDisabled={!Setting.isAdminUser(this.props.account)}
+              onApiKeyChange={e => {
+                this.updateProviderField("externalApiKey", e.target.value);
+              }}
+            />
+          </Card>
+        )}
 
         {/* Card 2: Advanced Model Parameters */}
         {isModelProvider && (this.isTemperatureEnabled(provider) || this.isTopPEnabled(provider) || (provider.type === "Gemini")) && (

@@ -101,8 +101,10 @@
     "iFrame": "iFrame"
   },
   "general": {
+    "API integration hint": "Use the key below with the OpenAI-compatible Base URL to call this from third-party clients.",
     "API key": "API key",
     "API key - Tooltip": "API key - Tooltip",
+    "External API key": "External API key",
     "Access secret": "Access secret",
     "Access secret - Tooltip": "Secret key for API access authentication",
     "Action": "Action",
@@ -130,6 +132,7 @@
     "Change": "Change",
     "Chat": "Chat",
     "Chat - Tooltip": "AI-assisted project guidance chat",
+    "Chat completions endpoint": "Chat completions endpoint",
     "Chat desc": "Welcome message, prompts and conversation settings",
     "Chats": "Chats",
     "City": "City",
@@ -259,6 +262,7 @@
     "ON": "ON",
     "Object": "Object",
     "Object - Tooltip": "Structured request payload",
+    "OpenAI compatible API": "OpenAI compatible API",
     "Options": "Options",
     "Options desc": "Advanced options for agent behavior and integrations",
     "Org ID": "Org ID",
