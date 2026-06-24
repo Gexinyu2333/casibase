@@ -59,7 +59,7 @@ func permissionFilter(ctx *context.Context) {
 	controllerName := strings.TrimPrefix(urlPath, "/api/")
 
 	// OpenAI-compatible endpoint uses Bearer token auth
-	if controllerName == "chat/completions" {
+	if controllerName == "chat/completions" || controllerName == "v1/chat/completions" {
 		return
 	}
 

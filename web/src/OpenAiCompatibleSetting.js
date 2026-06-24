@@ -20,5 +20,5 @@ export function getOpenAiCompatibleBaseUrl() {
 }
 
 export function getOpenAiCompatibleChatCompletionsUrl() {
-  return `${getOpenAiCompatibleBaseUrl()}/chat/completions`;
+  return `${getOpenAiCompatibleBaseUrl()}/v1/chat/completions`;
 }

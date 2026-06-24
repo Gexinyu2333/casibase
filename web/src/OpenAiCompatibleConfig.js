@@ -40,7 +40,7 @@ function OpenAiCompatibleConfig({apiKey, apiKeyDisabled = false, onApiKeyChange}
         <div style={{color: "var(--ant-color-text-secondary)", fontSize: "13px"}}>{i18next.t("general:API integration hint")}</div>
       </Space>
       <Row gutter={48}>
-        <Col style={{marginTop: "12px"}} span={Setting.isMobile() ? 22 : 7}>
+        <Col style={{marginTop: "12px"}} span={Setting.isMobile() ? 22 : 6}>
           <div style={{marginBottom: "4px"}}>{i18next.t("general:External API key")}</div>
           <Space.Compact style={{width: "100%"}}>
             <Input.Password
@@ -51,11 +51,11 @@ function OpenAiCompatibleConfig({apiKey, apiKeyDisabled = false, onApiKeyChange}
             <CopyButton value={apiKey} disabled={apiKeyDisabled} />
           </Space.Compact>
         </Col>
-        <Col style={{marginTop: "12px"}} span={Setting.isMobile() ? 22 : 7}>
+        <Col style={{marginTop: "12px"}} span={Setting.isMobile() ? 22 : 6}>
           <div style={{marginBottom: "4px"}}>{i18next.t("general:Base URL")}</div>
           <ReadOnlyCopyInput value={baseUrl} />
         </Col>
-        <Col style={{marginTop: "12px"}} span={Setting.isMobile() ? 22 : 7}>
+        <Col style={{marginTop: "12px"}} span={Setting.isMobile() ? 22 : 12}>
           <div style={{marginBottom: "4px"}}>{i18next.t("general:Chat completions endpoint")}</div>
           <ReadOnlyCopyInput value={chatCompletionsUrl} />
         </Col>

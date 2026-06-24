@@ -32,6 +32,7 @@ import (
 // @Param   body    body    openai.ChatCompletionRequest  true    "The OpenAI chat request"
 // @Success 200 {object} openai.ChatCompletionResponse
 // @router /api/chat/completions [post]
+// @router /api/v1/chat/completions [post]
 func (c *ApiController) ChatCompletions() {
 	auth := c.Ctx.Request.Header.Get("Authorization")
 	if !strings.HasPrefix(auth, "Bearer ") {
