@@ -360,7 +360,7 @@ class ProviderEditPage extends React.Component {
                   this.updateProviderField("subType", "cosyvoice-v1");
                 } else if (value === "Speech-to-Text") {
                   this.updateProviderField("type", "Alibaba Cloud");
-                  this.updateProviderField("subType", "paraformer-realtime-v1");
+                  this.updateProviderField("subType", "fun-asr-realtime");
                 }
               })}>
                 {
@@ -459,7 +459,7 @@ class ProviderEditPage extends React.Component {
                   }
                 } else if (provider.category === "Speech-to-Text") {
                   if (value === "Alibaba Cloud") {
-                    this.updateProviderField("subType", "paraformer-realtime-v1");
+                    this.updateProviderField("subType", "fun-asr-realtime");
                   }
                 }
               })}
