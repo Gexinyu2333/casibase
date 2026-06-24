@@ -114,6 +114,11 @@ func (c *ApiController) GetProvider() {
 		return
 	}
 
+	if err = object.EnsureProviderApiKey(provider); err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
 	c.ResponseOk(object.GetMaskedProvider(provider, true, user))
 }
 

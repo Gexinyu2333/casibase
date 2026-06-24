@@ -126,6 +126,17 @@ func GetMaskedProviders(providers []*Provider, isMaskEnabled bool, user *auth.Us
 	return providers
 }
 
+// EnsureProviderApiKey generates and persists an External API key for a model provider when it is missing.
+func EnsureProviderApiKey(provider *Provider) error {
+	if provider == nil || provider.IsRemote || provider.Category != "Model" || provider.ExternalApiKey != "" {
+		return nil
+	}
+
+	provider.ExternalApiKey = generateProviderKey()
+	_, err := adapter.engine.ID(core.PK{provider.Owner, provider.Name}).Cols("external_api_key").Update(provider)
+	return err
+}
+
 func GetGlobalProviders() ([]*Provider, error) {
 	providers := []*Provider{}
 	err := adapter.engine.Asc("owner").Desc("created_time").Find(&providers)

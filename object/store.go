@@ -160,6 +160,17 @@ func generateStoreApiKey() string {
 	return fmt.Sprintf("sk-%s", util.GetRandomString(24))
 }
 
+// EnsureStoreApiKey generates and persists an External API key for the store when it is missing.
+func EnsureStoreApiKey(store *Store) error {
+	if store == nil || store.ExternalApiKey != "" {
+		return nil
+	}
+
+	store.ExternalApiKey = generateStoreApiKey()
+	_, err := adapter.engine.ID(core.PK{store.Owner, store.Name}).Cols("external_api_key").Update(store)
+	return err
+}
+
 func GetMaskedStore(store *Store, user *auth.User) *Store {
 	if store == nil {
 		return nil
