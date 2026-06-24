@@ -176,11 +176,21 @@ func GetMaskedStore(store *Store, user *auth.User) *Store {
 		return nil
 	}
 
+	NormalizeEmbeddedStoreAssets(store)
+
 	if store.ExternalApiKey != "" && !util.IsGlobalAdmin(user) && (user == nil || user.Name != store.Owner) {
 		store.ExternalApiKey = "***"
 	}
 
 	return store
+}
+
+func NormalizeEmbeddedStoreAssets(store *Store) {
+	if store == nil {
+		return
+	}
+
+	store.Avatar = conf.NormalizeEmbeddedAssetUrl(store.Avatar)
 }
 
 func GetMaskedStores(stores []*Store, user *auth.User) []*Store {
@@ -586,6 +596,9 @@ func GetStoresByFields(owner string, fields ...string) ([]*Store, error) {
 	}
 	if err != nil {
 		return nil, err
+	}
+	for _, store := range stores {
+		NormalizeEmbeddedStoreAssets(store)
 	}
 
 	return stores, nil
