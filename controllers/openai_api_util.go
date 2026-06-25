@@ -66,13 +66,13 @@ func newOpenAIWriter(rw *context.Response, request openai.ChatCompletionRequest,
 }
 
 // createApiChatSession inserts a Chat, a user Message, and a placeholder AI Message into the DB.
-func createApiChatSession(store *object.Store, modelProviderName, question, requestId string) (*object.Chat, *object.Message, *object.Message, error) {
+func createApiChatSession(store *object.Store, modelProviderName, question string) (*object.Chat, *object.Message, *object.Message, error) {
 	now := util.GetCurrentTime()
 	userMessageTime := util.GetCurrentTimeWithMilli()
 
 	chat := &object.Chat{
 		Owner:         store.Owner,
-		Name:          "chat_api_" + requestId,
+		Name:          fmt.Sprintf("chat_%s", util.GetRandomName()),
 		CreatedTime:   now,
 		UpdatedTime:   now,
 		Store:         store.Name,
@@ -85,7 +85,7 @@ func createApiChatSession(store *object.Store, modelProviderName, question, requ
 
 	userMsg := &object.Message{
 		Owner:         store.Owner,
-		Name:          "msg_user_" + requestId,
+		Name:          fmt.Sprintf("message_%s", util.GetRandomName()),
 		CreatedTime:   userMessageTime,
 		Store:         store.Name,
 		Chat:          chat.Name,
@@ -100,7 +100,7 @@ func createApiChatSession(store *object.Store, modelProviderName, question, requ
 
 	aiMsg := &object.Message{
 		Owner:         store.Owner,
-		Name:          "msg_ai_" + requestId,
+		Name:          fmt.Sprintf("message_%s", util.GetRandomName()),
 		CreatedTime:   util.GetCurrentTimeBasedOnLastMilli(userMessageTime),
 		Store:         store.Name,
 		Chat:          chat.Name,
