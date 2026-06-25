@@ -74,6 +74,49 @@ type Message struct {
 	SearchResults     []model.SearchResult `xorm:"mediumtext" json:"searchResults"`
 
 	TransactionId string `xorm:"varchar(100)" json:"transactionId"`
+	IsReadOnly    bool   `xorm:"-" json:"isReadOnly"`
+}
+
+const messageReadOnlyChatBatchSize = 500
+
+func PopulateMessagesReadOnly(messages []*Message) error {
+	chatNamesByOwner := map[string]map[string]struct{}{}
+	for _, message := range messages {
+		if message == nil || message.Chat == "" {
+			continue
+		}
+		if chatNamesByOwner[message.Owner] == nil {
+			chatNamesByOwner[message.Owner] = map[string]struct{}{}
+		}
+		chatNamesByOwner[message.Owner][message.Chat] = struct{}{}
+	}
+
+	readOnlyChats := map[string]bool{}
+	for owner, nameSet := range chatNamesByOwner {
+		names := make([]string, 0, len(nameSet))
+		for name := range nameSet {
+			names = append(names, name)
+		}
+
+		for start := 0; start < len(names); start += messageReadOnlyChatBatchSize {
+			end := min(start+messageReadOnlyChatBatchSize, len(names))
+			chats := []*Chat{}
+			err := adapter.engine.In("name", names[start:end]).Find(&chats, &Chat{Owner: owner})
+			if err != nil {
+				return err
+			}
+			for _, chat := range chats {
+				readOnlyChats[chat.GetId()] = chat.IsApiLog()
+			}
+		}
+	}
+
+	for _, message := range messages {
+		if message != nil {
+			message.IsReadOnly = readOnlyChats[util.GetId(message.Owner, message.Chat)]
+		}
+	}
+	return nil
 }
 
 func GetGlobalMessages() ([]*Message, error) {

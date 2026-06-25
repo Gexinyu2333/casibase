@@ -14,7 +14,7 @@
 
 import React from "react";
 import Loading from "./common/Loading";
-import {Button, Card, Col, Input, Row, Select, Space, Switch} from "antd";
+import {Button, Card, Col, Input, Row, Select, Space, Switch, Tag} from "antd";
 import * as ChatBackend from "./backend/ChatBackend";
 import * as ProviderBackend from "./backend/ProviderBackend";
 import * as Setting from "./Setting";
@@ -22,6 +22,7 @@ import i18next from "i18next";
 import ChatBox from "./ChatBox";
 import {renderText} from "./ChatMessageRender";
 import * as MessageBackend from "./backend/MessageBackend";
+import {isApiChat} from "./ChatUtil";
 
 const {Option} = Select;
 
@@ -113,8 +114,14 @@ class ChatEditPage extends React.Component {
     });
   }
 
-  renderChatActions() {
+  isReadOnly() {
+    return isApiChat(this.state.chat);
+  }
 
+  renderChatActions() {
+    if (this.isReadOnly()) {
+      return null;
+    }
     return (
       <Space wrap>
         <Button onClick={() => this.submitChatEdit(false)}>{i18next.t("general:Save")}</Button>
@@ -134,11 +141,12 @@ class ChatEditPage extends React.Component {
   }
 
   renderChatSwitch(label, checked, onChange, span = 6) {
-    return this.renderChatField(label, <Switch checked={checked} onChange={onChange} />, span);
+    return this.renderChatField(label, <Switch checked={checked} disabled={this.isReadOnly()} onChange={onChange} />, span);
   }
 
   renderChat() {
     const chat = this.state.chat;
+    const isReadOnly = this.isReadOnly();
     const rowGutter = [16, 8];
     const cardHeadStyle = {background: "transparent", borderBottom: "none", fontWeight: 600, fontSize: "15px", fontFamily: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"};
     const sectionCardStyle = {
@@ -158,7 +166,11 @@ class ChatEditPage extends React.Component {
     return (
       <div>
         <div style={{marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center"}}>
-          <span style={{fontSize: "22px", fontWeight: 600}}>{i18next.t("chat:Edit Chat")}</span>
+          <Space wrap>
+            <span style={{fontSize: "22px", fontWeight: 600}}>{i18next.t(isReadOnly ? "chat:Chat Log" : "chat:Edit Chat")}</span>
+            {isReadOnly && <Tag color="blue">{i18next.t("general:API")}</Tag>}
+            {isReadOnly && <Tag>{i18next.t("general:Read-only")}</Tag>}
+          </Space>
           <div style={{display: "flex", gap: "8px", marginRight: "4px"}}>
             {this.renderChatActions()}
           </div>
@@ -168,21 +180,21 @@ class ChatEditPage extends React.Component {
           <Row gutter={rowGutter}>
             {this.renderChatField(
               Setting.getLabel(i18next.t("general:Name"), i18next.t("general:Name - Tooltip")),
-              <Input value={chat.name} onChange={e => {
+              <Input value={chat.name} disabled={isReadOnly} onChange={e => {
                 this.updateChatField("name", e.target.value);
               }} />,
               8
             )}
             {this.renderChatField(
               Setting.getLabel(i18next.t("general:Display name"), i18next.t("general:Display name - Tooltip")),
-              <Input value={chat.displayName} onChange={e => {
+              <Input value={chat.displayName} disabled={isReadOnly} onChange={e => {
                 this.updateChatField("displayName", e.target.value);
               }} />,
               8
             )}
             {this.renderChatField(
               Setting.getLabel(i18next.t("general:Store"), i18next.t("general:Store - Tooltip")),
-              <Input value={chat.store} onChange={e => {
+              <Input value={chat.store} disabled={isReadOnly} onChange={e => {
                 this.updateChatField("store", e.target.value);
               }} />,
               8
@@ -191,6 +203,7 @@ class ChatEditPage extends React.Component {
               Setting.getLabel(i18next.t("provider:Model provider"), i18next.t("provider:Model provider - Tooltip")),
               <Select
                 virtual={false}
+                disabled={isReadOnly}
                 style={{width: "100%"}}
                 value={chat.modelProvider}
                 onChange={(value) => {
@@ -215,7 +228,7 @@ class ChatEditPage extends React.Component {
             )}
             {this.renderChatField(
               Setting.getLabel(i18next.t("general:Category"), i18next.t("provider:Category - Tooltip")),
-              <Input value={chat.category} onChange={e => {
+              <Input value={chat.category} disabled={isReadOnly} onChange={e => {
                 this.updateChatField("category", e.target.value);
               }} />,
               8
@@ -227,7 +240,7 @@ class ChatEditPage extends React.Component {
           <Row gutter={rowGutter}>
             {this.renderChatField(
               Setting.getLabel(i18next.t("general:User"), i18next.t("general:User - Tooltip")),
-              <Input value={chat.user} onChange={e => {
+              <Input value={chat.user} disabled={isReadOnly} onChange={e => {
                 this.updateChatField("user", e.target.value);
               }} />,
               8

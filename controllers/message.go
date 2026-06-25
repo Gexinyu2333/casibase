@@ -24,6 +24,36 @@ import (
 	"github.com/the-open-agent/openagent/util"
 )
 
+func (c *ApiController) ensureMessageMutable(message *object.Message) (*object.Chat, bool) {
+	if message == nil || message.Chat == "" {
+		return nil, true
+	}
+	chat, err := object.GetChat(util.GetId(message.Owner, message.Chat))
+	if err != nil {
+		c.ResponseError(err.Error())
+		return nil, false
+	}
+	if chat == nil {
+		c.ResponseError(fmt.Sprintf("The chat: %s/%s is not found", message.Owner, message.Chat))
+		return nil, false
+	}
+	if chat.IsApiLog() {
+		c.ResponseError(c.T("controllers:API chat logs are read-only"))
+		return nil, false
+	}
+	return chat, true
+}
+
+func preserveMessageOwnership(message, persistedMessage *object.Message) {
+	message.Owner = persistedMessage.Owner
+	message.Name = persistedMessage.Name
+	message.CreatedTime = persistedMessage.CreatedTime
+	message.Organization = persistedMessage.Organization
+	message.Store = persistedMessage.Store
+	message.User = persistedMessage.User
+	message.Chat = persistedMessage.Chat
+}
+
 // GetGlobalMessages
 // @Title GetGlobalMessages
 // @Tag Message API
@@ -42,6 +72,10 @@ func (c *ApiController) GetGlobalMessages() {
 	if limit == "" || page == "" {
 		messages, err := object.GetGlobalMessages()
 		if err != nil {
+			c.ResponseError(err.Error())
+			return
+		}
+		if err = object.PopulateMessagesReadOnly(messages); err != nil {
 			c.ResponseError(err.Error())
 			return
 		}
@@ -100,6 +134,10 @@ func (c *ApiController) GetGlobalMessages() {
 			c.ResponseError(err.Error())
 			return
 		}
+		if err = object.PopulateMessagesReadOnly(messages); err != nil {
+			c.ResponseError(err.Error())
+			return
+		}
 
 		c.ResponseOk(messages, count)
 	}
@@ -137,12 +175,20 @@ func (c *ApiController) GetMessages() {
 			c.ResponseError(err.Error())
 			return
 		}
+		if err = object.PopulateMessagesReadOnly(messages); err != nil {
+			c.ResponseError(err.Error())
+			return
+		}
 		c.ResponseOk(messages)
 		return
 	}
 
 	messages, err := object.GetChatMessages(chat)
 	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+	if err = object.PopulateMessagesReadOnly(messages); err != nil {
 		c.ResponseError(err.Error())
 		return
 	}
@@ -170,6 +216,10 @@ func (c *ApiController) GetMessage() {
 		c.ResponseError("Message not found")
 		return
 	}
+	if err = object.PopulateMessagesReadOnly([]*object.Message{message}); err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
 
 	// Check if user has permission to view this message
 	if !c.IsAdmin() {
@@ -195,17 +245,31 @@ func (c *ApiController) UpdateMessage() {
 	id := c.Input().Get("id")
 	isHitOnly := c.Input().Get("isHitOnly")
 
+	persistedMessage, err := object.GetMessage(id)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+	if persistedMessage == nil {
+		c.ResponseError("Message not found")
+		return
+	}
+	if _, ok := c.ensureMessageMutable(persistedMessage); !ok {
+		return
+	}
+
 	var message object.Message
-	err := json.Unmarshal(c.Ctx.Input.RequestBody, &message)
+	err = json.Unmarshal(c.Ctx.Input.RequestBody, &message)
 	if err != nil {
 		c.ResponseError(err.Error())
 		return
 	}
 
-	ok := c.IsCurrentUser(message.User)
+	ok := c.IsCurrentUser(persistedMessage.User)
 	if !ok {
 		return
 	}
+	preserveMessageOwnership(&message, persistedMessage)
 
 	if message.NeedNotify {
 		if conf.IsCasdoorAvailable() {
@@ -243,17 +307,37 @@ func (c *ApiController) AddMessage() {
 		return
 	}
 
-	ok := c.IsCurrentUser(message.User)
-	if !ok {
-		return
-	}
-
 	id := util.GetIdFromOwnerAndName(message.Owner, message.Name)
 	originMessage, err := object.GetMessage(id)
 	if err != nil {
 		c.ResponseError(err.Error())
 		return
 	}
+
+	var chat *object.Chat
+	if originMessage != nil {
+		if !c.IsCurrentUser(originMessage.User) {
+			return
+		}
+		var mutable bool
+		chat, mutable = c.ensureMessageMutable(originMessage)
+		if !mutable {
+			return
+		}
+		preserveMessageOwnership(&message, originMessage)
+	} else {
+		if !c.IsCurrentUser(message.User) {
+			return
+		}
+		if message.Chat != "" {
+			var mutable bool
+			chat, mutable = c.ensureMessageMutable(&message)
+			if !mutable {
+				return
+			}
+		}
+	}
+
 	// if originMessage not nil, means edit message, delete all later messages
 	if originMessage != nil {
 		err = object.DeleteAllLaterMessages(id)
@@ -312,7 +396,6 @@ func (c *ApiController) AddMessage() {
 			}
 		}
 	}
-	var chat *object.Chat
 	if message.Chat == "" {
 		chat, err = c.addInitialChat(message.Organization, message.User, message.Store)
 		if err != nil {
@@ -322,18 +405,6 @@ func (c *ApiController) AddMessage() {
 
 		message.Organization = chat.Organization
 		message.Chat = chat.Name
-	} else {
-		chatId := util.GetId(message.Owner, message.Chat)
-		chat, err = object.GetChat(chatId)
-		if err != nil {
-			c.ResponseError(err.Error())
-			return
-		}
-
-		if chat == nil {
-			c.ResponseError(fmt.Sprintf("chat:The chat: %s is not found", chatId))
-			return
-		}
 	}
 
 	host := c.Ctx.Request.Host
@@ -438,7 +509,20 @@ func (c *ApiController) DeleteMessage() {
 		return
 	}
 
-	success, err := object.DeleteMessage(&message)
+	persistedMessage, err := object.GetMessage(message.GetId())
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+	if persistedMessage == nil {
+		c.ResponseError("Message not found")
+		return
+	}
+	if _, ok := c.ensureMessageMutable(persistedMessage); !ok {
+		return
+	}
+
+	success, err := object.DeleteMessage(persistedMessage)
 	if err != nil {
 		c.ResponseError(err.Error())
 		return

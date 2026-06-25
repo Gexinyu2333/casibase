@@ -21,6 +21,8 @@ import (
 	"xorm.io/core"
 )
 
+const ChatSourceOpenAICompatibleAPI = "OpenAICompatibleAPI"
+
 type Chat struct {
 	Owner       string `xorm:"varchar(100) notnull pk" json:"owner"`
 	Name        string `xorm:"varchar(100) notnull pk" json:"name"`
@@ -33,6 +35,7 @@ type Chat struct {
 	ModelProvider string  `xorm:"varchar(100)" json:"modelProvider"`
 	Tool          string  `xorm:"varchar(100)" json:"tool"`
 	Category      string  `xorm:"varchar(100)" json:"category"`
+	Source        string  `xorm:"varchar(100)" json:"source"`
 	User          string  `xorm:"varchar(100) index" json:"user"`
 	ClientIp      string  `xorm:"varchar(100)" json:"clientIp"`
 	UserAgent     string  `xorm:"varchar(200)" json:"userAgent"`
@@ -138,6 +141,10 @@ func DeleteChat(chat *Chat) (bool, error) {
 
 func (chat *Chat) GetId() string {
 	return fmt.Sprintf("%s/%s", chat.Owner, chat.Name)
+}
+
+func (chat *Chat) IsApiLog() bool {
+	return chat != nil && chat.Source == ChatSourceOpenAICompatibleAPI
 }
 
 func getChatCountByMessages(owner string, value string, store string) (int64, error) {

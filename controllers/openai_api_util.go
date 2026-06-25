@@ -77,6 +77,7 @@ func createApiChatSession(store *object.Store, modelProviderName, question strin
 		UpdatedTime:   now,
 		Store:         store.Name,
 		ModelProvider: modelProviderName,
+		Source:        object.ChatSourceOpenAICompatibleAPI,
 		User:          "api",
 	}
 	if _, err := object.AddChat(chat); err != nil {

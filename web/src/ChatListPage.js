@@ -14,7 +14,7 @@
 
 import React from "react";
 import {Link} from "react-router-dom";
-import {Button, Popconfirm, Switch, Table, Tooltip} from "antd";
+import {Button, Popconfirm, Space, Switch, Table, Tag, Tooltip} from "antd";
 import moment from "moment";
 import BaseListPage from "./BaseListPage";
 import * as Setting from "./Setting";
@@ -25,7 +25,8 @@ import * as Conf from "./Conf";
 import * as MessageBackend from "./backend/MessageBackend";
 import ChatBox from "./ChatBox";
 import {renderText} from "./ChatMessageRender";
-import {DeleteOutlined, EditOutlined} from "@ant-design/icons";
+import {DeleteOutlined, EditOutlined, EyeOutlined} from "@ant-design/icons";
+import {isApiChat} from "./ChatUtil";
 
 class ChatListPage extends BaseListPage {
   constructor(props) {
@@ -318,14 +319,18 @@ class ChatListPage extends BaseListPage {
         title: i18next.t("general:Name"),
         dataIndex: "name",
         key: "name",
-        width: "100px",
+        width: "180px",
         sorter: (a, b) => a.name.localeCompare(b.name),
         ...this.getColumnSearchProps("name"),
         render: (text, record, index) => {
           return (
-            <Link to={`chats/${text}`}>
-              {text}
-            </Link>
+            <Space size={4} wrap>
+              <Link to={`chats/${text}`}>
+                {text}
+              </Link>
+              {isApiChat(record) && <Tag color="blue">{i18next.t("general:API")}</Tag>}
+              {isApiChat(record) && <Tag>{i18next.t("general:Read-only")}</Tag>}
+            </Space>
           );
         },
       },
@@ -526,10 +531,11 @@ class ChatListPage extends BaseListPage {
         width: "130px",
         fixed: "right",
         render: (text, record, index) => {
+          const isReadOnly = isApiChat(record);
           return (
             <div style={{display: "flex", alignItems: "center", gap: "2px", flexWrap: "nowrap"}}>
-              <Tooltip title={i18next.t("general:Edit")}>
-                <Button type="text" size="small" icon={<EditOutlined />} style={{minWidth: "28px", width: "28px", height: "28px", padding: 0, borderRadius: "6px"}} onClick={() => this.props.history.push(`/chats/${record.name}`)} />
+              <Tooltip title={i18next.t(isReadOnly ? "general:View" : "general:Edit")}>
+                <Button type="text" size="small" icon={isReadOnly ? <EyeOutlined /> : <EditOutlined />} style={{minWidth: "28px", width: "28px", height: "28px", padding: 0, borderRadius: "6px"}} onClick={() => this.props.history.push(`/chats/${record.name}`)} />
               </Tooltip>
               <Popconfirm
                 title={`${i18next.t("general:Sure to delete")}: ${record.name} ?`}
@@ -577,7 +583,7 @@ class ChatListPage extends BaseListPage {
 
     return (
       <div>
-        <Table scroll={{x: "max-content"}} columns={columns} dataSource={chats} rowKey="name" rowSelection={this.getRowSelection()} size="middle" bordered pagination={paginationProps}
+        <Table scroll={{x: "max-content"}} columns={columns} dataSource={chats} rowKey="name" rowSelection={{...this.getRowSelection(), getCheckboxProps: record => ({disabled: isApiChat(record) && !Setting.isLocalAdminUser(this.props.account)})}} size="middle" bordered pagination={paginationProps}
           title={() => (
             <div>
               {i18next.t("general:Chats")}&nbsp;&nbsp;&nbsp;&nbsp;

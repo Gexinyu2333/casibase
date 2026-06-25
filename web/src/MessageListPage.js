@@ -23,7 +23,7 @@ import * as ProviderBackend from "./backend/ProviderBackend";
 import moment from "moment";
 import i18next from "i18next";
 import * as Conf from "./Conf";
-import {DeleteOutlined, EditOutlined} from "@ant-design/icons";
+import {DeleteOutlined, EditOutlined, EyeOutlined} from "@ant-design/icons";
 import VectorTooltip from "./VectorTooltip";
 
 class MessageListPage extends BaseListPage {
@@ -330,9 +330,13 @@ class MessageListPage extends BaseListPage {
         ...this.getColumnSearchProps("chat"),
         render: (text, record, index) => {
           return (
-            <Link to={`/chats/${text}`}>
-              {text}
-            </Link>
+            <div>
+              <Link to={`/chats/${text}`}>
+                {text}
+              </Link>
+              {record.isReadOnly && <Tag color="blue" style={{marginLeft: 4}}>{i18next.t("general:API")}</Tag>}
+              {record.isReadOnly && <Tag>{i18next.t("general:Read-only")}</Tag>}
+            </div>
           );
         },
       },
@@ -575,8 +579,8 @@ class MessageListPage extends BaseListPage {
         render: (text, record, index) => {
           return (
             <div style={{display: "flex", alignItems: "center", gap: "2px", flexWrap: "nowrap"}}>
-              <Tooltip title={i18next.t("general:Edit")}>
-                <Button type="text" size="small" icon={<EditOutlined />} style={{minWidth: "28px", width: "28px", height: "28px", padding: 0, borderRadius: "6px"}} onClick={() => this.props.history.push(`/messages/${record.name}`)} />
+              <Tooltip title={i18next.t(record.isReadOnly ? "general:View" : "general:Edit")}>
+                <Button type="text" size="small" icon={record.isReadOnly ? <EyeOutlined /> : <EditOutlined />} style={{minWidth: "28px", width: "28px", height: "28px", padding: 0, borderRadius: "6px"}} onClick={() => this.props.history.push(`/messages/${record.name}`)} />
               </Tooltip>
               <Popconfirm
                 title={`${i18next.t("general:Sure to delete")}: ${record.name} ?`}

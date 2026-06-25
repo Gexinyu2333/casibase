@@ -244,29 +244,34 @@ func (c *ApiController) GetChat() {
 func (c *ApiController) UpdateChat() {
 	id := c.Input().Get("id")
 
+	originalChat, err := object.GetChat(id)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+	if originalChat == nil {
+		c.ResponseError(fmt.Sprintf("The chat: %s is not found", id))
+		return
+	}
+	if originalChat.IsApiLog() {
+		c.ResponseError(c.T("controllers:API chat logs are read-only"))
+		return
+	}
+
 	var chat object.Chat
-	err := json.Unmarshal(c.Ctx.Input.RequestBody, &chat)
+	err = json.Unmarshal(c.Ctx.Input.RequestBody, &chat)
 	if err != nil {
 		c.ResponseError(err.Error())
 		return
 	}
 
-	ok := c.IsCurrentUser(chat.User)
+	ok := c.IsCurrentUser(originalChat.User)
 	if !ok {
 		return
 	}
+	chat.Source = originalChat.Source
 
 	if conf.IsDemoMode() {
-		originalChat, err := object.GetChat(id)
-		if err != nil {
-			c.ResponseError(err.Error())
-			return
-		}
-		if originalChat == nil {
-			c.ResponseError(fmt.Sprintf("The chat: %s is not found", id))
-			return
-		}
-
 		originalChat.ModelProvider = chat.ModelProvider
 		chat = *originalChat
 	}
@@ -307,6 +312,7 @@ func (c *ApiController) AddChat() {
 	chat.UserAgent = c.getUserAgent()
 	chat.ClientIpDesc = util.GetDescFromIP(chat.ClientIp)
 	chat.UserAgentDesc = util.GetDescFromUserAgent(chat.UserAgent)
+	chat.Source = ""
 
 	if chat.Store == "" {
 		var store *object.Store
@@ -347,20 +353,35 @@ func (c *ApiController) DeleteChat() {
 		return
 	}
 
-	ok := c.IsCurrentUser(chat.User)
-	if !ok {
+	persistedChat, err := object.GetChat(chat.GetId())
+	if err != nil {
+		c.ResponseError(err.Error())
 		return
 	}
+	if persistedChat == nil {
+		c.ResponseError(fmt.Sprintf("The chat: %s is not found", chat.GetId()))
+		return
+	}
+	if persistedChat.IsApiLog() {
+		if !c.RequireAdmin() {
+			return
+		}
+	} else {
+		ok := c.IsCurrentUser(persistedChat.User)
+		if !ok {
+			return
+		}
+	}
 
-	success, err := object.DeleteChat(&chat)
+	success, err := object.DeleteChat(persistedChat)
 	if err != nil {
 		c.ResponseError(err.Error())
 		return
 	}
 
 	message := object.Message{
-		Owner: chat.Owner,
-		Chat:  chat.Name,
+		Owner: persistedChat.Owner,
+		Chat:  persistedChat.Name,
 	}
 	success, err = object.DeleteMessagesByChat(&message)
 	if err != nil {

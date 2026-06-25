@@ -14,12 +14,13 @@
 
 import React from "react";
 import Loading from "./common/Loading";
-import {Button, Card, Col, Input, Row, Select, Space, Switch} from "antd";
+import {Button, Card, Col, Input, Row, Select, Space, Switch, Tag} from "antd";
 import i18next from "i18next";
 import * as Setting from "./Setting";
 import * as MessageBackend from "./backend/MessageBackend";
 import * as ChatBackend from "./backend/ChatBackend";
 import * as ProviderBackend from "./backend/ProviderBackend";
+import {isApiChat} from "./ChatUtil";
 
 const {TextArea} = Input;
 const {Option} = Select;
@@ -85,8 +86,8 @@ class MessageEditPage extends React.Component {
       });
   }
 
-  getChat(chatName) {
-    ChatBackend.getChat("admin", chatName)
+  getChat(owner, chatName) {
+    ChatBackend.getChat(owner, chatName)
       .then((res) => {
         if (res.status === "ok") {
           this.setState({
@@ -105,6 +106,7 @@ class MessageEditPage extends React.Component {
           this.setState({
             message: res.data,
           });
+          this.getChat(res.data.owner, res.data.chat);
           this.getProvider(res.data.modelProvider);
         } else {
           Setting.showMessage("error", `${i18next.t("general:Failed to get")}: ${res.msg}`);
@@ -142,6 +144,10 @@ class MessageEditPage extends React.Component {
     });
   }
 
+  isReadOnly() {
+    return this.state.message?.isReadOnly === true || isApiChat(this.state.chat);
+  }
+
   renderMessageField(label, control, span = 8) {
     return (
       <Col style={{marginTop: "12px"}} span={Setting.isMobile() ? 22 : span}>
@@ -152,10 +158,13 @@ class MessageEditPage extends React.Component {
   }
 
   renderMessageSwitch(label, checked, onChange, span = 6) {
-    return this.renderMessageField(label, <Switch checked={checked} onChange={onChange} />, span);
+    return this.renderMessageField(label, <Switch checked={checked} disabled={this.isReadOnly()} onChange={onChange} />, span);
   }
 
   renderMessageActions() {
+    if (this.isReadOnly()) {
+      return null;
+    }
     return (
       <Space wrap>
         <Button onClick={() => this.submitMessageEdit(false)}>{i18next.t("general:Save")}</Button>
@@ -167,6 +176,7 @@ class MessageEditPage extends React.Component {
 
   renderMessage() {
     const message = this.state.message;
+    const isReadOnly = this.isReadOnly();
     const rowGutter = [16, 8];
     const cardHeadStyle = {background: "transparent", borderBottom: "none", fontWeight: 600, fontSize: "15px", fontFamily: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"};
     const sectionCardStyle = {
@@ -185,7 +195,11 @@ class MessageEditPage extends React.Component {
     return (
       <div>
         <div style={{marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center"}}>
-          <span style={{fontSize: "22px", fontWeight: 600}}>{i18next.t("message:Edit Message")}</span>
+          <Space wrap>
+            <span style={{fontSize: "22px", fontWeight: 600}}>{i18next.t(isReadOnly ? "message:Message Log" : "message:Edit Message")}</span>
+            {isReadOnly && <Tag color="blue">{i18next.t("general:API")}</Tag>}
+            {isReadOnly && <Tag>{i18next.t("general:Read-only")}</Tag>}
+          </Space>
           <div style={{display: "flex", gap: "8px", marginRight: "4px"}}>
             {this.renderMessageActions()}
           </div>
@@ -195,12 +209,12 @@ class MessageEditPage extends React.Component {
           <Row gutter={rowGutter}>
             {this.renderMessageField(
               Setting.getLabel(i18next.t("general:Name"), i18next.t("general:Name - Tooltip")),
-              <Input value={message.name} onChange={(e) => this.updateMessageField("name", e.target.value)} />,
+              <Input value={message.name} disabled={isReadOnly} onChange={(e) => this.updateMessageField("name", e.target.value)} />,
               8
             )}
             {this.renderMessageField(
               Setting.getLabel(i18next.t("general:User"), i18next.t("general:User - Tooltip")),
-              <Input value={message.user} onChange={(e) => this.updateMessageField("user", e.target.value)} />,
+              <Input value={message.user} disabled={isReadOnly} onChange={(e) => this.updateMessageField("user", e.target.value)} />,
               8
             )}
             {this.renderMessageField(
@@ -212,12 +226,13 @@ class MessageEditPage extends React.Component {
               Setting.getLabel(i18next.t("message:Author"), i18next.t("message:Author - Tooltip")),
               <Select
                 virtual={false}
+                disabled={isReadOnly}
                 style={{width: "100%"}}
                 value={message.author}
                 onChange={(value) => this.updateMessageField("author", value)}
                 options={
                   this.state.chat !== null
-                    ? this.state.chat.users.map((user) => Setting.getOption(`${user}`, `${user}`))
+                    ? (this.state.chat.users || []).map((user) => Setting.getOption(`${user}`, `${user}`))
                     : []
                 }
               />,
@@ -227,6 +242,7 @@ class MessageEditPage extends React.Component {
               Setting.getLabel(i18next.t("provider:Model provider"), i18next.t("provider:Model provider - Tooltip")),
               <Select
                 virtual={false}
+                disabled={isReadOnly}
                 style={{width: "100%"}}
                 value={message.modelProvider}
                 onChange={(value) => {
@@ -251,6 +267,7 @@ class MessageEditPage extends React.Component {
               Setting.getLabel(i18next.t("message:Reply to"), i18next.t("message:Reply to - Tooltip")),
               <Select
                 virtual={false}
+                disabled={isReadOnly}
                 style={{width: "100%"}}
                 value={message.replyTo}
                 onChange={(value) => this.updateMessageField("replyTo", value)}
@@ -269,22 +286,22 @@ class MessageEditPage extends React.Component {
           <Row gutter={rowGutter}>
             {this.renderMessageField(
               Setting.getLabel(i18next.t("general:Reasoning text"), i18next.t("general:Reasoning text - Tooltip")),
-              <TextArea autoSize={{minRows: 1, maxRows: 15}} value={message.reasonText} onChange={(e) => this.updateMessageField("reasonText", e.target.value)} />,
+              <TextArea autoSize={{minRows: 1, maxRows: 15}} value={message.reasonText} disabled={isReadOnly} onChange={(e) => this.updateMessageField("reasonText", e.target.value)} />,
               24
             )}
             {this.renderMessageField(
               Setting.getLabel(i18next.t("general:Text"), i18next.t("general:Text - Tooltip")),
-              <TextArea autoSize={{minRows: 1, maxRows: 15}} value={message.text} onChange={(e) => this.updateMessageField("text", e.target.value)} />,
+              <TextArea autoSize={{minRows: 1, maxRows: 15}} value={message.text} disabled={isReadOnly} onChange={(e) => this.updateMessageField("text", e.target.value)} />,
               24
             )}
             {this.renderMessageField(
               Setting.getLabel(i18next.t("message:Error text"), i18next.t("message:Error text - Tooltip")),
-              <TextArea autoSize={{minRows: 1, maxRows: 15}} value={message.errorText} onChange={(e) => this.updateMessageField("errorText", e.target.value)} />,
+              <TextArea autoSize={{minRows: 1, maxRows: 15}} value={message.errorText} disabled={isReadOnly} onChange={(e) => this.updateMessageField("errorText", e.target.value)} />,
               24
             )}
             {this.renderMessageField(
               Setting.getLabel(i18next.t("message:Comment"), i18next.t("message:Comment - Tooltip")),
-              <TextArea autoSize={{minRows: 1, maxRows: 15}} value={message.comment} onChange={(e) => {
+              <TextArea autoSize={{minRows: 1, maxRows: 15}} value={message.comment} disabled={isReadOnly} onChange={(e) => {
                 if (e.target.value !== "") {
                   this.updateMessageField("needNotify", true);
                 } else {
