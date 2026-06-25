@@ -127,11 +127,19 @@ func applyResultToApiSession(aiMsg *object.Message, chat *object.Chat, writer *O
 		return err
 	}
 
-	chat.TokenCount += modelResult.TotalTokenCount
-	chat.Price += modelResult.TotalPrice
-	if chat.Currency == "" {
-		chat.Currency = modelResult.Currency
+	latestChat, err := object.GetChat(chat.GetId())
+	if err != nil {
+		return err
 	}
-	_, err := object.UpdateChat(chat.GetId(), chat)
+	if latestChat == nil {
+		return fmt.Errorf("chat not found: %s", chat.GetId())
+	}
+
+	latestChat.TokenCount += modelResult.TotalTokenCount
+	latestChat.Price += modelResult.TotalPrice
+	if latestChat.Currency == "" {
+		latestChat.Currency = modelResult.Currency
+	}
+	_, err = object.UpdateChat(latestChat.GetId(), latestChat)
 	return err
 }
