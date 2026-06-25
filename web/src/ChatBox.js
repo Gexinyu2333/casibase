@@ -45,6 +45,8 @@ class ChatBox extends React.Component {
     };
     this.synth = window.speechSynthesis;
     this.cursorPosition = undefined;
+    this.voiceInputBaseValue = "";
+    this.voiceInputBasePos = 0;
     this.copyFileName = null;
     this.messageListRef = React.createRef();
     this.inputRef = React.createRef();
@@ -116,6 +118,8 @@ class ChatBox extends React.Component {
       isVoiceInput: false,
     });
     this.cursorPosition = undefined;
+    this.voiceInputBaseValue = "";
+    this.voiceInputBasePos = 0;
   }
 
   focusInputAtEnd = () => {
@@ -293,8 +297,12 @@ class ChatBox extends React.Component {
     this.ttsHelper.readMessage(message, this.props.store);
   };
 
-  // Updated startVoiceInput method for ChatBox component
   startVoiceInput = () => {
+    // Snapshot value and cursor so subsequent transcript events append after existing text.
+    const base = this.state.value || "";
+    this.voiceInputBaseValue = base;
+    this.voiceInputBasePos = this.cursorPosition !== undefined ? this.cursorPosition : base.length;
+
     this.setState({isVoiceInput: true});
 
     // Check if using browser builtin or cloud provider
@@ -340,7 +348,6 @@ class ChatBox extends React.Component {
     }
   };
 
-  // Updated stopVoiceInput method for ChatBox component
   stopVoiceInput = () => {
     const providerValue = this.props.store?.speechToTextProvider || "";
     const useCloudProvider = providerValue !== "" && providerValue !== "Browser Built-In";
@@ -358,31 +365,23 @@ class ChatBox extends React.Component {
     }
   };
 
-  // Updated to handle both updating UI and to know when to send
   processVoiceResult = (shouldSendAfterProcessing = false) => {
     return (event) => {
       const transcript = Array.from(event?.results)?.map((result) => result[0].transcript).join(" ");
 
       if (!transcript || transcript.trim() === "") {
-        return; // Skip empty transcripts
+        return;
       }
 
-      // Update the input field with the transcript
-      if (this.cursorPosition === undefined) {
-        this.setState({value: transcript}, () => {
-          if (shouldSendAfterProcessing && this.state.value && this.state.value.trim() !== "") {
-            this.handleSend();
-          }
-        });
-      } else {
-        const oldValue = this.state.value || "";
-        const newValue = oldValue.slice(0, this.cursorPosition) + transcript + oldValue.slice(this.cursorPosition);
-        this.setState({value: newValue}, () => {
-          if (shouldSendAfterProcessing && this.state.value && this.state.value.trim() !== "") {
-            this.handleSend();
-          }
-        });
-      }
+      const base = this.voiceInputBaseValue || "";
+      const pos = this.voiceInputBasePos || base.length;
+      const newValue = base.slice(0, pos) + transcript + base.slice(pos);
+
+      this.setState({value: newValue}, () => {
+        if (shouldSendAfterProcessing && this.state.value && this.state.value.trim() !== "") {
+          this.handleSend();
+        }
+      });
     };
   };
 
