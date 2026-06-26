@@ -1010,6 +1010,12 @@ class ChatPage extends BaseListPage {
                 onMessageEdit={this.handleMessageEdit}
                 onCancelMessage={this.cancelMessage}
                 account={this.props.account}
+                showVirtualFigure={true}
+                onStoreUpdate={(updatedStore) => {
+                  this.setState(prevState => ({
+                    stores: prevState.stores?.map(store => store.owner === updatedStore.owner && store.name === updatedStore.name ? updatedStore : store),
+                  }));
+                }}
                 name={this.state.chat?.name}
                 displayName={this.state.chat?.displayName}
                 chat={this.state.chat}

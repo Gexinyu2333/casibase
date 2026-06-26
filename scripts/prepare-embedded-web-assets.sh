@@ -24,6 +24,7 @@ require_path() {
 PUBLIC_DIR="${ROOT_DIR}/web/public"
 
 require_path "${STATIC_REPO_DIR}/img"
+require_path "${STATIC_REPO_DIR}/img/openagent-figure.png"
 require_path "${STATIC_REPO_DIR}/flag-icons"
 require_path "${STATIC_REPO_DIR}/gravatar"
 

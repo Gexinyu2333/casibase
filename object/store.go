@@ -85,6 +85,9 @@ type Store struct {
 	Welcome                string            `xorm:"varchar(100)" json:"welcome"`
 	WelcomeTitle           string            `xorm:"varchar(100)" json:"welcomeTitle"`
 	WelcomeText            string            `xorm:"varchar(100)" json:"welcomeText"`
+	FigureEnabled          bool              `json:"figureEnabled"`
+	FigureUrl              string            `xorm:"varchar(500)" json:"figureUrl"`
+	FigureMode             string            `xorm:"varchar(100)" json:"figureMode"`
 	Prompt                 string            `xorm:"mediumtext" json:"prompt"`
 	ExampleQuestions       []ExampleQuestion `xorm:"mediumtext" json:"exampleQuestions"`
 	Avatar                 string            `xorm:"varchar(200)" json:"avatar"`
@@ -191,6 +194,7 @@ func NormalizeEmbeddedStoreAssets(store *Store) {
 	}
 
 	store.Avatar = conf.NormalizeEmbeddedAssetUrl(store.Avatar)
+	store.FigureUrl = conf.NormalizeEmbeddedAssetUrl(store.FigureUrl)
 }
 
 func GetMaskedStores(stores []*Store, user *auth.User) []*Store {

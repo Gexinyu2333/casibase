@@ -48,6 +48,10 @@ export function getDefaultAiAvatar() {
   return `${StaticBaseUrl}/img/openagent.png`;
 }
 
+export function getVirtualFigureUrl(store) {
+  return store?.figureUrl || `${StaticBaseUrl}/img/openagent-figure.png`;
+}
+
 export function getAvatarFallback() {
   return `${StaticBaseUrl}/gravatar/error.png`;
 }

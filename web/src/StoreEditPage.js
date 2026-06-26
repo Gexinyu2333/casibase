@@ -771,6 +771,46 @@ class StoreEditPage extends React.Component {
           </Row>
         </Card>
 
+        <Card size="small" title={renderCardTitle(i18next.t("figure:Virtual Figure"), i18next.t("figure:Virtual figure desc"))} style={sectionCardStyle} headStyle={cardHeadStyle}>
+          <Row gutter={rowGutter}>
+            {this.renderStoreSwitch(
+              Setting.getLabel(i18next.t("figure:Enable virtual figure"), i18next.t("figure:Enable virtual figure - Tooltip")),
+              store.figureEnabled !== false,
+              checked => {
+                this.updateStoreField("figureEnabled", checked);
+              },
+              8
+            )}
+            {this.renderStoreField(
+              Setting.getLabel(i18next.t("figure:Virtual figure URL"), i18next.t("figure:Virtual figure URL - Tooltip")),
+              <Input
+                value={store.figureUrl}
+                placeholder={Setting.getVirtualFigureUrl()}
+                onChange={e => {
+                  this.updateStoreField("figureUrl", e.target.value);
+                }}
+              />,
+              8
+            )}
+            {this.renderStoreField(
+              Setting.getLabel(i18next.t("figure:Default mode"), i18next.t("figure:Default mode - Tooltip")),
+              <Select
+                virtual={false}
+                style={{width: "100%"}}
+                value={store.figureMode || "Expanded"}
+                onChange={value => {
+                  this.updateStoreField("figureMode", value);
+                }}
+                options={[
+                  {value: "Expanded", label: i18next.t("figure:Expanded")},
+                  {value: "Collapsed", label: i18next.t("figure:Collapsed")},
+                ]}
+              />,
+              8
+            )}
+          </Row>
+        </Card>
+
         <Card size="small" title={renderCardTitle(i18next.t("general:Options"), i18next.t("general:Options desc"))} style={sectionCardStyle} headStyle={cardHeadStyle}>
           <Row gutter={rowGutter}>
             {this.renderStoreField(
