@@ -36,6 +36,8 @@ type Site struct {
 	NavItems      []string `xorm:"text" json:"navItems"`
 	Endpoint      string   `xorm:"varchar(500)" json:"endpoint"`
 
+	FigureUrl string `xorm:"varchar(500)" json:"figureUrl"`
+
 	CheckUserBalance bool `xorm:"bool" json:"checkUserBalance"`
 
 	Issuer              string `xorm:"varchar(500)" json:"issuer"`

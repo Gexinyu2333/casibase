@@ -172,7 +172,7 @@ class StoreListPage extends BaseListPage {
       welcomeTitle: i18next.t("chat:Hello, I'm OpenAgent AI Assistant"),
       welcomeText: i18next.t("chat:I'm here to help answer your questions"),
       figureEnabled: true,
-      figureUrl: Setting.getVirtualFigureUrl(),
+      figureUrl: "",
       figureMode: "Expanded",
       prompt: defaultPrompt,
       themeColor: Conf.ThemeDefault.colorPrimary,

@@ -83,6 +83,7 @@ class SiteEditPage extends React.Component {
         if (res.status === "ok") {
           Setting.showMessage("success", i18next.t("general:Successfully saved"));
           Setting.setThemeColor(this.state.site.themeColor || Setting.getThemeColor());
+          Setting.setBuiltInSiteFigureUrl(this.state.site.figureUrl);
           this.setState({siteName: this.state.site.name});
           if (this.props.onUpdateSite) {
             this.props.onUpdateSite();
@@ -235,6 +236,13 @@ class SiteEditPage extends React.Component {
               Setting.getLabel(i18next.t("general:Static base URL"), i18next.t("general:Static base URL - Tooltip")),
               <Input prefix={<LinkOutlined />} value={site.staticBaseUrl} onChange={e => {
                 this.updateSiteField("staticBaseUrl", e.target.value);
+              }} />,
+              12
+            )}
+            {this.renderSiteField(
+              Setting.getLabel(i18next.t("figure:Virtual figure URL"), i18next.t("figure:Virtual figure URL - Tooltip")),
+              <Input prefix={<LinkOutlined />} value={site.figureUrl} onChange={e => {
+                this.updateSiteField("figureUrl", e.target.value);
               }} />,
               12
             )}

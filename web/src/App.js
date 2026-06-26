@@ -79,6 +79,7 @@ class App extends Component {
         return;
       }
       Setting.setThemeColor(site.themeColor);
+      Setting.setBuiltInSiteFigureUrl(site.figureUrl);
       this.setState({site});
     });
   }
