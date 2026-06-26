@@ -52,7 +52,7 @@ function OpenAiCompatibleConfig({apiKey, apiKeyDisabled = false, onApiKeyChange}
           </Space.Compact>
         </Col>
         <Col style={{marginTop: "12px"}} span={Setting.isMobile() ? 22 : 6}>
-          <div style={{marginBottom: "4px"}}>{i18next.t("general:Base URL")}</div>
+          <div style={{marginBottom: "4px"}}>{i18next.t("server:Base URL")}</div>
           <ReadOnlyCopyInput value={baseUrl} />
         </Col>
         <Col style={{marginTop: "12px"}} span={Setting.isMobile() ? 22 : 12}>
