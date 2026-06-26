@@ -297,14 +297,14 @@ class VirtualFigure extends React.Component {
         <div className="chat-virtual-figure__controls">
           <Button
             type="text" size="small"
-            aria-label={i18next.t("figure:Reset figure position", {defaultValue: "Reset figure position"})}
+            aria-label={i18next.t("figure:Reset figure position")}
             className="chat-virtual-figure__control-button"
             icon={<ColumnWidthOutlined />}
             onClick={this.resetPosition}
           />
           <Button
             type="text" size="small"
-            aria-label={i18next.t("figure:Disable figure", {defaultValue: "Disable figure"})}
+            aria-label={i18next.t("figure:Disable figure")}
             className="chat-virtual-figure__control-button"
             icon={<CloseOutlined />}
             onClick={this.disableFigure}
@@ -323,7 +323,7 @@ class VirtualFigure extends React.Component {
           <img
             className="chat-virtual-figure__image"
             src={imageUrl}
-            alt={i18next.t("figure:AI virtual figure", {defaultValue: "AI virtual figure"})}
+            alt={i18next.t("figure:AI virtual figure")}
             draggable={false}
           />
           <div className="chat-virtual-figure__screen">

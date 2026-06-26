@@ -51,7 +51,7 @@ const statusLabelMap = {
 
 export function getStatusText(status) {
   const item = statusLabelMap[status] || statusLabelMap.idle;
-  return i18next.t(item.key, {defaultValue: item.label});
+  return i18next.t(item.key);
 }
 
 export function computeStatus({messageError, loading, messages, statusOverride, inputValue, isVoiceInput}) {
@@ -91,11 +91,11 @@ function VirtualFigureMenu({size, statusText, onAction}) {
   return (
     <div className="chat-virtual-figure__menu" onPointerDown={(e) => e.stopPropagation()}>
       <div className="chat-virtual-figure__menu-status">{statusText}</div>
-      <MenuItem actionKey="sizeSmall" label={i18next.t("figure:Small", {defaultValue: "Small"})} icon={size === "small" ? <CheckOutlined /> : null} active={size === "small"} onAction={onAction} />
-      <MenuItem actionKey="sizeMedium" label={i18next.t("figure:Medium", {defaultValue: "Medium"})} icon={size === "medium" ? <CheckOutlined /> : null} active={size === "medium"} onAction={onAction} />
-      <MenuItem actionKey="sizeLarge" label={i18next.t("figure:Large", {defaultValue: "Large"})} icon={size === "large" ? <CheckOutlined /> : null} active={size === "large"} onAction={onAction} />
-      <MenuItem actionKey="settings" label={i18next.t("figure:Figure settings", {defaultValue: "Figure settings"})} icon={<SettingOutlined />} onAction={onAction} />
-      <MenuItem actionKey="disable" label={i18next.t("figure:Disable figure", {defaultValue: "Disable figure"})} icon={<EyeInvisibleOutlined />} onAction={onAction} />
+      <MenuItem actionKey="sizeSmall" label={i18next.t("figure:Small")} icon={size === "small" ? <CheckOutlined /> : null} active={size === "small"} onAction={onAction} />
+      <MenuItem actionKey="sizeMedium" label={i18next.t("figure:Medium")} icon={size === "medium" ? <CheckOutlined /> : null} active={size === "medium"} onAction={onAction} />
+      <MenuItem actionKey="sizeLarge" label={i18next.t("figure:Large")} icon={size === "large" ? <CheckOutlined /> : null} active={size === "large"} onAction={onAction} />
+      <MenuItem actionKey="settings" label={i18next.t("figure:Figure settings")} icon={<SettingOutlined />} onAction={onAction} />
+      <MenuItem actionKey="disable" label={i18next.t("figure:Disable figure")} icon={<EyeInvisibleOutlined />} onAction={onAction} />
     </div>
   );
 }
