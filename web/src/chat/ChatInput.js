@@ -19,6 +19,7 @@ import {CloseOutlined, GlobalOutlined} from "@ant-design/icons";
 import ChatFileInput from "./ChatFileInput";
 import UploadFileArea from "./UploadFileArea";
 import ChatInputMenu from "./ChatInputMenu";
+import {getClipboardFiles, isClipboardImageFile} from "./clipboardFiles";
 import * as Setting from "../Setting";
 import i18next from "i18next";
 
@@ -42,44 +43,62 @@ const ChatInput = React.forwardRef(({
   onWebSearchChange,
 }, ref) => {
   const senderRef = React.useRef(null);
+  const filesRef = React.useRef(files);
+
+  React.useEffect(() => {
+    filesRef.current = files;
+  }, [files]);
+
   React.useImperativeHandle(ref, () => ({
     focus: () => senderRef.current?.focus(),
   }));
 
   const sendButtonDisabled = messageError || (value === "" && files.length === 0) || disableInput;
 
-  async function handleInputChange(file) {
-    const reader = new FileReader();
-    if (file.type.startsWith("image/")) {
-      reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-          const originalWidth = img.width;
-          const originalHeight = img.height;
-          const inputMaxWidth = 70;
-          const chatMaxWidth = 600;
-          let Ratio = 1;
-          if (originalWidth > inputMaxWidth) {
-            Ratio = inputMaxWidth / originalWidth;
-          }
-          if (originalWidth > chatMaxWidth) {
-            Ratio = chatMaxWidth / originalWidth;
-          }
-          const chatScaledWidth = Math.round(originalWidth * Ratio);
-          const chatScaledHeight = Math.round(originalHeight * Ratio);
-          const value = `<img src="${img.src}" alt="${img.alt}" width="${chatScaledWidth}" height="${chatScaledHeight}">`;
-          updateFileList(file, img.src, value);
+  function handleFileReadError(resolve) {
+    Setting.showMessage("error", i18next.t("general:Failed to upload"));
+    resolve();
+  }
+
+  function handleInputChange(file) {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onerror = () => handleFileReadError(resolve);
+
+      if (file.type.startsWith("image/")) {
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onerror = () => handleFileReadError(resolve);
+          img.onload = () => {
+            const originalWidth = img.width;
+            const originalHeight = img.height;
+            const inputMaxWidth = 70;
+            const chatMaxWidth = 600;
+            let Ratio = 1;
+            if (originalWidth > inputMaxWidth) {
+              Ratio = inputMaxWidth / originalWidth;
+            }
+            if (originalWidth > chatMaxWidth) {
+              Ratio = chatMaxWidth / originalWidth;
+            }
+            const chatScaledWidth = Math.round(originalWidth * Ratio);
+            const chatScaledHeight = Math.round(originalHeight * Ratio);
+            const value = `<img src="${img.src}" alt="${img.alt}" width="${chatScaledWidth}" height="${chatScaledHeight}">`;
+            updateFileList(file, img.src, value);
+            resolve();
+          };
+          img.src = e.target.result;
         };
-        img.src = e.target.result;
-      };
-    } else {
-      reader.onload = (e) => {
-        const content = `<a href="${e.target.result}" target="_blank">${file.name}</a>`;
-        const value = e.target.result;
-        updateFileList(file, content, value);
-      };
-    }
-    reader.readAsDataURL(file);
+      } else {
+        reader.onload = (e) => {
+          const content = `<a href="${e.target.result}" target="_blank">${file.name}</a>`;
+          const value = e.target.result;
+          updateFileList(file, content, value);
+          resolve();
+        };
+      }
+      reader.readAsDataURL(file);
+    });
   }
 
   function handleFileUploadClick() {
@@ -105,9 +124,26 @@ const ChatInput = React.forwardRef(({
       content: content,
       value: value,
     };
-    onFileChange(
-      [...files, uploadedFile]
-    );
+    const nextFiles = [...filesRef.current, uploadedFile];
+    filesRef.current = nextFiles;
+    onFileChange(nextFiles);
+  }
+
+  async function handlePaste(event) {
+    const imageFiles = getClipboardFiles(event, isClipboardImageFile);
+    if (imageFiles.length === 0) {
+      return;
+    }
+
+    event.preventDefault();
+    // Do not let the browser insert image HTML into Sender when uploads are disabled.
+    if (disableInput || messageError || store?.disableFileUpload) {
+      return;
+    }
+
+    for (const file of imageFiles) {
+      await handleInputChange(file);
+    }
   }
 
   // const isSpeechDisabled = store?.speechToTextProvider === "";
@@ -119,7 +155,7 @@ const ChatInput = React.forwardRef(({
   const inputShellBoxShadow = isDark ? "0 4px 24px rgba(0,0,0,0.4)" : "0 4px 24px rgba(0,0,0,0.08)";
 
   return (
-    <div style={{position: "absolute", bottom: 0, left: 0, right: 0, padding: "12px 24px 16px", zIndex: 1}}>
+    <div onPasteCapture={handlePaste} style={{position: "absolute", bottom: 0, left: 0, right: 0, padding: "12px 24px 16px", zIndex: 1}}>
       <UploadFileArea onFileChange={handleInputChange} />
       <div style={{maxWidth: "700px", margin: "0 auto"}}>
         {files.length > 0 && (
