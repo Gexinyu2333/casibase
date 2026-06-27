@@ -507,3 +507,9 @@ a[href^="mailto:"]:active {
 .chat-input-wrapper.chat-input-wrapper--no-focus-highlight .ant-sender textarea:focus {
   border-color: transparent !important;
 }
+
+
+@keyframes statusStripDot {
+  0%, 100% { opacity: 0; }
+  40%, 60% { opacity: 1; }
+}
