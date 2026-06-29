@@ -13,17 +13,12 @@
 // limitations under the License.
 
 import React from "react";
-import {Avatar, Button, Card, Divider, Spin, Tag, Typography} from "antd";
-import {CommentOutlined, FolderOpenOutlined} from "@ant-design/icons";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+import {Spin} from "antd";
 import * as StoreBackend from "./backend/StoreBackend";
 import * as Setting from "./Setting";
 import i18next from "i18next";
-import FileTree from "./FileTree";
 import {getChatUrl} from "./StoreHubDrawer";
-
-const {Text, Title} = Typography;
+import StoreHubAgentDetail from "./StoreHubAgentDetail";
 
 class StoreViewPage extends React.Component {
   constructor(props) {
@@ -33,6 +28,7 @@ class StoreViewPage extends React.Component {
       storeName: props.match.params.storeName,
       store: null,
       loading: true,
+      activeTab: "overview",
     };
   }
 
@@ -66,81 +62,34 @@ class StoreViewPage extends React.Component {
     }
   }
 
-  renderHeader(store) {
-    const initials = (store.displayName || store.name || "?")[0].toUpperCase();
-    const authorName = store.author || store.owner;
-
-    return (
-      <div style={{display: "flex", alignItems: "flex-start", gap: 20, marginBottom: 20, flexWrap: "wrap"}}>
-        {store.avatar ? (
-          <Avatar size={80} src={store.avatar} style={{flexShrink: 0}} />
-        ) : (
-          <Avatar size={80} style={{backgroundColor: Setting.getAvatarColor(store.name), flexShrink: 0, fontSize: 32}}>
-            {initials}
-          </Avatar>
-        )}
-        <div style={{flex: 1, minWidth: 0}}>
-          <div style={{display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap", marginBottom: 6}}>
-            <Title level={3} style={{margin: 0}}>
-              {store.displayName || store.name}
-            </Title>
-            <Button
-              type="primary"
-              icon={<CommentOutlined />}
-              onClick={() => this.handleStartChat()}
-            >
-              {i18next.t("store:Start Chat")}
-            </Button>
-          </div>
-          <Text type="secondary" style={{fontSize: 14}}>
-            {i18next.t("store:By")} <strong>{authorName}</strong>
-          </Text>
-          {store.affiliation ? (
-            <div style={{fontSize: 13, color: "var(--ant-color-text-tertiary)", marginTop: 2}}>
-              {store.affiliation}
-            </div>
-          ) : null}
-          <div style={{marginTop: 8, display: "flex", flexWrap: "wrap", gap: 6}}>
-            {store.subject ? <Tag color="purple">{store.subject}</Tag> : null}
-            {store.grade ? <Tag color="cyan">{store.grade}</Tag> : null}
-            {store.topic ? <Tag color="geekblue">{store.topic}</Tag> : null}
-          </div>
-          {store.brief ? (
-            <div style={{marginTop: 8, fontSize: 14, color: "var(--ant-color-text-secondary)", maxWidth: 640}}>
-              {store.brief}
-            </div>
-          ) : null}
-        </div>
-      </div>
-    );
+  handlePlaceholder(action) {
+    const messages = {
+      star: i18next.t("store:Star is coming soon"),
+      watch: i18next.t("store:Watch is coming soon"),
+      fork: i18next.t("store:Fork requires storage copy support"),
+    };
+    Setting.showMessage("info", messages[action]);
   }
 
-  renderReadme(store) {
-    const content = store.description || store.prompt || store.welcomeText || "";
-    if (!content) {return null;}
+  canManageStore(store) {
+    const {account} = this.props;
+    if (!account || !store) {
+      return false;
+    }
+    return account.name === store.owner || Setting.isAdminUser(account);
+  }
 
-    return (
-      <Card
-        title={
-          <div style={{display: "flex", alignItems: "center", gap: 8}}>
-            <FolderOpenOutlined />
-            <span>{i18next.t("general:Description")}</span>
-          </div>
-        }
-        style={{marginTop: 16}}
-        styles={{body: {padding: "20px 24px"}}}
-      >
-        <div className="markdown-body" style={{fontSize: 14, lineHeight: "1.6"}}>
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>
-            {content}
-          </ReactMarkdown>
-        </div>
-      </Card>
-    );
+  handleTabChange(key) {
+    if (key === "settings") {
+      const {store} = this.state;
+      this.props.history.push(`/stores/${store.owner}/${store.name}`);
+      return;
+    }
+    this.setState({activeTab: key});
   }
 
   render() {
-    const {store, loading} = this.state;
+    const {store, loading, activeTab} = this.state;
 
     if (loading) {
       return (
@@ -154,21 +103,23 @@ class StoreViewPage extends React.Component {
       return null;
     }
 
+    const canManage = this.canManageStore(store);
     return (
-      <div style={{padding: "24px 32px", maxWidth: 1200, margin: "0 auto"}}>
-        {this.renderHeader(store)}
-        <Divider style={{margin: "0 0 16px"}} />
-        <FileTree
-          account={this.props.account}
-          store={store}
-          onUpdateStore={(updatedStore) => {
-            this.setState({store: updatedStore});
-            Setting.submitStoreEdit(updatedStore);
-          }}
-          onRefresh={() => this.getStore()}
-        />
-        {this.renderReadme(store)}
-      </div>
+      <StoreHubAgentDetail
+        account={this.props.account}
+        store={store}
+        activeTab={activeTab}
+        canManage={canManage}
+        onTabChange={(key) => this.handleTabChange(key)}
+        onStartChat={() => this.handleStartChat()}
+        onPlaceholder={(action) => this.handlePlaceholder(action)}
+        onStoreUpdate={(updatedStore) => {
+          this.setState({store: updatedStore});
+          Setting.submitStoreEdit(updatedStore);
+        }}
+        onRefresh={() => this.getStore()}
+        onOpenAnalysis={() => this.props.history.push(`/analysis/${store.owner}/${store.name}`)}
+      />
     );
   }
 }
