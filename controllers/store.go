@@ -449,6 +449,11 @@ type shareStoreForm struct {
 	TargetUser string `json:"targetUser"`
 }
 
+type forkStoreForm struct {
+	Owner string `json:"owner"`
+	Name  string `json:"name"`
+}
+
 // AddSharedStore duplicates a store for another user (see object.ShareStore).
 // @router /add-shared-store [post]
 func (c *ApiController) AddSharedStore() {
@@ -497,6 +502,49 @@ func (c *ApiController) AddSharedStore() {
 	}
 
 	newStore, err := object.ShareStore(src.Owner, src.Name, form.TargetUser, c.GetSessionUsername())
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	c.ResponseOk(object.GetMaskedStore(newStore, c.GetSessionUser()))
+}
+
+// ForkStore duplicates a published store configuration into the current user's account.
+// @router /fork-store [post]
+func (c *ApiController) ForkStore() {
+	targetOwner, ok := c.RequireSignedIn()
+	if !ok {
+		return
+	}
+
+	var form forkStoreForm
+	err := json.Unmarshal(c.Ctx.Input.RequestBody, &form)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+	if form.Owner == "" || form.Name == "" {
+		c.ResponseError("owner and name are required")
+		return
+	}
+
+	src, err := object.GetStore(util.GetIdFromOwnerAndName(form.Owner, form.Name))
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+	if src == nil {
+		c.ResponseError("source store not found")
+		return
+	}
+
+	if src.PublishState != "Published" && src.Owner != targetOwner && !c.IsGlobalAdmin() {
+		c.ResponseError(c.T("auth:Unauthorized operation"))
+		return
+	}
+
+	newStore, err := object.ForkStore(src.Owner, src.Name, targetOwner)
 	if err != nil {
 		c.ResponseError(err.Error())
 		return

@@ -28,6 +28,7 @@ class StoreViewPage extends React.Component {
       storeName: props.match.params.storeName,
       store: null,
       loading: true,
+      forking: false,
       activeTab: "overview",
     };
   }
@@ -36,8 +37,8 @@ class StoreViewPage extends React.Component {
     this.getStore();
   }
 
-  getStore() {
-    StoreBackend.getStore(this.state.owner, this.state.storeName)
+  getStore(owner = this.state.owner, storeName = this.state.storeName) {
+    StoreBackend.getStore(owner, storeName)
       .then((res) => {
         if (res.status === "ok") {
           const store = res.data;
@@ -66,9 +67,35 @@ class StoreViewPage extends React.Component {
     const messages = {
       star: i18next.t("store:Star is coming soon"),
       watch: i18next.t("store:Watch is coming soon"),
-      fork: i18next.t("store:Fork requires storage copy support"),
     };
     Setting.showMessage("info", messages[action]);
+  }
+
+  handleFork() {
+    const {store, forking} = this.state;
+    if (!store || forking) {return;}
+
+    this.setState({forking: true});
+    StoreBackend.forkStore(store.owner, store.name)
+      .then((res) => {
+        if (res.status === "ok") {
+          const forkedStore = res.data;
+          Setting.showMessage("success", i18next.t("store:Forked successfully"));
+          this.props.history.push(`/agents/${forkedStore.owner}/${forkedStore.name}`);
+          this.setState({
+            owner: forkedStore.owner,
+            storeName: forkedStore.name,
+            store: null,
+            loading: true,
+          }, () => this.getStore(forkedStore.owner, forkedStore.name));
+        } else {
+          Setting.showMessage("error", `${i18next.t("store:Fork failed")}: ${res.msg}`);
+        }
+      })
+      .catch(error => {
+        Setting.showMessage("error", `${i18next.t("store:Fork failed")}: ${error}`);
+      })
+      .finally(() => this.setState({forking: false}));
   }
 
   canManageStore(store) {
@@ -89,7 +116,7 @@ class StoreViewPage extends React.Component {
   }
 
   render() {
-    const {store, loading, activeTab} = this.state;
+    const {store, loading, forking, activeTab} = this.state;
 
     if (loading) {
       return (
@@ -112,6 +139,8 @@ class StoreViewPage extends React.Component {
         canManage={canManage}
         onTabChange={(key) => this.handleTabChange(key)}
         onStartChat={() => this.handleStartChat()}
+        onFork={() => this.handleFork()}
+        forking={forking}
         onPlaceholder={(action) => this.handlePlaceholder(action)}
         onStoreUpdate={(updatedStore) => {
           this.setState({store: updatedStore});

@@ -944,19 +944,22 @@ class FileTree extends React.Component {
 
   render() {
     if (this.props.store.fileTree === null) {
-      return (
-        <div className="App">
-          <Result
-            status="error"
-            title={`${this.props.store.error}`}
-            extra={
-              <Button type="primary" onClick={() => this.props.history.push(`/stores/${this.props.store.owner}/${this.props.store.name}`)}>
-                Go to Store
-              </Button>
-            }
-          />
-        </div>
-      );
+      if (this.props.store.error) {
+        return (
+          <div className="App">
+            <Result
+              status="error"
+              title={`${this.props.store.error}`}
+              extra={
+                <Button type="primary" onClick={() => this.props.history.push(`/stores/${this.props.store.owner}/${this.props.store.name}`)}>
+                  Go to Store
+                </Button>
+              }
+            />
+          </div>
+        );
+      }
+      return <Empty description={i18next.t("general:No data")} />;
     }
 
     return (

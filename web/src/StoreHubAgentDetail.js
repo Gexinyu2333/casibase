@@ -23,7 +23,7 @@ import * as Setting from "./Setting";
 
 const {Text, Title} = Typography;
 
-function renderHeader(store, onStartChat, onPlaceholder) {
+function renderHeader(store, onStartChat, onFork, forking, onPlaceholder) {
   const initials = (store.displayName || store.name || "?")[0].toUpperCase();
   const authorName = store.author || store.owner;
 
@@ -54,7 +54,7 @@ function renderHeader(store, onStartChat, onPlaceholder) {
             <Button icon={<EyeOutlined />} onClick={() => onPlaceholder("watch")}>
               {i18next.t("store:Watch")}
             </Button>
-            <Button icon={<ForkOutlined />} onClick={() => onPlaceholder("fork")}>
+            <Button icon={<ForkOutlined />} loading={forking} onClick={onFork}>
               {i18next.t("store:Fork")}
             </Button>
             <Button type="primary" icon={<CommentOutlined />} onClick={onStartChat}>
@@ -85,6 +85,7 @@ function renderHeader(store, onStartChat, onPlaceholder) {
 function renderAbout(store) {
   const rows = [
     [i18next.t("general:Owner"), store.owner],
+    [i18next.t("store:Forked from"), store.forkedFromOwner && store.forkedFromName ? `${store.forkedFromOwner}/${store.forkedFromName}` : ""],
     [i18next.t("general:Author"), store.author],
     [i18next.t("store:Affiliation"), store.affiliation],
     [i18next.t("store:Tutor"), store.tutor],
@@ -213,7 +214,7 @@ function renderTabContent(account, store, activeTab, onStoreUpdate, onRefresh, o
   return renderOverview(account, store, onStoreUpdate, onRefresh);
 }
 
-function StoreHubAgentDetail({account, store, activeTab, canManage, onTabChange, onStartChat, onPlaceholder, onStoreUpdate, onRefresh, onOpenAnalysis}) {
+function StoreHubAgentDetail({account, store, activeTab, canManage, onTabChange, onStartChat, onFork, forking, onPlaceholder, onStoreUpdate, onRefresh, onOpenAnalysis}) {
   const tabItems = [
     {key: "overview", label: i18next.t("store:Overview")},
     {key: "files", label: i18next.t("general:Files")},
@@ -227,7 +228,7 @@ function StoreHubAgentDetail({account, store, activeTab, canManage, onTabChange,
 
   return (
     <div style={{padding: "24px 32px", maxWidth: 1280, margin: "0 auto"}}>
-      {renderHeader(store, onStartChat, onPlaceholder)}
+      {renderHeader(store, onStartChat, onFork, forking, onPlaceholder)}
       <Tabs
         activeKey={activeTab}
         items={tabItems}

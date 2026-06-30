@@ -88,6 +88,18 @@ export function addStore(store) {
   }).then(res => Setting.handleFetchResponse(res));
 }
 
+export function forkStore(owner, name) {
+  return fetch(`${Setting.ServerUrl}/api/fork-store`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Accept-Language": Setting.getAcceptLanguage(),
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({owner, name}),
+  }).then(res => Setting.handleFetchResponse(res));
+}
+
 export function deleteStore(store) {
   const newStore = Setting.deepCopy(store);
   return fetch(`${Setting.ServerUrl}/api/delete-store`, {

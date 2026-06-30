@@ -105,6 +105,8 @@ type Store struct {
 	IsDefault              bool              `json:"isDefault"`
 	State                  string            `xorm:"varchar(100)" json:"state"`
 	SharedBy               string            `xorm:"varchar(100)" json:"sharedBy"`
+	ForkedFromOwner        string            `xorm:"varchar(100)" json:"forkedFromOwner"`
+	ForkedFromName         string            `xorm:"varchar(100)" json:"forkedFromName"`
 
 	Author      string `xorm:"varchar(100)" json:"author"`
 	Affiliation string `xorm:"varchar(100)" json:"affiliation"`
