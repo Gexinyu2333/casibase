@@ -18,6 +18,7 @@ import {BarChartOutlined, CommentOutlined, EyeOutlined, FolderOpenOutlined, Fork
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import i18next from "i18next";
+import CommentArea from "./comment/CommentArea";
 import FileTree from "./FileTree";
 import * as Setting from "./Setting";
 
@@ -163,12 +164,22 @@ function renderFiles(account, store, onStoreUpdate, onRefresh) {
 }
 
 function renderOverview(account, store, onStoreUpdate, onRefresh) {
+  const isExternalStore = Boolean(store.endpoint || store.hubDbName);
+
   return (
     <Row gutter={[16, 16]}>
       <Col xs={24} lg={16}>
         <div style={{display: "grid", gap: 16}}>
           {renderFiles(account, store, onStoreUpdate, onRefresh)}
           {renderReadme(store)}
+          <CommentArea
+            account={account}
+            targetType="agenthub"
+            targetKey={`${store.owner}/${store.name}`}
+            targetOwner={store.owner}
+            disabled={isExternalStore}
+            unavailableText={i18next.t("store:Comments are unavailable for external agents")}
+          />
         </div>
       </Col>
       <Col xs={24} lg={8}>

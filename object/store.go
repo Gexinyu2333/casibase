@@ -372,7 +372,27 @@ func AddStore(store *Store) (bool, error) {
 }
 
 func DeleteStore(store *Store) (bool, error) {
-	affected, err := adapter.engine.ID(core.PK{store.Owner, store.Name}).Delete(&Store{})
+	session := adapter.engine.NewSession()
+	defer session.Close()
+
+	err := session.Begin()
+	if err != nil {
+		return false, err
+	}
+
+	affected, err := session.ID(core.PK{store.Owner, store.Name}).Delete(&Store{})
+	if err != nil {
+		session.Rollback()
+		return false, err
+	}
+
+	err = deleteCommentsByTargetWithSession(session, CommentTargetTypeAgentHub, store.GetId())
+	if err != nil {
+		session.Rollback()
+		return false, err
+	}
+
+	err = session.Commit()
 	if err != nil {
 		return false, err
 	}

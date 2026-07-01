@@ -56,6 +56,9 @@ func initAPI() {
 	beego.Router("/api/delete-site", &controllers.ApiController{}, "POST:DeleteSite")
 
 	beego.Router("/api/get-hub-stores", &controllers.ApiController{}, "GET:GetHubStores")
+	beego.Router("/api/get-comments", &controllers.ApiController{}, "GET:GetComments")
+	beego.Router("/api/add-comment", &controllers.ApiController{}, "POST:AddComment")
+	beego.Router("/api/delete-comment", &controllers.ApiController{}, "POST:DeleteComment")
 	beego.Router("/api/get-global-stores", &controllers.ApiController{}, "GET:GetGlobalStores")
 	beego.Router("/api/get-stores", &controllers.ApiController{}, "GET:GetStores")
 	beego.Router("/api/get-store", &controllers.ApiController{}, "GET:GetStore")

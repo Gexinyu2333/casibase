@@ -62,6 +62,14 @@
     "Preparing": "准备中",
     "Searching knowledge base": "正在搜索知识库"
   },
+  "comment": {
+    "Comment content cannot be empty": "评论内容不能为空",
+    "Comment content cannot be longer than %d characters": "评论内容不能超过%d个字符",
+    "Comment does not exist": "评论不存在",
+    "Comment target does not exist": "评论目标不存在",
+    "Parent comment does not exist": "被回复的评论不存在",
+    "Unsupported comment target type": "不支持的评论目标类型"
+  },
   "controllers": {
     "No permission": "无权限",
     "No records to add": "没有要添加的记录",

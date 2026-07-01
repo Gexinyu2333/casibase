@@ -62,6 +62,14 @@
     "Preparing": "Preparing",
     "Searching knowledge base": "Searching knowledge base"
   },
+  "comment": {
+    "Comment content cannot be empty": "Comment content cannot be empty",
+    "Comment content cannot be longer than %d characters": "Comment content cannot be longer than %d characters",
+    "Comment does not exist": "Comment does not exist",
+    "Comment target does not exist": "Comment target does not exist",
+    "Parent comment does not exist": "Parent comment does not exist",
+    "Unsupported comment target type": "Unsupported comment target type"
+  },
   "controllers": {
     "No permission": "No permission",
     "No records to add": "No records to add",
