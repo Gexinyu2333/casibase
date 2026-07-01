@@ -338,7 +338,7 @@ function CommentArea({account, targetType, targetKey, targetOwner, disabled = fa
       title={
         <div style={{display: "flex", alignItems: "center", gap: 8}}>
           <CommentOutlined />
-          <span>{i18next.t("store:Comments")}</span>
+          <span>{i18next.t("general:Comments")}</span>
         </div>
       }
       styles={{body: {padding: "20px 24px"}}}

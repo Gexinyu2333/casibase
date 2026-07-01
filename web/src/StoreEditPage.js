@@ -483,7 +483,7 @@ class StoreEditPage extends React.Component {
         <Card size="small" title={renderCardTitle(i18next.t("store:Agent Profile"), i18next.t("store:Agent Profile desc"))} style={sectionCardStyle} headStyle={cardHeadStyle}>
           <Row gutter={rowGutter}>
             {this.renderStoreField(
-              Setting.getLabel(i18next.t("message:Author"), i18next.t("message:Author - Tooltip")),
+              Setting.getLabel(i18next.t("general:Author"), i18next.t("message:Author - Tooltip")),
               <Input value={store.author} onChange={e => {
                 this.updateStoreField("author", e.target.value);
               }} />,

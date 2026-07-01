@@ -99,7 +99,7 @@ class CommentListPage extends BaseListPage {
         },
       },
       {
-        title: i18next.t("comment:Content"),
+        title: i18next.t("general:Content"),
         dataIndex: "content",
         key: "content",
         ...this.getColumnSearchProps("content"),

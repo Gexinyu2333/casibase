@@ -138,7 +138,7 @@ function renderReadme(store) {
       title={
         <div style={{display: "flex", alignItems: "center", gap: 8}}>
           <FolderOpenOutlined />
-          <span>README</span>
+          <span>{i18next.t("store:README")}</span>
         </div>
       }
       styles={{body: {padding: "20px 24px"}}}

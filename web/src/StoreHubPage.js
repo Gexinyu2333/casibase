@@ -168,7 +168,7 @@ class StoreHubPage extends React.Component {
     const sortFieldOptions = [
       {value: "", label: i18next.t("general:Sort")},
       {value: "displayName", label: i18next.t("general:Display name")},
-      {value: "author", label: i18next.t("message:Author")},
+      {value: "author", label: i18next.t("general:Author")},
       {value: "affiliation", label: i18next.t("store:Affiliation")},
       {value: "subject", label: i18next.t("store:Subject")},
       {value: "grade", label: i18next.t("store:Grade")},

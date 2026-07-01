@@ -223,7 +223,7 @@ class MessageEditPage extends React.Component {
               8
             )}
             {this.renderMessageField(
-              Setting.getLabel(i18next.t("message:Author"), i18next.t("message:Author - Tooltip")),
+              Setting.getLabel(i18next.t("general:Author"), i18next.t("message:Author - Tooltip")),
               <Select
                 virtual={false}
                 disabled={isReadOnly}

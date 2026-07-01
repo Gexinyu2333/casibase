@@ -91,7 +91,6 @@
     "Your chat text involves sensitive content. This chat has been forcibly terminated.": "Your chat text involves sensitive content. This chat has been forcibly terminated."
   },
   "comment": {
-    "Content": "Content",
     "Edit Comment": "Edit Comment",
     "Parent name": "Parent name",
     "Parent owner": "Parent owner",
@@ -458,7 +457,6 @@
     "Signing in...": "Signing in..."
   },
   "message": {
-    "Author": "Author",
     "Author - Tooltip": "The actual user or system identity that sent this message.",
     "Comment": "Comment",
     "Comment - Tooltip": "Optional human-readable note attached to the message.",
@@ -755,7 +753,6 @@
     "Claim": "Claim",
     "Click a question to get started": "Click a question to get started",
     "Collected time": "Collected time",
-    "Comments": "Comments",
     "Comments are unavailable": "Comments are unavailable",
     "Comments are unavailable for external agents": "Comments are unavailable for external agents",
     "Confirm share store": "Copy this agent for the selected user? The new agent will belong to them, with a name suffix for clarity.",
@@ -834,6 +831,7 @@
     "Published": "Published",
     "Publishing": "Publishing",
     "Publishing desc": "Control the agent's visibility in the public Hub",
+    "README": "README",
     "Read": "Read",
     "Rejected": "Rejected",
     "Reply": "Reply",

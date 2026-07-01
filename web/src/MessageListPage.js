@@ -169,7 +169,7 @@ class MessageListPage extends BaseListPage {
     const data = [];
     messages.forEach(item => {
       const row = {};
-      row[i18next.t("message:Author")] = item.author;
+      row[i18next.t("general:Author")] = item.author;
       row[i18next.t("general:Chat")] = item.chat;
       row[i18next.t("general:Message")] = item.name;
       row[i18next.t("general:Created time")] = Setting.getFormattedDate(item.createdTime);
@@ -356,7 +356,7 @@ class MessageListPage extends BaseListPage {
         },
       },
       {
-        title: i18next.t("message:Author"),
+        title: i18next.t("general:Author"),
         dataIndex: "author",
         key: "author",
         width: "90px",

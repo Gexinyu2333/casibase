@@ -152,10 +152,10 @@ class CommentEditPage extends React.Component {
           </Row>
         </Card>
 
-        <Card size="small" title={i18next.t("comment:Content")} style={sectionCardStyle} headStyle={cardHeadStyle}>
+        <Card size="small" title={i18next.t("general:Content")} style={sectionCardStyle} headStyle={cardHeadStyle}>
           <Row gutter={rowGutter}>
             {this.renderCommentField(
-              i18next.t("comment:Content"),
+              i18next.t("general:Content"),
               <TextArea
                 rows={6}
                 value={comment.content}
