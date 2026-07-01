@@ -80,12 +80,63 @@ func resolveCommentTarget(targetType string, targetKey string) (*commentTarget, 
 	return &commentTarget{Owner: store.Owner}, nil
 }
 
+// GetGlobalComments
+// @Title GetGlobalComments
+// @Tag Comment API
+// @Description get all comments (admin)
+// @Param p query string false "The page number"
+// @Param pageSize query string false "The page size"
+// @Param field query string false "The field to search"
+// @Param value query string false "The value to search"
+// @Param sortField query string false "The field to sort by"
+// @Param sortOrder query string false "The sort order"
+// @Success 200 {array} object.Comment The Response object
+// @router /get-global-comments [get]
+func (c *ApiController) GetGlobalComments() {
+	if !c.IsAdmin() {
+		c.ResponseError(c.T("auth:Unauthorized operation"))
+		return
+	}
+
+	limit := c.Input().Get("pageSize")
+	page := c.Input().Get("p")
+	field := c.Input().Get("field")
+	value := c.Input().Get("value")
+	sortField := c.Input().Get("sortField")
+	sortOrder := c.Input().Get("sortOrder")
+
+	if limit == "" || page == "" {
+		comments, err := object.GetGlobalComments()
+		if err != nil {
+			c.ResponseError(err.Error())
+			return
+		}
+		c.ResponseOk(comments)
+	} else {
+		limitInt := util.ParseInt(limit)
+		count, err := object.GetGlobalCommentCount(field, value)
+		if err != nil {
+			c.ResponseError(err.Error())
+			return
+		}
+		paginator := pagination.SetPaginator(c.Ctx, limitInt, count)
+		comments, err := object.GetGlobalPaginationComments(paginator.Offset(), limitInt, field, value, sortField, sortOrder)
+		if err != nil {
+			c.ResponseError(err.Error())
+			return
+		}
+		c.ResponseOk(comments, paginator.Nums())
+	}
+}
+
 // GetComments
 // @Title GetComments
 // @Tag Comment API
-// @Description get comments by target
+// @Description get comments by target (public)
 // @Param targetType query string true "The target type"
 // @Param targetKey query string true "The target key"
+// @Param p query string false "The page number"
+// @Param pageSize query string false "The page size"
 // @Success 200 {array} object.Comment The Response object
 // @router /get-comments [get]
 func (c *ApiController) GetComments() {
@@ -113,6 +164,83 @@ func (c *ApiController) GetComments() {
 	}
 
 	c.ResponseOk(comments, count)
+}
+
+// GetComment
+// @Title GetComment
+// @Tag Comment API
+// @Description get a comment by id
+// @Param id query string true "The id (owner/name) of the comment"
+// @Success 200 {object} object.Comment The Response object
+// @router /get-comment [get]
+func (c *ApiController) GetComment() {
+	id := c.Input().Get("id")
+
+	owner, name, err := util.GetOwnerAndNameFromIdWithError(id)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	comment, err := object.GetComment(owner, name)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+	if comment == nil {
+		c.responseCommentError("Comment does not exist")
+		return
+	}
+
+	username := c.GetSessionUsername()
+	if username != comment.Owner && !c.IsAdmin() {
+		c.ResponseError(c.T("auth:Unauthorized operation"))
+		return
+	}
+
+	c.ResponseOk(comment)
+}
+
+// UpdateComment
+// @Title UpdateComment
+// @Tag Comment API
+// @Description update a comment
+// @Param id query string true "The id (owner/name) of the comment"
+// @Param body body object.Comment true "The details of the comment"
+// @Success 200 {object} controllers.Response The Response object
+// @router /update-comment [post]
+func (c *ApiController) UpdateComment() {
+	if !c.IsAdmin() {
+		c.ResponseError(c.T("auth:Unauthorized operation"))
+		return
+	}
+
+	id := c.Input().Get("id")
+
+	var comment object.Comment
+	err := json.Unmarshal(c.Ctx.Input.RequestBody, &comment)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	comment.Content = strings.TrimSpace(comment.Content)
+	if comment.Content == "" {
+		c.responseCommentError("Comment content cannot be empty")
+		return
+	}
+	if utf8.RuneCountInString(comment.Content) > maxCommentLength {
+		c.ResponseError(fmt.Sprintf(c.T("comment:Comment content cannot be longer than %d characters"), maxCommentLength))
+		return
+	}
+
+	success, err := object.UpdateComment(id, &comment)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	c.ResponseOk(success)
 }
 
 // AddComment
@@ -219,14 +347,16 @@ func (c *ApiController) DeleteComment() {
 		return
 	}
 
-	target, err := resolveCommentTarget(comment.TargetType, comment.TargetKey)
-	if err != nil {
-		c.responseCommentError(err.Error())
-		return
-	}
-	if username != comment.Owner && username != target.Owner && !c.IsAdmin() {
-		c.ResponseError(c.T("auth:Unauthorized operation"))
-		return
+	if !c.IsAdmin() {
+		target, err := resolveCommentTarget(comment.TargetType, comment.TargetKey)
+		if err != nil {
+			c.responseCommentError(err.Error())
+			return
+		}
+		if username != comment.Owner && username != target.Owner {
+			c.ResponseError(c.T("auth:Unauthorized operation"))
+			return
+		}
 	}
 
 	success, err := object.DeleteComment(comment)

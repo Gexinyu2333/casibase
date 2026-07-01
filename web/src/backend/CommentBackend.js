@@ -14,6 +14,16 @@
 
 import * as Setting from "../Setting";
 
+export function getGlobalComments(page = "", pageSize = "", field = "", value = "", sortField = "", sortOrder = "") {
+  return fetch(`${Setting.ServerUrl}/api/get-global-comments?p=${page}&pageSize=${pageSize}&field=${field}&value=${value}&sortField=${sortField}&sortOrder=${sortOrder}`, {
+    method: "GET",
+    credentials: "include",
+    headers: {
+      "Accept-Language": Setting.getAcceptLanguage(),
+    },
+  }).then(res => Setting.handleFetchResponse(res));
+}
+
 export function getComments(targetType, targetKey, page, pageSize) {
   return fetch(`${Setting.ServerUrl}/api/get-comments?targetType=${encodeURIComponent(targetType)}&targetKey=${encodeURIComponent(targetKey)}&p=${page}&pageSize=${pageSize}`, {
     method: "GET",
@@ -21,6 +31,29 @@ export function getComments(targetType, targetKey, page, pageSize) {
     headers: {
       "Accept-Language": Setting.getAcceptLanguage(),
     },
+  }).then(res => Setting.handleFetchResponse(res));
+}
+
+export function getComment(owner, name) {
+  return fetch(`${Setting.ServerUrl}/api/get-comment?id=${owner}/${encodeURIComponent(name)}`, {
+    method: "GET",
+    credentials: "include",
+    headers: {
+      "Accept-Language": Setting.getAcceptLanguage(),
+    },
+  }).then(res => Setting.handleFetchResponse(res));
+}
+
+export function updateComment(owner, name, comment) {
+  const newComment = Setting.deepCopy(comment);
+  return fetch(`${Setting.ServerUrl}/api/update-comment?id=${owner}/${encodeURIComponent(name)}`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Accept-Language": Setting.getAcceptLanguage(),
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(newComment),
   }).then(res => Setting.handleFetchResponse(res));
 }
 

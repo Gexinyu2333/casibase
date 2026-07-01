@@ -106,6 +106,8 @@ import SystemInfo from "./SystemInfo";
 import ResourceListPage from "./ResourceListPage";
 import SiteListPage from "./SiteListPage";
 import SiteEditPage from "./SiteEditPage";
+import CommentListPage from "./CommentListPage";
+import CommentEditPage from "./CommentEditPage";
 const {Header, Footer, Content, Sider} = Layout;
 
 function getMenuParentKey(uri) {
@@ -116,7 +118,7 @@ function getMenuParentKey(uri) {
   if (uri.includes("/tasks") || uri.includes("/scales") || uri.includes("/forms")) {return "/multimedia";}
   if (uri.includes("/sessions") || uri.includes("/records") || uri.includes("/snapshots")) {return "/logs";}
   if (uri.includes("/users") || uri.includes("/casdoor-resources") || uri.includes("/permissions")) {return "/identity";}
-  if (uri.includes("/sysinfo") || uri.includes("/swagger") || uri.includes("/visitors") || uri.includes("/sites") || uri.includes("/usages")) {return "/admin";}
+  if (uri.includes("/sysinfo") || uri.includes("/swagger") || uri.includes("/visitors") || uri.includes("/sites") || uri.includes("/usages") || uri.includes("/comments")) {return "/admin";}
   return null;
 }
 
@@ -475,6 +477,7 @@ function ManagementPage(props) {
       if (Setting.isAdminUser(account) && !Setting.isChatAdminUser(account)) {
         res.push(Setting.getItem(<Link style={{color: textColor}} to="/sites/site-built-in">{i18next.t("general:Admin")}</Link>, "/admin", <SettingOutlined />, [
           Setting.getItem(<Link to="/sites/site-built-in">{i18next.t("general:Sites")}</Link>, "/sites", <LayoutOutlined />),
+          Setting.getItem(<Link to="/comments">{i18next.t("general:Comments")}</Link>, "/comments", <CommentOutlined />),
           Setting.getItem(<Link to="/resources">{i18next.t("general:Resources")}</Link>, "/resources", <InboxOutlined />),
           Setting.getItem(<Link to="/usages">{i18next.t("general:Usages")}</Link>, "/usages", <LineChartOutlined />),
           Setting.getItem(<Link to="/visitors">{i18next.t("general:Visitors")}</Link>, "/visitors", <FundOutlined />),
@@ -566,6 +569,8 @@ function ManagementPage(props) {
         <Route exact path="/sites" render={(props) => renderSigninIfNotSignedIn(<SiteListPage account={account} {...props} />)} />
         <Route exact path="/sites/:siteName" render={(props) => renderSigninIfNotSignedIn(<SiteEditPage account={account} onUpdateSite={onUpdateSite} {...props} />)} />
         <Route exact path="/visitors" render={(props) => renderSigninIfNotSignedIn(<VisitorPage account={account} themeAlgorithm={themeAlgorithm} {...props} />)} />
+        <Route exact path="/comments" render={(props) => renderSigninIfNotSignedIn(<CommentListPage account={account} {...props} />)} />
+        <Route exact path="/comments/:commentOwner/:commentName" render={(props) => renderSigninIfNotSignedIn(<CommentEditPage account={account} {...props} />)} />
         <Route exact path="/sessions" render={(props) => renderSigninIfNotSignedIn(<SessionListPage account={account} {...props} />)} />
         <Route exact path="/snapshots" render={(props) => renderSigninIfNotSignedIn(<SnapshotListPage account={account} {...props} />)} />
         <Route exact path="/records" render={(props) => renderSigninIfNotSignedIn(<RecordListPage account={account} {...props} />)} />

@@ -15,6 +15,8 @@
 package object
 
 import (
+	"fmt"
+
 	"github.com/the-open-agent/openagent/util"
 	"xorm.io/core"
 	"xorm.io/xorm"
@@ -41,6 +43,28 @@ type Comment struct {
 	Replies []*Comment `xorm:"-" json:"replies,omitempty"`
 }
 
+func (comment *Comment) GetId() string {
+	return fmt.Sprintf("%s/%s", comment.Owner, comment.Name)
+}
+
+func GetGlobalComments() ([]*Comment, error) {
+	comments := []*Comment{}
+	err := adapter.engine.Desc("created_time").Find(&comments)
+	return comments, err
+}
+
+func GetGlobalCommentCount(field, value string) (int64, error) {
+	session := GetDbSession("", -1, -1, field, value, "", "")
+	return session.Count(&Comment{})
+}
+
+func GetGlobalPaginationComments(offset, limit int, field, value, sortField, sortOrder string) ([]*Comment, error) {
+	comments := []*Comment{}
+	session := GetDbSession("", offset, limit, field, value, sortField, sortOrder)
+	err := session.Find(&comments)
+	return comments, err
+}
+
 func GetComment(owner string, name string) (*Comment, error) {
 	comment := Comment{Owner: owner, Name: name}
 	existed, err := adapter.engine.Get(&comment)
@@ -64,15 +88,19 @@ func GetPaginationComments(targetType string, targetKey string, offset int, limi
 		return comments, err
 	}
 
+	rootOwners := make([]string, 0, len(comments))
 	rootNames := make([]string, 0, len(comments))
 	rootSet := map[string]bool{}
 	for _, comment := range comments {
+		rootOwners = append(rootOwners, comment.Owner)
 		rootNames = append(rootNames, comment.Name)
 		rootSet[comment.Owner+"/"+comment.Name] = true
 	}
 
 	replies := []*Comment{}
-	err = adapter.engine.Where("target_type = ? and target_key = ?", targetType, targetKey).In("root_name", rootNames).Asc("created_time").Find(&replies)
+	err = adapter.engine.Where("target_type = ? and target_key = ?", targetType, targetKey).
+		In("root_owner", rootOwners).In("root_name", rootNames).
+		Asc("created_time").Find(&replies)
 	if err != nil {
 		return comments, err
 	}
@@ -90,6 +118,19 @@ func GetPaginationComments(targetType string, targetKey string, offset int, limi
 	}
 
 	return comments, nil
+}
+
+func UpdateComment(id string, comment *Comment) (bool, error) {
+	owner, name, err := util.GetOwnerAndNameFromIdWithError(id)
+	if err != nil {
+		return false, err
+	}
+	comment.UpdatedTime = util.GetCurrentTimeWithMilli()
+	_, err = adapter.engine.ID(core.PK{owner, name}).AllCols().Update(comment)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 func AddComment(comment *Comment) (bool, error) {
