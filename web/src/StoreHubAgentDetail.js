@@ -14,7 +14,7 @@
 
 import React from "react";
 import {Avatar, Button, Card, Col, Empty, Row, Space, Tabs, Tag, Typography} from "antd";
-import {BarChartOutlined, CommentOutlined, EyeOutlined, FolderOpenOutlined, ForkOutlined, SettingOutlined, StarOutlined} from "@ant-design/icons";
+import {AppstoreOutlined, BarChartOutlined, BugOutlined, CommentOutlined, EyeOutlined, FolderOpenOutlined, ForkOutlined, SettingOutlined, StarOutlined} from "@ant-design/icons";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import i18next from "i18next";
@@ -227,10 +227,10 @@ function renderTabContent(account, store, activeTab, onStoreUpdate, onRefresh, o
 
 function StoreHubAgentDetail({account, store, activeTab, canManage, onTabChange, onStartChat, onFork, forking, onPlaceholder, onStoreUpdate, onRefresh, onOpenAnalysis}) {
   const tabItems = [
-    {key: "overview", label: i18next.t("store:Overview")},
-    {key: "files", label: i18next.t("general:Files")},
-    {key: "issues", label: i18next.t("store:Issues")},
-    {key: "insights", label: i18next.t("store:Insights")},
+    {key: "overview", label: <span><AppstoreOutlined /> {i18next.t("store:Overview")}</span>},
+    {key: "files", label: <span><FolderOpenOutlined /> {i18next.t("general:Files")}</span>},
+    {key: "issues", label: <span><BugOutlined /> {i18next.t("store:Issues")}</span>},
+    {key: "insights", label: <span><BarChartOutlined /> {i18next.t("store:Insights")}</span>},
   ];
 
   if (canManage) {
