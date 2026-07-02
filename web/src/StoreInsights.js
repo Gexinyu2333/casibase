@@ -19,6 +19,7 @@ import i18next from "i18next";
 import InsightsPulse from "./InsightsPulse";
 import InsightsContributors from "./InsightsContributors";
 import InsightsTraffic from "./InsightsTraffic";
+import InsightsWordCloud from "./InsightsWordCloud";
 
 const {Sider, Content} = Layout;
 const {Text} = Typography;
@@ -80,7 +81,7 @@ class StoreInsights extends React.Component {
     case "pulse": return <InsightsPulse {...common} />;
     case "contributors": return <InsightsContributors {...common} />;
     case "traffic": return <InsightsTraffic {...common} />;
-    case "wordcloud":
+    case "wordcloud": return <InsightsWordCloud {...common} />;
     case "cost":
       return (
         <Card>
