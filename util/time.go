@@ -16,6 +16,15 @@ package util
 
 import "time"
 
+// TimeFormat is the layout used for CreatedTime/UpdatedTime string columns.
+const TimeFormat = "2006-01-02T15:04:05.999Z07:00"
+
+// FormatTimeForCompare formats t so it can be compared (via plain string comparison,
+// e.g. "created_time >= ?") against CreatedTime/UpdatedTime columns.
+func FormatTimeForCompare(t time.Time) string {
+	return t.Format(TimeFormat)
+}
+
 func GetCurrentTime() string {
 	timestamp := time.Now().Unix()
 	tm := time.Unix(timestamp, 0)
@@ -24,7 +33,7 @@ func GetCurrentTime() string {
 
 func GetCurrentTimeWithMilli() string {
 	tm := time.Now()
-	return tm.Format("2006-01-02T15:04:05.999Z07:00")
+	return tm.Format(TimeFormat)
 }
 
 func GetCurrentTimeEx(timestamp string) string {
@@ -38,12 +47,12 @@ func GetCurrentTimeEx(timestamp string) string {
 		tm = inputTime.Add(1 * time.Millisecond)
 	}
 
-	return tm.Format("2006-01-02T15:04:05.999Z07:00")
+	return tm.Format(TimeFormat)
 }
 
 func GetCurrentTimeBasedOnLastMilli(timestamp string) string {
 	tm := time.Now()
-	inputTime, err := time.Parse("2006-01-02T15:04:05.999Z07:00", timestamp)
+	inputTime, err := time.Parse(TimeFormat, timestamp)
 	if err != nil {
 		panic(err)
 	}
@@ -52,7 +61,7 @@ func GetCurrentTimeBasedOnLastMilli(timestamp string) string {
 		tm = inputTime.Add(1 * time.Millisecond)
 	}
 
-	return tm.Format("2006-01-02T15:04:05.999Z07:00")
+	return tm.Format(TimeFormat)
 }
 
 func AdjustTimeFromSecToMilli(timeStr string, offsetMs int) string {
@@ -63,18 +72,18 @@ func AdjustTimeFromSecToMilli(timeStr string, offsetMs int) string {
 
 	adjustedTime := t.Add(time.Duration(offsetMs) * time.Millisecond)
 
-	return adjustedTime.Format("2006-01-02T15:04:05.999Z07:00")
+	return adjustedTime.Format(TimeFormat)
 }
 
 func AdjustTimeWithMilli(timeStr string, offsetMs int) string {
-	t, err := time.Parse("2006-01-02T15:04:05.999Z07:00", timeStr)
+	t, err := time.Parse(TimeFormat, timeStr)
 	if err != nil {
 		return timeStr
 	}
 
 	adjustedTime := t.Add(time.Duration(offsetMs) * time.Millisecond)
 
-	return adjustedTime.Format("2006-01-02T15:04:05.999Z07:00")
+	return adjustedTime.Format(TimeFormat)
 }
 
 // GetCurrentUnixTime returns the current Unix timestamp in seconds

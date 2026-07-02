@@ -17,6 +17,8 @@ package object
 import (
 	"sort"
 	"time"
+
+	"github.com/the-open-agent/openagent/util"
 )
 
 // ProviderCategoryCount holds a provider category label and its count.
@@ -81,7 +83,7 @@ func GetUsageMessageHeatmap(owner string) (*MessageHeatmapData, error) {
 
 	var items []msgItem
 	query := adapter.engine.Table("message").Cols("created_time").
-		Where("created_time >= ?", oneYearAgo)
+		Where("created_time >= ?", util.FormatTimeForCompare(oneYearAgo))
 	if owner != "" {
 		query = query.And("organization = ?", owner)
 	}

@@ -187,7 +187,7 @@ func GetMessages(owner string, user string, storeName string) ([]*Message, error
 }
 
 func GetNearMessageCount(user string, limitMinutes int) (int, error) {
-	sinceTime := time.Now().Add(-time.Minute * time.Duration(limitMinutes))
+	sinceTime := util.FormatTimeForCompare(time.Now().Add(-time.Minute * time.Duration(limitMinutes)))
 	nearMessageCount, err := adapter.engine.Desc("created_time").Where("created_time >= ?", sinceTime).Count(&Message{Owner: "admin", User: user, Author: "AI"})
 	if err != nil {
 		return -1, err

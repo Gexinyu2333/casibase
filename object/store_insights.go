@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"github.com/the-open-agent/openagent/model"
+	"github.com/the-open-agent/openagent/util"
 )
 
 type StoreInsightsSummary struct {
@@ -97,13 +98,13 @@ func GetStoreInsightsSummary(owner string, storeName string, period string) (*St
 		return nil, err
 	}
 
-	// Align start to the bucket boundary so hourly buckets start on the hour and daily buckets start at UTC midnight.
-	now := time.Now().UTC()
+	// Align start to the bucket boundary so hourly buckets start on the hour and daily buckets start at midnight.
+	now := time.Now()
 	end := now.Truncate(spec.bucketUnit).Add(spec.bucketUnit)
 	start := end.Add(-spec.duration)
 
-	startStr := start.Format(time.RFC3339)
-	endStr := end.Format(time.RFC3339)
+	startStr := util.FormatTimeForCompare(start)
+	endStr := util.FormatTimeForCompare(end)
 
 	// Pre-fill buckets so the client always gets a dense series.
 	buckets := make([]*InsightsBucket, spec.bucketN)
