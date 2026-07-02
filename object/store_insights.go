@@ -123,9 +123,11 @@ func GetStoreInsightsSummary(owner string, storeName string, period string) (*St
 	}
 
 	// Chats — one row per Chat created in window (delta, not cumulative).
+	// Note: Chat.Owner is always "admin" (system-created), so filtering by the store's
+	// owner would never match — filter by store alone, like PopulateStoreCounts does.
 	chats := []*Chat{}
 	if err = adapter.engine.
-		Where("owner = ? and store = ? and created_time >= ? and created_time < ?", owner, storeName, startStr, endStr).
+		Where("store = ? and created_time >= ? and created_time < ?", storeName, startStr, endStr).
 		Find(&chats); err != nil {
 		return nil, err
 	}
@@ -143,7 +145,7 @@ func GetStoreInsightsSummary(owner string, storeName string, period string) (*St
 	// Messages — aggregated per bucket, plus per-user rollup for TopUsers.
 	messages := []*Message{}
 	if err = adapter.engine.
-		Where("owner = ? and store = ? and created_time >= ? and created_time < ?", owner, storeName, startStr, endStr).
+		Where("store = ? and created_time >= ? and created_time < ?", storeName, startStr, endStr).
 		Find(&messages); err != nil {
 		return nil, err
 	}
@@ -189,7 +191,7 @@ func GetStoreInsightsSummary(owner string, storeName string, period string) (*St
 	// Files — deltas.
 	files := []*File{}
 	if err = adapter.engine.
-		Where("owner = ? and store = ? and created_time >= ? and created_time < ?", owner, storeName, startStr, endStr).
+		Where("store = ? and created_time >= ? and created_time < ?", storeName, startStr, endStr).
 		Find(&files); err != nil {
 		return nil, err
 	}
@@ -207,7 +209,7 @@ func GetStoreInsightsSummary(owner string, storeName string, period string) (*St
 	// Vectors — deltas.
 	vectors := []*Vector{}
 	if err = adapter.engine.
-		Where("owner = ? and store = ? and created_time >= ? and created_time < ?", owner, storeName, startStr, endStr).
+		Where("store = ? and created_time >= ? and created_time < ?", storeName, startStr, endStr).
 		Find(&vectors); err != nil {
 		return nil, err
 	}
