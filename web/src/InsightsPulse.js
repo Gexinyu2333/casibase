@@ -171,11 +171,13 @@ class InsightsPulse extends React.Component {
     if (!data) {return null;}
 
     return (
-      <div>
-        {this.renderHeadline(data)}
-        {this.renderStatCards(data)}
-        {this.renderTopUsers(data)}
-      </div>
+      <Spin spinning={loading}>
+        <div>
+          {this.renderHeadline(data)}
+          {this.renderStatCards(data)}
+          {this.renderTopUsers(data)}
+        </div>
+      </Spin>
     );
   }
 }

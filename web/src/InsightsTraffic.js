@@ -206,11 +206,13 @@ class InsightsTraffic extends React.Component {
     if (!data) {return null;}
 
     return (
-      <div>
-        {this.renderKpiRow(data)}
-        {this.renderChart(data)}
-        {this.renderReferrersAndPaths(data)}
-      </div>
+      <Spin spinning={loading}>
+        <div>
+          {this.renderKpiRow(data)}
+          {this.renderChart(data)}
+          {this.renderReferrersAndPaths(data)}
+        </div>
+      </Spin>
     );
   }
 }

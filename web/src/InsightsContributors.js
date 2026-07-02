@@ -189,10 +189,12 @@ class InsightsContributors extends React.Component {
     if (!data) {return null;}
 
     return (
-      <div>
-        {this.renderTotalChart(data)}
-        {this.renderContributorCards(data)}
-      </div>
+      <Spin spinning={loading}>
+        <div>
+          {this.renderTotalChart(data)}
+          {this.renderContributorCards(data)}
+        </div>
+      </Spin>
     );
   }
 }

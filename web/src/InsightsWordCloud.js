@@ -78,55 +78,57 @@ class InsightsWordCloud extends React.Component {
     const distinctShown = filtered.length;
 
     return (
-      <div>
-        <Row gutter={[16, 16]}>
-          <Col xs={24} sm={8}>
-            <Card size="small">
-              <Statistic
-                title={<span><CloudOutlined /> {i18next.t("store:Distinct words")}</span>}
-                value={distinctTotal}
+      <Spin spinning={loading}>
+        <div>
+          <Row gutter={[16, 16]}>
+            <Col xs={24} sm={8}>
+              <Card size="small">
+                <Statistic
+                  title={<span><CloudOutlined /> {i18next.t("store:Distinct words")}</span>}
+                  value={distinctTotal}
+                />
+              </Card>
+            </Col>
+            <Col xs={24} sm={8}>
+              <Card size="small">
+                <Statistic
+                  title={i18next.t("store:Shown after filter")}
+                  value={distinctShown}
+                />
+              </Card>
+            </Col>
+            <Col xs={24} sm={8}>
+              <Card size="small">
+                <div style={{marginBottom: 4}}>
+                  <Typography.Text type="secondary">
+                    {i18next.t("store:Min frequency")}: {effectiveMinFreq}
+                  </Typography.Text>
+                </div>
+                <Slider
+                  min={1}
+                  max={maxFreq}
+                  value={effectiveMinFreq}
+                  onChange={(v) => this.setState({minFreq: v})}
+                />
+              </Card>
+            </Col>
+          </Row>
+          <Card size="small" style={{marginTop: 16}}>
+            <Typography.Text type="secondary" style={{fontSize: 12}}>
+              {i18next.t("store:Word cloud aggregates all messages in this store; period filter does not apply.")}
+            </Typography.Text>
+            {distinctShown === 0 ? (
+              <Empty style={{marginTop: 16}} description={i18next.t("store:No words match the current filter")} />
+            ) : (
+              <WordCloudChart
+                key={`${distinctShown}-${effectiveMinFreq}`}
+                wordCountMap={filteredMap}
+                height={"calc(100vh - 380px)"}
               />
-            </Card>
-          </Col>
-          <Col xs={24} sm={8}>
-            <Card size="small">
-              <Statistic
-                title={i18next.t("store:Shown after filter")}
-                value={distinctShown}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={8}>
-            <Card size="small">
-              <div style={{marginBottom: 4}}>
-                <Typography.Text type="secondary">
-                  {i18next.t("store:Min frequency")}: {effectiveMinFreq}
-                </Typography.Text>
-              </div>
-              <Slider
-                min={1}
-                max={maxFreq}
-                value={effectiveMinFreq}
-                onChange={(v) => this.setState({minFreq: v})}
-              />
-            </Card>
-          </Col>
-        </Row>
-        <Card size="small" style={{marginTop: 16}}>
-          <Typography.Text type="secondary" style={{fontSize: 12}}>
-            {i18next.t("store:Word cloud aggregates all messages in this store; period filter does not apply.")}
-          </Typography.Text>
-          {distinctShown === 0 ? (
-            <Empty style={{marginTop: 16}} description={i18next.t("store:No words match the current filter")} />
-          ) : (
-            <WordCloudChart
-              key={`${distinctShown}-${effectiveMinFreq}`}
-              wordCountMap={filteredMap}
-              height={"calc(100vh - 380px)"}
-            />
-          )}
-        </Card>
-      </div>
+            )}
+          </Card>
+        </div>
+      </Spin>
     );
   }
 }
