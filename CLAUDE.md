@@ -36,7 +36,7 @@ The backend is a standard [Beego](https://beego.vip/) MVC app. Every entity foll
 
 2. **`controllers/<entity>.go`** — Beego controller methods wired to routes. Standard set: `GetGlobal<Entities>`, `Get<Entities>`, `Get<Entity>`, `Add<Entity>`, `Update<Entity>`, `Delete<Entity>`. Use `c.IsAdmin()` / `c.IsGlobalAdmin()` / `c.RequireSignedIn()` for auth. Paginated list APIs accept `p`, `pageSize`, `field`, `value`, `sortField`, `sortOrder` query params and use `pagination.SetPaginator`.
 
-3. **`routers/router.go`** — `beego.Router` calls grouped by entity, alphabetically within their logical section. New entity routes must be inserted in the correct position (not appended to the end).
+3. **`routers/router.go`** — `beego.Router` calls grouped by entity (all routes for the same entity's CRUD kept together). No alphabetical ordering within a group. New entity routes should be inserted next to their entity's existing routes (not appended to the end of the file).
 
 **DB schema** is auto-migrated via `object/adapter.go` → `createTable()` using `engine.Sync2(new(EntityStruct))`. Add new entities there.
 
