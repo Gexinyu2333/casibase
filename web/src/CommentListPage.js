@@ -20,6 +20,7 @@ import * as Setting from "./Setting";
 import * as CommentBackend from "./backend/CommentBackend";
 import i18next from "i18next";
 import {DeleteOutlined, EditOutlined} from "@ant-design/icons";
+import {truncateCommentText} from "./comment/commentContentUtils";
 
 class CommentListPage extends BaseListPage {
   deleteItem = async(i) => {
@@ -104,11 +105,7 @@ class CommentListPage extends BaseListPage {
         key: "content",
         ...this.getColumnSearchProps("content"),
         render: (text) => {
-          const chars = Array.from(text || "");
-          if (chars.length > 80) {
-            return `${chars.slice(0, 80).join("")}...`;
-          }
-          return text;
+          return truncateCommentText(text, 80);
         },
       },
       {

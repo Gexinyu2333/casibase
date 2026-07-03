@@ -38,7 +38,7 @@ type Comment struct {
 	RootOwner   string `xorm:"varchar(100) index" json:"rootOwner"`
 	RootName    string `xorm:"varchar(100) index" json:"rootName"`
 
-	Content string `xorm:"varchar(1000)" json:"content"`
+	Content string `xorm:"mediumtext" json:"content"`
 
 	Replies []*Comment `xorm:"-" json:"replies,omitempty"`
 }
@@ -125,12 +125,19 @@ func UpdateComment(id string, comment *Comment) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	comment.UpdatedTime = util.GetCurrentTimeWithMilli()
-	_, err = adapter.engine.ID(core.PK{owner, name}).AllCols().Update(comment)
+	return UpdateCommentContent(owner, name, comment.Content)
+}
+
+func UpdateCommentContent(owner string, name string, content string) (bool, error) {
+	comment := Comment{
+		Content:     content,
+		UpdatedTime: util.GetCurrentTimeWithMilli(),
+	}
+	affected, err := adapter.engine.ID(core.PK{owner, name}).Cols("content", "updated_time").Update(&comment)
 	if err != nil {
 		return false, err
 	}
-	return true, nil
+	return affected != 0, nil
 }
 
 func AddComment(comment *Comment) (bool, error) {

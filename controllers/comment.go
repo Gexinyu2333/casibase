@@ -15,24 +15,38 @@
 package controllers
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"net/url"
 	"strings"
 	"unicode/utf8"
 
 	"github.com/beego/beego/utils/pagination"
 	"github.com/the-open-agent/openagent/object"
 	"github.com/the-open-agent/openagent/util"
+	"golang.org/x/net/html"
 )
 
 const (
 	defaultCommentPageSize = 10
 	maxCommentPageSize     = 50
-	maxCommentLength       = 1000
+	maxCommentHtmlLength   = 20000
+)
+
+var (
+	errCommentContentEmpty   = errors.New("Comment content cannot be empty")
+	errCommentContentTooLong = errors.New("Comment content is too long")
 )
 
 type commentTarget struct {
 	Owner string
+}
+
+var allowedCommentTags = map[string]bool{
+	"p": true, "br": true, "strong": true, "b": true, "em": true, "i": true, "u": true, "s": true,
+	"a": true, "ul": true, "ol": true, "li": true, "img": true,
 }
 
 func (c *ApiController) responseCommentError(message string) {
@@ -57,6 +71,150 @@ func getCommentPageSize(value string) int {
 		return maxCommentPageSize
 	}
 	return pageSize
+}
+
+func isSafeCommentURL(value string) bool {
+	value = strings.TrimSpace(value)
+	if value == "" {
+		return false
+	}
+
+	parsedURL, err := url.Parse(value)
+	if err != nil {
+		return false
+	}
+	if parsedURL.Scheme == "" {
+		return !strings.HasPrefix(value, "//")
+	}
+
+	scheme := strings.ToLower(parsedURL.Scheme)
+	return scheme == "http" || scheme == "https"
+}
+
+func renderSanitizedCommentNode(buffer *bytes.Buffer, node *html.Node) bool {
+	if node.Type == html.TextNode {
+		buffer.WriteString(html.EscapeString(node.Data))
+		return strings.TrimSpace(node.Data) != ""
+	}
+
+	if node.Type != html.ElementNode {
+		hasUsefulContent := false
+		for child := node.FirstChild; child != nil; child = child.NextSibling {
+			if renderSanitizedCommentNode(buffer, child) {
+				hasUsefulContent = true
+			}
+		}
+		return hasUsefulContent
+	}
+
+	tag := strings.ToLower(node.Data)
+	if tag == "script" || tag == "style" {
+		return false
+	}
+	if !allowedCommentTags[tag] {
+		hasUsefulContent := false
+		for child := node.FirstChild; child != nil; child = child.NextSibling {
+			if renderSanitizedCommentNode(buffer, child) {
+				hasUsefulContent = true
+			}
+		}
+		return hasUsefulContent
+	}
+
+	hasUsefulContent := false
+	buffer.WriteByte('<')
+	buffer.WriteString(tag)
+	switch tag {
+	case "a":
+		for _, attr := range node.Attr {
+			if strings.ToLower(attr.Key) == "href" && isSafeCommentURL(attr.Val) {
+				buffer.WriteString(` href="`)
+				buffer.WriteString(html.EscapeString(strings.TrimSpace(attr.Val)))
+				buffer.WriteString(`" target="_blank" rel="noopener noreferrer"`)
+				break
+			}
+		}
+	case "img":
+		src := ""
+		alt := "image"
+		title := ""
+		for _, attr := range node.Attr {
+			switch strings.ToLower(attr.Key) {
+			case "src":
+				if isSafeCommentURL(attr.Val) {
+					src = strings.TrimSpace(attr.Val)
+				}
+			case "alt":
+				if strings.TrimSpace(attr.Val) != "" {
+					alt = strings.TrimSpace(attr.Val)
+				}
+			case "title":
+				title = strings.TrimSpace(attr.Val)
+			}
+		}
+		if src == "" {
+			return false
+		}
+		hasUsefulContent = true
+		buffer.WriteString(` src="`)
+		buffer.WriteString(html.EscapeString(src))
+		buffer.WriteString(`" alt="`)
+		buffer.WriteString(html.EscapeString(alt))
+		buffer.WriteByte('"')
+		if title != "" {
+			buffer.WriteString(` title="`)
+			buffer.WriteString(html.EscapeString(title))
+			buffer.WriteByte('"')
+		}
+	}
+	buffer.WriteByte('>')
+
+	if tag != "img" && tag != "br" {
+		for child := node.FirstChild; child != nil; child = child.NextSibling {
+			if renderSanitizedCommentNode(buffer, child) {
+				hasUsefulContent = true
+			}
+		}
+		buffer.WriteString("</")
+		buffer.WriteString(tag)
+		buffer.WriteByte('>')
+	}
+	return hasUsefulContent
+}
+
+func sanitizeCommentContent(content string) (string, bool) {
+	nodes, err := html.ParseFragment(strings.NewReader(content), nil)
+	if err != nil {
+		return "", false
+	}
+
+	var buffer bytes.Buffer
+	hasUsefulContent := false
+	for _, node := range nodes {
+		if renderSanitizedCommentNode(&buffer, node) {
+			hasUsefulContent = true
+		}
+	}
+	return strings.TrimSpace(buffer.String()), hasUsefulContent
+}
+
+func normalizeCommentContent(content string) (string, error) {
+	content = strings.TrimSpace(content)
+	if content == "" {
+		return "", errCommentContentEmpty
+	}
+	if utf8.RuneCountInString(content) > maxCommentHtmlLength {
+		return "", errCommentContentTooLong
+	}
+
+	content, hasUsefulContent := sanitizeCommentContent(content)
+	if !hasUsefulContent {
+		return "", errCommentContentEmpty
+	}
+	if utf8.RuneCountInString(content) > maxCommentHtmlLength {
+		return "", errCommentContentTooLong
+	}
+	return content, nil
 }
 
 func resolveCommentTarget(targetType string, targetKey string) (*commentTarget, error) {
@@ -210,31 +368,50 @@ func (c *ApiController) GetComment() {
 // @Success 200 {object} controllers.Response The Response object
 // @router /update-comment [post]
 func (c *ApiController) UpdateComment() {
-	if !c.IsAdmin() {
-		c.ResponseError(c.T("auth:Unauthorized operation"))
+	username, ok := c.RequireSignedIn()
+	if !ok {
 		return
 	}
 
 	id := c.Input().Get("id")
-
-	var comment object.Comment
-	err := json.Unmarshal(c.Ctx.Input.RequestBody, &comment)
+	owner, name, err := util.GetOwnerAndNameFromIdWithError(id)
 	if err != nil {
 		c.ResponseError(err.Error())
 		return
 	}
 
-	comment.Content = strings.TrimSpace(comment.Content)
-	if comment.Content == "" {
-		c.responseCommentError("Comment content cannot be empty")
+	existingComment, err := object.GetComment(owner, name)
+	if err != nil {
+		c.ResponseError(err.Error())
 		return
 	}
-	if utf8.RuneCountInString(comment.Content) > maxCommentLength {
-		c.ResponseError(fmt.Sprintf(c.T("comment:Comment content cannot be longer than %d characters"), maxCommentLength))
+	if existingComment == nil {
+		c.responseCommentError("Comment does not exist")
+		return
+	}
+	if username != existingComment.Owner && !c.IsAdmin() {
+		c.ResponseError(c.T("auth:Unauthorized operation"))
 		return
 	}
 
-	success, err := object.UpdateComment(id, &comment)
+	var comment object.Comment
+	err = json.Unmarshal(c.Ctx.Input.RequestBody, &comment)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	comment.Content, err = normalizeCommentContent(comment.Content)
+	if err != nil {
+		if errors.Is(err, errCommentContentEmpty) {
+			c.responseCommentError("Comment content cannot be empty")
+		} else {
+			c.ResponseError(fmt.Sprintf(c.T("comment:Comment content cannot be longer than %d characters"), maxCommentHtmlLength))
+		}
+		return
+	}
+
+	success, err := object.UpdateCommentContent(owner, name, comment.Content)
 	if err != nil {
 		c.ResponseError(err.Error())
 		return
@@ -268,13 +445,13 @@ func (c *ApiController) AddComment() {
 	}
 
 	comment.Owner = username
-	comment.Content = strings.TrimSpace(comment.Content)
-	if comment.Content == "" {
-		c.responseCommentError("Comment content cannot be empty")
-		return
-	}
-	if utf8.RuneCountInString(comment.Content) > maxCommentLength {
-		c.ResponseError(fmt.Sprintf(c.T("comment:Comment content cannot be longer than %d characters"), maxCommentLength))
+	comment.Content, err = normalizeCommentContent(comment.Content)
+	if err != nil {
+		if errors.Is(err, errCommentContentEmpty) {
+			c.responseCommentError("Comment content cannot be empty")
+		} else {
+			c.ResponseError(fmt.Sprintf(c.T("comment:Comment content cannot be longer than %d characters"), maxCommentHtmlLength))
+		}
 		return
 	}
 

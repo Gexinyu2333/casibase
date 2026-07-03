@@ -16,10 +16,10 @@ import React from "react";
 import Loading from "./common/Loading";
 import {Button, Card, Col, Input, Row, Space} from "antd";
 import * as CommentBackend from "./backend/CommentBackend";
+import * as ResourceBackend from "./backend/ResourceBackend";
 import * as Setting from "./Setting";
+import CommentRichEditor from "./comment/CommentRichEditor";
 import i18next from "i18next";
-
-const {TextArea} = Input;
 
 class CommentEditPage extends React.Component {
   constructor(props) {
@@ -70,6 +70,12 @@ class CommentEditPage extends React.Component {
         Setting.showMessage("error", `${i18next.t("general:Failed to connect to server")}: ${error}`);
       });
   }
+
+  uploadCommentImage = file => {
+    const {account} = this.props;
+    const {comment} = this.state;
+    return ResourceBackend.uploadResource(account?.name || "", "chat", "comment", comment?.targetKey || comment?.name || "", file);
+  };
 
   renderCommentField(label, control, span = 8) {
     return (
@@ -156,10 +162,12 @@ class CommentEditPage extends React.Component {
           <Row gutter={rowGutter}>
             {this.renderCommentField(
               i18next.t("general:Content"),
-              <TextArea
-                rows={6}
+              <CommentRichEditor
                 value={comment.content}
-                onChange={e => this.updateCommentField("content", e.target.value)}
+                placeholder={i18next.t("store:Write a comment")}
+                submitText={i18next.t("general:Save")}
+                onChange={value => this.updateCommentField("content", value)}
+                uploadImage={this.uploadCommentImage}
               />,
               24
             )}
