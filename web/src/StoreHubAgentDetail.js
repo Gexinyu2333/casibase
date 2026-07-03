@@ -166,6 +166,7 @@ function renderFiles(account, store, onStoreUpdate, onRefresh) {
 
 function renderOverview(account, store, onStoreUpdate, onRefresh) {
   const isExternalStore = Boolean(store.endpoint || store.hubDbName);
+  const areCommentsUnavailable = isExternalStore || store.publishState !== "Published";
 
   return (
     <Row gutter={[16, 16]}>
@@ -178,8 +179,8 @@ function renderOverview(account, store, onStoreUpdate, onRefresh) {
             targetType="agenthub"
             targetKey={`${store.owner}/${store.name}`}
             targetOwner={store.owner}
-            disabled={isExternalStore}
-            unavailableText={i18next.t("store:Comments are unavailable for external agents")}
+            disabled={areCommentsUnavailable}
+            unavailableText={isExternalStore ? i18next.t("store:Comments are unavailable for external agents") : i18next.t("store:Comments are unavailable")}
           />
         </div>
       </Col>
