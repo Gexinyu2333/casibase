@@ -144,6 +144,26 @@ export function getFavoredStores(favoriteType) {
   }).then(res => Setting.handleFetchResponse(res));
 }
 
+export function getStoreFavoriteUsers(storeOwner, storeName, favoriteType, hubDbName = "") {
+  return fetch(`${Setting.ServerUrl}/api/get-store-favorite-users?storeOwner=${encodeURIComponent(storeOwner)}&storeName=${encodeURIComponent(storeName)}&type=${encodeURIComponent(favoriteType)}&hubDbName=${encodeURIComponent(hubDbName)}`, {
+    method: "GET",
+    credentials: "include",
+    headers: {
+      "Accept-Language": Setting.getAcceptLanguage(),
+    },
+  }).then(res => Setting.handleFetchResponse(res));
+}
+
+export function getStoreForks(owner, name, hubDbName = "") {
+  return fetch(`${Setting.ServerUrl}/api/get-store-forks?owner=${encodeURIComponent(owner)}&name=${encodeURIComponent(name)}&hubDbName=${encodeURIComponent(hubDbName)}`, {
+    method: "GET",
+    credentials: "include",
+    headers: {
+      "Accept-Language": Setting.getAcceptLanguage(),
+    },
+  }).then(res => Setting.handleFetchResponse(res));
+}
+
 export function refreshStoreVectors(store) {
   const newStore = Setting.deepCopy(store);
   return fetch(`${Setting.ServerUrl}/api/refresh-store-vectors`, {

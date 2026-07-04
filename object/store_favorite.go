@@ -130,6 +130,17 @@ func GetFavoredStores(user, favoriteType string) ([]*Store, error) {
 	return stores, nil
 }
 
+// GetStoreFavoriteUsers returns the users who starred/watched the given
+// store, most recent first. hubDbName is the source DB of the store (see
+// GetStoreFavoriteCount).
+func GetStoreFavoriteUsers(favoriteType, storeOwner, storeName, hubDbName string) ([]*StoreFavorite, error) {
+	favorites := []*StoreFavorite{}
+	err := withHubEngine(hubDbName, func(engine *xorm.Engine) error {
+		return engine.Where("type = ? and store_owner = ? and store_name = ?", favoriteType, storeOwner, storeName).Desc("created_time").Find(&favorites)
+	})
+	return favorites, err
+}
+
 // FillStoreFavoriteCounts populates StarCount / WatchCount / ForkCount on the
 // given stores using grouped queries (star/watch from store_favorite, fork from
 // the store table's forked_from columns) — avoids N+1 for hub/list rendering.

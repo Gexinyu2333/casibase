@@ -92,6 +92,8 @@ func initAPI() {
 	beego.Router("/api/toggle-store-favorite", &controllers.ApiController{}, "POST:ToggleStoreFavorite")
 	beego.Router("/api/get-favored-stores", &controllers.ApiController{}, "GET:GetFavoredStores")
 	beego.Router("/api/get-store-favorite-status", &controllers.ApiController{}, "GET:GetStoreFavoriteStatus")
+	beego.Router("/api/get-store-favorite-users", &controllers.ApiController{}, "GET:GetStoreFavoriteUsers")
+	beego.Router("/api/get-store-forks", &controllers.ApiController{}, "GET:GetStoreForks")
 
 	beego.Router("/api/get-global-providers", &controllers.ApiController{}, "GET:GetGlobalProviders")
 	beego.Router("/api/get-providers", &controllers.ApiController{}, "GET:GetProviders")

@@ -21,7 +21,7 @@ import {getChatUrl} from "./StoreHubDrawer";
 import StoreHubAgentDetail from "./StoreHubAgentDetail";
 
 const VALID_TABS = new Set(["overview", "files", "issues", "insights"]);
-const VALID_INSIGHTS_SUBS = new Set(["pulse", "contributors", "traffic", "wordcloud", "cost"]);
+const VALID_INSIGHTS_SUBS = new Set(["pulse", "contributors", "traffic", "wordcloud", "cost", "stargazers", "watchers", "forks"]);
 
 function resolveActiveTab(match) {
   const {tab, sub, issueName} = match.params;

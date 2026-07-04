@@ -101,6 +101,39 @@ func (c *ApiController) GetFavoredStores() {
 	c.ResponseOk(object.GetMaskedStores(stores, c.GetSessionUser()))
 }
 
+// GetStoreFavoriteUsers returns the users who starred/watched a store.
+// @router /get-store-favorite-users [get]
+func (c *ApiController) GetStoreFavoriteUsers() {
+	storeOwner := c.Input().Get("storeOwner")
+	storeName := c.Input().Get("storeName")
+	favoriteType := c.Input().Get("type")
+	hubDbName := c.Input().Get("hubDbName")
+	if storeOwner == "" || storeName == "" {
+		c.ResponseError("storeOwner and storeName are required")
+		return
+	}
+	if !object.IsValidFavoriteType(favoriteType) {
+		c.ResponseError("invalid favorite type")
+		return
+	}
+
+	favorites, err := object.GetStoreFavoriteUsers(favoriteType, storeOwner, storeName, hubDbName)
+	if err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
+
+	result := make([]map[string]interface{}, 0, len(favorites))
+	for _, favorite := range favorites {
+		result = append(result, map[string]interface{}{
+			"user":        favorite.Owner,
+			"createdTime": favorite.CreatedTime,
+		})
+	}
+
+	c.ResponseOk(result)
+}
+
 // GetStoreFavoriteStatus returns star/watch counts (public) and, for a signed-in
 // user, whether they starred/watched the store and whether they already forked it.
 // @router /get-store-favorite-status [get]

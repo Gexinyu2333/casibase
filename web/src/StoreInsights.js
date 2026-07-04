@@ -14,13 +14,15 @@
 
 import React from "react";
 import {Button, Layout, Menu, Segmented, Space, Tooltip, Typography} from "antd";
-import {CloudOutlined, DollarOutlined, EnvironmentOutlined, ReloadOutlined, TeamOutlined, ThunderboltOutlined} from "@ant-design/icons";
+import {CloudOutlined, DollarOutlined, EnvironmentOutlined, EyeOutlined, ForkOutlined, ReloadOutlined, StarOutlined, TeamOutlined, ThunderboltOutlined} from "@ant-design/icons";
 import i18next from "i18next";
 import InsightsPulse from "./InsightsPulse";
 import InsightsContributors from "./InsightsContributors";
 import InsightsTraffic from "./InsightsTraffic";
 import InsightsWordCloud from "./InsightsWordCloud";
 import InsightsCost from "./InsightsCost";
+import {InsightsStargazers, InsightsWatchers} from "./InsightsFavoriteUsers";
+import InsightsForks from "./InsightsForks";
 
 const {Sider, Content} = Layout;
 const {Text} = Typography;
@@ -40,6 +42,9 @@ function getSubTabs() {
     {key: "traffic", icon: <EnvironmentOutlined />, label: i18next.t("store:Traffic")},
     {key: "wordcloud", icon: <CloudOutlined />, label: i18next.t("store:Word Cloud")},
     {key: "cost", icon: <DollarOutlined />, label: i18next.t("store:Cost")},
+    {key: "stargazers", icon: <StarOutlined />, label: i18next.t("store:Stargazers")},
+    {key: "watchers", icon: <EyeOutlined />, label: i18next.t("store:Watchers")},
+    {key: "forks", icon: <ForkOutlined />, label: i18next.t("store:Forks")},
   ];
 }
 
@@ -98,6 +103,9 @@ class StoreInsights extends React.Component {
     case "traffic": return <InsightsTraffic {...common} />;
     case "wordcloud": return <InsightsWordCloud {...common} />;
     case "cost": return <InsightsCost {...common} />;
+    case "stargazers": return <InsightsStargazers {...common} />;
+    case "watchers": return <InsightsWatchers {...common} />;
+    case "forks": return <InsightsForks {...common} />;
     default: return null;
     }
   }

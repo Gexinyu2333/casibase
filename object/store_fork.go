@@ -19,6 +19,7 @@ import (
 	"fmt"
 
 	"github.com/the-open-agent/openagent/util"
+	"xorm.io/xorm"
 )
 
 func pickForkStoreName(owner, base string) (string, error) {
@@ -98,6 +99,16 @@ func HasUserForkedStore(targetOwner, srcOwner, srcName string) (bool, error) {
 		return false, err
 	}
 	return count > 0, nil
+}
+
+// GetStoreForks returns the stores forked from the given store, most recent
+// first. hubDbName is the source DB of the store (see GetStoreForkCount).
+func GetStoreForks(owner, name, hubDbName string) ([]*Store, error) {
+	stores := []*Store{}
+	err := withHubEngine(hubDbName, func(engine *xorm.Engine) error {
+		return engine.Where("forked_from_owner = ? and forked_from_name = ?", owner, name).Desc("created_time").Find(&stores)
+	})
+	return stores, err
 }
 
 // ForkStore duplicates only the store configuration for targetOwner and records the source store.
