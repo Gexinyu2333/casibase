@@ -443,8 +443,8 @@ class StoreHubPage extends React.Component {
 
     return (
       <div style={{padding: "24px 32px", minHeight: "100vh", background: "var(--ant-color-bg-layout)"}}>
-        <div style={{marginBottom: 24}}>
-          <h2 style={{fontWeight: 700, fontSize: 24, marginBottom: 4}}>{i18next.t("general:Hub")}</h2>
+        <div style={{marginBottom: 24, display: "flex", alignItems: "baseline", gap: 12, flexWrap: "wrap"}}>
+          <h2 style={{fontWeight: 700, fontSize: 24, margin: 0}}>{i18next.t("general:Hub")}</h2>
           <p style={{color: "var(--ant-color-text-secondary)", margin: 0}}>
             {this.props.site?.hubDesc || i18next.t("general:Hub desc")}
           </p>

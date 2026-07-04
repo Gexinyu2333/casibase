@@ -137,9 +137,9 @@ function renderAbout(store, account) {
     [i18next.t("store:Topic"), store.topic],
   ].filter(([, value]) => value);
   const stats = [
-    [i18next.t("store:Chat count"), store.chatCount],
+    [i18next.t("general:Chats"), store.chatCount],
     [i18next.t("general:Messages"), store.messageCount],
-    [i18next.t("store:Vector count"), store.vectorCount],
+    [i18next.t("general:Vectors"), store.vectorCount],
   ].filter(([, value]) => value !== undefined && value !== null);
 
   return (
