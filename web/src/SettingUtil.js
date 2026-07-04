@@ -525,3 +525,8 @@ export function getFormattedSize(bytes) {
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return Math.round(bytes / Math.pow(k, i) * 100) / 100 + " " + sizes[i];
 }
+
+export const GradeOptions = [
+  "一年级", "二年级", "三年级", "四年级", "五年级", "六年级", "七年级", "八年级", "九年级",
+  "高一", "高二", "高三",
+];

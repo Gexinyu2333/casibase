@@ -512,9 +512,13 @@ class StoreEditPage extends React.Component {
             )}
             {this.renderStoreField(
               Setting.getLabel(i18next.t("store:Grade"), i18next.t("store:Grade - Tooltip")),
-              <Input value={store.grade} onChange={e => {
-                this.updateStoreField("grade", e.target.value);
-              }} />,
+              <Select style={{width: "100%"}} allowClear value={store.grade || undefined} onChange={value => {
+                this.updateStoreField("grade", value);
+              }}>
+                {Setting.GradeOptions.map(grade => (
+                  <Option key={grade} value={grade}>{grade}</Option>
+                ))}
+              </Select>,
               8
             )}
             {this.renderStoreField(
