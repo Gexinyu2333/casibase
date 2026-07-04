@@ -317,7 +317,7 @@ class InsightsSecurity extends React.Component {
     return (
       <Card
         size="small"
-        title={<span><SafetyCertificateOutlined /> {i18next.t("store:Configuration checks")}</span>}
+        title={<span><SafetyCertificateOutlined /> {i18next.t("store:Data compliance check")}</span>}
         style={{marginTop: 16}}
         styles={{body: {padding: "4px 16px"}}}
       >
