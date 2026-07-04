@@ -276,7 +276,7 @@ function StoreHubAgentDetail({account, store, activeTab, activeSub, canManage, o
   }
 
   return (
-    <div style={{padding: "24px 32px", maxWidth: 1280, margin: "0 auto"}}>
+    <div style={{padding: "24px 32px", maxWidth: 1400, margin: "0 auto"}}>
       {renderHeader(store, account, onStartChat, onFork, forking, favoriteStatus, starLoading, watchLoading, onToggleFavorite)}
       <Tabs
         activeKey={activeTab}
