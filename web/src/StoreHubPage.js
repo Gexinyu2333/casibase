@@ -318,7 +318,7 @@ class StoreHubPage extends React.Component {
             borderColor: "var(--ant-color-border)",
           }}
           bodyStyle={{padding: "20px"}}
-          onClick={() => this.openDrawer(store)}
+          onClick={() => this.handleViewAgent(store)}
         >
           <div style={{display: "flex", alignItems: "flex-start", gap: 12, marginBottom: 12}}>
             {store.avatar ? (
@@ -408,14 +408,14 @@ class StoreHubPage extends React.Component {
             </Tooltip>
           </div>
           <div style={{display: "flex", alignItems: "center", justifyContent: "space-between"}}>
-            <div style={{display: "flex", alignItems: "center", gap: 4, color: "var(--ant-color-primary)", fontSize: 13}}>
+            <div
+              style={{display: "flex", alignItems: "center", gap: 4, color: "var(--ant-color-primary)", fontSize: 13, cursor: "pointer"}}
+              onClick={(e) => {e.stopPropagation(); this.openDrawer(store);}}
+            >
               <InfoCircleOutlined />
               <span>{i18next.t("store:View Details")}</span>
             </div>
-            <div
-              style={{display: "flex", alignItems: "center", gap: 4, color: "var(--ant-color-text-secondary)", fontSize: 13, cursor: "pointer"}}
-              onClick={(e) => {e.stopPropagation(); this.handleViewAgent(store);}}
-            >
+            <div style={{display: "flex", alignItems: "center", gap: 4, color: "var(--ant-color-text-secondary)", fontSize: 13}}>
               <RobotOutlined />
               <span>{i18next.t("store:Enter Agent")}</span>
             </div>
