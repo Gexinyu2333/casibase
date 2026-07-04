@@ -19,7 +19,7 @@ import {CloseOutlined, GlobalOutlined} from "@ant-design/icons";
 import ChatFileInput from "./ChatFileInput";
 import UploadFileArea from "./UploadFileArea";
 import ChatInputMenu from "./ChatInputMenu";
-import {getClipboardFiles, isClipboardImageFile} from "./clipboardFiles";
+import {ChatInputAcceptedFileTypes, getClipboardFiles, isSupportedClipboardFile} from "./clipboardFiles";
 import * as Setting from "../Setting";
 import i18next from "i18next";
 
@@ -104,7 +104,7 @@ const ChatInput = React.forwardRef(({
   function handleFileUploadClick() {
     const input = document.createElement("input");
     input.type = "file";
-    input.accept = "image/*, .txt, .md, .yaml, .csv, .docx, .pdf, .xlsx, .pptx";
+    input.accept = ChatInputAcceptedFileTypes;
     input.multiple = false;
     input.style.display = "none";
 
@@ -130,8 +130,8 @@ const ChatInput = React.forwardRef(({
   }
 
   async function handlePaste(event) {
-    const imageFiles = getClipboardFiles(event, isClipboardImageFile);
-    if (imageFiles.length === 0) {
+    const pastedFiles = getClipboardFiles(event, isSupportedClipboardFile);
+    if (pastedFiles.length === 0) {
       return;
     }
 
@@ -141,7 +141,7 @@ const ChatInput = React.forwardRef(({
       return;
     }
 
-    for (const file of imageFiles) {
+    for (const file of pastedFiles) {
       await handleInputChange(file);
     }
   }

@@ -12,14 +12,56 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+export const ChatInputAcceptedFileTypes = "image/*, .txt, .md, .yaml, .csv, .docx, .pdf, .xlsx, .pptx";
+
+const supportedFileExtensions = new Set([
+  "txt",
+  "md",
+  "yaml",
+  "csv",
+  "docx",
+  "pdf",
+  "xlsx",
+  "pptx",
+]);
+
+const supportedFileTypes = new Set([
+  "text/plain",
+  "text/markdown",
+  "text/yaml",
+  "text/csv",
+  "application/pdf",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+]);
+
 export function getClipboardFiles(event, acceptFile) {
-  const items = Array.from(event.clipboardData?.items || []);
-  return items
+  const clipboardData = event.clipboardData;
+  const itemFiles = Array.from(clipboardData?.items || [])
     .filter(item => item.kind === "file")
-    .map(item => item.getAsFile())
-    .filter(file => file && acceptFile(file));
+    .map(item => item.getAsFile());
+  const dataTransferFiles = Array.from(clipboardData?.files || []);
+  const fileMap = new Map();
+
+  [...itemFiles, ...dataTransferFiles]
+    .filter(file => file && acceptFile(file))
+    .forEach(file => {
+      fileMap.set(`${file.name}:${file.type}:${file.size}:${file.lastModified}`, file);
+    });
+
+  return Array.from(fileMap.values());
 }
 
-export function isClipboardImageFile(file) {
-  return (file.type || "").startsWith("image/");
+export function isSupportedClipboardFile(file) {
+  const fileType = (file.type || "").toLowerCase();
+  if (fileType.startsWith("image/")) {
+    return true;
+  }
+  if (supportedFileTypes.has(fileType)) {
+    return true;
+  }
+
+  const extension = file.name?.split(".").pop()?.toLowerCase();
+  return supportedFileExtensions.has(extension);
 }
