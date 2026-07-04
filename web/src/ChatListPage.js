@@ -18,10 +18,10 @@ import {Button, Popconfirm, Space, Switch, Table, Tag, Tooltip} from "antd";
 import moment from "moment";
 import BaseListPage from "./BaseListPage";
 import * as Setting from "./Setting";
+import UserLabel from "./common/UserLabel";
 import * as ChatBackend from "./backend/ChatBackend";
 import * as ProviderBackend from "./backend/ProviderBackend";
 import i18next from "i18next";
-import * as Conf from "./Conf";
 import * as MessageBackend from "./backend/MessageBackend";
 import ChatBox from "./ChatBox";
 import {renderText} from "./ChatMessageRender";
@@ -377,17 +377,7 @@ class ChatListPage extends BaseListPage {
         width: "90px",
         sorter: (a, b) => a.user.localeCompare(b.user),
         ...this.getColumnSearchProps("user"),
-        render: (text, record, index) => {
-          if (text.startsWith("u-")) {
-            return text;
-          }
-
-          return (
-            <a target="_blank" rel="noreferrer" href={Setting.getMyProfileUrl(this.props.account).replace("/account", `/users/${Conf.AuthConfig.organizationName}/${text}`)}>
-              {text}
-            </a>
-          );
-        },
+        render: (text) => <UserLabel user={text} account={this.props.account} size={22} />,
       },
       {
         title: i18next.t("general:Model"),

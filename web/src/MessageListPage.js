@@ -18,11 +18,11 @@ import {Button, Popconfirm, Popover, Switch, Table, Tag, Tooltip} from "antd";
 import BaseListPage from "./BaseListPage";
 import {ThemeDefault} from "./Conf";
 import * as Setting from "./Setting";
+import UserLabel from "./common/UserLabel";
 import * as MessageBackend from "./backend/MessageBackend";
 import * as ProviderBackend from "./backend/ProviderBackend";
 import moment from "moment";
 import i18next from "i18next";
-import * as Conf from "./Conf";
 import {DeleteOutlined, EditOutlined, EyeOutlined} from "@ant-design/icons";
 import VectorTooltip from "./VectorTooltip";
 
@@ -309,17 +309,7 @@ class MessageListPage extends BaseListPage {
         width: "90px",
         sorter: (a, b) => a.user.localeCompare(b.user),
         ...this.getColumnSearchProps("user"),
-        render: (text, record, index) => {
-          if (text.startsWith("u-")) {
-            return text;
-          }
-
-          return (
-            <a target="_blank" rel="noreferrer" href={Setting.getMyProfileUrl(this.props.account).replace("/account", `/users/${Conf.AuthConfig.organizationName}/${text}`)}>
-              {text}
-            </a>
-          );
-        },
+        render: (text) => <UserLabel user={text} account={this.props.account} size={22} />,
       },
       {
         title: i18next.t("general:Chat"),
@@ -362,26 +352,7 @@ class MessageListPage extends BaseListPage {
         width: "90px",
         sorter: (a, b) => a.author.localeCompare(b.author),
         ...this.getColumnSearchProps("author"),
-        render: (text, record, index) => {
-          if (text === "AI") {
-            return text;
-          }
-
-          if (text.startsWith("u-")) {
-            return text;
-          }
-
-          let userId = text;
-          if (!userId.includes("/")) {
-            userId = `${record.organization}/${userId}`;
-          }
-
-          return (
-            <a target="_blank" rel="noreferrer" href={Setting.getMyProfileUrl(this.props.account).replace("/account", `/users/${userId}`)}>
-              {text}
-            </a>
-          );
-        },
+        render: (text) => <UserLabel user={text} account={this.props.account} size={22} />,
       },
       {
         title: i18next.t("general:Model"),

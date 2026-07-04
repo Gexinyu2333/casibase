@@ -21,6 +21,15 @@ import * as Setting from "../Setting";
 
 const {Text} = Typography;
 
+// A username maps to a real, resolvable Casdoor profile unless it is the
+// anonymous "u-" runtime id or the "AI" sentinel author. Non-real names are
+// rendered as plain text — no avatar, hover card, or profile link — and never
+// trigger a backend lookup. Keeping this check here means callers can drop in
+// UserLabel with a bare username and not repeat these guards at every site.
+export function isRealUser(user) {
+  return !!user && !user.startsWith("u-") && user !== "AI";
+}
+
 // UserLabel renders a user's real Casdoor display name + avatar with a GitHub-style
 // hover card. Hovering pops a small profile card; clicking the name/avatar (or the
 // "View profile" button in the card) opens that user's Casdoor profile page.
@@ -40,8 +49,8 @@ class UserLabel extends React.Component {
 
   componentDidMount() {
     this._isMounted = true;
-    // Resolve only what the caller did not already supply.
-    if (this.props.user && (!this.props.displayName || this.props.avatar === undefined)) {
+    // Resolve only what the caller did not already supply, and only for real users.
+    if (isRealUser(this.props.user) && (!this.props.displayName || this.props.avatar === undefined)) {
       UserBackend.getUserInfo(this.props.user).then((info) => {
         if (this._isMounted && info) {
           this.setState((prev) => ({
@@ -126,6 +135,10 @@ class UserLabel extends React.Component {
     const {user, size = "small", showAvatar = true, showName = true, avatarOnly = false, strong = false, nameStyle = {}, children} = this.props;
     if (!user) {
       return children || null;
+    }
+    // Anonymous ("u-") or the "AI" sentinel: render the raw name as plain text.
+    if (!isRealUser(user)) {
+      return user;
     }
 
     const name = this.getDisplayName();
