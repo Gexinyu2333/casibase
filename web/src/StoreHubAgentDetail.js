@@ -215,7 +215,7 @@ function renderOverview(account, store, onStoreUpdate, onRefresh) {
 
   return (
     <Row gutter={[16, 16]}>
-      <Col xs={24} lg={16}>
+      <Col xs={24} lg={18}>
         <div style={{display: "grid", gap: 16}}>
           {renderFiles(account, store, onStoreUpdate, onRefresh)}
           {renderReadme(store)}
@@ -229,7 +229,7 @@ function renderOverview(account, store, onStoreUpdate, onRefresh) {
           />
         </div>
       </Col>
-      <Col xs={24} lg={8}>
+      <Col xs={24} lg={6}>
         {renderAbout(store, account)}
       </Col>
     </Row>
