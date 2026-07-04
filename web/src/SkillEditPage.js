@@ -121,7 +121,7 @@ class SkillEditPage extends React.Component {
               8
             )}
             {this.renderSkillField(
-              Setting.getLabel(i18next.t("skill:Emoji"), i18next.t("skill:Emoji - Tooltip")),
+              Setting.getLabel(i18next.t("general:Emoji"), i18next.t("general:Emoji - Tooltip")),
               <Input
                 value={skill.emoji}
                 onChange={e => this.updateSkillField("emoji", e.target.value)}

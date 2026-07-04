@@ -187,11 +187,11 @@ function CommentRichEditor({
                 />
               }
             >
-              <Tooltip title={i18next.t("comment:Emoji")}>
+              <Tooltip title={i18next.t("general:Emoji")}>
                 <Button type="text" size="small" icon={<SmileOutlined />} onMouseDown={e => e.preventDefault()} />
               </Tooltip>
             </Popover>
-            <Tooltip title={i18next.t("comment:Image")}>
+            <Tooltip title={i18next.t("general:Image")}>
               <Button type="text" size="small" icon={<PictureOutlined />} loading={uploading} onClick={() => fileInputRef.current?.click()} />
             </Tooltip>
             <input
