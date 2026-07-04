@@ -35,16 +35,15 @@ class InsightsWordCloud extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    // Word cloud is not period-scoped; only refresh explicitly re-fetches.
-    if (prevProps.refreshTick !== this.props.refreshTick) {
+    if (prevProps.period !== this.props.period || prevProps.refreshTick !== this.props.refreshTick) {
       this.fetch();
     }
   }
 
   fetch() {
-    const {storeName, onLoaded} = this.props;
+    const {storeName, period, onLoaded} = this.props;
     this.setState({loading: true, error: null});
-    AnalysisBackend.getStoreWordCloud(storeName)
+    AnalysisBackend.getStoreWordCloud(storeName, period)
       .then((res) => {
         if (res.status === "ok") {
           this.setState({loading: false, wordMap: res.data || {}});
@@ -114,9 +113,6 @@ class InsightsWordCloud extends React.Component {
             </Col>
           </Row>
           <Card size="small" style={{marginTop: 16}}>
-            <Typography.Text type="secondary" style={{fontSize: 12}}>
-              {i18next.t("store:Word cloud aggregates all messages in this store; period filter does not apply.")}
-            </Typography.Text>
             {distinctShown === 0 ? (
               <Empty style={{marginTop: 16}} description={i18next.t("store:No words match the current filter")} />
             ) : (

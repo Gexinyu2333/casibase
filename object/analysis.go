@@ -17,7 +17,10 @@ package object
 import (
 	"regexp"
 	"strings"
+	"time"
 	"unicode"
+
+	"github.com/the-open-agent/openagent/util"
 )
 
 var chineseStopWords = map[string]bool{
@@ -47,11 +50,35 @@ var englishStopWords = map[string]bool{
 
 var nonWordRe = regexp.MustCompile(`[^\p{L}\p{N}]+`)
 
-// GetStoreWordCloud returns word frequency map for all user messages in a store.
-func GetStoreWordCloud(storeName string) (map[string]int, error) {
-	messages, err := GetGlobalMessagesByStoreName(storeName)
-	if err != nil {
-		return nil, err
+// GetStoreWordCloud returns word frequency map for user messages in a store.
+// If period is "24h", "7d" or "30d", only messages within that window are counted;
+// an empty period keeps the original all-time behavior.
+func GetStoreWordCloud(storeName string, period string) (map[string]int, error) {
+	var messages []*Message
+	if period == "" {
+		var err error
+		messages, err = GetGlobalMessagesByStoreName(storeName)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		spec, err := resolvePeriod(period)
+		if err != nil {
+			return nil, err
+		}
+		now := time.Now()
+		end := now.Truncate(spec.bucketUnit).Add(spec.bucketUnit)
+		start := end.Add(-spec.duration)
+		startStr := util.FormatTimeForCompare(start)
+		endStr := util.FormatTimeForCompare(end)
+
+		messages = []*Message{}
+		if err = adapter.engine.
+			Cols("author", "text").
+			Where("store = ? and created_time >= ? and created_time < ?", storeName, startStr, endStr).
+			Find(&messages); err != nil {
+			return nil, err
+		}
 	}
 
 	wordCount := map[string]int{}

@@ -24,6 +24,7 @@ import (
 // @Title GetStoreWordCloud
 // @Tag Analysis API
 // @Description get word cloud data for a store based on its chat messages
+// @Param   period      query   string  false "time window: 24h | 7d | 30d; omit for all-time"
 // @Success 200 {object} map[string]int The Response object
 // @router /get-store-word-cloud [get]
 func (c *ApiController) GetStoreWordCloud() {
@@ -32,13 +33,14 @@ func (c *ApiController) GetStoreWordCloud() {
 		c.ResponseError("storeName is required")
 		return
 	}
+	period := c.Input().Get("period")
 
 	_, ok := c.RequireSignedIn()
 	if !ok {
 		return
 	}
 
-	wordCount, err := object.GetStoreWordCloud(storeName)
+	wordCount, err := object.GetStoreWordCloud(storeName, period)
 	if err != nil {
 		c.ResponseError(err.Error())
 		return

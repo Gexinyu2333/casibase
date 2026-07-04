@@ -14,8 +14,9 @@
 
 import * as Setting from "../Setting";
 
-export function getStoreWordCloud(storeName) {
-  return fetch(`${Setting.ServerUrl}/api/get-store-word-cloud?storeName=${encodeURIComponent(storeName)}`, {
+export function getStoreWordCloud(storeName, period) {
+  const extra = period ? `&period=${encodeURIComponent(period)}` : "";
+  return fetch(`${Setting.ServerUrl}/api/get-store-word-cloud?storeName=${encodeURIComponent(storeName)}${extra}`, {
     method: "GET",
     credentials: "include",
     headers: {
