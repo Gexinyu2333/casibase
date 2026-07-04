@@ -57,20 +57,11 @@
     "transaction failed to be mined: %v": "交易挖矿失败：%v",
     "transaction failed with status: %d, reason: %s": "交易失败，状态码：%d，原因：%s"
   },
-  "chat": {
-    "Generating answer with %s": "正在使用 %s 生成回答",
-    "Preparing": "准备中",
-    "Searching knowledge base": "正在搜索知识库"
-  },
   "comment": {
-    "Comment content cannot be empty": "评论内容不能为空",
-    "Comment content cannot be longer than %d characters": "评论内容不能超过%d个字符",
-    "Comment does not exist": "评论不存在",
-    "Comment target does not exist": "评论目标不存在",
-    "Parent comment does not exist": "被回复的评论不存在",
-    "Unsupported comment target type": "不支持的评论目标类型"
+    "Comment content cannot be longer than %d characters": "评论内容不能超过%d个字符"
   },
   "controllers": {
+    "API chat logs are read-only": "API chat logs are read-only",
     "No permission": "无权限",
     "No records to add": "没有要添加的记录",
     "No sessions to delete": "没有要删除的会话",
@@ -109,9 +100,6 @@
   },
   "issue": {
     "Issue content cannot be longer than %d characters": "问题内容不能超过 %d 个字符",
-    "Issue does not exist": "问题不存在",
-    "Issue store does not exist": "该智能体不存在",
-    "Issue title cannot be empty": "问题标题不能为空",
     "Issue title cannot be longer than %d characters": "问题标题不能超过 %d 个字符"
   },
   "model": {
@@ -138,15 +126,16 @@
     "Casdoor application: [%s] doesn't exist": "Casdoor应用：[%s] 不存在",
     "Casdoor organization: [%s] doesn't exist": "Casdoor组织：[%s] 不存在",
     "MCP test JSON must include non-empty \"tool\"": "MCP测试JSON必须包含非空的\"tool\"字段",
+    "No store found for user: %s, please create a store first": "No store found for user: %s, please create a store first",
     "Please add a model provider first": "请先添加模型提供商",
     "Please add an embedding provider first": "要使用此功能，请先在设置中配置嵌入模型",
     "Question message: [%s] doesn't exist": "问题消息：[%s] 不存在",
-    "SendErrorEmail() error, the receiver user: ": "SendErrorEmail()错误，接收方用户：",
+    "SendErrorEmail() error, the receiver user: ": "SendErrorEmail() error, the receiver user: ",
     "Server URL is empty": "服务器URL为空",
     "The MCP server: %s is not found": "未找到MCP服务器：%s",
     "The chat: %s is not found": "聊天：%s 未找到",
     "The embedding provider for store: %s is not found": "存储 %s 的嵌入提供商未找到",
-    "The embedding provider: %s is expected to be ": "嵌入提供商：%s 应为",
+    "The embedding provider: %s is expected to be ": "The embedding provider: %s is expected to be ",
     "The embedding provider: %s is not found": "嵌入提供商：%s 未找到",
     "The embedding provider: %s's client secret should not be empty": "嵌入提供商：%s 的客户端密钥不能为空",
     "The file URL for: %s is empty": "文件 %s 的 URL 为空",
@@ -154,7 +143,7 @@
     "The image provider for store: %s should not be empty": "存储 %s 的图像提供商不能为空",
     "The message: %s is not found": "消息：%s 未找到",
     "The model provider for store: %s is not found": "存储 %s 的模型提供商未找到",
-    "The model provider: %s is expected to be ": "模型提供商：%s 应为",
+    "The model provider: %s is expected to be ": "The model provider: %s is expected to be ",
     "The model provider: %s is not found": "模型提供商：%s 未找到",
     "The model provider: %s's client secret should not be empty": "模型提供商：%s 的客户端密钥不能为空",
     "The provider is not found": "提供商未找到",
@@ -162,12 +151,14 @@
     "The provider: %s is not found": "提供商：%s 未找到",
     "The store's embedding provider: [%s] should equal to vector's embedding provider: [%s], vector = %v": "存储的嵌入提供商：[%s] 应与向量的嵌入提供商：[%s] 一致，向量 = %v",
     "The text-to-speech provider for store: %s is not found": "存储 %s 的文本转语音提供商未找到",
+    "empty caption returned by vision model for image: %s": "empty caption returned by vision model for image: %s",
     "empty provider key": "提供商密钥为空",
     "failed to get record with id '%s': %w": "获取 ID 为 '%s' 的记录失败：%w",
     "failed to parse record identifier '%s': neither a valid owner/[id|name] format": "解析记录标识符 '%s' 失败：不是有效的 owner/[id|name] 格式",
     "failed to parse record: name %s, field %s, error: %v": "解析记录失败：名称 %s，字段 %s，错误：%v",
     "failed to update error text for record %s: %s": "更新记录 %s 的错误文本失败：%s",
     "getExtFromMimeType() error: unknown MimeType: %s": "getExtFromMimeType() 错误：未知的 MimeType：%s",
+    "image caption requires a model provider; configure a vision-capable ModelProvider on the store": "image caption requires a model provider; configure a vision-capable ModelProvider on the store",
     "invalid MCP test JSON: %v": "无效的MCP测试JSON：%v",
     "invalid range type: %s": "无效的范围类型：%s",
     "invalid tool test JSON in testContent: %v": "testContent中的工具测试JSON无效：%v",
@@ -185,17 +176,17 @@
     "the record: %s has already been committed, blockId = %s": "记录：%s 已提交，blockId = %s",
     "the record: %s's block ID should not be empty": "记录：%s 的区块 ID 不能为空",
     "the storage provider type: %s is not supported": "不支持的存储提供商类型：%s",
+    "the video provider type: %s is not supported": "the video provider type: %s is not supported",
     "there is no active blockchain provider": "没有活跃的区块链提供商",
-    "tool test JSON must include non-empty \"tool\"": "工具测试JSON必须包含非空的\"tool\"字段"
+    "tool test JSON must include non-empty \"tool\"": "工具测试JSON必须包含非空的\"tool\"字段",
+    "unsupported image type for: %s": "unsupported image type for: %s"
   },
   "openai": {
-    "Invalid API key format. Expected 'Bearer API_KEY'": "API密钥格式无效。应为 'Bearer API_KEY'",
-    "No user message found in the request": "请求中未找到用户消息"
+    "Invalid API key format. Expected 'Bearer API_KEY'": "API密钥格式无效。应为 'Bearer API_KEY'"
   },
   "resource": {
     "Invalid file data format": "无效的文件数据格式",
-    "Only docx and pdf files are allowed": "仅允许 docx 和 pdf 文件",
-    "Unsupported legacy file format %s, please convert to a modern format (e.g. .docx, .pptx, .xlsx) before uploading": "不支持旧版文件格式 %s，请将其转换为新版格式（如 .docx、.pptx、.xlsx）后再上传"
+    "Only docx and pdf files are allowed": "仅允许 docx 和 pdf 文件"
   },
   "storage": {
     "storage provider name: [%s] doesn't exist": "存储提供商名称：[%s] 不存在"
@@ -203,11 +194,7 @@
   "store": {
     "Cannot delete the default store": "无法删除默认存储库",
     "Only the super admin can publish an agent directly. Please set the publish state to Pending Review instead": "只有超级管理员才能直接将状态设置为已发布，请改为设置成待审核状态",
-    "Please set a custom display name for this agent (the default \"New Store\" name is not allowed)": "请为该智能体设置一个自定义的显示名称（不允许使用默认的\"New Store\"名称）",
-    "Please upload a custom avatar for this agent (the default avatar is not allowed)": "请为该智能体上传一个自定义头像（不允许使用默认头像）",
     "The agent does not exist": "智能体不存在",
-    "This agent needs at least 100 vectors before it can be submitted for review": "该智能体至少需要100条向量数据才能提交审核",
-    "This agent needs at least 200 messages before it can be submitted for review": "该智能体至少需要200条消息记录才能提交审核",
     "You can only set the publish state to Private or Pending Review": "您只能将状态设置为私有或待审核",
     "You cannot fork your own agent": "无法复刻自己的智能体",
     "You have already forked this agent": "你已经复刻过这个智能体了",
@@ -236,5 +223,8 @@
     "GetTextFromMarkitdown() error, markitdown does not exist": "GetTextFromMarkitdown() 错误，markitdown 不存在",
     "GetTextFromMarkitdown() error, markitdown failed to run: %v: %s": "GetTextFromMarkitdown() 错误，markitdown 运行失败：%v：%s",
     "unsupported file type: %s": "不支持的文件类型：%s"
+  },
+  "video": {
+    "The prompt should not be empty": "The prompt should not be empty"
   }
 }

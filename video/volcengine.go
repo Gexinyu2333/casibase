@@ -194,7 +194,7 @@ func (p *VolcengineProvider) calculatePrice(result *GenerationResult, lang strin
 		outputPrice := getPrice(result.ResponseTokenCount, priceItem[1])
 		price = inputPrice + outputPrice
 	} else {
-		return fmt.Errorf(i18n.Translate(lang, "video:calculatePrice() error: unknown model type: %s"), subType)
+		return fmt.Errorf(i18n.Translate(lang, "embedding:calculatePrice() error: unknown model type: %s"), subType)
 	}
 
 	result.Price = price

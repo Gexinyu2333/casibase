@@ -57,20 +57,11 @@
     "transaction failed to be mined: %v": "transaction failed to be mined: %v",
     "transaction failed with status: %d, reason: %s": "transaction failed with status: %d, reason: %s"
   },
-  "chat": {
-    "Generating answer with %s": "Generating answer with %s",
-    "Preparing": "Preparing",
-    "Searching knowledge base": "Searching knowledge base"
-  },
   "comment": {
-    "Comment content cannot be empty": "Comment content cannot be empty",
-    "Comment content cannot be longer than %d characters": "Comment content cannot be longer than %d characters",
-    "Comment does not exist": "Comment does not exist",
-    "Comment target does not exist": "Comment target does not exist",
-    "Parent comment does not exist": "Parent comment does not exist",
-    "Unsupported comment target type": "Unsupported comment target type"
+    "Comment content cannot be longer than %d characters": "Comment content cannot be longer than %d characters"
   },
   "controllers": {
+    "API chat logs are read-only": "API chat logs are read-only",
     "No permission": "No permission",
     "No records to add": "No records to add",
     "No sessions to delete": "No sessions to delete",
@@ -109,9 +100,6 @@
   },
   "issue": {
     "Issue content cannot be longer than %d characters": "Issue content cannot be longer than %d characters",
-    "Issue does not exist": "Issue does not exist",
-    "Issue store does not exist": "The issue's store does not exist",
-    "Issue title cannot be empty": "Issue title cannot be empty",
     "Issue title cannot be longer than %d characters": "Issue title cannot be longer than %d characters"
   },
   "model": {
@@ -138,6 +126,7 @@
     "Casdoor application: [%s] doesn't exist": "Casdoor application: [%s] doesn't exist",
     "Casdoor organization: [%s] doesn't exist": "Casdoor organization: [%s] doesn't exist",
     "MCP test JSON must include non-empty \"tool\"": "MCP test JSON must include a non-empty \"tool\" field",
+    "No store found for user: %s, please create a store first": "No store found for user: %s, please create a store first",
     "Please add a model provider first": "Please add a model provider first",
     "Please add an embedding provider first": "To use this feature, please configure an embedding model in the settings first",
     "Question message: [%s] doesn't exist": "Question message: [%s] doesn't exist",
@@ -162,12 +151,14 @@
     "The provider: %s is not found": "The provider: %s is not found",
     "The store's embedding provider: [%s] should equal to vector's embedding provider: [%s], vector = %v": "The store's embedding provider: [%s] should equal to vector's embedding provider: [%s], vector = %v",
     "The text-to-speech provider for store: %s is not found": "The text-to-speech provider for store: %s is not found",
+    "empty caption returned by vision model for image: %s": "empty caption returned by vision model for image: %s",
     "empty provider key": "empty provider key",
     "failed to get record with id '%s': %w": "failed to get record with id '%s': %w",
     "failed to parse record identifier '%s': neither a valid owner/[id|name] format": "failed to parse record identifier '%s': neither a valid owner/[id|name] format",
     "failed to parse record: name %s, field %s, error: %v": "failed to parse record: name %s, field %s, error: %v",
     "failed to update error text for record %s: %s": "failed to update error text for record %s: %s",
     "getExtFromMimeType() error: unknown MimeType: %s": "getExtFromMimeType() error: unknown MimeType: %s",
+    "image caption requires a model provider; configure a vision-capable ModelProvider on the store": "image caption requires a model provider; configure a vision-capable ModelProvider on the store",
     "invalid MCP test JSON: %v": "invalid MCP test JSON: %v",
     "invalid range type: %s": "invalid range type: %s",
     "invalid tool test JSON in testContent: %v": "invalid tool test JSON in testContent: %v",
@@ -185,17 +176,17 @@
     "the record: %s has already been committed, blockId = %s": "the record: %s has already been committed, blockId = %s",
     "the record: %s's block ID should not be empty": "the record: %s's block ID should not be empty",
     "the storage provider type: %s is not supported": "the storage provider type: %s is not supported",
+    "the video provider type: %s is not supported": "the video provider type: %s is not supported",
     "there is no active blockchain provider": "there is no active blockchain provider",
-    "tool test JSON must include non-empty \"tool\"": "tool test JSON must include non-empty \"tool\""
+    "tool test JSON must include non-empty \"tool\"": "tool test JSON must include non-empty \"tool\"",
+    "unsupported image type for: %s": "unsupported image type for: %s"
   },
   "openai": {
-    "Invalid API key format. Expected 'Bearer API_KEY'": "Invalid API key format. Expected 'Bearer API_KEY'",
-    "No user message found in the request": "No user message found in the request"
+    "Invalid API key format. Expected 'Bearer API_KEY'": "Invalid API key format. Expected 'Bearer API_KEY'"
   },
   "resource": {
     "Invalid file data format": "Invalid file data format",
-    "Only docx and pdf files are allowed": "Only docx and pdf files are allowed",
-    "Unsupported legacy file format %s, please convert to a modern format (e.g. .docx, .pptx, .xlsx) before uploading": "Unsupported legacy file format %s, please convert to a modern format (e.g. .docx, .pptx, .xlsx) before uploading"
+    "Only docx and pdf files are allowed": "Only docx and pdf files are allowed"
   },
   "storage": {
     "storage provider name: [%s] doesn't exist": "storage provider name: [%s] doesn't exist"
@@ -203,11 +194,7 @@
   "store": {
     "Cannot delete the default store": "Cannot delete the default store",
     "Only the super admin can publish an agent directly. Please set the publish state to Pending Review instead": "Only the super admin can publish an agent directly. Please set the publish state to Pending Review instead",
-    "Please set a custom display name for this agent (the default \"New Store\" name is not allowed)": "Please set a custom display name for this agent (the default \"New Store\" name is not allowed)",
-    "Please upload a custom avatar for this agent (the default avatar is not allowed)": "Please upload a custom avatar for this agent (the default avatar is not allowed)",
     "The agent does not exist": "The agent does not exist",
-    "This agent needs at least 100 vectors before it can be submitted for review": "This agent needs at least 100 vectors before it can be submitted for review",
-    "This agent needs at least 200 messages before it can be submitted for review": "This agent needs at least 200 messages before it can be submitted for review",
     "You can only set the publish state to Private or Pending Review": "You can only set the publish state to Private or Pending Review",
     "You cannot fork your own agent": "You cannot fork your own agent",
     "You have already forked this agent": "You have already forked this agent",
@@ -236,5 +223,8 @@
     "GetTextFromMarkitdown() error, markitdown does not exist": "GetTextFromMarkitdown() error, markitdown does not exist",
     "GetTextFromMarkitdown() error, markitdown failed to run: %v: %s": "GetTextFromMarkitdown() error, markitdown failed to run: %v: %s",
     "unsupported file type: %s": "unsupported file type: %s"
+  },
+  "video": {
+    "The prompt should not be empty": "The prompt should not be empty"
   }
 }

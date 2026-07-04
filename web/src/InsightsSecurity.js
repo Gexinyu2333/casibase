@@ -89,78 +89,94 @@ function fill(str, map) {
   return out;
 }
 
+// SECRET_CATEGORY_LABELS enumerates the finite set of secret categories the
+// backend's secretPatterns (object/store_security.go) can report, each mapped
+// to a statically-extractable i18next.t call.
+const SECRET_CATEGORY_LABELS = {
+  privateKey: () => i18next.t("store:sec.secret.privateKey"),
+  apiKey: () => i18next.t("store:sec.secret.apiKey"),
+  awsAccessKey: () => i18next.t("store:sec.secret.awsAccessKey"),
+  slackToken: () => i18next.t("store:sec.secret.slackToken"),
+  githubToken: () => i18next.t("store:sec.secret.githubToken"),
+  jwt: () => i18next.t("store:sec.secret.jwt"),
+  credentialAssignment: () => i18next.t("store:sec.secret.credentialAssignment"),
+};
+
 // getCheckText maps a backend check (key + status + meta) to localized display
 // text. The backend intentionally ships no prose — all copy lives here so it can
 // be translated and kept next to the rest of the store-namespace strings.
+//
+// Every string is passed directly to i18next.t as a literal "store:key" so
+// the generate_test.go scanner can find it; it cannot follow a wrapper
+// function or a template-literal key.
 function getCheckText(check) {
   const meta = check.meta || {};
-  const t = (k) => i18next.t(`store:${k}`);
   switch (check.key) {
   case "prompt_secret_scan": {
-    const cats = (meta.categories || []).map((c) => t(`sec.secret.${c}`)).join(", ");
+    const cats = (meta.categories || []).map((c) => (SECRET_CATEGORY_LABELS[c] ? SECRET_CATEGORY_LABELS[c]() : c)).join(", ");
     return {
-      title: t("Secrets in agent definition"),
+      title: i18next.t("store:Secrets in agent definition"),
       detail: check.status === "fail"
-        ? fill(t("Possible secrets detected in the agent's prompt or description: {c}."), {c: cats})
-        : t("No hard-coded secrets found in the agent's prompt or description."),
-      fix: t("Remove credentials from the prompt/description and inject them at runtime via a provider or environment variable."),
+        ? fill(i18next.t("store:Possible secrets detected in the agent's prompt or description: {c}."), {c: cats})
+        : i18next.t("store:No hard-coded secrets found in the agent's prompt or description."),
+      fix: i18next.t("store:Remove credentials from the prompt/description and inject them at runtime via a provider or environment variable."),
     };
   }
   case "api_key_exposure":
     return {
-      title: t("API key exposure"),
+      title: i18next.t("store:API key exposure"),
       detail: check.status === "fail"
-        ? t("The store's external API key appears in a text field readable by clients.")
-        : (meta.hasKey ? t("The external API key is set and not exposed in any readable text field.") : t("No external API key is configured.")),
-      fix: t("Rotate the external API key and remove it from the prompt, description, and welcome text."),
+        ? i18next.t("store:The store's external API key appears in a text field readable by clients.")
+        : (meta.hasKey ? i18next.t("store:The external API key is set and not exposed in any readable text field.") : i18next.t("store:No external API key is configured.")),
+      fix: i18next.t("store:Rotate the external API key and remove it from the prompt, description, and welcome text."),
     };
   case "content_moderation":
     return {
-      title: t("Content moderation list"),
+      title: i18next.t("store:Content moderation list"),
       detail: check.status === "warn"
-        ? t("No forbidden words are configured, so user input is not filtered.")
-        : fill(t("{n} forbidden word(s) configured for input filtering."), {n: meta.wordCount}),
-      fix: t("Add forbidden words in the agent settings to block abusive or sensitive input."),
+        ? i18next.t("store:No forbidden words are configured, so user input is not filtered.")
+        : fill(i18next.t("store:{n} forbidden word(s) configured for input filtering."), {n: meta.wordCount}),
+      fix: i18next.t("store:Add forbidden words in the agent settings to block abusive or sensitive input."),
     };
   case "file_upload_policy":
     return {
-      title: t("File upload policy"),
+      title: i18next.t("store:File upload policy"),
       detail: check.status === "warn"
-        ? t("This agent is public and file uploads are enabled, allowing anyone to upload files.")
-        : (meta.disabled ? t("File uploads are disabled.") : t("File uploads are enabled.")),
-      fix: t("Disable file uploads for public agents, or ensure uploaded files are scanned and access-controlled."),
+        ? i18next.t("store:This agent is public and file uploads are enabled, allowing anyone to upload files.")
+        : (meta.disabled ? i18next.t("store:File uploads are disabled.") : i18next.t("store:File uploads are enabled.")),
+      fix: i18next.t("store:Disable file uploads for public agents, or ensure uploaded files are scanned and access-controlled."),
     };
   case "public_exposure":
     return {
-      title: t("Public exposure"),
+      title: i18next.t("store:Public exposure"),
       detail: check.status === "warn"
-        ? t("This agent is published and reachable by anyone in the public Hub.")
-        : t("This agent is not published publicly."),
-      fix: t("Review the prompt, files, and knowledge base for sensitive content before publishing."),
+        ? i18next.t("store:This agent is published and reachable by anyone in the public Hub.")
+        : i18next.t("store:This agent is not published publicly."),
+      fix: i18next.t("store:Review the prompt, files, and knowledge base for sensitive content before publishing."),
     };
   case "tool_attack_surface":
     return {
-      title: t("Tool & capability surface"),
+      title: i18next.t("store:Tool & capability surface"),
       detail: check.status === "warn"
-        ? fill(t("{tools} tool(s), {skills} skill(s){mcp} are enabled, expanding the attack surface."), {tools: meta.toolCount, skills: meta.skillCount, mcp: meta.hasMcp ? t(" and an MCP server") : ""})
-        : t("No external tools, skills, or MCP servers are enabled."),
-      fix: t("Enable only the tools and skills this agent needs, and review MCP server permissions."),
+        ? fill(i18next.t("store:{tools} tool(s), {skills} skill(s){mcp} are enabled, expanding the attack surface."), {tools: meta.toolCount, skills: meta.skillCount, mcp: meta.hasMcp ? i18next.t("store: and an MCP server") : ""})
+        : i18next.t("store:No external tools, skills, or MCP servers are enabled."),
+      fix: i18next.t("store:Enable only the tools and skills this agent needs, and review MCP server permissions."),
     };
   case "access_control":
     return {
-      title: t("Co-owner access control"),
+      title: i18next.t("store:Co-owner access control"),
       detail: check.status === "warn"
-        ? fill(t("{n} owners have write access to this agent."), {n: meta.ownerCount})
-        : t("Only the primary owner can modify this agent."),
-      fix: t("Keep the co-owner list minimal and remove owners who no longer need write access."),
+        ? fill(i18next.t("store:{n} owners have write access to this agent."), {n: meta.ownerCount})
+        : i18next.t("store:Only the primary owner can modify this agent."),
+      fix: i18next.t("store:Keep the co-owner list minimal and remove owners who no longer need write access."),
     };
   case "forbidden_word_violations":
     return {
-      title: t("Forbidden-word violations"),
+      title: i18next.t("store:Forbidden-word violations"),
       detail: check.status === "fail"
-        ? fill(t("{hits} message(s) tripped the forbidden-word filter in this window."), {hits: meta.hits})
-        : fill(t("No forbidden-word violations across {n} scanned message(s)."), {n: meta.messagesScanned}),
-      fix: t("Review the flagged messages below and consider blocking or warning the users involved."),
+        ? fill(i18next.t("store:{hits} message(s) tripped the forbidden-word filter in this window."), {hits: meta.hits})
+        : fill(i18next.t("store:No forbidden-word violations across {n} scanned message(s)."), {n: meta.messagesScanned}),
+      fix: i18next.t("store:Review the flagged messages below and consider blocking or warning the users involved."),
     };
   default:
     return {title: check.key, detail: "", fix: ""};
