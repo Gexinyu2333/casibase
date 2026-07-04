@@ -14,7 +14,7 @@
 
 import React from "react";
 import {Avatar, Button, Card, Col, Empty, Input, Row, Segmented, Select, Spin, Tag, Tooltip, Typography} from "antd";
-import {CopyOutlined, InfoCircleOutlined, LinkOutlined, RobotOutlined, SortAscendingOutlined, SortDescendingOutlined} from "@ant-design/icons";
+import {CopyOutlined, EyeOutlined, ForkOutlined, InfoCircleOutlined, LinkOutlined, RobotOutlined, SortAscendingOutlined, SortDescendingOutlined, StarOutlined} from "@ant-design/icons";
 import * as StoreBackend from "./backend/StoreBackend";
 import * as Setting from "./Setting";
 import i18next from "i18next";
@@ -38,8 +38,8 @@ class StoreHubPage extends React.Component {
       filterSubject: "",
       filterGrade: "",
       filterTopic: "",
-      sortField: "",
-      sortOrder: "asc",
+      sortField: "starCount",
+      sortOrder: "desc",
     };
   }
 
@@ -117,7 +117,13 @@ class StoreHubPage extends React.Component {
     }
 
     if (sortField) {
+      const numericFields = ["starCount", "watchCount", "forkCount"];
       result.sort((a, b) => {
+        if (numericFields.includes(sortField)) {
+          const va = a[sortField] || 0;
+          const vb = b[sortField] || 0;
+          return sortOrder === "asc" ? va - vb : vb - va;
+        }
         let va, vb;
         if (sortField === "displayName") {
           va = (a.displayName || a.name || "").toLowerCase();
@@ -139,8 +145,10 @@ class StoreHubPage extends React.Component {
   }
 
   hasActiveFilters() {
-    const {searchText, filterSubject, filterGrade, filterTopic, sortField} = this.state;
-    return !!(searchText || filterSubject || filterGrade || filterTopic || sortField);
+    const {searchText, filterSubject, filterGrade, filterTopic, sortField, sortOrder} = this.state;
+    // The default "most starred" sort is not considered an active filter.
+    const nonDefaultSort = sortField !== "starCount" || sortOrder !== "desc";
+    return !!(searchText || filterSubject || filterGrade || filterTopic || nonDefaultSort);
   }
 
   resetFilters() {
@@ -149,8 +157,8 @@ class StoreHubPage extends React.Component {
       filterSubject: "",
       filterGrade: "",
       filterTopic: "",
-      sortField: "",
-      sortOrder: "asc",
+      sortField: "starCount",
+      sortOrder: "desc",
     });
   }
 
@@ -197,7 +205,9 @@ class StoreHubPage extends React.Component {
     const isFiltered = this.hasActiveFilters();
 
     const sortFieldOptions = [
-      {value: "", label: i18next.t("general:Sort")},
+      {value: "starCount", label: i18next.t("store:Stars")},
+      {value: "watchCount", label: i18next.t("store:Watchers")},
+      {value: "forkCount", label: i18next.t("store:Forks")},
       {value: "displayName", label: i18next.t("general:Display name")},
       {value: "author", label: i18next.t("general:Author")},
       {value: "affiliation", label: i18next.t("store:Affiliation")},
@@ -354,6 +364,11 @@ class StoreHubPage extends React.Component {
           ) : (
             <div style={{height: 60}} />
           )}
+          <div style={{display: "flex", alignItems: "center", gap: 14, marginBottom: 10, color: "var(--ant-color-text-secondary)", fontSize: 12}}>
+            <Tooltip title={i18next.t("store:Stars")}><span><StarOutlined /> {store.starCount || 0}</span></Tooltip>
+            <Tooltip title={i18next.t("store:Watchers")}><span><EyeOutlined /> {store.watchCount || 0}</span></Tooltip>
+            <Tooltip title={i18next.t("store:Forks")}><span><ForkOutlined /> {store.forkCount || 0}</span></Tooltip>
+          </div>
           <div
             style={{
               display: "flex",
