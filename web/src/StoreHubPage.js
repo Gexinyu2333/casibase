@@ -181,8 +181,13 @@ class StoreHubPage extends React.Component {
   }
 
   handleViewAgent(store) {
-    this.closeDrawer();
-    this.props.history.push(`/agents/${store.owner}/${store.name}`);
+    const agentPath = `/agents/${store.owner}/${store.name}`;
+    if (store.endpoint) {
+      window.open(`${store.endpoint}${agentPath}`, "_blank", "noopener,noreferrer");
+    } else {
+      this.closeDrawer();
+      this.props.history.push(agentPath);
+    }
   }
 
   handleCopyLink(store) {
@@ -230,17 +235,17 @@ class StoreHubPage extends React.Component {
           />
         ) : null}
         <Input.Search
-          placeholder={i18next.t("store:Please input your search term")}
+          placeholder={i18next.t("store:Please search here")}
           value={searchText}
           onChange={e => this.setState({searchText: e.target.value})}
           allowClear
-          style={{width: 220}}
+          style={{width: 250}}
         />
         {subjects.length > 0 ? (
           <Select
             value={filterSubject || ""}
             onChange={v => this.setState({filterSubject: v})}
-            style={{minWidth: 130}}
+            style={{minWidth: 150}}
             options={[
               {value: "", label: `${i18next.t("store:Subject")}: ${allLabel}`},
               ...subjects.map(s => ({value: s, label: s})),
@@ -251,7 +256,7 @@ class StoreHubPage extends React.Component {
           <Select
             value={filterGrade || ""}
             onChange={v => this.setState({filterGrade: v})}
-            style={{minWidth: 130}}
+            style={{minWidth: 150}}
             options={[
               {value: "", label: `${i18next.t("store:Grade")}: ${allLabel}`},
               ...grades.map(g => ({value: g, label: g})),
@@ -262,7 +267,7 @@ class StoreHubPage extends React.Component {
           <Select
             value={filterTopic || ""}
             onChange={v => this.setState({filterTopic: v})}
-            style={{minWidth: 130}}
+            style={{minWidth: 150}}
             options={[
               {value: "", label: `${i18next.t("store:Topic")}: ${allLabel}`},
               ...topics.map(t => ({value: t, label: t})),
