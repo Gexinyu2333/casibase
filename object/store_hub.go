@@ -17,6 +17,8 @@ package object
 import (
 	"fmt"
 	"strings"
+
+	"xorm.io/xorm"
 )
 
 // getEffectiveHubDbNames returns the HubDbNames for the given site.
@@ -90,4 +92,19 @@ func GetPublishedStoresFromAllDbs() ([]*Store, error) {
 	}
 
 	return stores, nil
+}
+
+// withHubEngine runs fn against the engine for hubDbName: the local engine if
+// hubDbName is empty or matches the local DB, otherwise a short-lived adapter
+// opened against that external hub DB. Stores fetched via
+// GetPublishedStoresFromAllDbs carry their source DB name in HubDbName, and
+// their star/watch/fork data lives in that same DB, not the local one.
+func withHubEngine(hubDbName string, fn func(engine *xorm.Engine) error) error {
+	if hubDbName == "" || hubDbName == adapter.DbName {
+		return fn(adapter.engine)
+	}
+
+	extraAdapter := NewAdapterWithDbName(adapter.driverName, adapter.dataSourceName, hubDbName)
+	defer extraAdapter.close()
+	return fn(extraAdapter.engine)
 }

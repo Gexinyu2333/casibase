@@ -69,7 +69,7 @@ func (c *ApiController) ToggleStoreFavorite() {
 		c.ResponseError(err.Error())
 		return
 	}
-	count, err := object.GetStoreFavoriteCount(form.Type, form.StoreOwner, form.StoreName)
+	count, err := object.GetStoreFavoriteCount(form.Type, form.StoreOwner, form.StoreName, "")
 	if err != nil {
 		c.ResponseError(err.Error())
 		return
@@ -107,22 +107,26 @@ func (c *ApiController) GetFavoredStores() {
 func (c *ApiController) GetStoreFavoriteStatus() {
 	storeOwner := c.Input().Get("storeOwner")
 	storeName := c.Input().Get("storeName")
+	// hubDbName identifies the source DB for stores pulled in from an external
+	// hub (see GetPublishedStoresFromAllDbs); empty means the local DB. Their
+	// star/watch/fork data lives in that same external DB.
+	hubDbName := c.Input().Get("hubDbName")
 	if storeOwner == "" || storeName == "" {
 		c.ResponseError("storeOwner and storeName are required")
 		return
 	}
 
-	starCount, err := object.GetStoreFavoriteCount(object.FavoriteTypeStar, storeOwner, storeName)
+	starCount, err := object.GetStoreFavoriteCount(object.FavoriteTypeStar, storeOwner, storeName, hubDbName)
 	if err != nil {
 		c.ResponseError(err.Error())
 		return
 	}
-	watchCount, err := object.GetStoreFavoriteCount(object.FavoriteTypeWatch, storeOwner, storeName)
+	watchCount, err := object.GetStoreFavoriteCount(object.FavoriteTypeWatch, storeOwner, storeName, hubDbName)
 	if err != nil {
 		c.ResponseError(err.Error())
 		return
 	}
-	forkCount, err := object.GetStoreForkCount(storeOwner, storeName)
+	forkCount, err := object.GetStoreForkCount(storeOwner, storeName, hubDbName)
 	if err != nil {
 		c.ResponseError(err.Error())
 		return

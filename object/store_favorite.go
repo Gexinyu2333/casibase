@@ -16,6 +16,7 @@ package object
 
 import (
 	"github.com/the-open-agent/openagent/util"
+	"xorm.io/xorm"
 )
 
 const (
@@ -63,8 +64,17 @@ func IsStoreFavorited(user, favoriteType, storeOwner, storeName string) (bool, e
 	return favorite != nil, nil
 }
 
-func GetStoreFavoriteCount(favoriteType, storeOwner, storeName string) (int64, error) {
-	return adapter.engine.Where("type = ? and store_owner = ? and store_name = ?", favoriteType, storeOwner, storeName).Count(&StoreFavorite{})
+// GetStoreFavoriteCount returns how many users starred/watched the given
+// store. hubDbName is the source DB of the store (empty for local stores);
+// external stores' favorites live in their own DB, not the local one.
+func GetStoreFavoriteCount(favoriteType, storeOwner, storeName, hubDbName string) (int64, error) {
+	var count int64
+	err := withHubEngine(hubDbName, func(engine *xorm.Engine) error {
+		var err error
+		count, err = engine.Where("type = ? and store_owner = ? and store_name = ?", favoriteType, storeOwner, storeName).Count(&StoreFavorite{})
+		return err
+	})
+	return count, err
 }
 
 // ToggleStoreFavorite adds the favorite if absent, removes it if present, and
@@ -123,67 +133,94 @@ func GetFavoredStores(user, favoriteType string) ([]*Store, error) {
 // FillStoreFavoriteCounts populates StarCount / WatchCount / ForkCount on the
 // given stores using grouped queries (star/watch from store_favorite, fork from
 // the store table's forked_from columns) — avoids N+1 for hub/list rendering.
+// Stores are grouped by HubDbName first: stores pulled in from external hub
+// DBs (see GetPublishedStoresFromAllDbs) have their favorite/fork data in that
+// same external DB, not the local one, so each DB is queried separately.
 func FillStoreFavoriteCounts(stores []*Store) error {
 	if len(stores) == 0 {
 		return nil
 	}
 
-	type favoriteCountRow struct {
-		Type       string
-		StoreOwner string
-		StoreName  string
-		Count      int
-	}
-	favoriteRows := []favoriteCountRow{}
-	err := adapter.engine.Table(new(StoreFavorite)).
-		Select("type, store_owner, store_name, count(*) as count").
-		GroupBy("type, store_owner, store_name").
-		Find(&favoriteRows)
-	if err != nil {
-		return err
-	}
-
-	starMap := map[string]int{}
-	watchMap := map[string]int{}
-	for _, row := range favoriteRows {
-		key := row.StoreOwner + "/" + row.StoreName
-		if row.Type == FavoriteTypeStar {
-			starMap[key] = row.Count
-		} else if row.Type == FavoriteTypeWatch {
-			watchMap[key] = row.Count
-		}
-	}
-
-	type forkCountRow struct {
-		ForkedFromOwner string
-		ForkedFromName  string
-		Count           int
-	}
-	forkRows := []forkCountRow{}
-	err = adapter.engine.Table(new(Store)).
-		Select("forked_from_owner, forked_from_name, count(*) as count").
-		Where("forked_from_owner <> ? and forked_from_name <> ?", "", "").
-		GroupBy("forked_from_owner, forked_from_name").
-		Find(&forkRows)
-	if err != nil {
-		return err
-	}
-
-	forkMap := map[string]int{}
-	for _, row := range forkRows {
-		forkMap[row.ForkedFromOwner+"/"+row.ForkedFromName] = row.Count
-	}
-
+	storesByDb := map[string][]*Store{}
 	for _, store := range stores {
-		key := store.Owner + "/" + store.Name
-		store.StarCount = starMap[key]
-		store.WatchCount = watchMap[key]
-		store.ForkCount = forkMap[key]
+		storesByDb[store.HubDbName] = append(storesByDb[store.HubDbName], store)
+	}
+
+	for hubDbName, dbStores := range storesByDb {
+		if err := fillStoreFavoriteCountsForDb(hubDbName, dbStores); err != nil {
+			return err
+		}
 	}
 	return nil
 }
 
+func fillStoreFavoriteCountsForDb(hubDbName string, stores []*Store) error {
+	return withHubEngine(hubDbName, func(engine *xorm.Engine) error {
+		type favoriteCountRow struct {
+			Type       string
+			StoreOwner string
+			StoreName  string
+			Count      int
+		}
+		favoriteRows := []favoriteCountRow{}
+		err := engine.Table(new(StoreFavorite)).
+			Select("type, store_owner, store_name, count(*) as count").
+			GroupBy("type, store_owner, store_name").
+			Find(&favoriteRows)
+		if err != nil {
+			return err
+		}
+
+		starMap := map[string]int{}
+		watchMap := map[string]int{}
+		for _, row := range favoriteRows {
+			key := row.StoreOwner + "/" + row.StoreName
+			if row.Type == FavoriteTypeStar {
+				starMap[key] = row.Count
+			} else if row.Type == FavoriteTypeWatch {
+				watchMap[key] = row.Count
+			}
+		}
+
+		type forkCountRow struct {
+			ForkedFromOwner string
+			ForkedFromName  string
+			Count           int
+		}
+		forkRows := []forkCountRow{}
+		err = engine.Table(new(Store)).
+			Select("forked_from_owner, forked_from_name, count(*) as count").
+			Where("forked_from_owner <> ? and forked_from_name <> ?", "", "").
+			GroupBy("forked_from_owner, forked_from_name").
+			Find(&forkRows)
+		if err != nil {
+			return err
+		}
+
+		forkMap := map[string]int{}
+		for _, row := range forkRows {
+			forkMap[row.ForkedFromOwner+"/"+row.ForkedFromName] = row.Count
+		}
+
+		for _, store := range stores {
+			key := store.Owner + "/" + store.Name
+			store.StarCount = starMap[key]
+			store.WatchCount = watchMap[key]
+			store.ForkCount = forkMap[key]
+		}
+		return nil
+	})
+}
+
 // GetStoreForkCount returns how many stores were forked from the given store.
-func GetStoreForkCount(owner, name string) (int64, error) {
-	return adapter.engine.Where("forked_from_owner = ? and forked_from_name = ?", owner, name).Count(&Store{})
+// hubDbName is the source DB of the store (empty for local stores); forks of
+// an external store are recorded in that store's own DB, not the local one.
+func GetStoreForkCount(owner, name, hubDbName string) (int64, error) {
+	var count int64
+	err := withHubEngine(hubDbName, func(engine *xorm.Engine) error {
+		var err error
+		count, err = engine.Where("forked_from_owner = ? and forked_from_name = ?", owner, name).Count(&Store{})
+		return err
+	})
+	return count, err
 }

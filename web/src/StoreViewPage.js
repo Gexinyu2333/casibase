@@ -90,7 +90,7 @@ class StoreViewPage extends React.Component {
             store.error = res.data2;
           }
           this.setState({store, loading: false});
-          this.getFavoriteStatus(owner, storeName);
+          this.getFavoriteStatus(owner, storeName, store?.hubDbName);
         } else {
           Setting.showMessage("error", `${i18next.t("general:Failed to get")}: ${res.msg}`);
           this.setState({loading: false});
@@ -98,8 +98,8 @@ class StoreViewPage extends React.Component {
       });
   }
 
-  getFavoriteStatus(owner = this.state.owner, storeName = this.state.storeName) {
-    StoreBackend.getStoreFavoriteStatus(owner, storeName)
+  getFavoriteStatus(owner = this.state.owner, storeName = this.state.storeName, hubDbName = this.state.store?.hubDbName) {
+    StoreBackend.getStoreFavoriteStatus(owner, storeName, hubDbName)
       .then((res) => {
         if (res.status === "ok" && res.data) {
           this.setState({favoriteStatus: res.data});

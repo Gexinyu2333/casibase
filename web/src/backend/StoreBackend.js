@@ -124,8 +124,8 @@ export function toggleStoreFavorite(favoriteType, storeOwner, storeName) {
   }).then(res => Setting.handleFetchResponse(res));
 }
 
-export function getStoreFavoriteStatus(storeOwner, storeName) {
-  return fetch(`${Setting.ServerUrl}/api/get-store-favorite-status?storeOwner=${encodeURIComponent(storeOwner)}&storeName=${encodeURIComponent(storeName)}`, {
+export function getStoreFavoriteStatus(storeOwner, storeName, hubDbName = "") {
+  return fetch(`${Setting.ServerUrl}/api/get-store-favorite-status?storeOwner=${encodeURIComponent(storeOwner)}&storeName=${encodeURIComponent(storeName)}&hubDbName=${encodeURIComponent(hubDbName)}`, {
     method: "GET",
     credentials: "include",
     headers: {
