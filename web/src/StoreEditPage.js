@@ -126,7 +126,7 @@ class StoreEditPage extends React.Component {
             ...(store ? {owner: store.owner, storeName: store.name} : {}),
           });
           if (store && store.owner && store.owner !== this.props.match.params.owner) {
-            this.props.history.replace(`/stores/${store.owner}/${store.name}`);
+            this.props.history.replace(`${this.props.basePath || "/stores"}/${store.owner}/${store.name}`);
           }
         } else {
           Setting.showMessage("error", `${i18next.t("general:Failed to get")}: ${res.msg}`);
@@ -993,6 +993,7 @@ class StoreEditPage extends React.Component {
       store = storeParam;
     }
 
+    const basePath = this.props.basePath || "/stores";
     store.fileTree = undefined;
     StoreBackend.updateStore(this.state.owner, this.state.storeName, store)
       .then((res) => {
@@ -1004,9 +1005,9 @@ class StoreEditPage extends React.Component {
           });
           window.dispatchEvent(new Event("storesChanged"));
           if (exitAfterSave) {
-            this.props.history.push("/stores");
+            this.props.history.push(basePath);
           } else {
-            this.props.history.push(`/stores/${this.state.store.owner}/${this.state.store.name}`);
+            this.props.history.push(`${basePath}/${this.state.store.owner}/${this.state.store.name}`);
           }
         } else {
           Setting.showMessage("error", `${i18next.t("general:Failed to save")}: ${res.msg}`);
@@ -1033,7 +1034,7 @@ class StoreEditPage extends React.Component {
                 owner: res.data.owner,
                 storeName: res.data.name,
               });
-              this.props.history.push(`/stores/${res.data.owner}/${res.data.name}`);
+              this.props.history.push(`${this.props.basePath || "/stores"}/${res.data.owner}/${res.data.name}`);
             } else {
               Setting.showMessage("error", `${i18next.t("general:Failed to save")}: ${res.msg}`);
             }
@@ -1046,13 +1047,14 @@ class StoreEditPage extends React.Component {
   }
 
   cancelStoreEdit() {
+    const basePath = this.props.basePath || "/stores";
     if (this.state.isNewStore) {
       StoreBackend.deleteStore(this.state.store)
         .then((res) => {
           if (res.status === "ok") {
             Setting.showMessage("success", i18next.t("general:Cancelled successfully"));
             window.dispatchEvent(new Event("storesChanged"));
-            this.props.history.push("/stores");
+            this.props.history.push(basePath);
           } else {
             Setting.showMessage("error", `${i18next.t("general:Failed to cancel")}: ${res.msg}`);
           }
@@ -1061,7 +1063,7 @@ class StoreEditPage extends React.Component {
           Setting.showMessage("error", `${i18next.t("general:Failed to cancel")}: ${error}`);
         });
     } else {
-      this.props.history.push("/stores");
+      this.props.history.push(basePath);
     }
   }
 

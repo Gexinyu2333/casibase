@@ -20,7 +20,7 @@ import i18next from "i18next";
 import {getChatUrl} from "./StoreHubDrawer";
 import StoreHubAgentDetail from "./StoreHubAgentDetail";
 
-const VALID_TABS = new Set(["overview", "files", "issues", "insights"]);
+const VALID_TABS = new Set(["overview", "files", "issues", "insights", "settings"]);
 const VALID_INSIGHTS_SUBS = new Set(["pulse", "contributors", "traffic", "wordcloud", "cost", "stargazers", "watchers", "forks"]);
 
 function resolveActiveTab(match) {
@@ -196,11 +196,6 @@ class StoreViewPage extends React.Component {
   }
 
   handleTabChange(key) {
-    if (key === "settings") {
-      const {store} = this.state;
-      this.props.history.push(`/stores/${store.owner}/${store.name}`);
-      return;
-    }
     const {store} = this.state;
     if (!store) {return;}
     this.props.history.push(buildTabUrl(store.owner, store.name, key));
@@ -241,6 +236,7 @@ class StoreViewPage extends React.Component {
     return (
       <StoreHubAgentDetail
         account={this.props.account}
+        history={this.props.history}
         store={store}
         activeTab={activeTab}
         activeSub={activeSub}

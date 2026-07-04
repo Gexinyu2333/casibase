@@ -16,6 +16,7 @@ import React from "react";
 import {Avatar, Button, Card, Col, Row, Space, Tabs, Tag, Tooltip, Typography} from "antd";
 import StoreInsights from "./StoreInsights";
 import StoreIssues from "./StoreIssues";
+import StoreEditPage from "./StoreEditPage";
 import {AppstoreOutlined, BarChartOutlined, BugOutlined, CommentOutlined, EyeFilled, EyeOutlined, FolderOpenOutlined, ForkOutlined, SettingOutlined, StarFilled, StarOutlined} from "@ant-design/icons";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -252,7 +253,19 @@ function renderInsights(account, store, activeSub, onSubTabChange) {
   );
 }
 
-function renderTabContent(account, store, activeTab, activeSub, activeIssueName, onStoreUpdate, onRefresh, onSubTabChange, onIssueChange) {
+function renderSettings(account, store, history) {
+  return (
+    <StoreEditPage
+      account={account}
+      history={history}
+      location={{}}
+      match={{params: {owner: store.owner, storeName: store.name}}}
+      basePath="/agents"
+    />
+  );
+}
+
+function renderTabContent(account, store, activeTab, activeSub, activeIssueName, onStoreUpdate, onRefresh, onSubTabChange, onIssueChange, history) {
   if (activeTab === "files") {
     return renderFiles(account, store, onStoreUpdate, onRefresh);
   }
@@ -262,10 +275,13 @@ function renderTabContent(account, store, activeTab, activeSub, activeIssueName,
   if (activeTab === "insights") {
     return renderInsights(account, store, activeSub, onSubTabChange);
   }
+  if (activeTab === "settings") {
+    return renderSettings(account, store, history);
+  }
   return renderOverview(account, store, onStoreUpdate, onRefresh);
 }
 
-function StoreHubAgentDetail({account, store, activeTab, activeSub, activeIssueName, canManage, onTabChange, onSubTabChange, onIssueChange, onStartChat, onFork, forking, favoriteStatus, starLoading, watchLoading, onToggleFavorite, onStoreUpdate, onRefresh}) {
+function StoreHubAgentDetail({account, store, activeTab, activeSub, activeIssueName, canManage, onTabChange, onSubTabChange, onIssueChange, onStartChat, onFork, forking, favoriteStatus, starLoading, watchLoading, onToggleFavorite, onStoreUpdate, onRefresh, history}) {
   const tabItems = [
     {key: "overview", label: <span><AppstoreOutlined /> {i18next.t("store:Overview")}</span>},
     {key: "files", label: <span><FolderOpenOutlined /> {i18next.t("general:Files")}</span>},
@@ -286,7 +302,7 @@ function StoreHubAgentDetail({account, store, activeTab, activeSub, activeIssueN
         onChange={onTabChange}
         style={{marginBottom: 16}}
       />
-      {renderTabContent(account, store, activeTab, activeSub, activeIssueName, onStoreUpdate, onRefresh, onSubTabChange, onIssueChange)}
+      {renderTabContent(account, store, activeTab, activeSub, activeIssueName, onStoreUpdate, onRefresh, onSubTabChange, onIssueChange, history)}
     </div>
   );
 }
