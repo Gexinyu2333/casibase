@@ -266,12 +266,17 @@ function renderSettings(account, store, history) {
   );
 }
 
-function renderChat(account, store, history) {
+// ChatPage internally calls history.push() whenever a chat is auto-selected
+// or created, which would otherwise navigate the whole agent detail page
+// away from the Chat tab. Give it a no-op history so it stays put.
+const noopHistory = {push: () => {}, replace: () => {}};
+
+function renderChat(account, store) {
   return (
     <div style={{margin: "0 -32px -24px", borderTop: "1px solid var(--ant-color-border-secondary)"}}>
       <ChatPage
         account={account}
-        history={history}
+        history={noopHistory}
         location={{}}
         match={{params: {storeName: store.name}}}
         autoFocusInput={false}
@@ -294,7 +299,7 @@ function renderTabContent(account, store, activeTab, activeSub, activeIssueName,
     return renderSettings(account, store, history);
   }
   if (activeTab === "chat") {
-    return renderChat(account, store, history);
+    return renderChat(account, store);
   }
   return renderOverview(account, store, onStoreUpdate, onRefresh);
 }
