@@ -22,21 +22,25 @@ import UserLabel from "./common/UserLabel";
 
 const {Text} = Typography;
 
-const PASS_COLOR = "#52c41a";
-const WARN_COLOR = "#faad14";
-const FAIL_COLOR = "#ff4d4f";
-const WORD_COLOR = "#ff4d4f";
+// shadcn/ui-style status palette — emerald/amber/red-500, matching shadcn's
+// default `--destructive` token and the emerald/amber accents used in its
+// dashboard blocks, instead of Ant Design's default vivid green/gold/red.
+const PASS_COLOR = "#10b981";
+const WARN_COLOR = "#f59e0b";
+const FAIL_COLOR = "#ef4444";
+const WORD_COLOR = "#ef4444";
+const NEUTRAL_COLOR = "#64748b";
 
 const STATUS_META = {
-  pass: {color: PASS_COLOR, icon: <CheckCircleFilled />, tag: "green", label: () => i18next.t("store:Pass")},
-  warn: {color: WARN_COLOR, icon: <ExclamationCircleFilled />, tag: "gold", label: () => i18next.t("store:Warning")},
-  fail: {color: FAIL_COLOR, icon: <CloseCircleFilled />, tag: "red", label: () => i18next.t("store:Fail")},
+  pass: {color: PASS_COLOR, icon: <CheckCircleFilled />, tag: PASS_COLOR, label: () => i18next.t("video:Pass")},
+  warn: {color: WARN_COLOR, icon: <ExclamationCircleFilled />, tag: WARN_COLOR, label: () => i18next.t("store:Warning")},
+  fail: {color: FAIL_COLOR, icon: <CloseCircleFilled />, tag: FAIL_COLOR, label: () => i18next.t("video:Fail")},
 };
 
 const SEVERITY_META = {
-  high: {color: "red", label: () => i18next.t("store:High")},
-  medium: {color: "orange", label: () => i18next.t("store:Medium")},
-  low: {color: "blue", label: () => i18next.t("store:Low")},
+  high: {color: FAIL_COLOR, label: () => i18next.t("store:High")},
+  medium: {color: WARN_COLOR, label: () => i18next.t("figure:Medium")},
+  low: {color: NEUTRAL_COLOR, label: () => i18next.t("store:Low")},
 };
 
 function scoreColor(score) {
@@ -218,7 +222,7 @@ class InsightsSecurity extends React.Component {
     const stats = [
       {label: i18next.t("store:Passed"), value: data.passCount, color: PASS_COLOR, icon: STATUS_META.pass.icon},
       {label: i18next.t("store:Warnings"), value: data.warnCount, color: WARN_COLOR, icon: STATUS_META.warn.icon},
-      {label: i18next.t("store:Failed"), value: data.failCount, color: FAIL_COLOR, icon: STATUS_META.fail.icon},
+      {label: i18next.t("application:Failed"), value: data.failCount, color: FAIL_COLOR, icon: STATUS_META.fail.icon},
     ];
     return (
       <Card size="small">
@@ -399,7 +403,7 @@ class InsightsSecurity extends React.Component {
         dataIndex: "word",
         key: "word",
         width: 130,
-        render: (word) => <Tag color="red">{word}</Tag>,
+        render: (word) => <Tag color={FAIL_COLOR}>{word}</Tag>,
       },
       {
         title: i18next.t("store:Context"),
