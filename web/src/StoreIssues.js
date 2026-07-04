@@ -40,9 +40,7 @@ class StoreIssues extends React.Component {
       loading: true,
       issues: [],
       filter: "open",
-      view: "list", // "list" | "form" | "detail"
-      editing: false,
-      currentIssue: null,
+      formMode: null, // null | "new" | "edit"
       formTitle: "",
       formContent: "",
       submitting: false,
@@ -53,25 +51,32 @@ class StoreIssues extends React.Component {
     this.fetchIssues();
   }
 
+  componentDidUpdate(prevProps) {
+    // Navigated to a different issue (e.g. via browser back/forward) — drop any open edit form.
+    if (prevProps.activeIssueName !== this.props.activeIssueName && this.state.formMode === "edit") {
+      this.setState({formMode: null});
+    }
+  }
+
   getStoreId() {
     const {store} = this.props;
     return `${store.owner}/${store.name}`;
   }
 
-  fetchIssues(preserveView = false) {
+  getCurrentIssue() {
+    const {activeIssueName} = this.props;
+    if (!activeIssueName) {
+      return null;
+    }
+    return this.state.issues.find((i) => i.name === activeIssueName) || null;
+  }
+
+  fetchIssues() {
     this.setState({loading: true});
     IssueBackend.getIssues(this.getStoreId())
       .then((res) => {
         if (res.status === "ok") {
-          this.setState((prev) => {
-            const next = {loading: false, issues: res.data || []};
-            // Keep the currently open issue's counts fresh when refreshing in place.
-            if (preserveView && prev.currentIssue) {
-              const updated = (res.data || []).find((i) => i.owner === prev.currentIssue.owner && i.name === prev.currentIssue.name);
-              if (updated) {next.currentIssue = updated;}
-            }
-            return next;
-          });
+          this.setState({loading: false, issues: res.data || []});
         } else {
           this.setState({loading: false});
           Setting.showMessage("error", res.msg);
@@ -97,18 +102,22 @@ class StoreIssues extends React.Component {
   }
 
   openList = () => {
-    this.setState({view: "list", currentIssue: null, editing: false});
-    this.fetchIssues();
+    this.setState({formMode: null});
+    this.props.onIssueChange(null);
   };
 
-  openNew = () => this.setState({view: "form", editing: false, currentIssue: null, formTitle: "", formContent: ""});
+  openNew = () => this.setState({formMode: "new", formTitle: "", formContent: ""});
 
-  openDetail = (issue) => this.setState({view: "detail", currentIssue: issue, editing: false});
+  openDetail = (issue) => {
+    this.setState({formMode: null});
+    this.props.onIssueChange(issue.name);
+  };
 
-  openEdit = (issue) => this.setState({view: "form", editing: true, currentIssue: issue, formTitle: issue.title, formContent: issue.content});
+  openEdit = (issue) => this.setState({formMode: "edit", formTitle: issue.title, formContent: issue.content});
 
   submitForm = () => {
-    const {editing, currentIssue, formTitle, formContent} = this.state;
+    const {formMode, formTitle, formContent} = this.state;
+    const currentIssue = this.getCurrentIssue();
     const title = formTitle.trim();
     if (title === "") {
       Setting.showMessage("error", i18next.t("store:Issue title cannot be empty"));
@@ -125,20 +134,20 @@ class StoreIssues extends React.Component {
       }
     };
 
-    if (editing && currentIssue) {
+    if (formMode === "edit" && currentIssue) {
       const updated = {...currentIssue, title, content: formContent};
       IssueBackend.updateIssue(currentIssue.owner, currentIssue.name, updated)
         .then((res) => done(res, () => {
-          this.setState({currentIssue: updated});
-          this.openDetail(updated);
-          this.fetchIssues(true);
+          this.setState({formMode: null});
+          this.fetchIssues();
         }))
         .catch((err) => done({status: "error", msg: err.message || String(err)}));
     } else {
       IssueBackend.addIssue({store: this.getStoreId(), title, content: formContent})
         .then((res) => done(res, () => {
           Setting.showMessage("success", i18next.t("general:Successfully added"));
-          this.openList();
+          this.setState({formMode: null});
+          this.fetchIssues();
         }))
         .catch((err) => done({status: "error", msg: err.message || String(err)}));
     }
@@ -149,8 +158,7 @@ class StoreIssues extends React.Component {
     const updated = {...issue, status: newStatus};
     IssueBackend.updateIssue(issue.owner, issue.name, updated).then((res) => {
       if (res.status === "ok") {
-        this.setState({currentIssue: updated});
-        this.fetchIssues(true);
+        this.fetchIssues();
       } else {
         Setting.showMessage("error", res.msg);
       }
@@ -242,7 +250,9 @@ class StoreIssues extends React.Component {
   }
 
   renderForm() {
-    const {editing, formTitle, formContent, submitting} = this.state;
+    const {formMode, formTitle, formContent, submitting} = this.state;
+    const editing = formMode === "edit";
+    const currentIssue = this.getCurrentIssue();
     return (
       <Card size="small" title={editing ? i18next.t("store:Edit issue") : i18next.t("store:New issue")}>
         <Space direction="vertical" size="middle" style={{width: "100%"}}>
@@ -263,7 +273,7 @@ class StoreIssues extends React.Component {
             <Button type="primary" loading={submitting} onClick={this.submitForm}>
               {editing ? i18next.t("general:Save") : i18next.t("store:Submit new issue")}
             </Button>
-            <Button onClick={() => (editing && this.state.currentIssue ? this.openDetail(this.state.currentIssue) : this.openList())}>
+            <Button onClick={() => (editing && currentIssue ? this.setState({formMode: null}) : this.openList())}>
               {i18next.t("general:Cancel")}
             </Button>
           </Space>
@@ -273,10 +283,17 @@ class StoreIssues extends React.Component {
   }
 
   renderDetail() {
-    const {currentIssue} = this.state;
+    const currentIssue = this.getCurrentIssue();
     const {account, store} = this.props;
     if (!currentIssue) {
-      return null;
+      return (
+        <div>
+          <Button type="link" icon={<ArrowLeftOutlined />} style={{paddingLeft: 0, marginBottom: 8}} onClick={this.openList}>
+            {i18next.t("store:Back to issues")}
+          </Button>
+          <Empty description={i18next.t("store:No issues yet")} style={{padding: "40px 0"}} />
+        </div>
+      );
     }
     const canManage = this.canManageIssue(currentIssue);
     const isClosed = currentIssue.status === STATUS_CLOSED;
@@ -329,14 +346,17 @@ class StoreIssues extends React.Component {
   }
 
   render() {
-    const {loading, view, issues} = this.state;
-    if (loading && issues.length === 0 && view === "list") {
+    const {loading, formMode, issues} = this.state;
+    const {activeIssueName} = this.props;
+    const view = formMode || (activeIssueName ? "detail" : "list");
+
+    if (loading && issues.length === 0) {
       return <div style={{padding: 40, textAlign: "center"}}><Spin /></div>;
     }
 
     return (
       <Spin spinning={loading && view === "list"}>
-        {view === "form" ? this.renderForm() : view === "detail" ? this.renderDetail() : this.renderList()}
+        {view === "new" || view === "edit" ? this.renderForm() : view === "detail" ? this.renderDetail() : this.renderList()}
       </Spin>
     );
   }

@@ -24,9 +24,11 @@ const VALID_TABS = new Set(["overview", "files", "issues", "insights"]);
 const VALID_INSIGHTS_SUBS = new Set(["pulse", "contributors", "traffic", "wordcloud", "cost"]);
 
 function resolveActiveTab(match) {
-  const {tab, sub} = match.params;
+  const {tab, sub, issueName} = match.params;
   // /agents/:owner/:storeName/insights/:sub → activeTab = "insights"
   if (sub && VALID_INSIGHTS_SUBS.has(sub)) {return "insights";}
+  // /agents/:owner/:storeName/issues/:issueName → activeTab = "issues"
+  if (issueName) {return "issues";}
   if (tab && VALID_TABS.has(tab)) {return tab;}
   return "overview";
 }
@@ -37,6 +39,10 @@ function resolveActiveSub(match) {
   return "pulse";
 }
 
+function resolveActiveIssueName(match) {
+  return match.params.issueName || null;
+}
+
 function buildTabUrl(owner, storeName, tab, sub) {
   if (tab === "insights") {
     return `/agents/${owner}/${storeName}/insights/${sub || "pulse"}`;
@@ -45,6 +51,13 @@ function buildTabUrl(owner, storeName, tab, sub) {
     return `/agents/${owner}/${storeName}`;
   }
   return `/agents/${owner}/${storeName}/${tab}`;
+}
+
+function buildIssueUrl(owner, storeName, issueName) {
+  if (!issueName) {
+    return `/agents/${owner}/${storeName}/issues`;
+  }
+  return `/agents/${owner}/${storeName}/issues/${issueName}`;
 }
 
 class StoreViewPage extends React.Component {
@@ -199,6 +212,12 @@ class StoreViewPage extends React.Component {
     this.props.history.push(buildTabUrl(store.owner, store.name, "insights", sub));
   }
 
+  handleIssueChange(issueName) {
+    const {store} = this.state;
+    if (!store) {return;}
+    this.props.history.push(buildIssueUrl(store.owner, store.name, issueName));
+  }
+
   render() {
     const {store, loading, forking, favoriteStatus, starLoading, watchLoading} = this.state;
 
@@ -217,6 +236,7 @@ class StoreViewPage extends React.Component {
     const canManage = this.canManageStore(store);
     const activeTab = resolveActiveTab(this.props.match);
     const activeSub = resolveActiveSub(this.props.match);
+    const activeIssueName = resolveActiveIssueName(this.props.match);
 
     return (
       <StoreHubAgentDetail
@@ -224,9 +244,11 @@ class StoreViewPage extends React.Component {
         store={store}
         activeTab={activeTab}
         activeSub={activeSub}
+        activeIssueName={activeIssueName}
         canManage={canManage}
         onTabChange={(key) => this.handleTabChange(key)}
         onSubTabChange={(sub) => this.handleSubTabChange(sub)}
+        onIssueChange={(issueName) => this.handleIssueChange(issueName)}
         onStartChat={() => this.handleStartChat()}
         onFork={() => this.handleFork()}
         forking={forking}

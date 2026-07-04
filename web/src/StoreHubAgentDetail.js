@@ -232,9 +232,9 @@ function renderOverview(account, store, onStoreUpdate, onRefresh) {
   );
 }
 
-function renderIssues(account, store) {
+function renderIssues(account, store, activeIssueName, onIssueChange) {
   return (
-    <StoreIssues account={account} store={store} />
+    <StoreIssues account={account} store={store} activeIssueName={activeIssueName} onIssueChange={onIssueChange} />
   );
 }
 
@@ -250,12 +250,12 @@ function renderInsights(account, store, activeSub, onSubTabChange) {
   );
 }
 
-function renderTabContent(account, store, activeTab, activeSub, onStoreUpdate, onRefresh, onSubTabChange) {
+function renderTabContent(account, store, activeTab, activeSub, activeIssueName, onStoreUpdate, onRefresh, onSubTabChange, onIssueChange) {
   if (activeTab === "files") {
     return renderFiles(account, store, onStoreUpdate, onRefresh);
   }
   if (activeTab === "issues") {
-    return renderIssues(account, store);
+    return renderIssues(account, store, activeIssueName, onIssueChange);
   }
   if (activeTab === "insights") {
     return renderInsights(account, store, activeSub, onSubTabChange);
@@ -263,7 +263,7 @@ function renderTabContent(account, store, activeTab, activeSub, onStoreUpdate, o
   return renderOverview(account, store, onStoreUpdate, onRefresh);
 }
 
-function StoreHubAgentDetail({account, store, activeTab, activeSub, canManage, onTabChange, onSubTabChange, onStartChat, onFork, forking, favoriteStatus, starLoading, watchLoading, onToggleFavorite, onStoreUpdate, onRefresh}) {
+function StoreHubAgentDetail({account, store, activeTab, activeSub, activeIssueName, canManage, onTabChange, onSubTabChange, onIssueChange, onStartChat, onFork, forking, favoriteStatus, starLoading, watchLoading, onToggleFavorite, onStoreUpdate, onRefresh}) {
   const tabItems = [
     {key: "overview", label: <span><AppstoreOutlined /> {i18next.t("store:Overview")}</span>},
     {key: "files", label: <span><FolderOpenOutlined /> {i18next.t("general:Files")}</span>},
@@ -284,7 +284,7 @@ function StoreHubAgentDetail({account, store, activeTab, activeSub, canManage, o
         onChange={onTabChange}
         style={{marginBottom: 16}}
       />
-      {renderTabContent(account, store, activeTab, activeSub, onStoreUpdate, onRefresh, onSubTabChange)}
+      {renderTabContent(account, store, activeTab, activeSub, activeIssueName, onStoreUpdate, onRefresh, onSubTabChange, onIssueChange)}
     </div>
   );
 }
