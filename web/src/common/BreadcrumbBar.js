@@ -48,7 +48,9 @@ const RESOURCE_LABELS = {
   "sysinfo": "general:System Info",
   // Store detail tabs
   "overview": "store:Overview",
+  "chat": "general:Chat",
   "issues": "store:Issues",
+  "security": "store:Security",
   "insights": "store:Insights",
   "settings": "general:Settings",
   // Insights sub-tabs (deep-linked as the last path segment)
@@ -57,6 +59,9 @@ const RESOURCE_LABELS = {
   "traffic": "store:Traffic",
   "wordcloud": "store:Word Cloud",
   "cost": "store:Cost",
+  "stargazers": "store:Stargazers",
+  "watchers": "store:Watchers",
+  "forks": "store:Forks",
 };
 
 function buildBreadcrumbItems(uri) {
