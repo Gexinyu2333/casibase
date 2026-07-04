@@ -42,6 +42,10 @@ func (c *ApiController) GetHubStores() {
 		c.ResponseError(err.Error())
 		return
 	}
+	if err := object.FillStoreActivityCounts(stores); err != nil {
+		c.ResponseError(err.Error())
+		return
+	}
 	c.ResponseOk(object.GetMaskedStores(stores, c.GetSessionUser()))
 }
 

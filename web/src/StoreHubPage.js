@@ -14,7 +14,7 @@
 
 import React from "react";
 import {Avatar, Button, Card, Col, Empty, Input, Row, Segmented, Select, Spin, Tag, Tooltip, Typography} from "antd";
-import {CopyOutlined, EyeOutlined, ForkOutlined, InfoCircleOutlined, LinkOutlined, RobotOutlined, SortAscendingOutlined, SortDescendingOutlined, StarOutlined} from "@ant-design/icons";
+import {CommentOutlined, CopyOutlined, EyeOutlined, ForkOutlined, InfoCircleOutlined, LinkOutlined, MessageOutlined, RobotOutlined, SortAscendingOutlined, SortDescendingOutlined, StarOutlined} from "@ant-design/icons";
 import * as StoreBackend from "./backend/StoreBackend";
 import * as Setting from "./Setting";
 import i18next from "i18next";
@@ -369,10 +369,16 @@ class StoreHubPage extends React.Component {
           ) : (
             <div style={{height: 60}} />
           )}
-          <div style={{display: "flex", alignItems: "center", gap: 14, marginBottom: 10, color: "var(--ant-color-text-secondary)", fontSize: 12}}>
-            <Tooltip title={i18next.t("store:Stars")}><span><StarOutlined /> {store.starCount || 0}</span></Tooltip>
-            <Tooltip title={i18next.t("store:Watchers")}><span><EyeOutlined /> {store.watchCount || 0}</span></Tooltip>
-            <Tooltip title={i18next.t("store:Forks")}><span><ForkOutlined /> {store.forkCount || 0}</span></Tooltip>
+          <div style={{display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10, color: "var(--ant-color-text-secondary)", fontSize: 12}}>
+            <div style={{display: "flex", alignItems: "center", gap: 14}}>
+              <Tooltip title={i18next.t("store:Stars")}><span><StarOutlined /> {store.starCount || 0}</span></Tooltip>
+              <Tooltip title={i18next.t("store:Watchers")}><span><EyeOutlined /> {store.watchCount || 0}</span></Tooltip>
+              <Tooltip title={i18next.t("store:Forks")}><span><ForkOutlined /> {store.forkCount || 0}</span></Tooltip>
+            </div>
+            <div style={{display: "flex", alignItems: "center", gap: 14}}>
+              <Tooltip title={i18next.t("general:Chats")}><span><CommentOutlined /> {store.chatCount || 0}</span></Tooltip>
+              <Tooltip title={i18next.t("general:Messages")}><span><MessageOutlined /> {store.messageCount || 0}</span></Tooltip>
+            </div>
           </div>
           <div
             style={{
