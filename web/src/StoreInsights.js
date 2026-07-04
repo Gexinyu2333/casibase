@@ -25,19 +25,23 @@ import InsightsCost from "./InsightsCost";
 const {Sider, Content} = Layout;
 const {Text} = Typography;
 
-const PERIOD_OPTIONS = [
-  {value: "24h", i18nKey: "store:24h"},
-  {value: "7d", i18nKey: "store:7d"},
-  {value: "30d", i18nKey: "store:30d"},
-];
+function getPeriodOptions() {
+  return [
+    {value: "24h", label: i18next.t("store:24h")},
+    {value: "7d", label: i18next.t("store:7d")},
+    {value: "30d", label: i18next.t("store:30d")},
+  ];
+}
 
-const SUB_TABS = [
-  {key: "pulse", icon: <ThunderboltOutlined />, i18nKey: "store:Pulse"},
-  {key: "contributors", icon: <TeamOutlined />, i18nKey: "store:Contributors"},
-  {key: "traffic", icon: <EnvironmentOutlined />, i18nKey: "store:Traffic"},
-  {key: "wordcloud", icon: <CloudOutlined />, i18nKey: "store:Word Cloud"},
-  {key: "cost", icon: <DollarOutlined />, i18nKey: "store:Cost"},
-];
+function getSubTabs() {
+  return [
+    {key: "pulse", icon: <ThunderboltOutlined />, label: i18next.t("store:Pulse")},
+    {key: "contributors", icon: <TeamOutlined />, label: i18next.t("store:Contributors")},
+    {key: "traffic", icon: <EnvironmentOutlined />, label: i18next.t("store:Traffic")},
+    {key: "wordcloud", icon: <CloudOutlined />, label: i18next.t("store:Word Cloud")},
+    {key: "cost", icon: <DollarOutlined />, label: i18next.t("store:Cost")},
+  ];
+}
 
 function formatAsOf(iso) {
   if (!iso) {return "—";}
@@ -113,10 +117,10 @@ class StoreInsights extends React.Component {
             selectedKeys={[activeSub]}
             onClick={({key}) => this.handleSubTabChange(key)}
             style={{background: "transparent", border: "none"}}
-            items={SUB_TABS.map((t) => ({
+            items={getSubTabs().map((t) => ({
               key: t.key,
               icon: t.icon,
-              label: i18next.t(t.i18nKey),
+              label: t.label,
             }))}
           />
         </Sider>
@@ -133,7 +137,7 @@ class StoreInsights extends React.Component {
           >
             <Space size="middle">
               <Segmented
-                options={PERIOD_OPTIONS.map((o) => ({value: o.value, label: i18next.t(o.i18nKey)}))}
+                options={getPeriodOptions()}
                 value={period}
                 onChange={this.handlePeriodChange}
               />
