@@ -16,9 +16,10 @@ import React from "react";
 import {Avatar, Button, Card, Col, Row, Space, Tabs, Tag, Tooltip, Typography} from "antd";
 import StoreInsights from "./StoreInsights";
 import StoreIssues from "./StoreIssues";
+import StoreSecurity from "./StoreSecurity";
 import StoreEditPage from "./StoreEditPage";
 import ChatPage from "./ChatPage";
-import {AppstoreOutlined, BarChartOutlined, BugOutlined, CommentOutlined, EyeFilled, EyeOutlined, FolderOpenOutlined, ForkOutlined, SettingOutlined, StarFilled, StarOutlined} from "@ant-design/icons";
+import {AppstoreOutlined, BarChartOutlined, BugOutlined, CommentOutlined, EyeFilled, EyeOutlined, FolderOpenOutlined, ForkOutlined, SafetyCertificateOutlined, SettingOutlined, StarFilled, StarOutlined} from "@ant-design/icons";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import i18next from "i18next";
@@ -242,6 +243,16 @@ function renderIssues(account, store, activeIssueName, onIssueChange) {
   );
 }
 
+function renderSecurity(account, store) {
+  return (
+    <StoreSecurity
+      account={account}
+      owner={store.owner}
+      storeName={store.name}
+    />
+  );
+}
+
 function renderInsights(account, store, activeSub, onSubTabChange) {
   return (
     <StoreInsights
@@ -292,6 +303,9 @@ function renderTabContent(account, store, activeTab, activeSub, activeIssueName,
   if (activeTab === "issues") {
     return renderIssues(account, store, activeIssueName, onIssueChange);
   }
+  if (activeTab === "security") {
+    return renderSecurity(account, store);
+  }
   if (activeTab === "insights") {
     return renderInsights(account, store, activeSub, onSubTabChange);
   }
@@ -310,6 +324,7 @@ function StoreHubAgentDetail({account, store, activeTab, activeSub, activeIssueN
     {key: "chat", label: <span><CommentOutlined /> {i18next.t("general:Chat")}</span>},
     {key: "files", label: <span><FolderOpenOutlined /> {i18next.t("general:Files")}</span>},
     {key: "issues", label: <span><BugOutlined /> {i18next.t("store:Issues")}</span>},
+    {key: "security", label: <span><SafetyCertificateOutlined /> {i18next.t("store:Security")}</span>},
     {key: "insights", label: <span><BarChartOutlined /> {i18next.t("store:Insights")}</span>},
   ];
 

@@ -20,7 +20,7 @@ import i18next from "i18next";
 import {getChatUrl} from "./StoreHubDrawer";
 import StoreHubAgentDetail from "./StoreHubAgentDetail";
 
-const VALID_TABS = new Set(["overview", "chat", "files", "issues", "insights", "settings"]);
+const VALID_TABS = new Set(["overview", "chat", "files", "issues", "security", "insights", "settings"]);
 const VALID_INSIGHTS_SUBS = new Set(["pulse", "contributors", "traffic", "wordcloud", "cost", "stargazers", "watchers", "forks"]);
 
 function resolveActiveTab(match) {

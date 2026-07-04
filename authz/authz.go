@@ -106,6 +106,7 @@ p, anonymous, *, /api/get-store-insights-summary
 p, anonymous, *, /api/get-store-contributors
 p, anonymous, *, /api/get-store-traffic
 p, anonymous, *, /api/get-store-cost-series
+p, anonymous, *, /api/get-store-security
 p, anonymous, *, /api/get-comments
 p, anonymous, *, /api/add-comment
 p, anonymous, *, /api/delete-comment
