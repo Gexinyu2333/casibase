@@ -505,9 +505,13 @@ class StoreEditPage extends React.Component {
             )}
             {this.renderStoreField(
               Setting.getLabel(i18next.t("store:Subject"), i18next.t("store:Subject - Tooltip")),
-              <Input value={store.subject} onChange={e => {
-                this.updateStoreField("subject", e.target.value);
-              }} />,
+              <Select style={{width: "100%"}} allowClear value={store.subject || undefined} onChange={value => {
+                this.updateStoreField("subject", value);
+              }}>
+                {Setting.SubjectOptions.map(subject => (
+                  <Option key={subject} value={subject}>{subject}</Option>
+                ))}
+              </Select>,
               8
             )}
             {this.renderStoreField(
