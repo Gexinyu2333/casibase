@@ -291,11 +291,9 @@ class StoreHubPage extends React.Component {
         {isFiltered ? (
           <Button onClick={() => this.resetFilters()}>{i18next.t("general:Reset")}</Button>
         ) : null}
-        {isFiltered ? (
-          <Text type="secondary" style={{fontSize: 13}}>
-            {filteredCount} / {activeStores.length}
-          </Text>
-        ) : null}
+        <Text type="secondary" style={{fontSize: 13}}>
+          {isFiltered ? `${filteredCount} / ${activeStores.length}` : `${activeStores.length}`} {i18next.t("general:Agents")}
+        </Text>
       </div>
     );
   }
