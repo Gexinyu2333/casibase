@@ -1009,6 +1009,7 @@ class ChatPage extends BaseListPage {
               <ChatBox
                 ref={this.chatBox}
                 disableInput={this.state.disableInput}
+                autoFocusInput={this.props.autoFocusInput}
                 disableFocusHighlight={true}
                 loading={this.state.messageLoading}
                 messages={this.state.messages}
