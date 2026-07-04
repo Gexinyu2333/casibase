@@ -63,17 +63,29 @@ function renderHeader(store, account, onStartChat, onFork, forking, favoriteStat
               <Text type="secondary" style={{fontSize: 20, fontWeight: 400}}> / </Text>
               {store.displayName || store.name}
             </Title>
-            <div style={{display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap"}}>
+            <div style={{display: "flex", alignItems: "center", gap: 28, flexWrap: "wrap"}}>
               <Text type="secondary" style={{fontSize: 14}}>
                 {i18next.t("store:By")}{" "}
                 {store.author
                   ? <strong>{store.author}</strong>
                   : <UserLabel user={store.owner} account={account} showAvatar={false} strong />}
               </Text>
-              {isForked ? (
-                <Tag icon={<ForkOutlined />} color="blue" style={{margin: 0}}>
-                  {i18next.t("store:Forked from")} {store.forkedFromOwner}/{store.forkedFromName}
-                </Tag>
+              {store.affiliation ? (
+                <Text type="secondary" style={{fontSize: 13}}>
+                  {store.affiliation}
+                </Text>
+              ) : null}
+              {(store.subject || store.grade || store.topic || isForked) ? (
+                <div style={{display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap"}}>
+                  {store.subject ? <Tag color="purple" style={{margin: 0}}>{store.subject}</Tag> : null}
+                  {store.grade ? <Tag color="cyan" style={{margin: 0}}>{store.grade}</Tag> : null}
+                  {store.topic ? <Tag color="geekblue" style={{margin: 0}}>{store.topic}</Tag> : null}
+                  {isForked ? (
+                    <Tag icon={<ForkOutlined />} color="blue" style={{margin: 0}}>
+                      {i18next.t("store:Forked from")} {store.forkedFromOwner}/{store.forkedFromName}
+                    </Tag>
+                  ) : null}
+                </div>
               ) : null}
             </div>
           </div>
@@ -105,18 +117,8 @@ function renderHeader(store, account, onStartChat, onFork, forking, favoriteStat
             </Button>
           </Space>
         </div>
-        {store.affiliation ? (
-          <div style={{fontSize: 13, color: "var(--ant-color-text-tertiary)", marginTop: 2}}>
-            {store.affiliation}
-          </div>
-        ) : null}
-        <div style={{marginTop: 8, display: "flex", flexWrap: "wrap", gap: 6}}>
-          {store.subject ? <Tag color="purple">{store.subject}</Tag> : null}
-          {store.grade ? <Tag color="cyan">{store.grade}</Tag> : null}
-          {store.topic ? <Tag color="geekblue">{store.topic}</Tag> : null}
-        </div>
         {store.brief ? (
-          <div style={{marginTop: 8, fontSize: 14, color: "var(--ant-color-text-secondary)", maxWidth: 640}}>
+          <div style={{marginTop: 8, fontSize: 14, color: "var(--ant-color-text-secondary)", maxWidth: "100%"}}>
             {store.brief}
           </div>
         ) : null}
