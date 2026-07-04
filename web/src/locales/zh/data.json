@@ -730,6 +730,9 @@
     "Skill folder path placeholder": "例如：/Users/alice/skills/my-skill或D:\\skills\\my-skill"
   },
   "store": {
+    "24h": "24小时",
+    "30d": "30天",
+    "7d": "7天",
     "About": "关于",
     "Active users": "活跃用户",
     "Activity over time": "活动趋势",
@@ -765,6 +768,7 @@
     "Comments are unavailable": "评论暂不可用",
     "Comments are unavailable for external agents": "外部智能体暂不支持评论",
     "Confirm share store": "确认为所选用户复制本数据仓库？新数据仓库将归该用户所有，名称会带后缀以便区分。",
+    "Contributors": "贡献者",
     "Cost": "费用",
     "Data as of": "数据截至",
     "Disable file upload": "禁止文件上传",
@@ -862,6 +866,7 @@
     "Published": "已发布",
     "Publishing": "发布设置",
     "Publishing desc": "控制此数据仓库在公开广场中的可见性",
+    "Pulse": "动态",
     "README": "说明文档",
     "Read": "读取",
     "Rejected": "已拒绝",
@@ -914,6 +919,7 @@
     "Total cost": "总费用",
     "Total tokens": "Token 总数",
     "Total views": "总访问量",
+    "Traffic": "流量",
     "Tutor": "指导教师",
     "Tutor - Tooltip": "指导老师或辅导员",
     "Unique visitors": "独立访客",

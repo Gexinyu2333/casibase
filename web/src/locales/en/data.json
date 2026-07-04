@@ -730,6 +730,9 @@
     "Skill folder path placeholder": "e.g. /Users/alice/skills/my-skill  or  D:\\skills\\my-skill"
   },
   "store": {
+    "24h": "24h",
+    "30d": "30d",
+    "7d": "7d",
     "About": "About",
     "Active users": "Active users",
     "Activity over time": "Activity over time",
@@ -765,6 +768,7 @@
     "Comments are unavailable": "Comments are unavailable",
     "Comments are unavailable for external agents": "Comments are unavailable for external agents",
     "Confirm share store": "Copy this agent for the selected user? The new agent will belong to them, with a name suffix for clarity.",
+    "Contributors": "Contributors",
     "Cost": "Cost",
     "Data as of": "Data as of",
     "Disable file upload": "Disable file upload",
@@ -862,6 +866,7 @@
     "Published": "Published",
     "Publishing": "Publishing",
     "Publishing desc": "Control the agent's visibility in the public Hub",
+    "Pulse": "Pulse",
     "README": "README",
     "Read": "Read",
     "Rejected": "Rejected",
@@ -914,6 +919,7 @@
     "Total cost": "Total cost",
     "Total tokens": "Total tokens",
     "Total views": "Total views",
+    "Traffic": "Traffic",
     "Tutor": "Tutor",
     "Tutor - Tooltip": "Tutor or instructor name",
     "Unique visitors": "Unique visitors",
