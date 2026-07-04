@@ -202,7 +202,13 @@
   },
   "store": {
     "Cannot delete the default store": "无法删除默认存储库",
+    "Only the super admin can publish an agent directly. Please set the publish state to Pending Review instead": "只有超级管理员才能直接将状态设置为已发布，请改为设置成待审核状态",
+    "Please set a custom display name for this agent (the default \"New Store\" name is not allowed)": "请为该智能体设置一个自定义的显示名称（不允许使用默认的\"New Store\"名称）",
+    "Please upload a custom avatar for this agent (the default avatar is not allowed)": "请为该智能体上传一个自定义头像（不允许使用默认头像）",
     "The agent does not exist": "智能体不存在",
+    "This agent needs at least 100 vectors before it can be submitted for review": "该智能体至少需要100条向量数据才能提交审核",
+    "This agent needs at least 200 messages before it can be submitted for review": "该智能体至少需要200条消息记录才能提交审核",
+    "You can only set the publish state to Private or Pending Review": "您只能将状态设置为私有或待审核",
     "You cannot fork your own agent": "无法复刻自己的智能体",
     "You have already forked this agent": "你已经复刻过这个智能体了",
     "given that there must be one default store in OpenAgent, you cannot set this store to non-default. You can directly set another store as default": "OpenAgent中必须保留至少一个默认存储，因此无法将当前存储设为非默认。您可以直接将另一个存储设为默认。"

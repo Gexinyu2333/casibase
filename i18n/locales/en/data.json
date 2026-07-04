@@ -202,7 +202,13 @@
   },
   "store": {
     "Cannot delete the default store": "Cannot delete the default store",
+    "Only the super admin can publish an agent directly. Please set the publish state to Pending Review instead": "Only the super admin can publish an agent directly. Please set the publish state to Pending Review instead",
+    "Please set a custom display name for this agent (the default \"New Store\" name is not allowed)": "Please set a custom display name for this agent (the default \"New Store\" name is not allowed)",
+    "Please upload a custom avatar for this agent (the default avatar is not allowed)": "Please upload a custom avatar for this agent (the default avatar is not allowed)",
     "The agent does not exist": "The agent does not exist",
+    "This agent needs at least 100 vectors before it can be submitted for review": "This agent needs at least 100 vectors before it can be submitted for review",
+    "This agent needs at least 200 messages before it can be submitted for review": "This agent needs at least 200 messages before it can be submitted for review",
+    "You can only set the publish state to Private or Pending Review": "You can only set the publish state to Private or Pending Review",
     "You cannot fork your own agent": "You cannot fork your own agent",
     "You have already forked this agent": "You have already forked this agent",
     "given that there must be one default store in OpenAgent, you cannot set this store to non-default. You can directly set another store as default": "given that there must be one default store in OpenAgent, you cannot set this store to non-default. You can directly set another store as default"

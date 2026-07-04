@@ -18,6 +18,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"sort"
+	"strings"
 
 	"github.com/beego/beego/utils/pagination"
 	"github.com/the-open-agent/openagent/conf"
@@ -173,6 +174,11 @@ func (c *ApiController) GetStore() {
 			return
 		}
 
+		if err = object.PopulateStoreCounts([]*object.Store{store}); err != nil {
+			c.ResponseError(err.Error())
+			return
+		}
+
 		host := c.Ctx.Request.Host
 		origin := getOriginFromHost(host)
 		err = store.Populate(origin, c.GetAcceptLanguage())
@@ -236,6 +242,13 @@ func (c *ApiController) UpdateStore() {
 		return
 	}
 
+	if store.PublishState != oldStore.PublishState {
+		if err = c.checkPublishStateChange(oldStore, &store); err != nil {
+			c.ResponseError(err.Error())
+			return
+		}
+	}
+
 	success, err := object.UpdateStore(id, &store)
 	if err != nil {
 		c.ResponseError(err.Error())
@@ -262,6 +275,53 @@ func (c *ApiController) UpdateStore() {
 	}
 
 	c.ResponseOk(success)
+}
+
+// checkPublishStateChange enforces who may transition a store's publish state, and (for
+// transitions into "Pending") that the store meets the hub review eligibility bar.
+//
+// - The super admin (global admin whose username is "admin") may set any state directly, including "Published".
+// - Other admins (isAdminUser) may set any state except "Published" directly.
+// - The store's own owner may only set the state to "" (Private) or "Pending" (Pending Review).
+// - Anyone else may not change the publish state.
+// - Everyone except the super admin must pass the eligibility check to move into "Pending".
+func (c *ApiController) checkPublishStateChange(oldStore *object.Store, store *object.Store) error {
+	username := c.GetSessionUsername()
+	isSuperAdmin := c.IsGlobalAdmin() && username == "admin"
+	if isSuperAdmin {
+		return nil
+	}
+
+	isAdmin := c.IsAdmin()
+	isOwner := username != "" && oldStore.Owner == username
+
+	if isAdmin {
+		if store.PublishState == "Published" {
+			return fmt.Errorf("%s", c.T("store:Only the super admin can publish an agent directly. Please set the publish state to Pending Review instead"))
+		}
+	} else if isOwner {
+		if store.PublishState != "" && store.PublishState != "Pending" {
+			return fmt.Errorf("%s", c.T("store:You can only set the publish state to Private or Pending Review"))
+		}
+	} else {
+		return fmt.Errorf("%s", c.T("auth:Unauthorized operation"))
+	}
+
+	if store.PublishState == "Pending" {
+		eligible, failedChecks, err := object.CheckStorePendingReviewEligibility(store, oldStore.Name)
+		if err != nil {
+			return err
+		}
+		if !eligible {
+			messages := make([]string, len(failedChecks))
+			for i, key := range failedChecks {
+				messages[i] = c.T(key)
+			}
+			return fmt.Errorf("%s", strings.Join(messages, "; "))
+		}
+	}
+
+	return nil
 }
 
 // AddStore

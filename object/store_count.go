@@ -14,6 +14,46 @@
 
 package object
 
+import "strings"
+
+const (
+	storeMinMessageCountForReview = 200
+	storeMinVectorCountForReview  = 100
+)
+
+// CheckStorePendingReviewEligibility checks whether a store qualifies to be submitted for hub review.
+// storeName is the store's DB name (used to count its messages/vectors).
+// Returns whether it is eligible, and the i18n keys of every unmet requirement.
+func CheckStorePendingReviewEligibility(store *Store, storeName string) (bool, []string, error) {
+	var failedChecks []string
+
+	if store.DisplayName == "" || strings.Contains(store.DisplayName, "New Store") {
+		failedChecks = append(failedChecks, "store:Please set a custom display name for this agent (the default \"New Store\" name is not allowed)")
+	}
+
+	if store.Avatar == "" || strings.Contains(store.Avatar, "openagent.png") || strings.Contains(store.Avatar, "casibase.png") {
+		failedChecks = append(failedChecks, "store:Please upload a custom avatar for this agent (the default avatar is not allowed)")
+	}
+
+	messageCount, err := adapter.engine.Count(&Message{Store: storeName})
+	if err != nil {
+		return false, nil, err
+	}
+	if messageCount < storeMinMessageCountForReview {
+		failedChecks = append(failedChecks, "store:This agent needs at least 200 messages before it can be submitted for review")
+	}
+
+	vectorCount, err := adapter.engine.Count(&Vector{Store: storeName})
+	if err != nil {
+		return false, nil, err
+	}
+	if vectorCount < storeMinVectorCountForReview {
+		failedChecks = append(failedChecks, "store:This agent needs at least 100 vectors before it can be submitted for review")
+	}
+
+	return len(failedChecks) == 0, failedChecks, nil
+}
+
 func InitStoreCount() {
 	emptyStoreMessage := &Message{}
 	has, err := adapter.engine.Where("store = ?", "").Or("store IS NULL").Get(emptyStoreMessage)

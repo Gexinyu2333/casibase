@@ -16,6 +16,7 @@ import React from "react";
 import {Link} from "react-router-dom";
 import Loading from "./common/Loading";
 import {Avatar, Button, Card, Col, Input, InputNumber, Modal, Row, Select, Space, Spin, Switch, Tag} from "antd";
+import {CheckCircleFilled, CloseCircleFilled} from "@ant-design/icons";
 import * as StoreBackend from "./backend/StoreBackend";
 import * as StorageProviderBackend from "./backend/StorageProviderBackend";
 import * as ProviderBackend from "./backend/ProviderBackend";
@@ -275,6 +276,37 @@ class StoreEditPage extends React.Component {
     return <Tag color={tag.color}>{tag.text}</Tag>;
   }
 
+  getPendingReviewChecks(store) {
+    const isDefaultDisplayName = !store.displayName || store.displayName.includes("New Store");
+    const isDefaultAvatar = !store.avatar || store.avatar.includes("openagent.png") || store.avatar.includes("casibase.png");
+
+    return [
+      {passed: !isDefaultDisplayName, text: i18next.t("store:Set a custom display name (not the default \"New Store\" name)")},
+      {passed: !isDefaultAvatar, text: i18next.t("store:Upload a custom avatar (not the default avatar)")},
+      {passed: (store.messageCount || 0) >= 200, text: i18next.t("store:Have at least 200 messages") + ` (${store.messageCount || 0}/200)`},
+      {passed: (store.vectorCount || 0) >= 100, text: i18next.t("store:Have at least 100 vectors") + ` (${store.vectorCount || 0}/100)`},
+    ];
+  }
+
+  renderPendingReviewChecklist(store) {
+    const checks = this.getPendingReviewChecks(store);
+    return (
+      <div style={{marginTop: "6px"}}>
+        <div style={{fontSize: "12px", color: "var(--ant-color-text-tertiary)", marginBottom: "4px"}}>
+          {i18next.t("store:Requirements to submit for review")}:
+        </div>
+        <Space direction="vertical" size={2}>
+          {checks.map((check, i) => (
+            <div key={i} style={{fontSize: "12px", color: check.passed ? "var(--ant-color-success)" : "var(--ant-color-text-tertiary)"}}>
+              {check.passed ? <CheckCircleFilled style={{color: "var(--ant-color-success)", marginRight: "6px"}} /> : <CloseCircleFilled style={{color: "var(--ant-color-error)", marginRight: "6px"}} />}
+              {check.text}
+            </div>
+          ))}
+        </Space>
+      </div>
+    );
+  }
+
   setPublishState(newState) {
     const store = Setting.deepCopy(this.state.store);
     store.publishState = newState;
@@ -448,33 +480,54 @@ class StoreEditPage extends React.Component {
           <Row gutter={rowGutter}>
             {this.renderStoreField(
               Setting.getLabel(i18next.t("store:Publish State"), i18next.t("store:Publish State - Tooltip")),
-              <Space wrap>
-                {this.renderPublishStateTag(store.publishState)}
-                {Setting.isAdminUser(this.props.account) ? (
-                  <Select
-                    size="small"
-                    value={store.publishState || ""}
-                    onChange={(value) => this.setPublishState(value)}
-                    style={{width: 150}}
-                    options={[
-                      {value: "", label: i18next.t("store:Private")},
-                      {value: "Pending", label: i18next.t("store:Pending Review")},
-                      {value: "Published", label: i18next.t("store:Published")},
-                      {value: "Rejected", label: i18next.t("store:Rejected")},
-                    ]}
-                  />
-                ) : (
-                  (!store.publishState || store.publishState === "" || store.publishState === "Rejected") &&
-                  store.owner === this.props.account?.name && (
-                    <Button size="small" type="primary" ghost onClick={() => this.setPublishState("Pending")}>
-                      {i18next.t("store:Submit for Review")}
-                    </Button>
-                  )
-                )}
-                {store.publishState === "Published" && (
-                  <Link to="/hub">{i18next.t("store:View in Hub")}</Link>
-                )}
-              </Space>,
+              (() => {
+                const isSuperAdmin = Setting.isGlobalAdminUser(this.props.account);
+                const isAdmin = Setting.isAdminUser(this.props.account);
+                const isOwner = store.owner === this.props.account?.name;
+                const eligible = this.getPendingReviewChecks(store).every(check => check.passed);
+
+                let options = null;
+                if (isSuperAdmin) {
+                  options = [
+                    {value: "", label: i18next.t("store:Private")},
+                    {value: "Pending", label: i18next.t("store:Pending Review")},
+                    {value: "Published", label: i18next.t("store:Published")},
+                    {value: "Rejected", label: i18next.t("store:Rejected")},
+                  ];
+                } else if (isAdmin) {
+                  options = [
+                    {value: "", label: i18next.t("store:Private")},
+                    {value: "Pending", label: i18next.t("store:Pending Review"), disabled: !eligible},
+                    {value: "Rejected", label: i18next.t("store:Rejected")},
+                  ];
+                } else if (isOwner) {
+                  options = [
+                    {value: "", label: i18next.t("store:Private")},
+                    {value: "Pending", label: i18next.t("store:Pending Review"), disabled: !eligible},
+                  ];
+                }
+
+                return (
+                  <div>
+                    <Space wrap>
+                      {this.renderPublishStateTag(store.publishState)}
+                      {options !== null && (
+                        <Select
+                          size="small"
+                          value={store.publishState || ""}
+                          onChange={(value) => this.setPublishState(value)}
+                          style={{width: 150}}
+                          options={options}
+                        />
+                      )}
+                      {store.publishState === "Published" && (
+                        <Link to="/hub">{i18next.t("store:View in Hub")}</Link>
+                      )}
+                    </Space>
+                    {options !== null && this.renderPendingReviewChecklist(store)}
+                  </div>
+                );
+              })(),
               24
             )}
           </Row>
